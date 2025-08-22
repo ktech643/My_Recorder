@@ -1,0 +1,2 @@
+type samsung_vendor_type;
+typeattribute samsung_vendor_type mlstrustedsubject;

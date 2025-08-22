@@ -1,0 +1,3 @@
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/.cxx/Debug/16t425n5/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/.cxx/Debug/16t425n5/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/.cxx/Debug/16t425n5/arm64-v8a/CMakeFiles/native-lib.dir

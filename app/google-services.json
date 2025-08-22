@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "944189379444",
+    "firebase_url": "https://vcs-client-default-rtdb.firebaseio.com",
+    "project_id": "vcs-client",
+    "storage_bucket": "vcs-client.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944189379444:android:763ff6fe84913932799221",
+        "android_client_info": {
+          "package_name": "com.checkmate.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6wjX99btI5YxxLBgX05s6Qx6ALQHxHeo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944189379444:android:0c418790a6662452799221",
+        "android_client_info": {
+          "package_name": "com.t3ther.vcsclient"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6wjX99btI5YxxLBgX05s6Qx6ALQHxHeo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

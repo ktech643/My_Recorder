@@ -1,0 +1,1 @@
+/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/build/intermediates/cmake/debug/obj/armeabi-v7a

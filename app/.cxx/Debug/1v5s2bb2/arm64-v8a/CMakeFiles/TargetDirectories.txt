@@ -1,0 +1,3 @@
+/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/.cxx/Debug/1v5s2bb2/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/.cxx/Debug/1v5s2bb2/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/.cxx/Debug/1v5s2bb2/arm64-v8a/CMakeFiles/native-lib.dir

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".ui.activity.HomeActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:visibility="gone"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <FrameLayout
+                android:id="@+id/main_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white" />
+            
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/border" />
+
+        <com.volcaniccoder.bottomify.BottomifyNavigationView
+            android:id="@+id/bottom_tab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            app:active_color="@color/teal"
+            app:animation_duration="100"
+            app:item_padding="4dp"
+            app:item_text_size="10sp"
+            app:menu="@menu/tab_bar"
+            app:passive_color="@color/text_normal"
+            app:pressed_color="@color/gray_dark"
+            app:scale_percent="5" />
+    </LinearLayout>
+    <FrameLayout
+        android:id="@+id/flImages"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/place_holder_image"
+        android:visibility="gone"
+        />
+</RelativeLayout>

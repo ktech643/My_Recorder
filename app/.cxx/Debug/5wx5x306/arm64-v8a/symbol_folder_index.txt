@@ -1,0 +1,1 @@
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/build/intermediates/cxx/Debug/5wx5x306/obj/arm64-v8a

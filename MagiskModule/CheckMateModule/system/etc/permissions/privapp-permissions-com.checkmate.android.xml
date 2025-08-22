@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+  <privapp-permissions package="com.checkmate.android">
+    <permission name="android.permission.CAPTURE_AUDIO_OUTPUT"/>
+    <permission name="android.permission.CAPTURE_AUDIO_HOTWORD"/>
+    <permission name="android.permission.MODIFY_AUDIO_ROUTING"/>
+    <permission name="android.permission.READ_PRIVILEGED_PHONE_STATE"/>
+    <permission name="android.permission.INTERACT_ACROSS_USERS_FULL"/>
+    <permission name="android.permission.CAPTURE_VOICE_COMMUNICATION_OUTPUT"/>
+    <permission name="android.permission.WRITE_SECURE_SETTINGS"/>
+    <permission name="com.android.permission.RECORD_AUDIO_CALL"/>
+    <permission name="android.permission.PROJECT_MEDIA"/>
+    <permission name="android.permission.CAPTURE_VIDEO_OUTPUT"/>
+    <permission name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
+  </privapp-permissions>
+</permissions>

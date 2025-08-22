@@ -1,0 +1,414 @@
+{
+  "info": {
+    "name": "MyHttpServer API v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET /system/info",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/system/info",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "system",
+            "info"
+          ]
+        }
+      }
+    },
+    {
+      "name": "GET /camera/status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/camera/status",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "camera",
+            "status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "POST /camera/set",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/camera/set",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "camera",
+            "set"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"\"\n}"
+        }
+      }
+    },
+    {
+      "name": "GET /audio/status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/audio/status",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "audio",
+            "status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "POST /audio/set",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/audio/set",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "audio",
+            "set"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"enable\": \"\"\n}"
+        }
+      }
+    },
+    {
+      "name": "GET /streaming/status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/streaming/status",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "streaming",
+            "status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "POST /streaming/set",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/streaming/set",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "streaming",
+            "set"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"action\": \"\"\n}"
+        }
+      }
+    },
+    {
+      "name": "GET /recording/status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/recording/status",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "recording",
+            "status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "POST /recording/set",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/recording/set",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "recording",
+            "set"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"action\": \"\"\n}"
+        }
+      }
+    },
+    {
+      "name": "GET /playback/list",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/playback/list",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "playback",
+            "list"
+          ]
+        }
+      }
+    },
+    {
+      "name": "POST /playback/download",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/playback/download",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "playback",
+            "download"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"filename\": \"\"\n}"
+        }
+      }
+    },
+    {
+      "name": "GET /gps/status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/gps/status",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "gps",
+            "status"
+          ]
+        }
+      }
+    },
+    {
+      "name": "POST /gps/set",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/gps/set",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "gps",
+            "set"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"action\": \"\",\n  \"interval\": \"\"\n}"
+        }
+      }
+    },
+    {
+      "name": "POST /app/update",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{X-API-Key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://{{host}}:{{port}}/api/v1/app/update",
+          "host": [
+            "{{host}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "v1",
+            "magisk",
+            "update"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"url\": \"\"\n}"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+ninja: Entering directory `/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/.cxx/Debug/16t425n5/arm64-v8a'
+[1/2] Building CXX object CMakeFiles/native-lib.dir/native-lib.cpp.o
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/StreamManager.h:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Sources/StreamSource.h:3:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/VS_Abstract.h:12:
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/VS_Reader.h:180:16: warning: 9 enumeration values not handled in switch: 'AV_SAMPLE_FMT_NONE', 'AV_SAMPLE_FMT_U8', 'AV_SAMPLE_FMT_FLT'... [-Wswitch]
+        switch(_audioType) {
+               ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/VS_Reader.h:309:5: warning: control may reach end of non-void function [-Wreturn-type]
+    }
+    ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/VS_Reader.h:1020:42: warning: data argument not used by format string [-Wformat-extra-args]
+            printf("frame cliped pts: ", _pts);
+                   ~~~~~~~~~~~~~~~~~~~~  ^
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/StreamManager.h:5:
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Sources/StreamSource.h:8:7: warning: 'DisplayCurFrame' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+        void DisplayCurFrame() {}
+             ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/VS_Abstract.h:186:18: note: overridden virtual function is here
+    virtual void        DisplayCurFrame() = 0;
+                        ^
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/StreamManager.h:6:
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Sources/SourceList.h:58:2: warning: control may reach end of non-void function [-Wreturn-type]
+        }
+        ^
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/StreamManager.h:7:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Outputs/VideoPlayer.h:5:
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Outputs/../VSFilter.h:169:2: warning: control reaches end of non-void function [-Wreturn-type]
+        }
+        ^
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/StreamManager.h:7:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Outputs/VideoPlayer.h:11:
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Outputs/../OboeSound.h:55:18: warning: 'DisplayCurFrame' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+    virtual void        DisplayCurFrame() {};
+                        ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/VS_Abstract.h:186:18: note: overridden virtual function is here
+    virtual void        DisplayCurFrame() = 0;
+                        ^
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/StreamManager.h:7:
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Outputs/VideoPlayer.h:37:18: warning: 'Play' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+    virtual int  Play();
+                 ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/VS_Abstract.h:196:18: note: overridden virtual function is here
+    virtual int  Play() = 0;
+                 ^
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/StreamManager.h:7:
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Outputs/VideoPlayer.h:39:18: warning: 'Stop' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+    virtual void Stop();
+                 ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/VS_Abstract.h:197:18: note: overridden virtual function is here
+    virtual void Stop() = 0;
+                 ^
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/StreamManager.h:7:
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Outputs/VideoPlayer.h:40:18: warning: 'DisplayCurFrame' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+    virtual void DisplayCurFrame();
+                 ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/VS_Abstract.h:198:18: note: overridden virtual function is here
+    virtual void DisplayCurFrame() = 0;
+                 ^
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/StreamManager.h:7:
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Outputs/VideoPlayer.h:41:18: warning: 'AboutUpdate' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+    virtual void AboutUpdate();
+                 ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/VS_Abstract.h:199:18: note: overridden virtual function is here
+    virtual void AboutUpdate() = 0;
+                 ^
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/StreamManager.h:7:
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Outputs/VideoPlayer.h:45:18: warning: 'SetSource' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+    virtual void SetSource(AbstractSource* _source, int _type);
+                 ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/VS_Abstract.h:201:18: note: overridden virtual function is here
+    virtual void SetSource(AbstractSource* _source, int _type) = 0;
+                 ^
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:5:
+In file included from /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/StreamManager.h:8:
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Outputs/FFWriter.h:43:6: warning: 'GetId' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+        int GetId();
+            ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/Managers/../Outputs/../VS_Abstract.h:202:17: note: overridden virtual function is here
+    virtual int GetId() = 0;
+                ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/native-lib.cpp:14:9: warning: 'LOG_TAG' macro redefined [-Wmacro-redefined]
+#define LOG_TAG "native-lib"
+        ^
+/Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/src/main/cpp/../jniLibs/include/crossunits.h:10:13: note: previous definition is here
+    #define LOG_TAG "player"
+            ^
+14 warnings generated.
+[2/2] Linking CXX shared library /Users/jahan/Desktop/Projects/t3_vcs_checkmate/app/build/intermediates/cxx/Debug/16t425n5/obj/arm64-v8a/libnative-lib.so

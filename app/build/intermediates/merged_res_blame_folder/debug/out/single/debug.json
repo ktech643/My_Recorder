@@ -1,0 +1,1054 @@
+[
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_camera.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_camera.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xxhdpi_ic_record.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xxhdpi/ic_record.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/xml_file_paths.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/xml/file_paths.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-hdpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-hdpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_btn_mute_a.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/btn_mute_a.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_flip.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/button_flip.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/anim_out_down.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/anim/out_down.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_home.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/fragment_home.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate_disabled.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate_disabled.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_resume.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/button_resume.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_ic_warning_black_48dp.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/ic_warning_black_48dp.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_flash.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/btn_flash.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_activation.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_activation.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_queen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_queen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_edit.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_edit.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_elephant.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/elephant.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_camera_disabled.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_camera_disabled.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_queen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_queen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_floating_bar.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/floating_bar.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_delete.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_delete.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_butterfly.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/butterfly.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate_white.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate_white.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_lan_connect_black_24dp.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/ic_lan_connect_black_24dp.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_dark_no_border.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/dark_no_border.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_temp_icon.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/temp_icon.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_stream.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_stream.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_pig.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/pig.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_text_inpu_password.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/text_inpu_password.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_deer.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/deer.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_share.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_share.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_single.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_single.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_splash.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_splash.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_text_input_activation.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/text_input_activation.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/anim_in_left.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/anim/in_left.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/anim_out_right.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/anim/out_right.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_service.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_service.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_record.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_record.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout-land_activity_service.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout-land/activity_service.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_dark_border.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/dark_border.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_activation_complete.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_activation_complete.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_close_white_16dp.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/ic_close_white_16dp.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-hdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_text.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_text.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_flip.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_flip.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_bottom.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_bottom.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_com_loading_arrow.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/com_loading_arrow.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_blue_button.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/blue_button.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_title.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_title.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_wifilist.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_wifilist.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_bmb_text_outside_circle_button.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/bmb_text_outside_circle_button.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_piece_dot.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/piece_dot.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_wifi.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_wifi.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_wifi_password.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_wifi_password.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_btn_stop.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/btn_stop.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-xxhdpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-xxhdpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout-land_activity_chess.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout-land/activity_chess.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_back.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_back.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bg_white.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/bg_white.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_question.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_question.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-ldpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-ldpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_middle_pressed.9.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_middle_pressed.9.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_progress.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_progress.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_shoot.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/btn_shoot.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_squirrel.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/squirrel.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_king.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_king.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_test.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_test.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_mute_on.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/button_mute_on.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bee.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/bee.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_accessibility_overlay.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/accessibility_overlay.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/anim_in_down.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/anim/in_down.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_horse.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/horse.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_encryption.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_encryption.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_simple_list_item.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/simple_list_item.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_single_pressed.9.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_single_pressed.9.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_controls.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/controls.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_piece.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/piece.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_chess.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_chess.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_middle_normal.9.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_middle_normal.9.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_actionbar_title.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/actionbar_title.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_edit.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_edit.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_camera_white.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_camera_white.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/xml_network_security_config.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/xml/network_security_config.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_person.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_person.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_row_camera.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/row_camera.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_playback.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_playback.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_mirror.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_mirror.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/anim_none.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/anim/none.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_pause.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/ic_pause.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_flip.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/btn_flip.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_rat.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/rat.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_rec_stop.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/ic_rec_stop.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-mdpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-mdpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_home.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_home.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_camera.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_camera.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_king.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_king.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_stats.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/stats.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_help.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_help.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_transcode.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_transcode.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_pin.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_pin.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_btn_start.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/btn_start.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_knight.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_knight.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_menu.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_menu.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-ldpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-ldpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_playback.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/fragment_playback.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_middle.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_middle.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_text_input_serial.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/text_input_serial.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_ic_warning_black_36dp.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/ic_warning_black_36dp.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_delete.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_delete.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_screenshot_shot.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/screenshot_shot.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_general.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_general.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_add.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_add.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_streaming.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/fragment_streaming.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_email.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_email.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bear.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/bear.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_top_pressed.9.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_top_pressed.9.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-mdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_refresh.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_refresh.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_rec_indicator.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/rec_indicator.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/anim_in_right.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/anim/in_right.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_tile_layout.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/tile_layout.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bat.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/bat.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_eagle.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/eagle.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_plus.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_plus.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/color_focus_text_color.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/color/focus_text_color.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/raw_t3thercloudworker.pfx.flat",
+        "source": "com.checkmate.android.app-main-63:/raw/t3thercloudworker.pfx"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_label.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/label.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bg_border.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/bg_border.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_otc.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_otc.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_mute_off.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/button_mute_off.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_cell_dropdown_rotate.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/cell_dropdown_rotate.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi-v9_ic_fiber_manual_record_trans.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi-v9/ic_fiber_manual_record_trans.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_afl_surface.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/afl_surface.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio_active_white.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio_active_white.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_settings.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_settings.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_stream_active.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_stream_active.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-hdpi_ic_notif.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-hdpi/ic_notif.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/xml_accessibility_service_config.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/xml/accessibility_service_config.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/anim_rotate.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/anim/rotate.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_rook.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_rook.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_help.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_help.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_lan_connect_white_16dp.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/ic_lan_connect_white_16dp.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_bmb.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/bmb.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_bottom_normal.9.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_bottom_normal.9.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_bishop.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_bishop.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_round_border_background.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/round_border_background.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_light_border.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/light_border.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi-v9_ic_fiber_manual_record_red.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi-v9/ic_fiber_manual_record_red.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_share.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_share.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_row_media.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/row_media.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_btn_update.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/btn_update.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_hide.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_hide.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_progress_bar.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/progress_bar.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_cancel_bt.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_cancel_bt.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_snake.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/snake.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_camera_logo.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/camera_logo.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_trash.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_trash.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_inverse.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/button_inverse.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_hide.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/fragment_hide.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bg_circle_progress.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/bg_circle_progress.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_arrow_down.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/arrow_down.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_rook.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_rook.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_row_wifi_camera.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/row_wifi_camera.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_shape_oval_normal.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/shape_oval_normal.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_shoot.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/button_shoot.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_light_no_border.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/light_no_border.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-xxxhdpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-xxxhdpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/anim_out_left.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/anim/out_left.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-mdpi_ic_record.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-mdpi/ic_record.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_owl.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/owl.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_refresh_head.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/refresh_head.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_refresh_disabled.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_refresh_disabled.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_ic_launcher_foreground.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_cancel_bt_bg.9.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_cancel_bt_bg.9.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_dolphin.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/dolphin.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_camera_recorder.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_camera_recorder.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_settings.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_settings.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_refresh_footer.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/refresh_footer.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_bg_camera.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/ic_bg_camera.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_knight.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_knight.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_navigation_view_header.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/navigation_view_header.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio_active.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio_active.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_bottom_pressed.9.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_bottom_pressed.9.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_mute.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/btn_mute.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/menu_tab_bar.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/menu/tab_bar.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_camera.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_camera.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/color_focus_button_tint.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/color/focus_button_tint.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/xml_device_filter.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/xml/device_filter.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_main.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bg_rectangle.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/bg_rectangle.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_record.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/ic_record.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_bmb_simple_circle_button.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/bmb_simple_circle_button.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_bg_ios6.9.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_bg_ios6.9.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_erroe_reporter.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_erroe_reporter.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_custom_notif.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/custom_notif.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_place_holder_image.jpg.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/place_holder_image.jpg"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_pawn.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_pawn.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_frequency_selection.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_frequency_selection.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_shape_rectangle_normal.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/shape_rectangle_normal.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_restart.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_restart.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/anim_in_up.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/anim/in_up.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_settings.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/fragment_settings.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_main_gles.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_main_gles.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate_90.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate_90.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_home.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_home.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_other_bt_bg.9.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_other_bt_bg.9.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_stop_bg.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/ic_stop_bg.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_machine.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_machine.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_main.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/main.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xxhdpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xxhdpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_lock.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_lock.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-xhdpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-land-xhdpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_android_debug_bridge_black_24dp.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/ic_android_debug_bridge_black_24dp.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/anim_out_up.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/anim/out_up.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_peacock.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/peacock.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_row_text.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/row_text.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_logout.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_logout.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_top_normal.9.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_top_normal.9.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_flash.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/button_flash.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_bmb_ham_button.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/bmb_ham_button.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_serial.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_serial.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_code.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_code.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xxxhdpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xxxhdpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio_white.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio_white.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_settings.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/button_settings.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_btn_refresh.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/btn_refresh.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_screen.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/screen.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bg_dialog_progress.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/bg_dialog_progress.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_bishop.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_bishop.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_web.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_web.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_usb_popup.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/activity_usb_popup.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/button.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_live.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/fragment_live.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_dot_fill.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/dot_fill.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_transparent_icon.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/transparent_icon.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_clear.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/clear.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/raw_t3thercloudworker2023a.pfx.flat",
+        "source": "com.checkmate.android.app-main-63:/raw/t3thercloudworker2023a.pfx"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_bmb_text_inside_circle_button.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/bmb_text_inside_circle_button.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_stream_white.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_stream_white.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_refresh_white.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_refresh_white.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_password.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_password.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_live.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_live.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_vumeter.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/vumeter.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_settings.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/btn_settings.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_pawn.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_pawn.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable_cat.png.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable/cat.png"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_name.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/layout/dialog_name.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_top.xml.flat",
+        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_top.xml"
+    },
+    {
+        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_single_normal.9.png.flat",
+        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_single_normal.9.png"
+    }
+]

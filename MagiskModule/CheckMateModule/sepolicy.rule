@@ -1,0 +1,77 @@
+#############################################
+#  CheckMate  Samsung-optimized policy (v4)
+#############################################
+
+#  Core Samsung Requirements 
+# Knox & Secure Folder
+allow priv_app sec_container:dir { search };
+allow priv_app sec_container:file { read open getattr };
+allow priv_app knox_guard_service:service_manager find;
+allow priv_app knox_analytics_prop:property_service set;
+
+# Samsung DeX
+allow priv_app dex_service:service_manager find;
+allow priv_app samsung_dex:unix_stream_socket connectto;
+
+# One UI System Services
+allow priv_app samsung_power_service:service_manager find;
+allow priv_app sem_display_control_service:service_manager find;
+allow priv_app sem_media_projection_service:service_manager find;
+
+#  Binder Extensions for Samsung 
+allow priv_app samsung_audio_hal_service:binder { call transfer };
+allow priv_app sec_radio_service:binder { call transfer };
+allow priv_app sec_telephony_service:binder { call transfer };
+
+#  Enhanced Audio/Media Capture 
+# Samsung-specific audio HALs
+allow priv_app samsung_audio_hal_service:service_manager { find get };
+allow priv_app samsung_soundalive_service:service_manager find;
+allow priv_app soundalive_effect:dir search;
+
+# Samsung Camera/Mic Indicators
+allow priv_app sysfs_camera_indicators:file { read open };
+allow priv_app sysfs_mic_indicators:file { read open };
+
+#  Samsung Display & Graphics 
+allow priv_app samsung_display_service:service_manager find;
+allow priv_app sec_hardware_composer:service_manager find;
+allow priv_app surfaceflinger_extension_prop:property_service set;
+
+#  Critical Additions from Logs 
+# Allow access to Samsung's privacy indicator control
+allow priv_app privacy_indicators_service:service_manager find;
+allow priv_app sec_privacy_controller:binder { call transfer };
+
+# Samsung-specific media projection
+allow priv_app sem_media_projection_service:binder { call transfer };
+
+#  Secure Flag Workarounds 
+# Samsung multi-window/DeX compatibility
+allow priv_app multi_window_service:service_manager find;
+allow priv_app dex_secure_flag_prop:property_service { get set };
+
+#  Samsung Telephony Extensions 
+allow priv_app sec_phone_service:service_manager find;
+allow priv_app sec_phone_extension:dir { search };
+allow priv_app sec_telephony_provider:file { read open };
+
+#  Optional Vendor-Specific 
+optional {
+  # Qualcomm QMI
+  allow priv_app qmuxd_socket:sock_file write;
+  allow priv_app qmux_radio_service:service_manager find;
+
+  # Exynos-specific
+  allow priv_app exynos_audio_hal:dir search;
+  allow priv_app exynos_camera_hal:file { read open };
+}
+
+#  Samsung Debugging & Analytics 
+# Required for proper One UI functionality
+allow priv_app diag_device:chr_file { open read write };
+allow priv_app sec_logger:file { read open getattr };
+
+#  Final System Stability Rules 
+# Prevent Samsung system_server crashes
+neverallow system_server priv_app:process { sigkill sigstop };

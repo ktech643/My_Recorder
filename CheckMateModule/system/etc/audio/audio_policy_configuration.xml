@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<audioPolicyConfiguration version="1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <globalConfiguration speaker_drc_enabled="true"/>
+
+  <modules>
+    <module name="primary" halVersion="3.0">
+
+      <attachedDevices>
+        <item>Earpiece</item>
+        <item>Speaker</item>
+        <item>Built-In Mic</item>
+        <item>Built-In Back Mic</item>
+        <item>Voice Call Mic</item>
+      </attachedDevices>
+
+      <defaultOutputDevice>Speaker</defaultOutputDevice>
+
+      <mixPorts>
+        <!-- Primary output -->
+        <mixPort name="primary-out" role="source" flags="AUDIO_OUTPUT_FLAG_PRIMARY|AUDIO_OUTPUT_FLAG_DEEP_BUFFER">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="48000"
+                   channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
+        </mixPort>
+
+        <!-- Fast output -->
+        <mixPort name="fast" role="source" flags="AUDIO_OUTPUT_FLAG_FAST">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="48000"
+                   channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
+        </mixPort>
+
+        <!-- Generic input -->
+        <mixPort name="primary-in" role="sink">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
+                   channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK"/>
+        </mixPort>
+
+        <!-- GSM downlink (remote party) -->
+        <mixPort name="voice_rx" role="sink" flags="AUDIO_INPUT_FLAG_CALL_CAPTURE">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="8000,16000,48000"
+                   channelMasks="AUDIO_CHANNEL_IN_MONO"/>
+                   <playbackCaptureAllowed/>
+        </mixPort>
+
+        <!-- GSM uplink (your mic path) -->
+        <mixPort name="voice_tx" role="sink" flags="AUDIO_INPUT_FLAG_CALL_CAPTURE">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="8000,16000,48000"
+                   channelMasks="AUDIO_CHANNEL_IN_MONO"/>
+        </mixPort>
+
+        <!-- VoIP capture -->
+        <mixPort name="voip_capture" role="sink" flags="AUDIO_INPUT_FLAG_CALL_CAPTURE">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="16000,48000"
+                   channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO"/>
+                   <playbackCaptureAllowed/>
+        </mixPort>
+
+                 <!-- Combined Telephony (uplink+downlink) -->
+      <mixPort name="call_capture" role="sink" flags="AUDIO_INPUT_FLAG_CALL_CAPTURE">
+        <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                 samplingRates="8000,16000,48000"
+                 channelMasks="AUDIO_CHANNEL_IN_STEREO"/> <!-- MONO → STEREO -->
+      </mixPort>
+      
+      </mixPorts>
+
+      <devicePorts>
+        <!-- Standard outputs -->
+        <devicePort tagName="Earpiece" role="sink" type="AUDIO_DEVICE_OUT_EARPIECE">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="48000"
+                   channelMasks="AUDIO_CHANNEL_OUT_MONO"/>
+        </devicePort>
+        <devicePort tagName="Speaker" role="sink" type="AUDIO_DEVICE_OUT_SPEAKER">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="48000"
+                   channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
+        </devicePort>
+        <devicePort tagName="Wired Headset" role="sink" type="AUDIO_DEVICE_OUT_WIRED_HEADSET">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="48000"
+                   channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
+        </devicePort>
+        <devicePort tagName="Bt Sco All" role="sink" type="AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="48000"
+                   channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
+        </devicePort>
+
+        <!-- Standard inputs -->
+        <devicePort tagName="Built-In Mic" role="source" type="AUDIO_DEVICE_IN_BUILTIN_MIC">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
+                   channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK"/>
+        </devicePort>
+
+        <!-- Telephony -->
+        <devicePort tagName="Telephony Rx" role="source" type="AUDIO_DEVICE_IN_TELEPHONY_RX">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="8000,16000"
+                   channelMasks="AUDIO_CHANNEL_IN_MONO"/>
+        </devicePort>
+        <devicePort tagName="Telephony Tx" role="source" type="AUDIO_DEVICE_IN_TELEPHONY_TX">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="8000,16000"
+                   channelMasks="AUDIO_CHANNEL_IN_MONO"/>
+        </devicePort>
+
+        <!-- VoIP -->
+        <devicePort tagName="VoIP Capture" role="source" type="AUDIO_DEVICE_IN_VOICE_COMMUNICATION">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="16000,48000"
+                   channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO"/>
+        </devicePort>
+        <devicePort tagName="VoIP Full Duplex" role="source" 
+        type="AUDIO_DEVICE_IN_VOICE_COMMUNICATION_DUPLEX">
+<profile format="AUDIO_FORMAT_PCM_16_BIT"
+        samplingRates="8000,16000,48000"
+        channelMasks="AUDIO_CHANNEL_IN_STEREO"/>
+</devicePort>
+        <devicePort tagName="SEC_VOICE_RX" role="source" 
+           type="AUDIO_DEVICE_IN_SAMSUNG_VOICE_RX">
+  <profile format="AUDIO_FORMAT_PCM_16_BIT"
+           samplingRates="8000,16000"
+           channelMasks="AUDIO_CHANNEL_IN_MONO"/>
+</devicePort>
+
+<devicePort tagName="SEC_VOICE_TX" role="source" 
+           type="AUDIO_DEVICE_IN_SAMSUNG_VOICE_TX">
+  <profile format="AUDIO_FORMAT_PCM_16_BIT"
+           samplingRates="8000,16000"
+           channelMasks="AUDIO_CHANNEL_IN_MONO"/>
+</devicePort>
+
+      </devicePorts>
+
+      <routes>
+        <!-- GSM routes -->
+        <route type="mix" sink="voice_rx" sources="Telephony Rx"/>
+        <route type="mix" sink="voice_tx" sources="Telephony Tx"/>
+        <route type="mix" sink="voice_call" sources="Telephony Rx,Telephony Tx"/>    
+                 
+        <!-- VoIP route -->
+        <route type="mix" sink="voip_capture" sources="VoIP Capture,Telephony Rx"/>
+        <route type="mix" sink="call_capture" sources="SEC_VOICE_RX,SEC_VOICE_TX"/>
+ 
+        <!-- Default playback -->
+        <route type="mix" sink="Earpiece"       sources="primary-out,fast"/>
+        <route type="mix" sink="Speaker"        sources="primary-out,fast"/>
+        <route type="mix" sink="Wired Headset"  sources="primary-out,fast"/>
+      </routes>
+
+    </module>
+
+    <!-- A2DP Audio HAL (unchanged) -->
+    <module name="a2dpsink" halVersion="2.0">
+      <mixPorts>
+        <mixPort name="a2dp input" role="sink">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="44100,48000"
+                   channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO"/>
+        </mixPort>
+      </mixPorts>
+      <devicePorts>
+        <devicePort tagName="BT A2DP In" role="source" type="AUDIO_DEVICE_IN_BLUETOOTH_A2DP">
+          <profile format="AUDIO_FORMAT_PCM_16_BIT"
+                   samplingRates="44100,48000"
+                   channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO"/>
+        </devicePort>
+      </devicePorts>
+      <routes>
+        <route type="mix" sink="a2dp input" sources="BT A2DP In"/>
+      </routes>
+    </module>
+
+    <!-- Remote Submix Audio HAL -->
+    <xi:include href="r_submix_audio_policy_configuration.xml"/>
+
+  </modules>
+
+  <!-- Volume section -->
+  <xi:include href="audio_policy_volumes.xml"/>
+  <volume stream="VOICE_CALL" deviceCategory="TELEPHONY">
+    <point>0,0</point>
+    <point>100,0</point>
+  </volume>
+  <xi:include href="default_volume_tables.xml"/>
+
+  <!-- Grant our app call-recording rights -->
+  <roles>
+    <role name="call_record">
+      <allow package="com.checkmate.android"/>
+    </role>
+  </roles>
+  
+
+</audioPolicyConfiguration>

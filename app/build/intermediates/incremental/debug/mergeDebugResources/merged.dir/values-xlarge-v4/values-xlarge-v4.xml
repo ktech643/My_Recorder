@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="abc_dialog_fixed_height_major" type="dimen">60%</item>
+    <item name="abc_dialog_fixed_height_minor" type="dimen">90%</item>
+    <item name="abc_dialog_fixed_width_major" type="dimen">50%</item>
+    <item name="abc_dialog_fixed_width_minor" type="dimen">70%</item>
+    <item name="abc_dialog_min_width_major" type="dimen">45%</item>
+    <item name="abc_dialog_min_width_minor" type="dimen">72%</item>
+    <dimen name="image_extra_large">256dp</dimen>
+    <dimen name="image_extra_small">48dp</dimen>
+    <dimen name="image_large">192dp</dimen>
+    <dimen name="image_normal">144dp</dimen>
+    <dimen name="image_small">96dp</dimen>
+    <dimen name="image_very_large">288dp</dimen>
+    <dimen name="image_very_small">12dp</dimen>
+    <dimen name="margin_extra_large">64dp</dimen>
+    <dimen name="margin_extra_small">4dp</dimen>
+    <dimen name="margin_large">32dp</dimen>
+    <dimen name="margin_normal">16dp</dimen>
+    <dimen name="margin_really_large">128dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_very_large">96dp</dimen>
+    <dimen name="margin_very_small">2dp</dimen>
+    <dimen name="slide_left_width">540dp</dimen>
+    <dimen name="slide_notification_size">40dp</dimen>
+    <dimen name="textsize_extra_large">24sp</dimen>
+    <dimen name="textsize_extra_small">14sp</dimen>
+    <dimen name="textsize_hot_large">41sp</dimen>
+    <dimen name="textsize_large">21sp</dimen>
+    <dimen name="textsize_normal">18sp</dimen>
+    <dimen name="textsize_really_large">35sp</dimen>
+    <dimen name="textsize_small">16sp</dimen>
+    <dimen name="textsize_very_large">30sp</dimen>
+    <dimen name="textsize_very_small">12sp</dimen>
+    <dimen name="video_height">400dp</dimen>
+</resources>

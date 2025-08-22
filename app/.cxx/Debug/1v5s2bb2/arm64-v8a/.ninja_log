@@ -1,0 +1,5 @@
+# ninja log v5
+1	1400	1755878241	CMakeFiles/native-lib.dir/native-lib.cpp.o	208b0cb25a85e5e3
+1401	1602	1755878241	/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/build/intermediates/cxx/Debug/1v5s2bb2/obj/arm64-v8a/libnative-lib.so	47995b57f588839c
+1	392	1755881220	/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/build/intermediates/cxx/Debug/1v5s2bb2/obj/arm64-v8a/libnative-lib.so	47995b57f588839c
+4	537	1755883657	/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/build/intermediates/cxx/Debug/1v5s2bb2/obj/arm64-v8a/libnative-lib.so	47995b57f588839c

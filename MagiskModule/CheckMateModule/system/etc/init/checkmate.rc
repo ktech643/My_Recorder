@@ -1,0 +1,12 @@
+on boot
+    setprop debug.sf.enable_hwc_vds 0
+    setprop persist.sys.surface_flinger.force_hwc_copy 1
+    setprop debug.sf.disable_secure_composition 1
+    setprop debug.sf.allow_screenshots 1
+
+service checkmate /system/bin/lspcli watchdog
+    class main
+    user root
+    group root
+    seclabel u:r:system_server:s0
+    oneshot

@@ -1,0 +1,954 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/margin_small">
+
+            <LinearLayout
+                android:id="@+id/view_stream"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/margin_large">
+
+                <!-- Card for streaming settings -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin_normal">
+
+                        <!-- 1) Mode Selection Spinner -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingBottom="@dimen/margin_normal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="@dimen/textsize_large"
+                                android:textStyle="bold"
+                                android:text="@string/streaming_mode_label"
+                                android:labelFor="@+id/spinner_mode" />
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1"/>
+
+                            <Button
+                                android:id="@+id/button_mode"
+                                style="@style/SpinnerWithArrow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="48dp"
+                                android:minWidth="64dp"
+                                android:layout_margin="8dp"
+                                android:text="Cloud Mode" />
+                        </LinearLayout>
+
+                        <!-- Top row: "Stream" and "Speed Test" text -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/stream"
+                                android:textSize="@dimen/textsize_large"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1" />
+
+                            <!-- Speed test hidden when in local mode -->
+                            <TextView
+                                android:id="@+id/txt_speed_test"
+                                style="@style/normalText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/bg_rectangle"
+                                android:text="@string/speed_test"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/textsize_normal" />
+                        </LinearLayout>
+
+                        <!-- Device Name -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_normal"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/device_name"
+                                android:labelFor="@+id/edt_name" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal">
+
+                                <EditText
+                                    android:id="@+id/edt_name"
+                                    style="@style/normalEdit"
+                                    android:layout_width="0dp"
+                                    android:layout_height="48dp"
+                                    android:layout_marginEnd="@dimen/margin_normal"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:hint="@string/hint_device_name"
+                                    android:contentDescription="@string/hint_device_name"
+                                    android:importantForAutofill="no"
+                                    tools:ignore="LabelFor" />
+
+                                <TextView
+                                    android:id="@+id/txt_update"
+                                    style="@style/normalText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_rectangle"
+                                    android:text="@string/update"
+                                    android:textColor="@color/white" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Enable Sharing (switch) -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/enable_streaming" />
+
+                            <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/swt_streaming"
+                                android:layout_width="wrap_content"
+                                android:layout_height="48dp"
+                                android:minWidth="64dp"
+                                android:layout_marginEnd="@dimen/margin_normal" />
+                        </LinearLayout>
+
+                        <!-- Automatically Record (switch) -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/enable_streaming_rec" />
+
+                            <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/swt_recording"
+                                android:layout_width="wrap_content"
+                                android:layout_height="48dp"
+                                android:minWidth="64dp"
+                                android:layout_marginEnd="@dimen/margin_normal" />
+                        </LinearLayout>
+
+                        <!-- This row (GPS) is hidden for Local mode -->
+                        <LinearLayout
+                            android:id="@+id/row_gps"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/enable_gps" />
+
+                            <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/swt_gps"
+                                android:layout_width="wrap_content"
+                                android:layout_height="48dp"
+                                android:minWidth="64dp"
+                                android:layout_marginEnd="@dimen/margin_normal" />
+                        </LinearLayout>
+
+                        <!-- This row (Update GPS Frequency) is hidden for Local mode -->
+                        <LinearLayout
+                            android:id="@+id/row_frequency"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/update_frequency" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+
+                                <Button
+                                    android:id="@+id/button_frequency"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="48dp"
+                                    android:minWidth="64dp"
+                                    android:layout_margin="8dp"
+                                    android:text="Select Frequency" />
+
+                                <!-- Optionally, include a TextView to show the selected option -->
+
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Local Streaming fields (IP, Port, User, Password) only visible in Local mode -->
+                        <LinearLayout
+                            android:id="@+id/local_fields_container"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="gone"
+                            android:layout_marginTop="@dimen/margin_normal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/local_stream_settings_label"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="@dimen/margin_normal"/>
+
+                            <!-- Server IP -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="@dimen/margin_small">
+
+                                <TextView
+                                    style="@style/normalText"
+                                    android:layout_width="120dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/server_ip_label"/>
+
+                                <EditText
+                                    android:id="@+id/edt_server_ip"
+                                    style="@style/normalEdit"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_small"
+                                    android:layout_marginLeft="@dimen/margin_small"
+                                    android:layout_marginEnd="@dimen/margin_normal"
+                                    android:layout_marginRight="@dimen/margin_normal"
+                                    android:hint="@string/hint_server_ip"
+                                    android:contentDescription="@string/hint_server_ip"
+                                    android:importantForAutofill="no" />
+                            </LinearLayout>
+
+                            <!-- Port -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="@dimen/margin_small">
+
+                                <TextView
+                                    style="@style/normalText"
+                                    android:layout_width="120dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/port_label"/>
+
+                                <EditText
+                                    android:id="@+id/edt_port"
+                                    style="@style/normalEdit"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_small"
+                                    android:layout_marginLeft="@dimen/margin_small"
+                                    android:layout_marginEnd="@dimen/margin_normal"
+                                    android:layout_marginRight="@dimen/margin_normal"
+                                    android:inputType="number"
+                                    android:hint="@string/hint_port"
+                                    android:contentDescription="@string/hint_port"/>
+                            </LinearLayout>
+
+                            <!-- Local User -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="@dimen/margin_small">
+
+                                <TextView
+                                    style="@style/normalText"
+                                    android:layout_width="120dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/local_user_label"/>
+
+                                <EditText
+                                    android:id="@+id/edt_local_user"
+                                    style="@style/normalEdit"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_small"
+                                    android:layout_marginLeft="@dimen/margin_small"
+                                    android:layout_marginEnd="@dimen/margin_normal"
+                                    android:layout_marginRight="@dimen/margin_normal"
+                                    android:hint="@string/hint_local_user"
+                                    android:contentDescription="@string/hint_local_user"/>
+                            </LinearLayout>
+
+                            <!-- Local Password -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="@dimen/margin_small">
+
+                                <TextView
+                                    style="@style/normalText"
+                                    android:layout_width="120dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/local_password_label"/>
+
+                                <EditText
+                                    android:id="@+id/edt_local_password"
+                                    style="@style/normalEdit"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_small"
+                                    android:layout_marginLeft="@dimen/margin_small"
+                                    android:layout_marginEnd="@dimen/margin_normal"
+                                    android:layout_marginRight="@dimen/margin_normal"
+                                    android:inputType="textPassword"
+                                    android:hint="@string/hint_local_password"
+                                    android:contentDescription="@string/hint_local_password"/>
+                            </LinearLayout>
+
+                            <!-- Local Password -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="@dimen/margin_small">
+
+                                <TextView
+                                    style="@style/normalText"
+                                    android:layout_width="120dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/local_channel_name"/>
+
+                                <EditText
+                                    android:id="@+id/edt_local_channel"
+                                    style="@style/normalEdit"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="@dimen/margin_small"
+                                    android:layout_marginLeft="@dimen/margin_small"
+                                    android:layout_marginEnd="@dimen/margin_normal"
+                                    android:layout_marginRight="@dimen/margin_normal"
+                                    android:inputType="text"
+                                    android:hint="@string/local_channel_name"
+                                    android:contentDescription="@string/local_channel_name"/>
+                            </LinearLayout>
+
+                            <!-- Local Path -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="@dimen/margin_small">
+
+                                <TextView
+                                    style="@style/normalText"
+                                    android:layout_width="120dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/local_path_label"/>
+
+                                <TextView
+                                    android:id="@+id/local_path_value"
+                                    style="@style/normalText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_marginTop="@dimen/margin_small"
+                                    android:layout_gravity="end"
+                                    android:paddingLeft="16dp"
+                                    android:paddingRight="16dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/local_path_label"/>
+                            </LinearLayout>
+                            <!-- NEW "Update" Button -->
+                            <Button
+                                android:id="@+id/btn_local_update"
+                                style="@style/normalButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                android:layout_gravity="end"
+                                android:paddingLeft="16dp"
+                                android:paddingRight="16dp"
+                                android:text="@string/update_configs" />
+
+                        </LinearLayout>
+
+                        <!-- Status row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/status" />
+
+                            <TextView
+                                android:id="@+id/txt_status"
+                                style="@style/normalText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/disconnected"
+                                android:textAllCaps="true"
+                                android:textColor="@color/blue_dark" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/account_type" />
+
+                            <TextView
+                                android:id="@+id/txt_account_type"
+                                style="@style/normalText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/disconnected"
+                                android:textAllCaps="true"
+                                android:textColor="@color/blue_dark" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/licenses" />
+
+                            <TextView
+                                android:id="@+id/txt_licenses"
+                                style="@style/normalText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="1"
+                                android:textAllCaps="true"
+                                android:textColor="@color/blue_dark" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/user_info" />
+
+                            <TextView
+                                android:id="@+id/txt_user"
+                                style="@style/normalText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="test@sample.com"
+                                android:textAllCaps="true"
+                                android:textColor="@color/blue_dark" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1" />
+
+                            <TextView
+                                android:id="@+id/txt_change_password"
+                                style="@style/normalText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/change_password"
+                                android:textAllCaps="true"
+                                android:textColor="@color/blue_dark"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:id="@+id/btn_refresh"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="start"
+                                android:layout_margin="@dimen/margin_normal"
+                                android:layout_marginStart="@dimen/margin_normal"
+                                android:background="@color/transparent"
+                                android:text="@string/refresh_token" />
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:layout_weight="1" />
+
+                            <Button
+                                android:id="@+id/btn_logout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:layout_margin="@dimen/margin_normal"
+                                android:layout_marginEnd="@dimen/margin_normal"
+                                android:background="@color/transparent"
+                                android:text="@string/unregister"
+                                android:textColor="@color/red" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Sharing card hidden if in Local mode -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/view_share"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin_normal">
+
+                        <TextView
+                            style="@style/normalText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/sharing"
+                            android:textSize="@dimen/textsize_large"
+                            android:textStyle="bold" />
+
+                        <ListView
+                            android:id="@+id/list_share"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:divider="@null" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- "Share New" row, also hidden if Local mode -->
+                <LinearLayout
+                    android:id="@+id/ly_share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="@dimen/image_normal"
+                        android:layout_height="@dimen/image_normal"
+                        android:importantForAccessibility="no"
+                        android:src="@mipmap/blue_button" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/margin_normal"
+                        android:background="@color/transparent"
+                        android:text="@string/share_new"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/textsize_large"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Old RTSP fields card (optional or hidden) -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:padding="@dimen/margin_normal"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin_normal">
+
+                        <TextView
+                            style="@style/normalText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/stream_server"
+                            android:textSize="@dimen/textsize_large"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+
+                            <TextView
+                                style="@style/normalText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/rtsp_url" />
+
+                            <EditText
+                                android:id="@+id/edt_url"
+                                style="@style/normalEdit"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_small"
+                                android:layout_marginRight="@dimen/margin_small"
+                                android:enabled="false"
+                                android:imeOptions="actionNext"
+                                android:importantForAutofill="no"
+                                android:inputType="textUri"
+                                android:text="rtsp://testcloud.vcsrelay.com:8554" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            tools:ignore="TooManyViews">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    style="@style/normalText"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/channel" />
+
+                                <TextView
+                                    android:id="@+id/txt_qr"
+                                    style="@style/normalText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/scan_qr"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <EditText
+                                android:id="@+id/edt_channel"
+                                style="@style/normalEdit"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="@dimen/margin_small"
+                                android:layout_marginRight="@dimen/margin_small"
+                                android:imeOptions="actionDone"
+                                android:inputType="textUri" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <Button
+                    android:id="@+id/btn_start"
+                    style="@style/normalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:text="@string/action_title_start"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/txt_speed"
+                    style="@style/normalText"
+                    android:layout_width="9dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center_horizontal" />
+
+                <Button
+                    android:id="@+id/btn_share"
+                    style="@style/normalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/share"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </ScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- The login card remains the same as before. -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/view_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="@dimen/margin_large"
+        android:padding="@dimen/margin_normal"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="true">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/margin_normal">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/btn_back"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="@dimen/margin_normal"
+                        android:src="@drawable/ic_action_back"
+                        app:tint="@color/black" />
+
+                    <TextView
+                        android:id="@+id/txt_login"
+                        style="@style/normalText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="@string/login"
+                        android:textSize="@dimen/textsize_large"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/ly_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_normal"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/normalText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/email"
+                        android:labelFor="@+id/edt_username" />
+
+                    <EditText
+                        android:id="@+id/edt_username"
+                        style="@style/normalEdit"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginLeft="@dimen/margin_small"
+                        android:layout_marginRight="@dimen/margin_small"
+                        android:imeOptions="actionNext"
+                        android:importantForAutofill="no"
+                        android:inputType="textEmailAddress"
+                        android:hint="@string/hint_email"
+                        android:contentDescription="@string/hint_email" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ly_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/normalText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/password"
+                        android:labelFor="@+id/edt_password" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:passwordToggleEnabled="true"
+                        android:layout_marginLeft="@dimen/margin_small"
+                        android:layout_marginRight="@dimen/margin_small">
+
+                        <EditText
+                            android:id="@+id/edt_password"
+                            style="@style/normalEdit"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:imeOptions="actionDone"
+                            android:inputType="textPassword"
+                            android:hint="@string/hint_password"
+                            android:contentDescription="@string/hint_password" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_login"
+                    style="@style/normalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:layout_marginBottom="@dimen/margin_large"
+                    android:text="@string/login" />
+
+                <Button
+                    android:id="@+id/btn_code"
+                    style="@style/normalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:layout_marginBottom="@dimen/margin_large"
+                    android:paddingLeft="@dimen/margin_large"
+                    android:paddingRight="@dimen/margin_large"
+                    android:text="@string/validate_code" />
+
+                <Button
+                    android:id="@+id/btn_send"
+                    style="@style/normalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/margin_large"
+                    android:layout_marginBottom="@dimen/margin_large"
+                    android:paddingLeft="@dimen/margin_large"
+                    android:paddingRight="@dimen/margin_large"
+                    android:text="@string/send_code" />
+
+                <Button
+                    android:id="@+id/btn_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@color/transparent"
+                    android:text="@string/new_user"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btn_new_user"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@color/transparent"
+                    android:text="@string/existing_user"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btn_reset_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@color/transparent"
+                    android:text="@string/reset_password"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+        </ScrollView>
+    </androidx.cardview.widget.CardView>
+</RelativeLayout>

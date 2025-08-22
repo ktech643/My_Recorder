@@ -1,0 +1,25 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml:24:1-25:12
+INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml:24:1-25:12
+INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml:24:1-25:12
+	package
+		ADDED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml:24:11-52
+		INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml
+		INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml:24:1-25:12
+uses-sdk
+INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml
+INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml
+INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml
+INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml
+		ADDED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml
+		INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml
+		ADDED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml
+		INJECTED from /Users/jahan/Desktop/Projects/t3_vcs_recorder/usbCameraCommon/src/main/AndroidManifest.xml

@@ -1,0 +1,26 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.checkmate.android.app-mergeDebugResources-59:/values-round-v23/values-round-v23.xml",
+            "map": [
+                {
+                    "source": "/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/res/values-round/strings.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "16",
+                        "endColumns": "58",
+                        "endOffsets": "70"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "58",
+                        "endOffsets": "109"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+project.ext {
+    releaseVersion = "1.0"
+    releaseVersionCode = 1
+
+    compileSdkVersion = 33
+    buildToolsVersion = '29.0.3'
+    minSdkVersion = 26    // 5.0
+    targetSdkVersion = 33 // 10.0
+
+    androidXAnnotationVersion = '1.1.0'
+    androidXNavigationVersion = '2.3.0'
+}

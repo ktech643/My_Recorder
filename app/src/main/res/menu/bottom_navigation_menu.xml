@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_live"
+        android:icon="@mipmap/ic_live"
+        android:title="@string/live" />
+    
+    <item
+        android:id="@+id/navigation_playback"
+        android:icon="@mipmap/ic_playback"
+        android:title="@string/playback" />
+    
+    <item
+        android:id="@+id/navigation_streaming"
+        android:icon="@mipmap/ic_stream"
+        android:title="@string/streaming" />
+    
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@mipmap/ic_settings"
+        android:title="@string/settings" />
+    
+    <item
+        android:id="@+id/navigation_hide"
+        android:icon="@mipmap/ic_hide"
+        android:title="@string/hide" />
+</menu>

@@ -1,0 +1,24 @@
+# Set permissions for your app
+# MAGISK
+
+# install your main app
+set_perm_recursive 0 0 0755 0644 "/system/priv-app/com.checkmate.android"
+
+# install DisableFlagSecure submodule
+set_perm_recursive 0 0 0755 0644 "/system/app/com.checkmate.xposed"
+
+# updater-script
+ui_print(" Verifying installation order...");
+
+assert(
+    file_getprop("/data/adb/magisk.db", "SELECT name FROM modules WHERE name='LSPosed'") == "LSPosed",
+    "Install LSPosed first!"
+);
+
+assert(
+    run_program("/system/xbin/sqlite3", "--version") != "",
+    "SQLite3 not detected!"
+);
+
+# Proceed with main installation
+ui_print(" Prerequisites verified");

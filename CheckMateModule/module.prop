@@ -1,0 +1,6 @@
+id=checkmate_module
+name=CheckMate Privacy Suite
+version=v2.0.0
+versionCode=2024051601
+author=VCS
+description=Hides privacy indicators, screensharing icons, SU toasts; keeps CheckMate alive; bypasses FLAG_SECURE.  Samsung One UI (Android 10 +) only.  Requires Magisk & LSPosed (Zygisk).

@@ -1,0 +1,12 @@
+{
+  "ndkVersionFromDsl": "21.1.6352462",
+  "ndkDirProperty": "/Users/office/Library/Android/sdk/ndk/21.1.6352462",
+  "sdkFolder": "/Users/office/Library/Android/sdk",
+  "sideBySideNdkFolderNames": [
+    "20.0.5594570",
+    "27.0.12077973",
+    "21.1.6352462",
+    "26.1.10909125",
+    "23.1.7779620"
+  ]
+}

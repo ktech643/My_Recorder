@@ -1,0 +1,153 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/fps"
+        android:layout_width="56dp"
+        android:layout_height="26dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="16dp"
+        android:alpha="0.3"
+        android:background="@drawable/label"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/zoom_ratio"
+        android:layout_width="56dp"
+        android:layout_height="26dp"
+        android:layout_below="@id/fps"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="16dp"
+        android:alpha="0.3"
+        android:background="@drawable/label"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/broadcast_time"
+        android:layout_width="78dp"
+        android:layout_height="26dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_toRightOf="@id/fps"
+        android:alpha="0.3"
+        android:background="@drawable/label"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/rec_indicator"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="22dp"
+        android:layout_toRightOf="@id/broadcast_time"
+        android:alpha="0.7"
+        android:background="@drawable/rec_indicator"
+        android:orientation="vertical"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/connection_name"
+        android:layout_width="100dp"
+        android:layout_height="26dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="18dp"
+        android:alpha="0.3"
+        android:background="@drawable/label"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/connection_name1"
+        android:layout_width="100dp"
+        android:layout_height="26dp"
+        android:layout_above="@id/connection_name"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="8dp"
+        android:alpha="0.3"
+        android:background="@drawable/label"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/connection_name2"
+        android:layout_width="100dp"
+        android:layout_height="26dp"
+        android:layout_above="@id/connection_name1"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="8dp"
+        android:alpha="0.3"
+        android:background="@drawable/label"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/connection_status"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="18dp"
+        android:layout_toRightOf="@id/connection_name"
+        android:alpha="0.3"
+        android:background="@drawable/label"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/connection_status1"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_above="@id/connection_status"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_toRightOf="@id/connection_name1"
+        android:alpha="0.3"
+        android:background="@drawable/label"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/connection_status2"
+        android:layout_width="148dp"
+        android:layout_height="26dp"
+        android:layout_above="@id/connection_status1"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_toRightOf="@id/connection_name2"
+        android:alpha="0.3"
+        android:background="@drawable/label"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
+</merge>

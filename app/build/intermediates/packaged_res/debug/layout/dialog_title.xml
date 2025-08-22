@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/bold_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Please enter your pin code."
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:paddingBottom="8dp" />
+
+    <TextView
+        android:id="@+id/regular_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Please choose a password using only the digits 1 through 8."
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:gravity="center" />
+</LinearLayout>
