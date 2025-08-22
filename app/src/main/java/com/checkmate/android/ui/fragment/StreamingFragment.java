@@ -24,6 +24,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
@@ -41,7 +42,6 @@ import com.blikoon.qrcodescanner.QrCodeActivity;
 import com.checkmate.android.AppConstant;
 import com.checkmate.android.AppPreference;
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.FragmentStreamingBinding;
 import com.checkmate.android.model.Device;
 import com.checkmate.android.model.Invite;
 import com.checkmate.android.model.PushChannel;
@@ -64,7 +64,6 @@ import com.checkmate.android.util.MainActivity;
 import com.checkmate.android.util.MessageUtil;
 import com.checkmate.android.viewmodels.EventType;
 import com.checkmate.android.viewmodels.SharedViewModel;
-import com.checkmate.android.service.FragmentVisibilityListener;
 import com.kongzue.dialogx.dialogs.MessageDialog;
 import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
 import com.kongzue.dialogx.util.TextInfo;
@@ -79,8 +78,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -88,7 +85,7 @@ import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
 
-public class StreamingFragment extends BaseFragment implements FragmentVisibilityListener {
+public class StreamingFragment extends BaseFragment {
 
     private final int REQUEST_CODE_QR_SCAN = 101;
     public static StreamingFragment instance;
@@ -99,7 +96,66 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
     MainActivity mActivity;
     Responses.LoginResponse user_info;
-    private FragmentStreamingBinding binding;
+
+    // Old RTSP fields (still in layout but hidden)
+    
+    // UI Components
+    private SwipeRefreshLayout swipe_refresh;
+    private LinearLayout view_stream;
+    private Button button_mode;
+    private TextView txt_speed_test;
+    private EditText edt_name;
+    private TextView txt_update;
+    private SwitchCompat swt_streaming;
+    private SwitchCompat swt_recording;
+    private LinearLayout row_gps;
+    private SwitchCompat swt_gps;
+    private LinearLayout row_frequency;
+    private Button button_frequency;
+    private LinearLayout local_fields_container;
+    private EditText edt_server_ip;
+    private EditText edt_port;
+    private EditText edt_local_user;
+    private EditText edt_local_password;
+    private EditText edt_local_channel;
+    private TextView local_path_value;
+    private Button btn_local_update;
+    private TextView txt_status;
+    private TextView txt_account_type;
+    private TextView txt_licenses;
+    private TextView txt_user;
+    private TextView txt_change_password;
+    private Button btn_refresh;
+    private Button btn_logout;
+    private androidx.cardview.widget.CardView view_share;
+    private ListView list_share;
+    private LinearLayout ly_share;
+    private EditText edt_url;
+    private TextView txt_qr;
+    private EditText edt_channel;
+    private Button btn_start;
+    private TextView txt_speed;
+    private Button btn_share;
+    private androidx.cardview.widget.CardView view_login;
+    private ImageView btn_back;
+    private TextView txt_login;
+    private LinearLayout ly_username;
+    private EditText edt_username;
+    private LinearLayout ly_password;
+    private EditText edt_password;
+    private Button btn_login;
+    private Button btn_code;
+    private Button btn_send;
+    private Button btn_password;
+    private Button btn_new_user;
+    private Button btn_reset_password;
+    private Button spinner_mode;
+
+    // Username/password for Cloud login
+
+    // Spinner for Cloud vs. Local streaming
+
+    // Rows hidden when in Local mode
     ListAdapter adapter;
     List<Invite> mDataList = new ArrayList<>();
     private ActivityFragmentCallbacks mListener;
@@ -192,26 +248,79 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        binding = FragmentStreamingBinding.inflate(inflater, container, false);
-        rootView = binding.getRoot();
+        mView = inflater.inflate(R.layout.fragment_streaming, container, false);
+        
+        // Initialize UI components
+        swipe_refresh = mView.findViewById(R.id.swipe_refresh);
+        view_stream = mView.findViewById(R.id.view_stream);
+        button_mode = mView.findViewById(R.id.button_mode);
+        txt_speed_test = mView.findViewById(R.id.txt_speed_test);
+        edt_name = mView.findViewById(R.id.edt_name);
+        txt_update = mView.findViewById(R.id.txt_update);
+        swt_streaming = mView.findViewById(R.id.swt_streaming);
+        swt_recording = mView.findViewById(R.id.swt_recording);
+        row_gps = mView.findViewById(R.id.row_gps);
+        swt_gps = mView.findViewById(R.id.swt_gps);
+        row_frequency = mView.findViewById(R.id.row_frequency);
+        button_frequency = mView.findViewById(R.id.button_frequency);
+        local_fields_container = mView.findViewById(R.id.local_fields_container);
+        edt_server_ip = mView.findViewById(R.id.edt_server_ip);
+        edt_port = mView.findViewById(R.id.edt_port);
+        edt_local_user = mView.findViewById(R.id.edt_local_user);
+        edt_local_password = mView.findViewById(R.id.edt_local_password);
+        edt_local_channel = mView.findViewById(R.id.edt_local_channel);
+        local_path_value = mView.findViewById(R.id.local_path_value);
+        btn_local_update = mView.findViewById(R.id.btn_local_update);
+        txt_status = mView.findViewById(R.id.txt_status);
+        txt_account_type = mView.findViewById(R.id.txt_account_type);
+        txt_licenses = mView.findViewById(R.id.txt_licenses);
+        txt_user = mView.findViewById(R.id.txt_user);
+        txt_change_password = mView.findViewById(R.id.txt_change_password);
+        btn_refresh = mView.findViewById(R.id.btn_refresh);
+        btn_logout = mView.findViewById(R.id.btn_logout);
+        view_share = mView.findViewById(R.id.view_share);
+        list_share = mView.findViewById(R.id.list_share);
+        ly_share = mView.findViewById(R.id.ly_share);
+        edt_url = mView.findViewById(R.id.edt_url);
+        txt_qr = mView.findViewById(R.id.txt_qr);
+        edt_channel = mView.findViewById(R.id.edt_channel);
+        btn_start = mView.findViewById(R.id.btn_start);
+        txt_speed = mView.findViewById(R.id.txt_speed);
+        btn_share = mView.findViewById(R.id.btn_share);
+        view_login = mView.findViewById(R.id.view_login);
+        btn_back = mView.findViewById(R.id.btn_back);
+        txt_login = mView.findViewById(R.id.txt_login);
+        ly_username = mView.findViewById(R.id.ly_username);
+        edt_username = mView.findViewById(R.id.edt_username);
+        ly_password = mView.findViewById(R.id.ly_password);
+        edt_password = mView.findViewById(R.id.edt_password);
+        btn_login = mView.findViewById(R.id.btn_login);
+        btn_code = mView.findViewById(R.id.btn_code);
+        btn_send = mView.findViewById(R.id.btn_send);
+        btn_password = mView.findViewById(R.id.btn_password);
+        btn_new_user = mView.findViewById(R.id.btn_new_user);
+        btn_reset_password = mView.findViewById(R.id.btn_reset_password);
+        spinner_mode = mView.findViewById(R.id.button_mode);
+        
+        rootView = mView;
 
         showInitialLogin();
         String login_email = AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, "");
         String login_password = AppPreference.getStr(AppPreference.KEY.LOGIN_PASSWORD, "");
         if (!TextUtils.isEmpty(login_email) && !TextUtils.isEmpty(login_password)) {
-            binding.edtUsername.setText(login_email);
-            binding.edtPassword.setText(login_password);
+            edt_username.setText(login_email);
+            edt_password.setText(login_password);
             onLogin();
         } else {
             initialize();
         }
 
         if (mActivity != null) {
-            binding.btnBack.setColorFilter(ContextCompat.getColor(mActivity, R.color.black));
+            // btn_back.setColorFilter(ContextCompat.getColor(mActivity, R.color.black));
         }
 
         // Store channel changes for Cloud streaming
-        binding.edtChannel.addTextChangedListener(new TextWatcher() {
+        edt_channel.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!TextUtils.isEmpty(s.toString().trim())) {
@@ -221,32 +330,46 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
             @Override public void afterTextChanged(Editable s) {}
         });
         String channel = AppPreference.getStr(AppPreference.KEY.STREAM_CHANNEL, "");
-        binding.edtChannel.setText(channel);
+        edt_channel.setText(channel);
         // Setup share list
         if (mActivity != null) {
             adapter = new ListAdapter(mActivity);
         }
-        binding.listShare.setAdapter(adapter);
+        list_share.setAdapter(adapter);
 
-        binding.buttonFrequency.setOnClickListener(new View.OnClickListener() {
+        button_frequency.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showFrequencySelectionDialog();
             }
         });
 
+        // Set up click listeners for all buttons
+        btn_local_update.setOnClickListener(v -> onRefresh());
+        btn_refresh.setOnClickListener(v -> onRefresh());
+        btn_logout.setOnClickListener(v -> onLogout());
+        btn_start.setOnClickListener(v -> onShare());
+        btn_share.setOnClickListener(v -> onShare());
+        btn_back.setOnClickListener(v -> onBackPressed());
+        btn_login.setOnClickListener(v -> onLogin());
+        btn_code.setOnClickListener(v -> onPassword());
+        btn_send.setOnClickListener(v -> onPassword());
+        btn_password.setOnClickListener(v -> onPassword());
+        btn_new_user.setOnClickListener(v -> onPassword());
+        btn_reset_password.setOnClickListener(v -> onPassword());
+
         int freq_min = AppPreference.getInt(AppPreference.KEY.FREQUENCY_MIN, 1);
         switch (freq_min) {
-            case 1:  binding.buttonFrequency.setText("1 Minute"); break;
-            case 5:  binding.buttonFrequency.setText("5 Minutes"); break;
-            case 10: binding.buttonFrequency.setText("10 Minutes"); break;
-            case 15: binding.buttonFrequency.setText("15 Minutes"); break;
-            case 30: binding.buttonFrequency.setText("30 Minutes"); break;
+            case 1:  button_frequency.setText("1 Minute"); break;
+            case 5:  button_frequency.setText("5 Minutes"); break;
+            case 10: button_frequency.setText("10 Minutes"); break;
+            case 15: button_frequency.setText("15 Minutes"); break;
+            case 30: button_frequency.setText("30 Minutes"); break;
         }
 
         // Swipe refresh
-        binding.swipeRefresh.setOnRefreshListener(() -> {
-            binding.swipeRefresh.setRefreshing(false);
+        swipe_refresh.setOnRefreshListener(() -> {
+            swipe_refresh.setRefreshing(false);
             refreshToken();
         });
 
@@ -254,60 +377,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
         setupViewsForConfigs();
         setupStreamingModeSpinner();
         setupLocalStreaming();
-        initMonitoring();
-        
-        // Setup all click listeners
-        setupClickListeners();
-        
-        return rootView;
-    }
-    
-    private void setupClickListeners() {
-        binding.btnLocalUpdate.setOnClickListener(v -> onLocalUpdateClicked());
-        binding.txtChangePassword.setOnClickListener(v -> changePassword());
-        binding.txtUpdate.setOnClickListener(v -> updateName());
-        binding.btnStart.setOnClickListener(v -> startBroadCast());
-        binding.txtSpeedTest.setOnClickListener(v -> speedTest());
-        
-        // Multiple click listeners
-        binding.btnShare.setOnClickListener(v -> onShare());
-        binding.btnLogout.setOnClickListener(v -> onLogout());
-        binding.lyShare.setOnClickListener(v -> onShare());
-        binding.btnRefresh.setOnClickListener(v -> {
-            binding.edtUsername.setText(AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, ""));
-            binding.edtPassword.setText(AppPreference.getStr(AppPreference.KEY.LOGIN_PASSWORD, ""));
-            onLogin();
-        });
-        binding.btnBack.setOnClickListener(v -> {
-            binding.viewLogin.setVisibility(View.VISIBLE);
-            binding.lyUsername.setVisibility(View.GONE);
-            binding.btnNewUser.setVisibility(View.VISIBLE);
-            binding.btnPassword.setVisibility(View.VISIBLE);
-            binding.btnResetPassword.setVisibility(View.VISIBLE);
-            binding.btnCode.setVisibility(View.GONE);
-            binding.btnBack.setVisibility(View.GONE);
-            binding.btnSend.setVisibility(View.GONE);
-            binding.viewStream.setVisibility(View.GONE);
-        });
-        binding.btnLogin.setOnClickListener(v -> onLogin());
-        binding.btnPassword.setOnClickListener(v -> needPassword());
-        binding.btnResetPassword.setOnClickListener(v -> resetPassword());
-        binding.btnNewUser.setOnClickListener(v -> doLogin());
-        binding.btnCode.setOnClickListener(v -> onPassword());
-        
-        // QR code scanning
-        View txtQr = rootView.findViewById(R.id.txt_qr);
-        if (txtQr != null) {
-            txtQr.setOnClickListener(v -> {
-                if (mListener != null) {
-                    mListener.isDialog(true);
-                }
-                if (mActivity != null) {
-                    Intent i = new Intent(mActivity, QrCodeActivity.class);
-                    startActivityForResult(i, REQUEST_CODE_QR_SCAN);
-                }
-            });
-        }
+        return mView;
     }
 
     private void showFrequencySelectionDialog() {
@@ -317,7 +387,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
             @Override
             public void onFrequencySelected(String frequency) {
                 // Handle the selected frequency here
-                binding.buttonFrequency.setText(frequency);
+                button_frequency.setText(frequency);
                 // Optionally update another view with the selected frequency.
                 String[] parts = frequency.split(" ");
                 int number = Integer.parseInt(parts[0]);
@@ -344,18 +414,18 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
         String username =AppPreference.getStr(AppPreference.KEY.LOCAL_STREAM_NAME,"");
         String password =AppPreference.getStr(AppPreference.KEY.LOCAL_STREAM_PASSWORD,"");//
         String wifiDirectLocalChannel =AppPreference.getStr(AppPreference.KEY.LOCAL_STREAM_CHANNEL,getUniqueChannelName(getContext()));
-        binding.edtServerIp.setText(ip);
-        binding.edtPort.setText(String.format(Locale.getDefault(), "%d", port));
-        binding.edtLocalUser.setText(username);
-        binding.edtLocalPassword.setText(password);
-        binding.edtLocalChannel.setText(wifiDirectLocalChannel);
+        edt_server_ip.setText(ip);
+        edt_port.setText(String.format(Locale.getDefault(), "%d", port));
+        edt_local_user.setText(username);
+        edt_local_password.setText(password);
+        edt_local_channel.setText(wifiDirectLocalChannel);
         String finalUrl;
         if (!TextUtils.isEmpty(username)) {
             finalUrl = String.format(Locale.getDefault(), "rtsp://%s:%s@%s:%d/%s", username, password, ip, port, wifiDirectLocalChannel);
         } else {
             finalUrl = String.format(Locale.getDefault(), "rtsp://%s:%d/%s", ip, port, wifiDirectLocalChannel);
         }
-        binding.localPathValue.setText(finalUrl);
+        local_path_value.setText(finalUrl);
     }
 
     @Override
@@ -370,11 +440,11 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
     void onLocalUpdateClicked() {
         // Grab the local fields...
-        String ip   = binding.edtServerIp.getText().toString().trim();
-        String port = binding.edtPort.getText().toString().trim();
-        String user = binding.edtLocalUser.getText().toString().trim();
-        String pass = binding.edtLocalPassword.getText().toString().trim();
-        String channel = binding.edtLocalChannel.getText().toString().trim();
+        String ip   = edt_server_ip.getText().toString().trim();
+        String port = edt_port.getText().toString().trim();
+        String user = edt_local_user.getText().toString().trim();
+        String pass = edt_local_password.getText().toString().trim();
+        String channel = edt_local_channel.getText().toString().trim();
 
         // Validate / do something with them...
         if (TextUtils.isEmpty(ip)) {
@@ -399,7 +469,6 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
             return;
         }
 
-
         int portValue = Integer.parseInt(port);
         // ... and so on.
         AppPreference.setStr(AppPreference.KEY.LOCAL_STREAM_IP,ip);
@@ -415,7 +484,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
         } else {
             finalUrl = String.format(Locale.getDefault(), "rtsp://%s:%s/%s", ip, portString, channel);
         }
-        binding.localPathValue.setText(finalUrl);
+        local_path_value.setText(finalUrl);
         MessageUtil.showToast(getContext(), "Updating local settings with IP: " + ip);
     }
 
@@ -425,12 +494,12 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
            public void run() {
                int streamingMode = AppPreference.getInt(AppPreference.KEY.STREAMING_MODE, 0);
                if (streamingMode == 1) {
-                   binding.buttonMode.setText("Local Streaming");
-                   binding.localFieldsContainer.setVisibility(View.VISIBLE);
-                   binding.rowGps.setVisibility(View.GONE);
-                   binding.rowFrequency.setVisibility(View.GONE);
-                   binding.viewShare.setVisibility(View.GONE);
-                   binding.lyShare.setVisibility(View.GONE);
+                   spinner_mode.setText("Local Streaming");
+                   local_fields_container.setVisibility(View.VISIBLE);
+                   row_gps.setVisibility(View.GONE);
+                   row_frequency.setVisibility(View.GONE);
+                   view_share.setVisibility(View.GONE);
+                   ly_share.setVisibility(View.GONE);
                    View txtSpeedTest = (rootView != null) ? rootView.findViewById(R.id.txt_speed_test) : null;
                    if (txtSpeedTest != null) {
                        txtSpeedTest.setVisibility(View.GONE);
@@ -439,12 +508,12 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                    }
                } else {
                    Log.e(TAG, "drawing:");
-                   binding.buttonMode.setText("Cloud Streaming");
-                   binding.localFieldsContainer.setVisibility(View.GONE);
-                   binding.rowGps.setVisibility(View.VISIBLE);
-                   binding.rowFrequency.setVisibility(View.VISIBLE);
-                   binding.viewShare.setVisibility(View.VISIBLE);
-                   binding.lyShare.setVisibility(View.VISIBLE);
+                   spinner_mode.setText("Cloud Streaming");
+                   local_fields_container.setVisibility(View.GONE);
+                   row_gps.setVisibility(View.VISIBLE);
+                   row_frequency.setVisibility(View.VISIBLE);
+                   view_share.setVisibility(View.VISIBLE);
+                   ly_share.setVisibility(View.VISIBLE);
                    View txtSpeedTest = (rootView != null) ? rootView.findViewById(R.id.txt_speed_test) : null;
                    if (txtSpeedTest != null) {
                        txtSpeedTest.setVisibility(View.GONE);
@@ -460,7 +529,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
     }
     // Spinner logic for Cloud vs Local
     private void setupStreamingModeSpinner() {
-        binding.buttonMode.setOnClickListener(new View.OnClickListener() {
+        spinner_mode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MessageDialog messageDialog = MessageDialog.show("Streaming Mode", "Please choose the streaming Mode","Local Streaming" , "Cloud Streaming").setCancelButton(new OnDialogButtonClickListener<MessageDialog>() {
@@ -468,12 +537,12 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                     public boolean onClick(MessageDialog dialog, View v) {
                         dialog.dismiss();
                         // Show Cloud stuff
-                        binding.buttonMode.setText("Cloud Streaming");
-                        binding.localFieldsContainer.setVisibility(View.GONE);
-                        binding.rowGps.setVisibility(View.VISIBLE);
-                        binding.rowFrequency.setVisibility(View.VISIBLE);
-                        binding.viewShare.setVisibility(View.VISIBLE);
-                        binding.lyShare.setVisibility(View.VISIBLE);
+                        spinner_mode.setText("Cloud Streaming");
+                        local_fields_container.setVisibility(View.GONE);
+                        row_gps.setVisibility(View.VISIBLE);
+                        row_frequency.setVisibility(View.VISIBLE);
+                        view_share.setVisibility(View.VISIBLE);
+                        ly_share.setVisibility(View.VISIBLE);
                         View txtSpeedTest = (rootView != null) ? rootView.findViewById(R.id.txt_speed_test) : null;
                         if (txtSpeedTest != null) {
                             txtSpeedTest.setVisibility(View.GONE);
@@ -490,12 +559,12 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                     @Override
                     public boolean onClick(MessageDialog baseDialog, View v) {
                         baseDialog.dismiss();
-                        binding.buttonMode.setText("Local Streaming");
-                        binding.localFieldsContainer.setVisibility(View.VISIBLE);
-                        binding.rowGps.setVisibility(View.GONE);
-                        binding.rowFrequency.setVisibility(View.GONE);
-                        binding.viewShare.setVisibility(View.GONE);
-                        binding.lyShare.setVisibility(View.GONE);
+                        spinner_mode.setText("Local Streaming");
+                        local_fields_container.setVisibility(View.VISIBLE);
+                        row_gps.setVisibility(View.GONE);
+                        row_frequency.setVisibility(View.GONE);
+                        view_share.setVisibility(View.GONE);
+                        ly_share.setVisibility(View.GONE);
                         View txtSpeedTest = (rootView != null) ? rootView.findViewById(R.id.txt_speed_test) : null;
                         if (txtSpeedTest != null) {
                             txtSpeedTest.setVisibility(View.GONE);
@@ -518,38 +587,38 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
     // Show initial login UI
     void showInitialLogin() {
-        binding.lyUsername.setVisibility(View.GONE);
-        binding.lyPassword.setVisibility(View.GONE);
-        binding.btnLogin.setVisibility(View.GONE);
-        binding.btnPassword.setVisibility(View.VISIBLE);
-        binding.btnNewUser.setVisibility(View.VISIBLE);
-        binding.btnResetPassword.setVisibility(View.VISIBLE);
-        binding.btnCode.setVisibility(View.GONE);
-        binding.viewLogin.setVisibility(View.VISIBLE);
-        binding.btnBack.setVisibility(View.GONE);
-        binding.btnSend.setVisibility(View.GONE);
-        binding.viewStream.setVisibility(View.GONE);
+        ly_username.setVisibility(View.GONE);
+        ly_password.setVisibility(View.GONE);
+        btn_login.setVisibility(View.GONE);
+        btn_password.setVisibility(View.VISIBLE);
+        btn_new_user.setVisibility(View.VISIBLE);
+        btn_reset_password.setVisibility(View.VISIBLE);
+        btn_code.setVisibility(View.GONE);
+        view_login.setVisibility(View.VISIBLE);
+        btn_back.setVisibility(View.GONE);
+        btn_send.setVisibility(View.GONE);
+        view_stream.setVisibility(View.GONE);
     }
 
     // Basic initialization for streaming UI
     void initialize() {
         if (user_info == null) {
-            binding.viewShare.setVisibility(View.GONE);
-            binding.viewStream.setVisibility(View.GONE);
+            view_share.setVisibility(View.GONE);
+            view_stream.setVisibility(View.GONE);
             showInitialLogin();
             return;
         }
         if (myDevice() != null) {
-            binding.edtName.setText(myDevice().name);
-            AppPreference.setStr(AppPreference.KEY.DEVICE_NAME, binding.edtName.getText().toString());
+            edt_name.setText(myDevice().name);
+            AppPreference.setStr(AppPreference.KEY.DEVICE_NAME, edt_name.getText().toString());
         }
-        binding.viewStream.setVisibility(View.VISIBLE);
+        view_stream.setVisibility(View.VISIBLE);
         if (!user_info.isAdmin()) {
-            binding.lyShare.setVisibility(View.GONE);
+            ly_share.setVisibility(View.GONE);
         }
 
-        binding.swtStreaming.setChecked(AppPreference.getBool(AppPreference.KEY.BROADCAST, true));
-        binding.swtStreaming.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+        swt_streaming.setChecked(AppPreference.getBool(AppPreference.KEY.BROADCAST, true));
+        swt_streaming.setOnCheckedChangeListener((compoundButton, isChecked) -> {
             AppPreference.setBool(AppPreference.KEY.BROADCAST, isChecked);
             if (!isChecked) {
                 if (mActivity != null && mActivity.mCamService != null) {
@@ -557,14 +626,14 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                        // mListener.fragStopStreaming();
                     }
                 }
-                binding.swtGps.setChecked(true);
+                swt_gps.setChecked(true);
                 AppPreference.setBool(AppPreference.KEY.GPS_ENABLED, false);
                 stopTimer();
             }
         });
 
-        binding.swtGps.setChecked(AppPreference.getBool(AppPreference.KEY.GPS_ENABLED, false));
-        binding.swtGps.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        swt_gps.setChecked(AppPreference.getBool(AppPreference.KEY.GPS_ENABLED, false));
+        swt_gps.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppPreference.setBool(AppPreference.KEY.GPS_ENABLED, isChecked);
             if (isChecked) {
                 if (mListener != null) {
@@ -584,7 +653,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
             }
         });
 
-        if (binding.swtGps.isChecked()) {
+        if (swt_gps.isChecked()) {
             if (mListener != null) {
                 mListener.fragStartLocationService();
                 // Add a small delay to ensure service is started
@@ -594,13 +663,13 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
             }
         }
 
-        binding.swtRecording.setChecked(AppPreference.getBool(AppPreference.KEY.RECORD_BROADCAST, false));
-        binding.swtRecording.setOnCheckedChangeListener((compoundButton, b) ->
+        swt_recording.setChecked(AppPreference.getBool(AppPreference.KEY.RECORD_BROADCAST, false));
+        swt_recording.setOnCheckedChangeListener((compoundButton, b) ->
                 AppPreference.setBool(AppPreference.KEY.RECORD_BROADCAST, b)
         );
 
         if (user_info != null) {
-            binding.txtUser.setText(AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, ""));
+            txt_user.setText(AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, ""));
         }
 
         // Setup push channel if found
@@ -629,9 +698,9 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
         }
 
         if (TextUtils.isEmpty(user_info.expiration)) {
-            binding.txtAccountType.setText(user_info.account_status);
+            txt_account_type.setText(user_info.account_status);
         } else {
-            binding.txtAccountType.setText(String.format("%s(Expires %s)",
+            txt_account_type.setText(String.format("%s(Expires %s)",
                     user_info.account_status,
                     DateTimeUtils.dateToString(
                             DateTimeUtils.stringToDate(user_info.expiration, DateTimeUtils.DATE_FULL_FORMATTER),
@@ -647,9 +716,9 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
     // Update share UI
     void updateUI() {
-        binding.viewShare.setVisibility(View.VISIBLE);
+        view_share.setVisibility(View.VISIBLE);
         adapter.notifyDataSetChanged();
-        CommonUtil.setListViewHeightBasedOnItems(binding.listShare);
+        CommonUtil.setListViewHeightBasedOnItems(list_share);
     }
 
     // Starts location update timer
@@ -660,7 +729,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
     public void updateGPSLocation() {
         if (mActivity != null) {
             String latitude = "", longitude = "";
-            if (binding.swtGps.isChecked()) {
+            if (swt_gps.isChecked()) {
                 latitude = String.valueOf(LocationManagerService.lat);
                 longitude = String.valueOf(LocationManagerService.lng);
             }
@@ -718,7 +787,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
     // Called by code that refreshes the share list
     void getSharedDevice() {
-        binding.viewLogin.setVisibility(View.GONE);
+        view_login.setVisibility(View.GONE);
         if (mListener != null) {
             mListener.isDialog(true);
             mListener.showDialog();
@@ -826,8 +895,8 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
     // Show the login form
     void showLoginForm() {
-        binding.viewLogin.setVisibility(View.VISIBLE);
-        binding.viewStream.setVisibility(View.GONE);
+        view_login.setVisibility(View.VISIBLE);
+        view_stream.setVisibility(View.GONE);
     }
 
     // Called on user logout
@@ -921,22 +990,25 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
         AppPreference.removeKey(AppPreference.KEY.BROADCAST);
         AppPreference.removeKey(AppPreference.KEY.GPS_ENABLED);
         AppPreference.removeKey(AppPreference.KEY.RECORD_BROADCAST);
-        binding.edtUsername.setText("");
-        binding.edtPassword.setText("");
-        binding.edtName.setText("");
+        edt_username.setText("");
+        edt_password.setText("");
+        edt_name.setText("");
         if (mActivity != null && mActivity.mCamService != null) {
             mActivity.mCamService.stopStreaming();
         }
         if (LiveFragment.getInstance() != null) {
-            LiveFragment.getInstance().getTxtSpeed().setText("");
+            LiveFragment.getInstance().txt_speed.setText("");
         }
     }
 
+    void onBackPressed(){
+
+    }
     // Called when user tries to log in
     void onLogin() {
         if (mActivity == null) return;
-        String email = binding.edtUsername.getText().toString().trim();
-        String password = binding.edtPassword.getText().toString().trim();
+        String email = edt_username.getText().toString().trim();
+        String password = edt_password.getText().toString().trim();
         if (TextUtils.isEmpty(email)) {
             MessageUtil.showToast(mActivity, R.string.no_email);
             return;
@@ -990,8 +1062,8 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                 if (response.isSuccessful()) {
                     user_info = response.body();
                     updateDeviceBattery();
-                    binding.viewLogin.setVisibility(View.GONE);
-                    binding.viewStream.setVisibility(View.VISIBLE);
+                    view_login.setVisibility(View.GONE);
+                    view_stream.setVisibility(View.VISIBLE);
 
                     AppPreference.setStr(AppPreference.KEY.LOGIN_EMAIL, email);
                     AppPreference.setStr(AppPreference.KEY.LOGIN_PASSWORD, password);
@@ -1049,8 +1121,8 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
     // Refresh token logic
     public void refreshToken() {
-        String email = binding.edtUsername.getText().toString().trim();
-        String password = binding.edtPassword.getText().toString().trim();
+        String email = edt_username.getText().toString().trim();
+        String password = edt_password.getText().toString().trim();
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || !CommonUtil.isValidEmail(email)) {
             initLogin();
             return;
@@ -1071,8 +1143,8 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                             if (response.isSuccessful()) {
                                 user_info = response.body();
                                 updateDeviceBattery();
-                                binding.viewLogin.setVisibility(View.GONE);
-                                binding.viewStream.setVisibility(View.VISIBLE);
+                                view_login.setVisibility(View.GONE);
+                                view_stream.setVisibility(View.VISIBLE);
 
                                 AppPreference.setStr(AppPreference.KEY.LOGIN_EMAIL, email);
                                 AppPreference.setStr(AppPreference.KEY.LOGIN_PASSWORD, password);
@@ -1101,8 +1173,8 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
     }
 
     void initLogin() {
-        binding.viewLogin.setVisibility(View.VISIBLE);
-        binding.viewStream.setVisibility(View.GONE);
+        view_login.setVisibility(View.VISIBLE);
+        view_stream.setVisibility(View.GONE);
         AppPreference.removeKey(AppPreference.KEY.LOGIN_EMAIL);
         AppPreference.removeKey(AppPreference.KEY.LOGIN_PASSWORD);
         AppPreference.removeKey(AppPreference.KEY.USER_TOKEN);
@@ -1118,7 +1190,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
             mListener.isDialog(true);
         }
         nameDialog.setOkListener(view -> {
-            String name = nameDialog.getEdtCode().getText().toString().trim();
+            String name = nameDialog.edt_code.getText().toString().trim();
             if (TextUtils.isEmpty(name)) {
                 MessageUtil.showToast(getContext(), R.string.device_desc);
                 return;
@@ -1176,7 +1248,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                         }
                         if (response.isSuccessful()) {
                             AppPreference.setStr(AppPreference.KEY.DEVICE_NAME, name);
-                            binding.edtName.setText(name);
+                            edt_name.setText(name);
                             MessageUtil.showToast(mActivity, R.string.Success);
                             getSharedDevice();
                         } else {
@@ -1207,41 +1279,41 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
     // For "New User" click
     void doLogin() {
-        binding.viewLogin.setVisibility(View.VISIBLE);
-        binding.lyUsername.setVisibility(View.VISIBLE);
-        binding.lyPassword.setVisibility(View.VISIBLE);
-        binding.btnLogin.setVisibility(View.VISIBLE);
-        binding.btnPassword.setVisibility(View.GONE);
-        binding.btnResetPassword.setVisibility(View.GONE);
-        binding.btnNewUser.setVisibility(View.GONE);
-        binding.btnBack.setVisibility(View.VISIBLE);
-        binding.btnSend.setVisibility(View.GONE);
-        binding.viewStream.setVisibility(View.GONE);
+        view_login.setVisibility(View.VISIBLE);
+        ly_username.setVisibility(View.VISIBLE);
+        ly_password.setVisibility(View.VISIBLE);
+        btn_login.setVisibility(View.VISIBLE);
+        btn_password.setVisibility(View.GONE);
+        btn_reset_password.setVisibility(View.GONE);
+        btn_new_user.setVisibility(View.GONE);
+        btn_back.setVisibility(View.VISIBLE);
+        btn_send.setVisibility(View.GONE);
+        view_stream.setVisibility(View.GONE);
     }
 
     // For "Reset Password" click
     void resetPassword() {
-        binding.lyUsername.setVisibility(View.VISIBLE);
-        binding.btnNewUser.setVisibility(View.GONE);
-        binding.btnPassword.setVisibility(View.GONE);
-        binding.btnResetPassword.setVisibility(View.GONE);
-        binding.btnBack.setVisibility(View.VISIBLE);
-        binding.btnSend.setVisibility(View.VISIBLE);
-        binding.viewStream.setVisibility(View.GONE);
-        binding.viewLogin.setVisibility(View.VISIBLE);
+        ly_username.setVisibility(View.VISIBLE);
+        btn_new_user.setVisibility(View.GONE);
+        btn_password.setVisibility(View.GONE);
+        btn_reset_password.setVisibility(View.GONE);
+        btn_back.setVisibility(View.VISIBLE);
+        btn_send.setVisibility(View.VISIBLE);
+        view_stream.setVisibility(View.GONE);
+        view_login.setVisibility(View.VISIBLE);
     }
 
     // For "Need Password" click
     void needPassword() {
-        binding.lyUsername.setVisibility(View.VISIBLE);
-        binding.btnNewUser.setVisibility(View.GONE);
-        binding.btnResetPassword.setVisibility(View.GONE);
-        binding.btnPassword.setVisibility(View.GONE);
-        binding.btnCode.setVisibility(View.VISIBLE);
-        binding.btnBack.setVisibility(View.VISIBLE);
-        binding.btnSend.setVisibility(View.GONE);
-        binding.viewStream.setVisibility(View.GONE);
-        binding.viewLogin.setVisibility(View.VISIBLE);
+        ly_username.setVisibility(View.VISIBLE);
+        btn_new_user.setVisibility(View.GONE);
+        btn_reset_password.setVisibility(View.GONE);
+        btn_password.setVisibility(View.GONE);
+        btn_code.setVisibility(View.VISIBLE);
+        btn_back.setVisibility(View.VISIBLE);
+        btn_send.setVisibility(View.GONE);
+        view_stream.setVisibility(View.GONE);
+        view_login.setVisibility(View.VISIBLE);
     }
 
     // Clicking "Share new" invites user by email
@@ -1261,7 +1333,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                 if (mListener != null) {
                     mListener.isDialog(false);
                 }
-                String email = codeDialog.getEdtEmail().getText().toString();
+                String email = codeDialog.edt_email.getText().toString();
                 if (!CommonUtil.isValidEmail(email)) {
                     MessageUtil.showToast(mActivity, R.string.invalid_email);
                 } else {
@@ -1326,7 +1398,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
     // For "Send code" click
     void callResetPassword() {
         if (mActivity != null) {
-            String email = binding.edtUsername.getText().toString().trim();
+            String email = edt_username.getText().toString().trim();
             if (!CommonUtil.isValidEmail(email)) {
                 MessageUtil.showToast(mActivity, R.string.invalid_email);
                 return;
@@ -1383,8 +1455,8 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
     // For "Validate code" click
     void onPassword() {
         if (mActivity == null) return;
-        String email = binding.edtUsername.getText().toString().trim();
-        binding.edtPassword.setText("");
+        String email = edt_username.getText().toString().trim();
+        edt_password.setText("");
         if (TextUtils.isEmpty(email)) {
             MessageUtil.showToast(mActivity, R.string.no_email);
             return;
@@ -1444,7 +1516,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
     // Called after user enters code
     public void loginCode(String pin_code) {
-        String email = binding.edtUsername.getText().toString().trim();
+        String email = edt_username.getText().toString().trim();
         loginWithCode(email, pin_code);
     }
 
@@ -1508,8 +1580,8 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
             if (mListener != null) {
                 mListener.isDialog(false);
             }
-            String password = pwdDialog.getEdtPassword().getText().toString();
-            String re_password = pwdDialog.getEdtRepassword().getText().toString();
+            String password = pwdDialog.edt_password.getText().toString();
+            String re_password = pwdDialog.edt_repassword.getText().toString();
             if (TextUtils.isEmpty(password)) {
                 MessageUtil.showToast(mActivity, R.string.invalid_password);
                 return;
@@ -1530,7 +1602,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
     void setPasswordAPI(String token, String password) {
         AppPreference.setStr(AppPreference.KEY.PWD_TOKEN, token);
-        String email = binding.edtUsername.getText().toString().trim();
+        String email = edt_username.getText().toString().trim();
         if (mListener != null) {
             mListener.isDialog(true);
             mListener.showDialog();
@@ -1547,7 +1619,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                         if (response.isSuccessful()) {
                             if (response.body().success) {
                                 MessageUtil.showToast(mActivity, "Set Password Success!");
-                                binding.edtPassword.setText(password);
+                                edt_password.setText(password);
                                 onLogin();
                             } else {
                                 MessageUtil.showToast(mActivity, "Failed to set your password.");
@@ -1597,8 +1669,8 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                 if (mListener != null) {
                     mListener.isDialog(false);
                 }
-                String password = pwdDialog.getEdtPassword().getText().toString();
-                String re_password = pwdDialog.getEdtRepassword().getText().toString();
+                String password = pwdDialog.edt_password.getText().toString();
+                String re_password = pwdDialog.edt_repassword.getText().toString();
                 if (TextUtils.isEmpty(password)) {
                     MessageUtil.showToast(mActivity, R.string.invalid_password);
                     return;
@@ -1621,13 +1693,13 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
     // "Update" button next to device name
     void updateName() {
         if (mActivity != null) {
-            String name = binding.edtName.getText().toString().trim();
+            String name = edt_name.getText().toString().trim();
             if (TextUtils.isEmpty(name)) {
                 MessageUtil.showToast(mActivity, R.string.no_name);
                 return;
             }
             String latitude = "", longitude = "";
-            if (binding.swtGps.isChecked()) {
+            if (swt_gps.isChecked()) {
                 latitude = String.valueOf(LocationManagerService.lat);
                 longitude = String.valueOf(LocationManagerService.lng);
             }
@@ -1732,7 +1804,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
     // Update device battery info
     public void updateDeviceBattery() {
         String latitude = "", longitude = "";
-        if (binding.swtGps.isChecked()) {
+        if (swt_gps.isChecked()) {
             latitude = String.valueOf(LocationManagerService.lat);
             longitude = String.valueOf(LocationManagerService.lng);
         }
@@ -1744,7 +1816,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
     // Called from outside for streaming updates
     public void updateDeviceStreaming(boolean streaming) {
         String lat = "", lng = "";
-        if (binding.swtGps.isChecked()) {
+        if (swt_gps.isChecked()) {
             lat = String.valueOf(LocationManagerService.lat);
             lng = String.valueOf(LocationManagerService.lng);
         }
@@ -1753,7 +1825,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
     public void updateDeviceStreaming(boolean streaming, boolean showing) {
         String lat = "", lng = "";
-        if (binding.swtGps.isChecked()) {
+        if (swt_gps.isChecked()) {
             lat = String.valueOf(LocationManagerService.lat);
             lng = String.valueOf(LocationManagerService.lng);
         }
@@ -1771,10 +1843,10 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
         if (isLocalMode) {
             // Local streaming logic
-            String serverIP = binding.edtServerIp.getText().toString().trim();
-            String port = binding.edtPort.getText().toString().trim();
-            String localUser = binding.edtLocalUser.getText().toString().trim();
-            String localPassword = binding.edtLocalPassword.getText().toString().trim();
+            String serverIP = edt_server_ip.getText().toString().trim();
+            String port = edt_port.getText().toString().trim();
+            String localUser = edt_local_user.getText().toString().trim();
+            String localPassword = edt_local_password.getText().toString().trim();
 
             if (TextUtils.isEmpty(serverIP)) {
                 MessageUtil.showToast(mActivity, "Please enter Server IP");
@@ -1792,24 +1864,24 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
 
         } else {
             // Cloud streaming logic
-            if (!binding.swtStreaming.isChecked()) {
+            if (!swt_streaming.isChecked()) {
                 MessageUtil.showToast(mActivity, R.string.stream_disabled);
                 return;
             }
             // If you still needed these old fields:
             //   edt_url is hidden in your new UI
             //   We have `edt_channel`, `edt_username`, `edt_password` for Cloud
-            String channel = binding.edtChannel.getText().toString().trim();
+            String channel = edt_channel.getText().toString().trim();
             if (TextUtils.isEmpty(channel)) {
                 MessageUtil.showToast(mActivity, R.string.no_channel);
                 return;
             }
-            String uname = binding.edtUsername.getText().toString().trim();
+            String uname = edt_username.getText().toString().trim();
             if (TextUtils.isEmpty(uname)) {
                 MessageUtil.showToast(mActivity, R.string.invalid_username);
                 return;
             }
-            String pwd = binding.edtPassword.getText().toString().trim();
+            String pwd = edt_password.getText().toString().trim();
             if (TextUtils.isEmpty(pwd)) {
                 MessageUtil.showToast(mActivity, R.string.invalid_password);
                 return;
@@ -1850,62 +1922,73 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
         }
     }
 
-    // Additional OnClick references from your layout
+
     public void onClick(View v) {
-        int id = v.getId();
-        if (id == R.id.btn_share) {
-            if (mListener != null) {
-                mListener.isDialog(true);
-            }
-            if (mActivity != null) {
-                mActivity.startActivity(new Intent(mActivity, ShareActivity.class));
-            }
-        } else if (id == R.id.btn_logout) {
-            if (mListener != null) {
-                mListener.isDialog(true);
-            }
-            MessageDialog logoutConfirm = MessageDialog.show(
-                            getString(R.string.unregister),
-                            getString(R.string.label_logout),
-                            getString(R.string.Okay),
-                            getString(R.string.cancel))
-                    .setCancelButton((dialog, v1) -> {
-                        dialog.dismiss();
-                        return false;
-                    })
-                    .setOkButton((baseDialog, v12) -> {
-                        onLogout();
-                        baseDialog.dismiss();
-                        return false;
-                    });
-            logoutConfirm.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-            logoutConfirm.setCancelTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-        } else if (id == R.id.ly_share) {
-            onShare();
-        } else if (id == R.id.btn_refresh) {
-            binding.edtUsername.setText(AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, ""));
-            binding.edtPassword.setText(AppPreference.getStr(AppPreference.KEY.LOGIN_PASSWORD, ""));
-            onLogin();
-        } else if (id == R.id.btn_back) {
-            showInitialLogin();
-        } else if (id == R.id.btn_login) {
-            onLogin();
-        } else if (id == R.id.btn_password) {
-            needPassword();
-        } else if (id == R.id.btn_reset_password) {
-            resetPassword();
-        } else if (id == R.id.btn_new_user) {
-            doLogin();
-        } else if (id == R.id.btn_code) {
-            onPassword();
-        } else if (id == R.id.txt_qr) {
-            if (mListener != null) {
-                mListener.isDialog(true);
-            }
-            if (mActivity != null) {
-                Intent i = new Intent(mActivity, QrCodeActivity.class);
-                startActivityForResult(i, REQUEST_CODE_QR_SCAN);
-            }
+        switch (v.getId()) {
+            case R.id.btn_share:
+                if (mListener != null) {
+                    mListener.isDialog(true);
+                }
+                if (mActivity != null) {
+                    mActivity.startActivity(new Intent(mActivity, ShareActivity.class));
+                }
+                break;
+            case R.id.btn_logout:
+                if (mListener != null) {
+                    mListener.isDialog(true);
+                }
+                MessageDialog logoutConfirm = MessageDialog.show(
+                                getString(R.string.unregister),
+                                getString(R.string.label_logout),
+                                getString(R.string.Okay),
+                                getString(R.string.cancel))
+                        .setCancelButton((dialog, v1) -> {
+                            dialog.dismiss();
+                            return false;
+                        })
+                        .setOkButton((baseDialog, v12) -> {
+                            onLogout();
+                            baseDialog.dismiss();
+                            return false;
+                        });
+                logoutConfirm.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
+                logoutConfirm.setCancelTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
+                break;
+            case R.id.ly_share:
+                onShare();
+                break;
+            case R.id.btn_refresh:
+                edt_username.setText(AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, ""));
+                edt_password.setText(AppPreference.getStr(AppPreference.KEY.LOGIN_PASSWORD, ""));
+                onLogin();
+                break;
+            case R.id.btn_back:
+                showInitialLogin();
+                break;
+            case R.id.btn_login:
+                onLogin();
+                break;
+            case R.id.btn_password:
+                needPassword();
+                break;
+            case R.id.btn_reset_password:
+                resetPassword();
+                break;
+            case R.id.btn_new_user:
+                doLogin();
+                break;
+            case R.id.btn_code:
+                onPassword();
+                break;
+            case R.id.txt_qr:
+                if (mListener != null) {
+                    mListener.isDialog(true);
+                }
+                if (mActivity != null) {
+                    Intent i = new Intent(mActivity, QrCodeActivity.class);
+                    startActivityForResult(i, REQUEST_CODE_QR_SCAN);
+                }
+                break;
         }
     }
 
@@ -1918,7 +2001,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
         }
         if (resultCode == RESULT_OK && data != null && requestCode == REQUEST_CODE_QR_SCAN) {
             String result = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
-            binding.edtChannel.setText(result);
+            edt_channel.setText(result);
         }
     }
     private boolean isUpdatingStatus = false;
@@ -1938,25 +2021,25 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
             try {
                 if (!isAdded()) return;
                 if (TextUtils.equals(body, offlineStr)) {
-                    binding.btnStart.setEnabled(true);
-                    binding.btnStart.setText(R.string.action_title_start);
+                    btn_start.setEnabled(true);
+                    btn_start.setText(R.string.action_title_start);
                     if (LiveFragment.getInstance() != null && LiveFragment.getInstance().isAdded()) {
                         if (!AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false)) {
-                            LiveFragment.getInstance().getIcStream().setImageResource(R.mipmap.ic_stream);
+                            LiveFragment.getInstance().ic_stream.setImageResource(R.mipmap.ic_stream);
                         }
                         LiveFragment.getInstance().is_streaming = false;
                         stopStream();
                     }
                 } else if (TextUtils.equals(body, onlineStr)) {
-                    binding.btnStart.setEnabled(true);
-                    binding.btnStart.setText(R.string.action_title_stop);
+                    btn_start.setEnabled(true);
+                    btn_start.setText(R.string.action_title_stop);
                     if (LiveFragment.getInstance() != null && LiveFragment.getInstance().isAdded()) {
-                        LiveFragment.getInstance().getIcStream().setImageResource(R.mipmap.ic_stream_active);
+                        LiveFragment.getInstance().ic_stream.setImageResource(R.mipmap.ic_stream_active);
                         startStream();
                     }
                 } else if (TextUtils.equals(body, connectingStr)) {
-                    binding.btnStart.setEnabled(false);
-                    binding.btnStart.setText(R.string.action_title_stop);
+                    btn_start.setEnabled(false);
+                    btn_start.setText(R.string.action_title_stop);
                     if (LiveFragment.getInstance() != null && LiveFragment.getInstance().isAdded()) {
                         if (mActivity.isStreaming()) {
                             startStream();
@@ -1965,7 +2048,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                         }
                     }
                 }
-                binding.txtStatus.setText(body);
+                txt_status.setText(body);
             } finally {
                 isUpdatingStatus = false;
             }
@@ -1975,7 +2058,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
         boolean isStreaming = AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false);
         if (isStreaming) {
             if (LiveFragment.getInstance() != null && LiveFragment.getInstance().isAdded()) {
-                LiveFragment.getInstance().getIcStream().setImageResource(R.mipmap.ic_stream_active);
+                LiveFragment.getInstance().ic_stream.setImageResource(R.mipmap.ic_stream_active);
             }
 //            if (MainActivity.getInstance() != null ) {
 //                if (MainActivity.getInstance().mCamService != null) {
@@ -1997,7 +2080,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
     private void stopStream() {
         if (MainActivity.getInstance() != null) {
             if (LiveFragment.getInstance() != null && LiveFragment.getInstance().isAdded()) {
-                LiveFragment.getInstance().getIcStream().setImageResource(R.mipmap.ic_stream);
+                LiveFragment.getInstance().ic_stream.setImageResource(R.mipmap.ic_stream);
             }
 //            MainActivity.instance.stopFragUSBService();
 //            MainActivity.instance.stopFragWifiService();
@@ -2011,192 +2094,52 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
     @SuppressLint("DefaultLocale")
     public void updateSpeed(String speed) {
         if (mActivity == null || !isAdded()) return;
-        
-        // Guard: Don't update speed if streaming is not active or service is null
-        boolean eglManagerExists = mActivity.sharedEglManager != null;
-        boolean eglStreaming = eglManagerExists && mActivity.sharedEglManager.mStreaming;
-        boolean camServiceExists = mActivity.mCamService != null;
-        boolean camServiceStreaming = camServiceExists && mActivity.mCamService.isStreaming();
-        
-        // Throttle speed updates to reduce frequency
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - mLastSpeedUpdateTime < SPEED_UPDATE_THROTTLE_MS) {
-            return; // Skip this update
-        }
-        mLastSpeedUpdateTime = currentTime;
-        
-        Log.d(TAG, "updateSpeed: eglManager=" + eglManagerExists + ", eglStreaming=" + eglStreaming + 
-                   ", camService=" + camServiceExists + ", camStreaming=" + camServiceStreaming + ", speed=" + speed);
-        
-        if (!eglManagerExists || !eglStreaming || !camServiceExists || !camServiceStreaming) {
-            Log.d(TAG, "updateSpeed: Ignoring speed update - conditions not met");
-            return;
-        }
-        
         mActivity.runOnUiThread(() -> {
-            binding.txtSpeed.setText(speed);
-            binding.txtSpeed.setTextColor(Color.WHITE);
+            txt_speed.setText(speed);
+            txt_speed.setTextColor(Color.WHITE);
             if (LiveFragment.getInstance() != null) {
-                LiveFragment.getInstance().getTxtSpeed().setTextColor(Color.WHITE);
+                LiveFragment.getInstance().txt_speed.setTextColor(Color.WHITE);
                 String channel = AppPreference.getStr(AppPreference.KEY.STREAM_CHANNEL, "");
                 if (!TextUtils.isEmpty(speed) && !TextUtils.isEmpty(channel)) {
-                                    Streamer.Size size = mActivity.sharedEglManager.videoSize;
-                String chInfo = String.format("Channel: %s %s", channel, speed);
-                if (mActivity.sharedEglManager.mStreamer != null && size != null) {
-                    double fps = mActivity.sharedEglManager.mStreamer.getFps();
-                    String resInfo = String.format("Resolution: %d x %d, %.2f fps", size.width, size.height, fps);
-                    LiveFragment.getInstance().getTxtSpeed().setText(String.format("%s\n%s", chInfo, resInfo));
-                } else if (size == null) {
-                    // If videoSize is null, just show channel info without resolution
-                    LiveFragment.getInstance().getTxtSpeed().setText(chInfo);
-                }
+                    if (LiveFragment.getInstance().is_camera_opened && mActivity.mCamService != null) {
+                        Streamer.Size size = mActivity.mCamService.mEglManager.videoSize;
+                        String chInfo = String.format("Channel: %s %s", channel, speed);
+                        if (mActivity.mCamService.mEglManager.mStreamer != null) {
+                            double fps = mActivity.mCamService.mEglManager.mStreamer.getFps();
+                            String resInfo = String.format("Resolution: %d x %d, %.2f fps", size.width, size.height, fps);
+                            LiveFragment.getInstance().txt_speed.setText(String.format("%s\n%s", chInfo, resInfo));
+                        }
+                    }else if (LiveFragment.getInstance().is_usb_opened && mActivity.mUSBService != null) {
+                        Streamer.Size size = mActivity.mUSBService.mEglManager.videoSize;
+                        String chInfo = String.format("Channel: %s %s", channel, speed);
+                        if (mActivity.mUSBService.mEglManager.mStreamer != null) {
+                            double fps = mActivity.mUSBService.mEglManager.mStreamer.getFps();
+                            String resInfo = String.format("Resolution: %d x %d, %.2f fps", size.width, size.height, fps);
+                            LiveFragment.getInstance().txt_speed.setText(String.format("%s\n%s", chInfo, resInfo));
+                        }
+                    }else if (LiveFragment.getInstance().is_audio_only && mActivity.mAudioService != null) {
+                        Streamer.Size size = mActivity.mAudioService.mEglManager.videoSize;
+                        String chInfo = String.format("Channel: %s %s", channel, speed);
+                        if (mActivity.mAudioService.mEglManager.mStreamer != null) {
+                            double fps = mActivity.mAudioService.mEglManager.mStreamer.getFps();
+                            String resInfo = String.format("Resolution: %d x %d, %.2f fps", 0, 0, fps);
+                            LiveFragment.getInstance().txt_speed.setText(String.format("%s\n%s", chInfo, resInfo));
+                        }
+                    }else if (LiveFragment.getInstance().is_cast_opened && mActivity.mCastService != null) {
+                        Streamer.Size size = mActivity.mCastService.mEglManager.videoSize;
+                        String chInfo = String.format("Channel: %s %s", channel, speed);
+                        if (mActivity.mCastService.mEglManager.mStreamer != null) {
+                            double fps = mActivity.mCastService.mEglManager.mStreamer.getFps();
+                            String resInfo = String.format("Resolution: %d x %d, %.2f fps", size.width, size.height, fps);
+                            LiveFragment.getInstance().txt_speed.setText(String.format("%s\n%s", chInfo, resInfo));
+                        }
+                    }
                 } else {
-                    LiveFragment.getInstance().getTxtSpeed().setText("");
+                    LiveFragment.getInstance().txt_speed.setText("");
                 }
-                // Don't call handleStreamView here - it's causing UI flicker
-                // The stream view should only be updated when stream state actually changes
-                // LiveFragment.getInstance().handleStreamView();
+                LiveFragment.getInstance().handleStreamView();
             }
-            Log.d(TAG, "Raw speed: " + speed);
-            processSpeedValue(speed);
         });
-    }
-
-    // Add these member variables
-    private long mLowSpeedStartTime = -1;
-    private long mLastSpeedUpdateTime = 0;
-    private static final long SPEED_UPDATE_THROTTLE_MS = 5000; // Only update every 5 seconds
-    private final Handler mSpeedHandler = new Handler(Looper.getMainLooper());
-    private final Runnable mSpeedCheckRunnable = new Runnable() {
-        @Override
-        public void run() {
-            checkSpeedDuration();
-            mSpeedHandler.postDelayed(this, 1000);
-        }
-    };
-
-    private void processSpeedValue(String speed) {
-        double currentSpeed = parseSpeed(speed);
-        Log.d(TAG, "Parsed speed: " + currentSpeed);
-
-        if (currentSpeed > 36.0) {
-            // Speed is good - reset tracking
-            if (mLowSpeedStartTime != -1) {
-                Log.d(TAG, "Speed improved to " + currentSpeed + ", resetting timer");
-                mLowSpeedStartTime = -1;
-            }
-        } else if (currentSpeed > 0) {  // Valid speed ≤30
-            long now = System.currentTimeMillis();
-
-            if (mLowSpeedStartTime == -1) {
-                // Start tracking low speed
-                mLowSpeedStartTime = now;
-                Log.d(TAG, "Low speed detected: " + currentSpeed + ", starting timer");
-            } else {
-                // Log ongoing low speed duration
-                long duration = now - mLowSpeedStartTime;
-                Log.d(TAG, "Low speed ongoing: " + currentSpeed +
-                        " for " + duration + "ms");
-            }
-        }
-    }
-
-    private void checkSpeedDuration() {
-        if (mLowSpeedStartTime == -1) return;
-
-        long now = System.currentTimeMillis();
-        long duration = now - mLowSpeedStartTime;
-        Log.d(TAG, "Checking low speed duration: " + duration + "ms");
-
-        if (duration >= 30000) {
-            Log.d(TAG, "LOW SPEED CONDITION MET: 6+ seconds");
-            onLowSpeedDetected();
-            // Reset to detect new periods
-            mLowSpeedStartTime = -1;
-        }
-    }
-
-
-    private double parseSpeed(String speed) {
-        if (TextUtils.isEmpty(speed)) {
-            return -1;
-        }
-        try {
-            // Normalize the string to lowercase for easier handling
-            String lowerSpeed = speed.toLowerCase();
-
-            // Check if value is in Mbps (e.g., "1.23 Mbps")
-            if (lowerSpeed.contains("mbps")) {
-                String numberPart = lowerSpeed.replace("mbps", "")
-                        .replaceAll("[^\\d.]", "")
-                        .trim();
-                if (!numberPart.isEmpty()) {
-                    double mbps = Double.parseDouble(numberPart);
-                    // Convert Mbps to Kbps (1 Mbps = 1000 Kbps)
-                    return mbps * 1000;
-                }
-            }
-            // Check if value is in Kbps (e.g., "28.1Kbps")
-            else if (lowerSpeed.contains("kbps")) {
-                String numberPart = lowerSpeed.replace("kbps", "")
-                        .replaceAll("[^\\d.]", "")
-                        .trim();
-                if (!numberPart.isEmpty()) {
-                    return Double.parseDouble(numberPart);
-                }
-            }
-            // Fallback: extract first numeric value
-            else {
-                Pattern pattern = Pattern.compile("(\\d+\\.?\\d*)");
-                Matcher matcher = pattern.matcher(lowerSpeed);
-                if (matcher.find()) {
-                    return Double.parseDouble(matcher.group(1));
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Speed parsing error: " + speed, e);
-        }
-        return -1;
-    }
-
-    private void onLowSpeedDetected() {
-        // YOUR ACTION HERE
-        int position = AppPreference.getSafeIntPreference(AppPreference.KEY.STREAMING_MODE, 0);
-        if (position != 3) {
-            Log.w(TAG, "Speed ≤30 kbps for 6+ seconds - PERFORMING ACTION");
-            // Example: mActivity.showLowSpeedWarning();
-            LiveFragment fragment = LiveFragment.getInstance();
-            if (fragment != null && fragment.isAdded()) {
-                if (!fragment.is_cast_opened) {
-                    fragment.onItemSelected(null,null, position, 0);
-                    fragment.isItemRestart = true;
-                }
-            } else {
-                Log.w(TAG, "LiveFragment not available for low speed warning");
-            }
-        }
-    }
-
-    public void startSpeedMonitoring() {
-        Log.d(TAG, "Starting speed monitoring");
-        mLowSpeedStartTime = -1;
-        mSpeedHandler.post(mSpeedCheckRunnable);
-    }
-
-    public void stopSpeedMonitoring() {
-        Log.d(TAG, "Stopping speed monitoring");
-        mSpeedHandler.removeCallbacks(mSpeedCheckRunnable);
-    }
-
-    // Call this when you start receiving speed updates
-    public void initMonitoring() {
-        startSpeedMonitoring();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stopSpeedMonitoring();
     }
     @Override
     public void onRefresh() {
@@ -2238,8 +2181,8 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
         class ViewHolder {
             TextView txt_email;
             TextView txt_status;
-            TextView txt_action;
             TextView txt_share;
+            TextView txt_action;
         }
 
         @Override
@@ -2248,10 +2191,12 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.row_text, parent, false);
                 holder = new ViewHolder();
+                
                 holder.txt_email = convertView.findViewById(R.id.txt_email);
                 holder.txt_status = convertView.findViewById(R.id.txt_status);
-                holder.txt_action = convertView.findViewById(R.id.txt_action);
                 holder.txt_share = convertView.findViewById(R.id.txt_share);
+                holder.txt_action = convertView.findViewById(R.id.txt_action);
+                
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -2336,7 +2281,7 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                             if (response.isSuccessful()) {
                                 mDataList.remove(invite);
                                 adapter.notifyDataSetChanged();
-                                CommonUtil.setListViewHeightBasedOnItems(binding.listShare);
+                                CommonUtil.setListViewHeightBasedOnItems(list_share);
                             }
                         }
                         @Override
@@ -2357,21 +2302,5 @@ public class StreamingFragment extends BaseFragment implements FragmentVisibilit
                 }
             });
         }
-    }
-    
-    // ===== FRAGMENT VISIBILITY METHODS =====
-    
-    @Override
-    public void onFragmentVisible() {
-        Log.d("StreamingFragment", "Fragment became visible");
-        if (isAdded() && getActivity() != null) {
-            // Update streaming UI
-        }
-    }
-    
-    @Override
-    public void onFragmentHidden() {
-        Log.d("StreamingFragment", "Fragment became hidden");
-        // Simple cleanup
     }
 }

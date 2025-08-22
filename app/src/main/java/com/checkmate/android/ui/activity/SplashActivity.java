@@ -4,19 +4,16 @@ package com.checkmate.android.ui.activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -24,16 +21,19 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -44,6 +44,11 @@ import com.checkmate.android.AppPreference;
 import com.checkmate.android.BuildConfig;
 import com.checkmate.android.R;
 import com.checkmate.android.networking.HttpApiService;
+import com.checkmate.android.ui.dialog.ActivationCompleteDialog;
+import com.checkmate.android.ui.dialog.ActivationDialog;
+import com.checkmate.android.ui.dialog.CodeDialog;
+import com.checkmate.android.ui.dialog.MachineCodeDialog;
+import com.checkmate.android.ui.dialog.SerialDialog;
 import com.checkmate.android.util.CommonUtil;
 import com.checkmate.android.util.Crypto;
 import com.checkmate.android.util.DeviceUtils;
@@ -51,24 +56,11 @@ import com.checkmate.android.util.MainActivity;
 import com.checkmate.android.util.MessageUtil;
 import com.checkmate.android.util.ResourceUtil;
 import com.checkmate.android.util.RootCommandExecutor;
-import com.checkmate.android.util.PreferenceInitializer;
-import com.checkmate.android.util.Logger;
-import com.checkmate.android.util.CrashReporter;
-import com.checkmate.android.ui.dialog.ActivationCompleteDialog;
-import com.checkmate.android.ui.dialog.ActivationDialog;
-import com.checkmate.android.ui.dialog.CodeDialog;
-import com.checkmate.android.ui.dialog.MachineCodeDialog;
-import com.checkmate.android.ui.dialog.SerialDialog;
-import com.blikoon.qrcodescanner.QrCodeActivity;
-import com.checkmate.android.util.StoragePermissionHelper;
-import com.checkmate.android.util.SplashStorageHelper;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -76,9 +68,6 @@ import java.util.UUID;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import android.view.WindowManager;
-import java.util.Arrays;
 
 
 public class SplashActivity extends BaseActivity {
@@ -88,7 +77,6 @@ public class SplashActivity extends BaseActivity {
     private static final int REQUEST_CODE_QR_SCAN_SERIAL_NUMBER = 101;
     private static final int REQUEST_CODE_QR_SCAN_ACTIVATION = 102;
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 105; // Define your request code
-    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 106; // Notification permission request code
 
     private static final String[] PERMISSIONS = {
             Manifest.permission.CAMERA,
@@ -103,83 +91,37 @@ public class SplashActivity extends BaseActivity {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.CHANGE_NETWORK_STATE,
             Manifest.permission.WAKE_LOCK,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.MODIFY_AUDIO_SETTINGS,
             Manifest.permission.READ_MEDIA_AUDIO,
+            Manifest.permission.MANAGE_DEVICE_POLICY_AUDIO_OUTPUT,
             Manifest.permission.CAPTURE_AUDIO_OUTPUT
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Logger.i(TAG, "SplashActivity onCreate started");
         setContentView(R.layout.activity_splash);
-
-        // Create notification channels for Android 14 compatibility
-        createNotificationChannels();
-
-        // Remove notification permission request from onCreate - will be requested after activation
-
-        // Prevent screen blinking when notifications appear
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-        // Additional flags to prevent blinking and ensure stable display
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
-
-        // Set window to be stable and prevent focus changes from causing blinking
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
-                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
-                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-        );
-
-        // Ensure the window is stable and doesn't get affected by system UI changes
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.blue_dark));
-        }
-
         runADBCommands();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         connection_manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        Logger.i(TAG, "SplashActivity onCreate completed");
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-
-        // Prevent screen blinking when focus changes (e.g., when notifications appear)
-        if (hasFocus) {
-            // Ensure the window stays stable
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+    void runADBCommands(){
+        int capOut = ActivityCompat.checkSelfPermission(getApplicationContext(), "android.permission.CAPTURE_AUDIO_OUTPUT");
+        if (capOut == PackageManager.PERMISSION_GRANTED) {
+            RootCommandExecutor.disableProjectionConfirmation();
+            RootCommandExecutor.hideCameraGreenDot();
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Logger.i(TAG, "SplashActivity onPause");
-        // Keep the screen on even when paused to prevent blinking
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
+    ConnectivityManager connection_manager;
 
     @Override
     protected void onResume() {
         super.onResume();
-        Logger.i(TAG, "SplashActivity onResume");
-
-        // Ensure window stability when resuming
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
 
         if (AppPreference.getBool(AppPreference.KEY.APP_FORCE_QUIT, true)) {
             AppPreference.setBool(AppPreference.KEY.APP_FORCE_QUIT, true);
@@ -198,25 +140,18 @@ public class SplashActivity extends BaseActivity {
                 }
             }, 2500);
         }
-        Logger.d(TAG, "App force quit check: " + AppPreference.getBool(AppPreference.KEY.APP_FORCE_QUIT, true));
     }
-
-    void runADBCommands(){
-        Logger.d(TAG, "Running ADB commands");
-        int capOut = ActivityCompat.checkSelfPermission(getApplicationContext(), "android.permission.CAPTURE_AUDIO_OUTPUT");
-        if (capOut == PackageManager.PERMISSION_GRANTED) {
-            Logger.i(TAG, "CAPTURE_AUDIO_OUTPUT permission granted, executing root commands");
-            RootCommandExecutor.disableProjectionConfirmation();
-            RootCommandExecutor.hideCameraGreenDot();
-        } else {
-            Logger.w(TAG, "CAPTURE_AUDIO_OUTPUT permission not granted");
-        }
-    }
-
-    ConnectivityManager connection_manager;
 
     public void verifyPermissions(Activity activity) {
-        Logger.i(TAG, "Verifying permissions");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // For Android 13 and above
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CAMERA},
+                        CAMERA_PERMISSION_REQUEST_CODE);
+            }
+        }
         int permission0 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
         int permission1 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permission2 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -259,7 +194,6 @@ public class SplashActivity extends BaseActivity {
             requestModifySystemSettingsPermission(activity);
             checkStoragePermissions();
         } else {
-            Logger.i(TAG, "All permissions already granted");
             gotoNextView();
         }
     }
@@ -306,33 +240,19 @@ public class SplashActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Logger.i(TAG, "onRequestPermissionsResult: requestCode=" + requestCode);
-
-        // Handle storage permissions using StoragePermissionHelper
-        StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
-
-        // Handle storage helper permissions
-        if (storageHelper != null) {
-            storageHelper.handlePermissionResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_STORAGE_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("Storage", "Permission granted!");
+            } else {
+                Log.e("Storage", "Permission denied!");
+            }
         }
 
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Logger.i(TAG, "Camera permission granted");
+                Log.d("Camera", "Permission granted!");
             } else {
-                Logger.w(TAG, "Camera permission denied");
-            }
-        }
-
-        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Logger.i(TAG, "Notification permission granted");
-                Toast.makeText(this, "Notifications enabled successfully!", Toast.LENGTH_SHORT).show();
-                openMainScreen();
-            } else {
-                Logger.w(TAG, "Notification permission denied");
-                // Show dialog to guide user to settings
-                showNotificationPermissionDialog();
+                Log.d("Camera", "Permission denied!");
             }
         }
     }
@@ -377,26 +297,8 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
-    private boolean notificationAsked = false;
-
-    private void maybeAskNotificationThenMain() {
-        if (notificationAsked) {
-            openMainScreen();
-            return;
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                        != PackageManager.PERMISSION_GRANTED) {
-            notificationAsked = true;
-            showNotificationPermissionDialog(); // this calls openMainScreen() on skip/continue
-        } else {
-            openMainScreen();
-        }
-    }
-
     boolean is_dialog_show = false;
     boolean should_show_complete = false;
-    private SplashStorageHelper storageHelper;
 
     public synchronized String getUniqueChannelName(Context context) {
         SharedPreferences sharedPrefs = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
@@ -408,40 +310,46 @@ public class SplashActivity extends BaseActivity {
         return uniqueID;
     }
     void gotoNextView() {
-        Logger.i(TAG, "gotoNextView called");
         if (is_dialog_show) {
-            Logger.d(TAG, "Dialog already showing, returning");
             return;
         }
         // check activation
         String activation = AppPreference.getStr(AppPreference.KEY.ACTIVATION_CODE, "");
-        Logger.d(TAG, "Checking activation: " + (TextUtils.isEmpty(activation) ? "Not activated" : "Already activated"));
         if (TextUtils.isEmpty(activation)) {
             @SuppressLint("HardwareIds") String androidId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
             if (androidId == null || androidId.isEmpty()) {
                 // Fallback: Use a random UUID if ANDROID_ID is not available.
                 androidId = java.util.UUID.randomUUID().toString();
             }
-            // Initialize activation-specific defaults using PreferenceInitializer
-            PreferenceInitializer.initActivationDefaults(this);
-            // Initialize storage helper
-            storageHelper = new SplashStorageHelper(this, new SplashStorageHelper.StorageSelectionCallback() {
-                @Override
-                public void onStorageSelected(String storagePath, String storageType) {
-                    Log.d(TAG, "Storage selected: " + storagePath + " (" + storageType + ")");
-                    // After storage is selected, continue with activation
-                    continueWithActivation();
-                }
-                @Override
-                public void onStorageSelectionCancelled() {
-                    Log.w(TAG, "Storage selection cancelled");
-                    // Use default storage and continue
-                    PreferenceInitializer.validateStorageLocation(SplashActivity.this);
-                    continueWithActivation();
-                }
+            String deviceId = CommonUtil.getDeviceID(this);
+            String defaultPath = ResourceUtil.getRecordPath();
+            AppPreference.setStr(AppPreference.KEY.IS_STORAGE_INTERNAL, "INTERNAL STORAGE");
+            AppPreference.setStr(AppPreference.KEY.Storage_Type, "Storage Location: Phone Storage");
+            AppPreference.setStr(AppPreference.KEY.STORAGE_LOCATION, defaultPath);
+            AppPreference.setStr(AppPreference.KEY.GALLERY_PATH, defaultPath);
+            AppPreference.setInt(AppPreference.KEY.USB_RESOLUTION, 1);
+            AppPreference.setInt(AppPreference.KEY.STREAMING_MODE,0);
+            AppPreference.setStr(AppPreference.KEY.LOCAL_STREAM_IP,"172.20.1.1");
+            AppPreference.setStr(AppPreference.KEY.LOCAL_STREAM_IP_TEST,"76.239.139.178");
+            AppPreference.setInt(AppPreference.KEY.LOCAL_STREAM_PORT,554);
+            AppPreference.setInt(AppPreference.KEY.LOCAL_STREAM_PORT_TEST,8554);
+            AppPreference.setStr(AppPreference.KEY.LOCAL_STREAM_NAME,"");
+            AppPreference.setStr(AppPreference.KEY.LOCAL_STREAM_PASSWORD,"");
+            AppPreference.setStr(AppPreference.KEY.LOCAL_STREAM_CHANNEL,deviceId);
+            should_show_complete = true;
+            is_dialog_show = true;
+            ActivationDialog activationDialog = new ActivationDialog(this);
+            activationDialog.setOkListener(view -> {
+                activationDialog.dismiss();
+                is_dialog_show = false;
+                setSerialNumber();
             });
-            // Show storage selection dialog and wait for user selection
-            storageHelper.showCustomStorageDialog();
+            activationDialog.setCloseListener(view -> {
+                is_dialog_show = false;
+                activationDialog.dismiss();
+                finish();
+            });
+            activationDialog.show();
             return;
         } else { // check
             if (!isValidActivation(activation)) {
@@ -449,7 +357,7 @@ public class SplashActivity extends BaseActivity {
                 return;
             }
         }
-        // After activation and storage selection, ask for notification permission before main
+
         if (should_show_complete) {
             should_show_complete = false;
             is_dialog_show = true;
@@ -457,94 +365,15 @@ public class SplashActivity extends BaseActivity {
             com_dialog.setOkListener(view -> {
                 is_dialog_show = false;
                 com_dialog.dismiss();
-                maybeAskNotificationThenMain();
+                openMainScreen();
             });
             com_dialog.show();
         } else {
-            maybeAskNotificationThenMain();
-        }
-    }
-
-    /**
-     * Continue with activation after storage is configured
-     */
-    private void continueWithActivation() {
-        // Validate and fix storage location if needed
-        PreferenceInitializer.validateStorageLocation(this);
-        // Check storage permissions and request if needed using StoragePermissionHelper
-        if (!StoragePermissionHelper.areStoragePermissionsGranted(this)) {
-            Log.d(TAG, "Storage permissions not granted, requesting permissions");
-            StoragePermissionHelper.requestStoragePermissions(this);
-        }
-        should_show_complete = true;
-        is_dialog_show = true;
-        ActivationDialog activationDialog = new ActivationDialog(this);
-        activationDialog.setOkListener(view -> {
-            activationDialog.dismiss();
-            is_dialog_show = false;
-            setSerialNumber();
-        });
-        activationDialog.setCloseListener(view -> {
-            is_dialog_show = false;
-            activationDialog.dismiss();
-            finish();
-        });
-        activationDialog.show();
-    }
-
-    /**
-     * Request notification permission after activation is complete
-     */
-    private void requestNotificationPermissionAfterActivation() {
-        maybeAskNotificationThenMain();
-    }
-
-    /**
-     * Show notification permission dialog with proper user guidance
-     */
-    private void showNotificationPermissionDialog() {
-        // Show instructions dialog directly
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("🔔 Enable Notifications");
-        builder.setMessage("To enable notifications:\n\n" +
-                "1. Tap 'Open Settings' below\n" +
-                "2. Find 'Notifications' in the app settings\n" +
-                "3. Turn ON 'Allow notifications'\n" +
-                "4. Return to CheckMate! when done\n\n" +
-                "This ensures you receive important alerts about your recordings.");
-
-        builder.setPositiveButton("Open Settings", (dialog, which) -> {
-            dialog.dismiss();
-            // Navigate to app settings
-            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intent.setData(uri);
-            startActivity(intent);
-
-            // Show a reminder dialog after a delay
-            new Handler().postDelayed(() -> {
-                showNotificationReminderDialog();
-            }, 3000); // 3 seconds delay
-        });
-
-        builder.setCancelable(false);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        // Make button more visible
-        try {
-            Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-
-            if (positiveButton != null) {
-                positiveButton.setTextColor(Color.BLACK);
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Could not set button colors", e);
+            openMainScreen();
         }
     }
 
     void openMainScreen() {
-        Logger.i(TAG, "Opening main screen");
 
         if (AppPreference.getBool(AppPreference.KEY.APP_FIRST_LAUNCH, true)) {
             AlertDialog.Builder  builder = new AlertDialog.Builder(this)
@@ -749,7 +578,7 @@ public class SplashActivity extends BaseActivity {
         serialDialog.setOkListener(view -> {
             is_dialog_show = false;
             serialDialog.dismiss();
-            String serial_number = serialDialog.getEdtSerial().getText().toString();
+            String serial_number = serialDialog.edt_serial.getText().toString();
             if (isValidSerial(serial_number)) {
                 displayID();
             } else {
@@ -795,7 +624,7 @@ public class SplashActivity extends BaseActivity {
         });
         codeDialog.setOkListener(view -> {
             codeDialog.dismiss();
-            String activation_code = codeDialog.getEdtCode().getText().toString();
+            String activation_code = codeDialog.edt_code.getText().toString();
             isValidActivation(activation_code);
             is_dialog_show = false;
             gotoNextView();
@@ -870,7 +699,6 @@ public class SplashActivity extends BaseActivity {
                     machineCodeDialog.dismiss();
                     is_dialog_show = false;
                     dlg_progress.dismiss();
-                    Logger.e(TAG, "Activation API call failed", t);
                     MessageUtil.showToast(getApplicationContext(), t.getLocalizedMessage());
                     gotoNextView();
                 }
@@ -878,8 +706,6 @@ public class SplashActivity extends BaseActivity {
         });
         machineCodeDialog.show();
     }
-
-
 
     void setPinCode() {
         if (is_dialog_show) {
@@ -927,12 +753,6 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Handle storage helper folder selection
-        if (storageHelper != null) {
-            storageHelper.handleFolderSelectionResult(requestCode, resultCode, data);
-        }
-
         if (resultCode == RESULT_OK && data != null) {
             if (requestCode == REQUEST_CODE_QR_SCAN_SERIAL_NUMBER) {
                 String result = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
@@ -1010,73 +830,5 @@ public class SplashActivity extends BaseActivity {
         }
         AppPreference.setStr(AppPreference.KEY.ACTIVATION_CODE, activation_code);
         return true;
-    }
-
-    public void createNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            if (notificationManager != null) {
-                // Main notification channel
-                NotificationChannel mainChannel = new NotificationChannel(
-                        "main_channel",
-                        "Main Notifications",
-                        NotificationManager.IMPORTANCE_HIGH
-                );
-                mainChannel.setDescription("Main app notifications");
-                mainChannel.enableVibration(true);
-                mainChannel.setVibrationPattern(new long[]{0, 500, 200, 500});
-
-                // Service notification channel
-                NotificationChannel serviceChannel = new NotificationChannel(
-                        "service_channel",
-                        "Service Notifications",
-                        NotificationManager.IMPORTANCE_LOW
-                );
-                serviceChannel.setDescription("Background service notifications");
-                serviceChannel.setShowBadge(false);
-
-                notificationManager.createNotificationChannels(Arrays.asList(mainChannel, serviceChannel));
-            }
-        }
-    }
-
-
-
-    /**
-     * Show reminder dialog to check if user enabled notifications
-     */
-    private void showNotificationReminderDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("🔔 Notification Status");
-        builder.setMessage("Did you enable notifications in the settings?\n\n" +
-                "If yes, tap 'Continue'. If not, you can enable them later from the app settings.");
-
-        builder.setPositiveButton("Continue", (dialog, which) -> {
-            dialog.dismiss();
-            // Check if notification permission is now granted
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Notifications enabled successfully!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "You can enable notifications later from app settings", Toast.LENGTH_LONG).show();
-                }
-            }
-            openMainScreen();
-        });
-
-        builder.setCancelable(false);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        // Make button more visible
-        try {
-            Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            if (positiveButton != null) {
-                positiveButton.setTextColor(Color.BLACK);
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Could not set button colors", e);
-        }
     }
 }

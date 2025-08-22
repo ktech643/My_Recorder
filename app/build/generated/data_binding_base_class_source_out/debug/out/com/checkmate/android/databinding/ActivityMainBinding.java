@@ -4,8 +4,6 @@ package com.checkmate.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +12,7 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import androidx.viewpager2.widget.ViewPager2;
 import com.checkmate.android.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -23,52 +22,7 @@ public final class ActivityMainBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
-  public final LinearLayout bottomNavigation;
-
-  @NonNull
-  public final LinearLayout btnNavHide;
-
-  @NonNull
-  public final LinearLayout btnNavLive;
-
-  @NonNull
-  public final LinearLayout btnNavPlayback;
-
-  @NonNull
-  public final LinearLayout btnNavSettings;
-
-  @NonNull
-  public final LinearLayout btnNavStreaming;
-
-  @NonNull
-  public final ImageView iconHide;
-
-  @NonNull
-  public final ImageView iconLive;
-
-  @NonNull
-  public final ImageView iconPlayback;
-
-  @NonNull
-  public final ImageView iconSettings;
-
-  @NonNull
-  public final ImageView iconStreaming;
-
-  @NonNull
-  public final TextView textHide;
-
-  @NonNull
-  public final TextView textLive;
-
-  @NonNull
-  public final TextView textPlayback;
-
-  @NonNull
-  public final TextView textSettings;
-
-  @NonNull
-  public final TextView textStreaming;
+  public final BottomNavigationView bottomNavigation;
 
   @NonNull
   public final TextView txtRecord;
@@ -80,31 +34,10 @@ public final class ActivityMainBinding implements ViewBinding {
   public final ViewPager2 viewPager;
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView,
-      @NonNull LinearLayout bottomNavigation, @NonNull LinearLayout btnNavHide,
-      @NonNull LinearLayout btnNavLive, @NonNull LinearLayout btnNavPlayback,
-      @NonNull LinearLayout btnNavSettings, @NonNull LinearLayout btnNavStreaming,
-      @NonNull ImageView iconHide, @NonNull ImageView iconLive, @NonNull ImageView iconPlayback,
-      @NonNull ImageView iconSettings, @NonNull ImageView iconStreaming, @NonNull TextView textHide,
-      @NonNull TextView textLive, @NonNull TextView textPlayback, @NonNull TextView textSettings,
-      @NonNull TextView textStreaming, @NonNull TextView txtRecord, @NonNull View viewOverlay,
-      @NonNull ViewPager2 viewPager) {
+      @NonNull BottomNavigationView bottomNavigation, @NonNull TextView txtRecord,
+      @NonNull View viewOverlay, @NonNull ViewPager2 viewPager) {
     this.rootView = rootView;
     this.bottomNavigation = bottomNavigation;
-    this.btnNavHide = btnNavHide;
-    this.btnNavLive = btnNavLive;
-    this.btnNavPlayback = btnNavPlayback;
-    this.btnNavSettings = btnNavSettings;
-    this.btnNavStreaming = btnNavStreaming;
-    this.iconHide = iconHide;
-    this.iconLive = iconLive;
-    this.iconPlayback = iconPlayback;
-    this.iconSettings = iconSettings;
-    this.iconStreaming = iconStreaming;
-    this.textHide = textHide;
-    this.textLive = textLive;
-    this.textPlayback = textPlayback;
-    this.textSettings = textSettings;
-    this.textStreaming = textStreaming;
     this.txtRecord = txtRecord;
     this.viewOverlay = viewOverlay;
     this.viewPager = viewPager;
@@ -138,98 +71,8 @@ public final class ActivityMainBinding implements ViewBinding {
     int id;
     missingId: {
       id = R.id.bottomNavigation;
-      LinearLayout bottomNavigation = ViewBindings.findChildViewById(rootView, id);
+      BottomNavigationView bottomNavigation = ViewBindings.findChildViewById(rootView, id);
       if (bottomNavigation == null) {
-        break missingId;
-      }
-
-      id = R.id.btnNavHide;
-      LinearLayout btnNavHide = ViewBindings.findChildViewById(rootView, id);
-      if (btnNavHide == null) {
-        break missingId;
-      }
-
-      id = R.id.btnNavLive;
-      LinearLayout btnNavLive = ViewBindings.findChildViewById(rootView, id);
-      if (btnNavLive == null) {
-        break missingId;
-      }
-
-      id = R.id.btnNavPlayback;
-      LinearLayout btnNavPlayback = ViewBindings.findChildViewById(rootView, id);
-      if (btnNavPlayback == null) {
-        break missingId;
-      }
-
-      id = R.id.btnNavSettings;
-      LinearLayout btnNavSettings = ViewBindings.findChildViewById(rootView, id);
-      if (btnNavSettings == null) {
-        break missingId;
-      }
-
-      id = R.id.btnNavStreaming;
-      LinearLayout btnNavStreaming = ViewBindings.findChildViewById(rootView, id);
-      if (btnNavStreaming == null) {
-        break missingId;
-      }
-
-      id = R.id.iconHide;
-      ImageView iconHide = ViewBindings.findChildViewById(rootView, id);
-      if (iconHide == null) {
-        break missingId;
-      }
-
-      id = R.id.iconLive;
-      ImageView iconLive = ViewBindings.findChildViewById(rootView, id);
-      if (iconLive == null) {
-        break missingId;
-      }
-
-      id = R.id.iconPlayback;
-      ImageView iconPlayback = ViewBindings.findChildViewById(rootView, id);
-      if (iconPlayback == null) {
-        break missingId;
-      }
-
-      id = R.id.iconSettings;
-      ImageView iconSettings = ViewBindings.findChildViewById(rootView, id);
-      if (iconSettings == null) {
-        break missingId;
-      }
-
-      id = R.id.iconStreaming;
-      ImageView iconStreaming = ViewBindings.findChildViewById(rootView, id);
-      if (iconStreaming == null) {
-        break missingId;
-      }
-
-      id = R.id.textHide;
-      TextView textHide = ViewBindings.findChildViewById(rootView, id);
-      if (textHide == null) {
-        break missingId;
-      }
-
-      id = R.id.textLive;
-      TextView textLive = ViewBindings.findChildViewById(rootView, id);
-      if (textLive == null) {
-        break missingId;
-      }
-
-      id = R.id.textPlayback;
-      TextView textPlayback = ViewBindings.findChildViewById(rootView, id);
-      if (textPlayback == null) {
-        break missingId;
-      }
-
-      id = R.id.textSettings;
-      TextView textSettings = ViewBindings.findChildViewById(rootView, id);
-      if (textSettings == null) {
-        break missingId;
-      }
-
-      id = R.id.textStreaming;
-      TextView textStreaming = ViewBindings.findChildViewById(rootView, id);
-      if (textStreaming == null) {
         break missingId;
       }
 
@@ -251,10 +94,8 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityMainBinding((ConstraintLayout) rootView, bottomNavigation, btnNavHide,
-          btnNavLive, btnNavPlayback, btnNavSettings, btnNavStreaming, iconHide, iconLive,
-          iconPlayback, iconSettings, iconStreaming, textHide, textLive, textPlayback, textSettings,
-          textStreaming, txtRecord, viewOverlay, viewPager);
+      return new ActivityMainBinding((ConstraintLayout) rootView, bottomNavigation, txtRecord,
+          viewOverlay, viewPager);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -4,23 +4,23 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import androidx.annotation.Nullable;
-import dagger.hilt.android.AndroidEntryPoint;
-import javax.inject.Inject;
+import toothpick.Toothpick;
 
-@AndroidEntryPoint
 public class MyBackgroundService extends Service {
     private MyHttpServer httpServer;
-    
-    @Inject
-    ServiceManager serviceManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        // Get ServiceManager instance from Toothpick
+        ServiceManager serviceManager = Toothpick
+                .openScope("APP_SCOPE")  // Use your application's scope
+                .getInstance(ServiceManager.class);
+
         // Create HTTP server with ServiceManager
         int port = 8080; // Your server port
-        httpServer = new MyHttpServer(port, getApplicationContext());
+        httpServer = new MyHttpServer(port, getApplicationContext(), serviceManager);
         httpServer.startServer();
     }
 

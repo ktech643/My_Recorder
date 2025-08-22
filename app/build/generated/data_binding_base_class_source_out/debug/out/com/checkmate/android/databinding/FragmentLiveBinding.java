@@ -15,7 +15,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.checkmate.android.R;
-import com.checkmate.android.ui.view.MySpinner;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -76,12 +75,6 @@ public final class FragmentLiveBinding implements ViewBinding {
   public final LinearLayout lyStream;
 
   @NonNull
-  public final MySpinner spinnerCamera;
-
-  @NonNull
-  public final MySpinner spinnerRotate;
-
-  @NonNull
   public final TextView txtCastScreen;
 
   @NonNull
@@ -117,12 +110,10 @@ public final class FragmentLiveBinding implements ViewBinding {
       @NonNull ImageView icSnapshot, @NonNull ImageView icStream, @NonNull LinearLayout llNework,
       @NonNull TextView lyAudio, @NonNull LinearLayout lyCameraType, @NonNull FrameLayout lyCast,
       @NonNull LinearLayout lyMenu, @NonNull LinearLayout lyRec, @NonNull LinearLayout lyRotate,
-      @NonNull LinearLayout lySnap, @NonNull LinearLayout lyStream,
-      @NonNull MySpinner spinnerCamera, @NonNull MySpinner spinnerRotate,
-      @NonNull TextView txtCastScreen, @NonNull TextView txtGps, @NonNull TextView txtNetwork,
-      @NonNull TextView txtRec, @NonNull TextView txtRecord, @NonNull TextView txtRotate,
-      @NonNull TextView txtSel, @NonNull TextView txtSnapshot, @NonNull TextView txtSpeed,
-      @NonNull TextView txtStream) {
+      @NonNull LinearLayout lySnap, @NonNull LinearLayout lyStream, @NonNull TextView txtCastScreen,
+      @NonNull TextView txtGps, @NonNull TextView txtNetwork, @NonNull TextView txtRec,
+      @NonNull TextView txtRecord, @NonNull TextView txtRotate, @NonNull TextView txtSel,
+      @NonNull TextView txtSnapshot, @NonNull TextView txtSpeed, @NonNull TextView txtStream) {
     this.rootView = rootView;
     this.btnRefresh = btnRefresh;
     this.frameCamera = frameCamera;
@@ -141,8 +132,6 @@ public final class FragmentLiveBinding implements ViewBinding {
     this.lyRotate = lyRotate;
     this.lySnap = lySnap;
     this.lyStream = lyStream;
-    this.spinnerCamera = spinnerCamera;
-    this.spinnerRotate = spinnerRotate;
     this.txtCastScreen = txtCastScreen;
     this.txtGps = txtGps;
     this.txtNetwork = txtNetwork;
@@ -284,18 +273,6 @@ public final class FragmentLiveBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.spinner_camera;
-      MySpinner spinnerCamera = ViewBindings.findChildViewById(rootView, id);
-      if (spinnerCamera == null) {
-        break missingId;
-      }
-
-      id = R.id.spinner_rotate;
-      MySpinner spinnerRotate = ViewBindings.findChildViewById(rootView, id);
-      if (spinnerRotate == null) {
-        break missingId;
-      }
-
       id = R.id.txt_cast_screen;
       TextView txtCastScreen = ViewBindings.findChildViewById(rootView, id);
       if (txtCastScreen == null) {
@@ -358,9 +335,8 @@ public final class FragmentLiveBinding implements ViewBinding {
 
       return new FragmentLiveBinding((RelativeLayout) rootView, btnRefresh, frameCamera, frameOut,
           icRec, icRotate, icSel, icSnapshot, icStream, llNework, lyAudio, lyCameraType, lyCast,
-          lyMenu, lyRec, lyRotate, lySnap, lyStream, spinnerCamera, spinnerRotate, txtCastScreen,
-          txtGps, txtNetwork, txtRec, txtRecord, txtRotate, txtSel, txtSnapshot, txtSpeed,
-          txtStream);
+          lyMenu, lyRec, lyRotate, lySnap, lyStream, txtCastScreen, txtGps, txtNetwork, txtRec,
+          txtRecord, txtRotate, txtSel, txtSnapshot, txtSpeed, txtStream);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

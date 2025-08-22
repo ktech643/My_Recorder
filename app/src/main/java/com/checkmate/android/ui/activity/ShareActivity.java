@@ -17,13 +17,12 @@ import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.ActivityShareBinding;
 import com.checkmate.android.model.Media;
 import com.checkmate.android.ui.fragment.PlaybackFragment;
 import com.checkmate.android.ui.view.DragListView;
 import com.checkmate.android.util.MessageUtil;
 import com.checkmate.android.util.ResourceUtil;
-import com.google.android.material.tabs.TabLayout;
+import com.checkmate.android.util.TabView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,48 +30,34 @@ import java.util.List;
 
 public class ShareActivity extends BaseActionBarActivity {
 
-    private ActivityShareBinding binding;
+    DragListView list_view;
+
+    TabView tabv_tab;
+
     ListAdapter adapter;
     List<String> mDataList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityShareBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_share);
 
         SetTitle(R.string.share, -1);
         ShowActionBarIcons(true, R.id.action_back);
 
+                list_view = findViewById(R.id.list_view);
+        tabv_tab = findViewById(R.id.tabv_tab);
+
         adapter = new ListAdapter(this);
-        binding.listView.setAdapter(adapter);
-        binding.tabvTab.addTab(binding.tabvTab.newTab().setText("Pending"));
-        binding.tabvTab.addTab(binding.tabvTab.newTab().setText("Accepted"));
-        
-        binding.tabvTab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        list_view.setAdapter(adapter);
+        tabv_tab.setOnTabSelectedListener(new TabView.OnTabSelectedListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 0) { // Pending
+            public void onTabSelected(int index) {
+                if (index == 0) { // Pending
 
                 } else { // Accepted
 
                 }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
-        });
-
-        // Set up click listeners
-        binding.btnInvite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                invite();
             }
         });
 
@@ -86,6 +71,14 @@ public class ShareActivity extends BaseActionBarActivity {
         mDataList.add("Test 4");
         mDataList.add("Test 5");
         adapter.notifyDataSetChanged();
+    }
+
+    public void OnClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_invite:
+                invite();
+                break;
+        }
     }
 
     void invite() {
@@ -121,7 +114,7 @@ public class ShareActivity extends BaseActionBarActivity {
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.row_text, parent, false);
                 holder = new ViewHolder();
-                holder.txt_email = convertView.findViewById(R.id.txt_email);
+                
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();

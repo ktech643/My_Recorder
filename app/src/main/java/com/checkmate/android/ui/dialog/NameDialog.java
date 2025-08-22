@@ -9,12 +9,15 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.DialogNameBinding;
 import com.checkmate.android.util.MessageUtil;
+
+
 
 public class NameDialog extends Dialog {
 
-    private DialogNameBinding binding;
+    Button btn_ok;
+    Button btn_close;
+    public EditText edt_code;
 
     public NameDialog(Context context, int theme) {
         super(context, theme);
@@ -30,9 +33,14 @@ public class NameDialog extends Dialog {
 
     private void init(Context context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogNameBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_name);
         setCancelable(false);
+        
+        // Initialize views
+        btn_ok = findViewById(R.id.btn_ok);
+        btn_close = findViewById(R.id.btn_close);
+        edt_code = findViewById(R.id.edt_code);
+
     }
 
     @Override
@@ -48,15 +56,11 @@ public class NameDialog extends Dialog {
     }
 
     public void setOkListener(View.OnClickListener listener) {
-        binding.btnOk.setOnClickListener(listener);
+        btn_ok.setOnClickListener(listener);
     }
 
     public void setCloseListener(View.OnClickListener listner) {
-        binding.btnClose.setOnClickListener(listner);
+        btn_close.setOnClickListener(listner);
     }
 
-    // Getter for the EditText
-    public EditText getEdtCode() {
-        return binding.edtCode;
-    }
 }

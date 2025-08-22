@@ -9,11 +9,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.DialogCodeBinding;
+
+
 
 public class CodeDialog extends Dialog {
 
-    private DialogCodeBinding binding;
+    Button btn_ok;
+    Button btn_close;
+    Button btn_qr;
+    public EditText edt_code;
 
     public CodeDialog(Context context, int theme) {
         super(context, theme);
@@ -29,9 +33,15 @@ public class CodeDialog extends Dialog {
 
     private void init(Context context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogCodeBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_code);
         setCancelable(false);
+        
+        // Initialize views
+        btn_ok = findViewById(R.id.btn_ok);
+        btn_close = findViewById(R.id.btn_close);
+        btn_qr = findViewById(R.id.btn_qr);
+        edt_code = findViewById(R.id.edt_code);
+
     }
 
     @Override
@@ -47,19 +57,15 @@ public class CodeDialog extends Dialog {
     }
 
     public void setOkListener(View.OnClickListener listener) {
-        binding.btnOk.setOnClickListener(listener);
+        btn_ok.setOnClickListener(listener);
     }
 
     public void setCloseListener(View.OnClickListener listner) {
-        binding.btnClose.setOnClickListener(listner);
+        btn_close.setOnClickListener(listner);
     }
 
     public void setScanListener(View.OnClickListener listener) {
-        binding.btnQr.setOnClickListener(listener);
+        btn_qr.setOnClickListener(listener);
     }
 
-    // Getter for the EditText
-    public EditText getEdtCode() {
-        return binding.edtCode;
-    }
 }

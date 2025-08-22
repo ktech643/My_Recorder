@@ -2,13 +2,14 @@ package com.checkmate.android.ui.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
+import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,22 +23,18 @@ import android.widget.TextView;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.checkmate.android.AppPreference;
 import com.checkmate.android.R;
+import com.checkmate.android.database.FileStoreDb;
 import com.checkmate.android.model.Media;
 import com.checkmate.android.ui.view.DragListView;
-import com.checkmate.android.util.DefaultStorageUtils;
 import com.checkmate.android.util.MessageUtil;
 import com.checkmate.android.util.ResourceUtil;
 import com.checkmate.android.viewmodels.EventType;
 import com.checkmate.android.viewmodels.SharedViewModel;
-import com.checkmate.android.ui.activity.ImageViewerActivity;
-import com.checkmate.android.ui.activity.VideoPlayerActivity;
-import com.checkmate.android.service.FragmentVisibilityListener;
 import com.kongzue.dialogx.dialogs.MessageDialog;
 import com.kongzue.dialogx.interfaces.OnDialogButtonClickListener;
 import com.kongzue.dialogx.util.TextInfo;
@@ -54,10 +51,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -69,7 +68,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class PlaybackFragment extends BaseFragment
-        implements DragListView.OnRefreshLoadingMoreListener, FragmentVisibilityListener {
+        implements DragListView.OnRefreshLoadingMoreListener {
 
     public static final String ARG_TREE_URI = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
     public static WeakReference<PlaybackFragment> instance;
@@ -81,6 +80,7 @@ public class PlaybackFragment extends BaseFragment
     private Uri treeUri;
     private List<Media> mDataList = new ArrayList<>();
     private ListAdapter adapter;
+    private FileStoreDb fileStoreDb;
 
     // UI references
     DragListView list_view;
@@ -95,71 +95,30 @@ public class PlaybackFragment extends BaseFragment
         PlaybackFragment fragment = new PlaybackFragment();
         Bundle args = new Bundle();
         String storage_location = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-
-        // Validate storage location before parsing as URI
-        if (storage_location == null || storage_location.isEmpty()) {
-            // Set a default storage path if none is configured
-            String defaultPath = DefaultStorageUtils.getDefaultStoragePath();
-            AppPreference.setStr(AppPreference.KEY.STORAGE_LOCATION, defaultPath);
-            storage_location = defaultPath;
+        
+        // Only set treeUri if it's a valid content URI
+        if (storage_location.startsWith("content://")) {
+            Uri treeUri = Uri.parse(storage_location);
+            args.putParcelable(ARG_TREE_URI, treeUri);
         }
-
-        // Only parse as URI if it's a valid SAF URI, otherwise use as file path
-        Uri treeUri;
-        if (isValidSAFUri(storage_location)) {
-            treeUri = Uri.parse(storage_location);
-        } else {
-            // For file paths, create a file URI
-            treeUri = Uri.fromFile(new File(storage_location));
-        }
-
-        args.putParcelable(ARG_TREE_URI, treeUri);
+        
         fragment.setArguments(args);
         return fragment;
-    }
-
-    /**
-     * Check if the given string is a valid SAF URI
-     */
-    private static boolean isValidSAFUri(String uriString) {
-        if (uriString == null || uriString.isEmpty()) {
-            return false;
-        }
-
-        try {
-            Uri uri = Uri.parse(uriString);
-            // Check if it's a valid SAF URI (content:// scheme)
-            if (!"content".equals(uri.getScheme())) {
-                return false;
-            }
-
-            // Validate that it's a tree URI
-            if (!uri.toString().contains("/tree/")) {
-                return false;
-            }
-
-            // Try to get the document ID to validate
-            DocumentsContract.getTreeDocumentId(uri);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         instance = new WeakReference<>(this);
+        fileStoreDb = new FileStoreDb(context);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+        if (fileStoreDb != null) {
+            fileStoreDb.close();
+        }
     }
 
     @Override
@@ -209,25 +168,20 @@ public class PlaybackFragment extends BaseFragment
     private void handleArguments() {
         if (getArguments() != null) {
             String storage_location = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-
-            // Validate and set default storage if empty
-            if (storage_location == null || storage_location.isEmpty()) {
-                String defaultPath = DefaultStorageUtils.getDefaultStoragePath();
-                AppPreference.setStr(AppPreference.KEY.STORAGE_LOCATION, defaultPath);
-                storage_location = defaultPath;
-            }
-
-            // Handle storage path based on type
-            if (isValidSAFUri(storage_location)) {
+            
+            // Check if storage_location is a valid content URI or just a file path
+            if (storage_location.startsWith("content://")) {
                 treeUri = Uri.parse(storage_location);
-                String strName = getFullPathFromTreeUri(treeUri);
-                tv_storage_path.setText(strName != null ? strName : "SAF Storage Selected");
             } else {
-                // Handle file path
-                treeUri = Uri.fromFile(new File(storage_location));
+                // It's a file path, not a content URI - we can't use DocumentFile with this
+                treeUri = null;
                 tv_storage_path.setText(storage_location);
+                tv_storage_location.setText("Storage Location: File Path (Limited Access)");
+                return;
             }
-
+            
+            String strName = getFullPathFromTreeUri(treeUri);
+            tv_storage_path.setText(strName);
             String storageType = AppPreference.getStr(AppPreference.KEY.Storage_Type, "Storage Location: Default Storage");
             tv_storage_location.setText(storageType);
         }
@@ -235,31 +189,18 @@ public class PlaybackFragment extends BaseFragment
 
     public String getFullPathFromTreeUri(Uri treeUri) {
         if (treeUri == null || treeUri.toString().isEmpty()) return null;
-
-        // Handle file URIs (legacy file paths)
-        if ("file".equals(treeUri.getScheme())) {
-            return treeUri.getPath();
-        }
-
-        // Handle SAF URIs
         if (treeUri.toString().contains("/0/")) {
             return treeUri.toString();
         }
+        String docId = DocumentsContract.getTreeDocumentId(treeUri);
+        String[] split = docId.split(":");
+        String storageType = split[0];
+        String relativePath = "";
 
-        try {
-            String docId = DocumentsContract.getTreeDocumentId(treeUri);
-            String[] split = docId.split(":");
-            String storageType = split[0];
-            String relativePath = "";
-
-            if (split.length >= 2) {
-                relativePath = split[1];
-            }
-            return "/storage/" + storageType + "/" + relativePath;
-        } catch (Exception e) {
-            Log.e("PlaybackFragment", "Error parsing tree URI: " + treeUri, e);
-            return "SAF Storage Selected";
+        if (split.length >= 2) {
+            relativePath = split[1];
         }
+        return "/storage/" + storageType + "/" + relativePath;
     }
 
     @Override
@@ -300,85 +241,53 @@ public class PlaybackFragment extends BaseFragment
 
     private void openVideo(Media media) {
         if (media.is_encrypted) {
-            decryptAndOpenVideo(media);
+            decryptAndOpen(media, "video/mp4");
         } else {
-            // Directly open in built-in video player
-            VideoPlayerActivity.start(requireActivity(), media, null);
+            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+            Uri contentUri = media.contentUri;
+            viewIntent.setType("video/mp4");
+            viewIntent.setDataAndType(contentUri, "video/*");
+            viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(viewIntent, null));
         }
     }
 
     private void openImage(Media media) {
         if (media.is_encrypted) {
-            decryptAndOpenImage(media);
+            decryptAndOpen(media, "image/*");
         } else {
-            // Directly open in built-in image viewer
-            ImageViewerActivity.start(requireActivity(), media, null);
+            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+            Uri contentUri = media.contentUri;
+            viewIntent.setType("image/*");
+            viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            viewIntent.setDataAndType(contentUri, "image/*");
+            startActivity(Intent.createChooser(viewIntent, null));
         }
     }
 
-    private void decryptAndOpenVideo(Media media) {
-        if (!isAdded() || getActivity() == null || getActivity().isFinishing()) {
-            return;
-        }
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireActivity());
+    private void decryptAndOpen(Media media, String mimeType) {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(getActivity());
         builder.setTitle("Enter Password");
-        final android.widget.EditText input = new android.widget.EditText(requireActivity());
+        final android.widget.EditText input = new android.widget.EditText(getActivity());
         input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
         builder.setView(input);
         builder.setPositiveButton("OK", (dialog, which) -> {
             String password = input.getText().toString();
             try {
-                File tempDecryptedFile = File.createTempFile("temp_decrypted", ".mp4", requireActivity().getCacheDir());
+                File tempDecryptedFile = File.createTempFile("temp_decrypted", ".mp4", getActivity().getCacheDir());
                 boolean result = decryptFile(media.contentUri, tempDecryptedFile, password);
                 if (result) {
-                    // Directly open in built-in video player
-                    VideoPlayerActivity.start(requireActivity(), media, tempDecryptedFile.getAbsolutePath());
+                    Uri fileUri = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName() + ".provider", tempDecryptedFile);
+                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                    viewIntent.setDataAndType(fileUri, mimeType);
+                    viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(Intent.createChooser(viewIntent, null));
                 } else {
-                    MessageUtil.showToast(requireActivity(), "Failed to decrypt");
-                    // Clean up the temporary file
-                    if (tempDecryptedFile.exists()) {
-                        tempDecryptedFile.delete();
-                    }
+                    MessageUtil.showToast(getActivity(), "Failed to decrypt");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                MessageUtil.showToast(requireActivity(), e.getLocalizedMessage());
-            }
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
-    }
-
-    private void decryptAndOpenImage(Media media) {
-        if (!isAdded() || getActivity() == null || getActivity().isFinishing()) {
-            return;
-        }
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireActivity());
-        builder.setTitle("Enter Password");
-        final android.widget.EditText input = new android.widget.EditText(requireActivity());
-        input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            String password = input.getText().toString();
-            try {
-                String extension = media.name.toLowerCase().endsWith(".t3j") ? ".jpg" : ".png";
-                File tempDecryptedFile = File.createTempFile("temp_decrypted", extension, requireActivity().getCacheDir());
-                boolean result = decryptFile(media.contentUri, tempDecryptedFile, password);
-                if (result) {
-                    // Directly open in built-in image viewer
-                    ImageViewerActivity.start(requireActivity(), media, tempDecryptedFile.getAbsolutePath());
-                } else {
-                    MessageUtil.showToast(requireActivity(), "Failed to decrypt");
-                    // Clean up the temporary file
-                    if (tempDecryptedFile.exists()) {
-                        tempDecryptedFile.delete();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                MessageUtil.showToast(requireActivity(), e.getLocalizedMessage());
+                MessageUtil.showToast(getActivity(), e.getLocalizedMessage());
             }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
@@ -419,141 +328,15 @@ public class PlaybackFragment extends BaseFragment
         }
     }
 
-    private void shareFile(Media media) {
-        try {
-            // Validate that the media object and URI are not null
-            if (media == null || media.contentUri == null) {
-                MessageUtil.showToast(requireActivity(), "Invalid media file");
-                return;
-            }
-
-            String mimeType = media.type == Media.TYPE.VIDEO ? "video/mp4" : "image/*";
-            Uri shareUri = media.contentUri;
-            
-            // Handle file URIs by converting them to FileProvider URIs
-            if ("file".equals(media.contentUri.getScheme())) {
-                File file = new File(media.contentUri.getPath());
-                if (file.exists() && file.canRead()) {
-                    shareUri = androidx.core.content.FileProvider.getUriForFile(
-                        requireContext(),
-                        requireContext().getPackageName() + ".provider",
-                        file
-                    );
-                } else {
-                    MessageUtil.showToast(requireActivity(), "File not found or not readable");
-                    return;
-                }
-            } else if ("content".equals(media.contentUri.getScheme())) {
-                // For SAF URIs, grant temporary permissions
-                try {
-                    requireContext().getContentResolver().takePersistableUriPermission(
-                        media.contentUri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    );
-                } catch (SecurityException e) {
-                    Log.w("Share", "Could not take persistable permission for SAF URI", e);
-                    // Continue anyway, the share might still work
-                }
-            }
-            
-            // Validate that we have a valid URI to share
-            if (shareUri == null) {
-                MessageUtil.showToast(requireActivity(), "Could not prepare file for sharing");
-                return;
-            }
-            
-            ShareCompat.IntentBuilder.from(requireActivity())
-                    .setType(mimeType)
-                    .setStream(shareUri)
-                    .setChooserTitle("Share media...")
-                    .startChooser();
-                    
-        } catch (Exception e) {
-            Log.e("Share", "Error sharing file", e);
-            MessageUtil.showToast(requireActivity(), "Error sharing file: " + e.getMessage());
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X", b));
         }
+        return sb.toString();
     }
 
-    private void decryptAndShareFile(Media media) {
-        if (!isAdded() || getActivity() == null || getActivity().isFinishing()) {
-            return;
-        }
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireActivity());
-        builder.setTitle("Enter Password");
-        final android.widget.EditText input = new android.widget.EditText(requireActivity());
-        input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            String password = input.getText().toString();
-            try {
-                String extension = media.type == Media.TYPE.VIDEO ? ".mp4" : 
-                    (media.name.toLowerCase().endsWith(".t3j") ? ".jpg" : ".png");
-                File tempDecryptedFile = File.createTempFile("temp_decrypted", extension, requireActivity().getCacheDir());
-                boolean result = decryptFile(media.contentUri, tempDecryptedFile, password);
-                if (result) {
-                    // Share the decrypted file
-                    shareDecryptedFile(media, tempDecryptedFile);
-                } else {
-                    MessageUtil.showToast(requireActivity(), "Failed to decrypt");
-                    // Clean up the temporary file
-                    if (tempDecryptedFile.exists()) {
-                        tempDecryptedFile.delete();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                MessageUtil.showToast(requireActivity(), e.getLocalizedMessage());
-            }
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
-    }
-
-    private void shareDecryptedFile(Media media, File decryptedFile) {
-        try {
-            // Validate the decrypted file
-            if (decryptedFile == null || !decryptedFile.exists() || !decryptedFile.canRead()) {
-                MessageUtil.showToast(requireActivity(), "Decrypted file is not accessible");
-                return;
-            }
-
-            String mimeType = media.type == Media.TYPE.VIDEO ? "video/mp4" : "image/*";
-            
-            // Use FileProvider to share the decrypted file
-            Uri shareUri = androidx.core.content.FileProvider.getUriForFile(
-                requireContext(),
-                requireContext().getPackageName() + ".provider",
-                decryptedFile
-            );
-            
-            if (shareUri == null) {
-                MessageUtil.showToast(requireActivity(), "Could not prepare decrypted file for sharing");
-                return;
-            }
-            
-            ShareCompat.IntentBuilder.from(requireActivity())
-                    .setType(mimeType)
-                    .setStream(shareUri)
-                    .setChooserTitle("Share decrypted media...")
-                    .startChooser();
-                    
-        } catch (Exception e) {
-            Log.e("Share", "Error sharing decrypted file", e);
-            MessageUtil.showToast(requireActivity(), "Error sharing decrypted file: " + e.getMessage());
-        } finally {
-            // Clean up the temporary file after sharing
-            new android.os.Handler().postDelayed(() -> {
-                if (decryptedFile != null && decryptedFile.exists()) {
-                    boolean deleted = decryptedFile.delete();
-                    if (!deleted) {
-                        Log.w("Share", "Failed to delete temporary decrypted file: " + decryptedFile.getAbsolutePath());
-                    }
-                }
-            }, 5000); // Delete after 5 seconds to allow sharing to complete
-        }
-    }
-
+    @Override
     public void onRefresh() {}
 
     @Override
@@ -563,58 +346,18 @@ public class PlaybackFragment extends BaseFragment
 
     @Override
     public void onDragLoadMore() {}
-    
-    // ===== FRAGMENT VISIBILITY METHODS =====
-    
-    @Override
-    public void onFragmentVisible() {
-        Log.d("PlaybackFragment", "Fragment became visible");
-        // Simple visibility handling
-        if (isAdded() && getActivity() != null) {
-            // Initialize playback if needed
-            initialize();
-        }
-    }
-    
-    @Override
-    public void onFragmentHidden() {
-        Log.d("PlaybackFragment", "Fragment became hidden");
-        // Simple cleanup
-    }
 
     private void loadFromTreeUriSingleDirectory() {
         if (treeUri == null) {
+            // This means we're using file path storage, not content URI storage
             txt_no_data.setVisibility(View.VISIBLE);
+            txt_no_data.setText("Content URI access required for this feature");
             return;
         }
-
-        // Check if it's a file URI (legacy file path) or SAF URI
-        if ("file".equals(treeUri.getScheme())) {
-            // Handle file path
-            loadFromFileDirectory();
-        } else {
-            // Handle SAF URI
-            txt_no_data.setVisibility(View.GONE);
-            new LoadDirectoryTask().execute(treeUri);
-        }
-    }
-
-    private void loadFromFileDirectory() {
-        String filePath = treeUri.getPath();
-        if (filePath == null) {
-            txt_no_data.setVisibility(View.VISIBLE);
-            return;
-        }
-
-        File directory = new File(filePath);
-        if (!directory.exists() || !directory.isDirectory()) {
-            txt_no_data.setVisibility(View.VISIBLE);
-            return;
-        }
-
         txt_no_data.setVisibility(View.GONE);
-        new LoadFileDirectoryTask().execute(directory);
+        new LoadDirectoryTask().execute(treeUri);
     }
+
 
     private class LoadDirectoryTask extends AsyncTask<Uri, Void, List<Media>> {
         @Override
@@ -630,6 +373,17 @@ public class PlaybackFragment extends BaseFragment
                 return result;
             }
 
+            // Get existing records from DB
+            Map<String, Media> dbMediaMap = new HashMap<>();
+            List<Media> dbMediaList = fileStoreDb.getMediaForPath(treeUri.toString());
+            for (Media media : dbMediaList) {
+                // Use URI as key to ensure uniqueness
+                dbMediaMap.put(media.contentUri.toString(), media);
+            }
+
+            // Create a set to track files we've found in directory
+            Set<String> foundUris = new HashSet<>();
+
             // Scan directory
             DocumentFile[] children = rootDoc.listFiles();
             if (children == null) return result;
@@ -639,224 +393,123 @@ public class PlaybackFragment extends BaseFragment
                 String name = doc.getName();
                 if (TextUtils.isEmpty(name)) continue;
 
-                Media media = new Media();
-                media.name = name;
-                media.date = new Date(doc.lastModified());
-                media.file = doc;
-                media.contentUri = doc.getUri();
-                media.fileSize = doc.length();
+                Uri contentUri = doc.getUri();
+                String uriString = contentUri.toString();
+                foundUris.add(uriString);
 
-                String lowerName = name.toLowerCase();
-                if (lowerName.endsWith(".t3v")) {
-                    media.type = Media.TYPE.VIDEO;
-                    media.is_encrypted = true;
-                } else if (lowerName.endsWith(".t3j")) {
-                    media.type = Media.TYPE.PHOTO;
-                    media.is_encrypted = true;
-                } else if (lowerName.endsWith(".mp4") || lowerName.endsWith(".mov") ||
-                        lowerName.endsWith(".mkv") || lowerName.endsWith(".avi")) {
-                    media.type = Media.TYPE.VIDEO;
-                } else if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") ||
-                        lowerName.endsWith(".png") || lowerName.endsWith(".gif")) {
-                    media.type = Media.TYPE.PHOTO;
+                Media media = dbMediaMap.get(uriString);
+
+                // Create new media if doesn't exist in DB
+                if (media == null) {
+                    media = new Media();
+                    media.name = name;
+                    media.date = new Date(doc.lastModified());
+                    media.file = doc;
+                    media.contentUri = contentUri;
+
+                    String lowerName = name.toLowerCase();
+                    if (lowerName.endsWith(".t3v")) {
+                        media.type = Media.TYPE.VIDEO;
+                        media.is_encrypted = true;
+                    } else if (lowerName.endsWith(".t3j")) {
+                        media.type = Media.TYPE.PHOTO;
+                        media.is_encrypted = true;
+                    } else if (lowerName.endsWith(".mp4") || lowerName.endsWith(".mov") ||
+                            lowerName.endsWith(".mkv") || lowerName.endsWith(".avi")) {
+                        media.type = Media.TYPE.VIDEO;
+                    } else if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") ||
+                            lowerName.endsWith(".png") || lowerName.endsWith(".gif")) {
+                        media.type = Media.TYPE.PHOTO;
+                    } else {
+                        continue;
+                    }
+
+                    // Extract and store metadata for non-encrypted files
+                    if (!media.is_encrypted) {
+                        extractAndStoreMetadata(context, media);
+                    }
+
+                    // Insert into database
+                    fileStoreDb.logFile(
+                            media.name,
+                            uriString,
+                            media.date.getTime(),
+                            media.type == Media.TYPE.VIDEO ? "video" : "photo",
+                            media.is_encrypted,
+                            media.duration,
+                            media.resolutionWidth,
+                            media.resolutionHeight,
+                            media.fileSize
+                    );
+
+                    // Add to result list
+                    result.add(media);
                 } else {
-                    continue;
+                    // Update existing media object with current DocumentFile
+                    media.file = doc;
+                    result.add(media);
                 }
+            }
 
-                // Extract metadata for non-encrypted files
-                if (!media.is_encrypted) {
-                    extractAndStoreMetadata(context, media);
+            // Add database records not found in current directory
+            for (Media media : dbMediaMap.values()) {
+                if (!foundUris.contains(media.contentUri.toString())) {
+                    // Try to get DocumentFile from URI
+                    DocumentFile doc = DocumentFile.fromSingleUri(context, Uri.parse(media.contentUri.toString()));
+                    if (doc != null && doc.exists()) {
+                        media.file = doc;
+                        result.add(media);
+                    } else {
+                        // Remove from database if file no longer exists
+                        fileStoreDb.deleteByPath(media.contentUri.toString());
+                    }
                 }
-
-                result.add(media);
             }
 
             // Sort by date (newest first)
-            result.sort((m1, m2) -> Long.compare(m2.date.getTime(), m1.date.getTime()));
+            result.sort((m1, m2) ->
+                    Long.compare(m2.date.getTime(), m1.date.getTime()));
 
             return result;
         }
 
         private void extractAndStoreMetadata(Context context, Media media) {
             try {
-                if (media.type == Media.TYPE.VIDEO) {
-                    // For videos, try to extract metadata using MediaMetadataRetriever
-                    try {
-                        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                        retriever.setDataSource(context, media.contentUri);
-
-                        String durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                        media.duration = durationStr != null ? Long.parseLong(durationStr) : 0;
-
-                        String widthStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
-                        String heightStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
-
-                        media.resolutionWidth = widthStr != null ? Integer.parseInt(widthStr) : 0;
-                        media.resolutionHeight = heightStr != null ? Integer.parseInt(heightStr) : 0;
-
-                    } catch (Exception e) {
-                        Log.w("Metadata", "Could not extract video metadata for: " + media.contentUri);
-                        // Don't log the full exception to avoid showing errors to users
-                    }
-                } else if (media.type == Media.TYPE.PHOTO) {
-                    // For images, use BitmapFactory to get dimensions
-                    try {
-                        android.graphics.BitmapFactory.Options options = new android.graphics.BitmapFactory.Options();
-                        options.inJustDecodeBounds = true;
-
-                        try (InputStream is = context.getContentResolver().openInputStream(media.contentUri)) {
-                            if (is != null) {
-                                android.graphics.BitmapFactory.decodeStream(is, null, options);
-                            }
-                        }
-
-                        media.resolutionWidth = options.outWidth;
-                        media.resolutionHeight = options.outHeight;
-
-                    } catch (Exception e) {
-                        Log.w("Metadata", "Could not extract image metadata for: " + media.contentUri);
-                        // Don't log the full exception to avoid showing errors to users
-                    }
-                }
-
-            } catch (Exception e) {
-                Log.w("Metadata", "Error extracting metadata for: " + media.contentUri);
-                // Don't log the full exception to avoid showing errors to users
-            }
-        }
-
-        @Override
-        protected void onPostExecute(List<Media> result) {
-            mDataList.clear();
-            mDataList.addAll(result);
-            adapter.notifyDataSetChanged();
-            txt_no_data.setVisibility(mDataList.isEmpty() ? View.VISIBLE : View.GONE);
-            list_view.onRefreshComplete();
-        }
-    }
-
-    private class LoadFileDirectoryTask extends AsyncTask<File, Void, List<Media>> {
-        @Override
-        protected List<Media> doInBackground(File... files) {
-            List<Media> result = new ArrayList<>();
-            File directory = files[0];
-
-            if (directory == null || !directory.exists() || !directory.isDirectory()) {
-                return result;
-            }
-
-            // Scan directory
-            File[] children = directory.listFiles();
-            if (children == null) return result;
-
-            for (File file : children) {
-                if (file.isDirectory()) continue;
-
-                String name = file.getName();
-                if (TextUtils.isEmpty(name)) continue;
-
-                Media media = new Media();
-                media.name = name;
-                media.date = new Date(file.lastModified());
-                media.contentUri = Uri.fromFile(file);
-                media.fileSize = file.length();
-
-                String lowerName = name.toLowerCase();
-                if (lowerName.endsWith(".t3v")) {
-                    media.type = Media.TYPE.VIDEO;
-                    media.is_encrypted = true;
-                } else if (lowerName.endsWith(".t3j")) {
-                    media.type = Media.TYPE.PHOTO;
-                    media.is_encrypted = true;
-                } else if (lowerName.endsWith(".mp4") || lowerName.endsWith(".mov") ||
-                        lowerName.endsWith(".mkv") || lowerName.endsWith(".avi")) {
-                    media.type = Media.TYPE.VIDEO;
-                } else if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") ||
-                        lowerName.endsWith(".png") || lowerName.endsWith(".gif")) {
-                    media.type = Media.TYPE.PHOTO;
-                } else {
-                    continue;
-                }
-
-                // Extract metadata for non-encrypted files
-                if (!media.is_encrypted) {
-                    extractAndStoreMetadataForFile(media);
-                }
-
-                result.add(media);
-            }
-
-            // Sort by date (newest first)
-            result.sort((m1, m2) -> Long.compare(m2.date.getTime(), m1.date.getTime()));
-
-            return result;
-        }
-
-        private void extractAndStoreMetadataForFile(Media media) {
-            try {
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                retriever.setDataSource(context, media.contentUri);
 
-                // Handle different file types and URI schemes
                 if (media.type == Media.TYPE.VIDEO) {
-                    // For videos, try to extract metadata
-                    try {
-                        if ("file".equals(media.contentUri.getScheme())) {
-                            // For file URIs, use the path directly
-                            retriever.setDataSource(media.contentUri.getPath());
-                        } else {
-                            // For SAF URIs, use ContentResolver
-                            try (ParcelFileDescriptor pfd = requireContext().getContentResolver()
-                                    .openFileDescriptor(media.contentUri, "r")) {
-                                if (pfd != null) {
-                                    retriever.setDataSource(pfd.getFileDescriptor());
-                                } else {
-                                    Log.w("Metadata", "Could not open file descriptor for: " + media.contentUri);
-                                    return;
-                                }
-                            }
-                        }
-
-                        String durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                        media.duration = durationStr != null ? Long.parseLong(durationStr) : 0;
-
-                        String widthStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
-                        String heightStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
-
-                        media.resolutionWidth = widthStr != null ? Integer.parseInt(widthStr) : 0;
-                        media.resolutionHeight = heightStr != null ? Integer.parseInt(heightStr) : 0;
-
-                    } catch (Exception e) {
-                        Log.w("Metadata", "Could not extract video metadata for: " + media.contentUri);
-                        // Don't log the full exception to avoid showing errors to users
-                    }
-                } else if (media.type == Media.TYPE.PHOTO) {
-                    // For images, use BitmapFactory to get dimensions
-                    try {
-                        android.graphics.BitmapFactory.Options options = new android.graphics.BitmapFactory.Options();
-                        options.inJustDecodeBounds = true;
-
-                        if ("file".equals(media.contentUri.getScheme())) {
-                            android.graphics.BitmapFactory.decodeFile(media.contentUri.getPath(), options);
-                        } else {
-                            try (InputStream is = requireContext().getContentResolver().openInputStream(media.contentUri)) {
-                                if (is != null) {
-                                    android.graphics.BitmapFactory.decodeStream(is, null, options);
-                                }
-                            }
-                        }
-
-                        media.resolutionWidth = options.outWidth;
-                        media.resolutionHeight = options.outHeight;
-
-                    } catch (Exception e) {
-                        Log.w("Metadata", "Could not extract image metadata for: " + media.contentUri);
-                        // Don't log the full exception to avoid showing errors to users
-                    }
+                    String durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                    media.duration = durationStr != null ? Long.parseLong(durationStr) : 0;
                 }
 
+                String widthStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+                if (widthStr == null) {
+                    widthStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_IMAGE_WIDTH);
+                }
+
+                String heightStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+                if (heightStr == null) {
+                    heightStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_IMAGE_HEIGHT);
+                }
+
+                media.resolutionWidth = widthStr != null ? Integer.parseInt(widthStr) : 0;
+                media.resolutionHeight = heightStr != null ? Integer.parseInt(heightStr) : 0;
+
+                // Get file size
+                try (Cursor cursor = context.getContentResolver().query(
+                        media.contentUri,
+                        new String[]{OpenableColumns.SIZE},
+                        null, null, null)) {
+                    if (cursor != null && cursor.moveToFirst()) {
+                        int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                        if (sizeIndex != -1) {
+                            media.fileSize = cursor.getLong(sizeIndex);
+                        }
+                    }
+                }
             } catch (Exception e) {
-                Log.w("Metadata", "Error extracting metadata for file: " + media.contentUri);
-                // Don't log the full exception to avoid showing errors to users
+                Log.e("Metadata", "Error extracting metadata", e);
             }
         }
 
@@ -869,7 +522,6 @@ public class PlaybackFragment extends BaseFragment
             list_view.onRefreshComplete();
         }
     }
-
     private void onSelect() {
         is_selectable = !is_selectable;
         for (Media media : mDataList) {
@@ -906,14 +558,9 @@ public class PlaybackFragment extends BaseFragment
                 .setCancelButton((dialog, view) -> false)
                 .setOkButton((baseDialog, view) -> {
                     for (Media media : mDataList) {
-                        if (media.is_selected) {
-                            if ("file".equals(media.contentUri.getScheme())) {
-                                // Delete file path
-                                new File(media.contentUri.getPath()).delete();
-                            } else if (media.file != null) {
-                                // Delete SAF URI
-                                media.file.delete();
-                            }
+                        if (media.is_selected && media.file != null) {
+                            media.file.delete();
+                            fileStoreDb.deleteByPath(media.contentUri.toString());
                         }
                     }
                     list_view.refresh();
@@ -966,6 +613,7 @@ public class PlaybackFragment extends BaseFragment
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
+            holder = (ViewHolder) convertView.getTag();
             final Media media = mDataList.get(position);
             holder.txt_name.setText(media.name);
             holder.txt_date.setText(ResourceUtil.date(media.date));
@@ -1011,20 +659,12 @@ public class PlaybackFragment extends BaseFragment
                     media.is_selected = isChecked);
 
             holder.ic_share.setOnClickListener(v -> {
-                if (media.is_encrypted) {
-                    // For encrypted files, offer to decrypt and share
-                    MessageDialog.show("Share Encrypted File", 
-                        "This file is encrypted. Would you like to decrypt it first and then share?",
-                        "Decrypt & Share", "Cancel")
-                        .setCancelButton((dialog, view) -> false)
-                        .setOkButton((baseDialog, view) -> {
-                            decryptAndShareFile(media);
-                            return false;
-                        });
-                    return;
-                }
-                
-                shareFile(media);
+                String mimeType = media.type == Media.TYPE.VIDEO ? "video/mp4" : "image/*";
+                ShareCompat.IntentBuilder.from(requireActivity())
+                        .setType(mimeType)
+                        .setStream(media.contentUri)
+                        .setChooserTitle("Share media...")
+                        .startChooser();
             });
 
             holder.ic_trash.setOnClickListener(v ->
@@ -1032,16 +672,21 @@ public class PlaybackFragment extends BaseFragment
                                     getString(R.string.Okay), getString(R.string.cancel))
                             .setCancelButton((dialog, view) -> false)
                             .setOkButton((baseDialog, view) -> {
-                                if ("file".equals(media.contentUri.getScheme())) {
-                                    new File(media.contentUri.getPath()).delete();
-                                } else if (media.file != null) {
+                                if (media.file != null) {
                                     media.file.delete();
+                                    fileStoreDb.deleteByPath(media.contentUri.toString());
+                                    list_view.refresh();
                                 }
-                                list_view.refresh();
                                 return false;
                             }));
 
             return convertView;
         }
+    }
+
+    public interface ActivityFragmentCallbacks {
+        void isDialog(boolean isShow);
+        void showDialog();
+        void dismissDialog();
     }
 }

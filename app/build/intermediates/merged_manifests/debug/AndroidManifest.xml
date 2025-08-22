@@ -3,7 +3,7 @@
     coreApp="true"
     package="com.checkmate.android"
     android:versionCode="1"
-    android:versionName="3.387" >
+    android:versionName="4.002" >
 
     <uses-sdk
         android:minSdkVersion="29"

@@ -13,11 +13,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.DialogSerialBinding;
+
 
 public class SerialDialog extends Dialog {
 
-    private DialogSerialBinding binding;
+    Button btn_ok;
+
+    Button btn_close;
+
+    ImageView img_help;
+
+    Button btn_qr;
+
+    public EditText edt_serial;
+
+    TextView txt_content;
 
     public SerialDialog(Context context, int theme) {
         super(context, theme);
@@ -33,9 +43,14 @@ public class SerialDialog extends Dialog {
 
     private void init(Context context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogSerialBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_serial);
         setCancelable(false);
+                btn_ok = findViewById(R.id.btn_ok);
+        btn_close = findViewById(R.id.btn_close);
+        img_help = findViewById(R.id.img_help);
+        btn_qr = findViewById(R.id.btn_qr);
+        txt_content = findViewById(R.id.txt_content);
+
     }
 
     @Override
@@ -51,28 +66,18 @@ public class SerialDialog extends Dialog {
     }
 
     public void setOkListener(View.OnClickListener listener) {
-        binding.btnOk.setOnClickListener(listener);
+        btn_ok.setOnClickListener(listener);
     }
 
     public void setCloseListener(View.OnClickListener listner) {
-        binding.btnClose.setOnClickListener(listner);
+        btn_close.setOnClickListener(listner);
     }
 
     public void setScanListener(View.OnClickListener listener) {
-        binding.btnQr.setOnClickListener(listener);
+        btn_qr.setOnClickListener(listener);
     }
 
     public void setHelpListener(View.OnClickListener listener) {
-        binding.imgHelp.setOnClickListener(listener);
-    }
-
-    // Getter for the EditText
-    public EditText getEdtSerial() {
-        return binding.edtSerial;
-    }
-
-    // Getter for the TextView
-    public TextView getTxtContent() {
-        return binding.txtContent;
+        img_help.setOnClickListener(listener);
     }
 }

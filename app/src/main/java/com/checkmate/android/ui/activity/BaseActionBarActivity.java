@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.checkmate.android.AppPreference;
+import com.checkmate.android.BuildConfig;
 import com.checkmate.android.R;
 import com.checkmate.android.ui.dialog.MyProgressDialog;
 
@@ -41,14 +42,20 @@ public class BaseActionBarActivity extends AppCompatActivity implements OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Window window = getWindow();
-        // clear FLAG_TRANSLUCENT_STATUS flag:
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // clear FLAG_TRANSLUCENT_STATUS flag:
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
-        // finally change the color
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.blue_dark));
+            // finally change the color
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.blue_dark));
+        }
+
+        if (!BuildConfig.DEBUG) {
+//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        }
 
         actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -138,11 +145,13 @@ public class BaseActionBarActivity extends AppCompatActivity implements OnClickL
 
             if (res_id_arr != null) {
                 for (int i = 0; i < res_id_arr.length; i++) {
-                    int id = res_id_arr[i];
-                    if (id == R.id.action_back) {
-                        action_button_back.setVisibility(View.VISIBLE);
-                    } else if (id == R.id.action_add) {
-                        action_add.setVisibility(View.VISIBLE);
+                    switch (res_id_arr[i]) {
+                        case R.id.action_back:
+                            action_button_back.setVisibility(View.VISIBLE);
+                            break;
+                        case R.id.action_add:
+                            action_add.setVisibility(View.VISIBLE);
+                            break;
                     }
                 }
             }
@@ -152,9 +161,10 @@ public class BaseActionBarActivity extends AppCompatActivity implements OnClickL
     @Override
     public void onClick(View view) {
         // TODO Auto-generated method stub
-        int id = view.getId();
-        if (id == R.id.action_back) {
-            myBack();
+        switch (view.getId()) {
+            case R.id.action_back:
+                myBack();
+                break;
         }
     }
 

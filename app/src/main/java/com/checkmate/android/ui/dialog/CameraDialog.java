@@ -28,7 +28,6 @@ import com.checkmate.android.AppPreference;
 import com.checkmate.android.BuildConfig;
 import com.checkmate.android.R;
 import com.checkmate.android.database.DBManager;
-import com.checkmate.android.databinding.DialogCameraBinding;
 import com.checkmate.android.model.Camera;
 import com.checkmate.android.ui.fragment.SettingsFragment;
 import com.checkmate.android.ui.view.MySpinner;
@@ -38,14 +37,38 @@ import com.checkmate.android.util.MessageUtil;
 
 import java.util.List;
 
-// Butterknife import removed - using view binding instead
-
 public class CameraDialog extends Dialog {
 
-    private DialogCameraBinding binding;
+    EditText edt_name;
+
+    TextView txt_title;
+
+    EditText edt_url;
+
+    EditText edt_username;
+
+    EditText edt_password;
+
+    CheckBox chk_anonymous;
+
+    EditText edt_port;
+
+    EditText edt_uri;
+
+    CheckBox chk_full_address;
+
+    RadioButton radio_udp;
+
+    RadioButton radio_tcp;
+
     Camera camera = null;
     String ssid = "";
     String wifi_password = "";
+
+    public MySpinner spinner_in;
+
+    public MySpinner spinner_out;
+
     Context context;
     int camera_type;
 
@@ -72,6 +95,7 @@ public class CameraDialog extends Dialog {
         this.camera = null;
         ssid = "";
         init(context);
+
         instance = this;
     }
 
@@ -83,61 +107,62 @@ public class CameraDialog extends Dialog {
         ssid = "";
         init(context);
         setDefaultValues();
+
         instance = this;
     }
 
     void setDefaultValues() {
         switch (camera_type) {
             case AppConstant.WIFI_TYPE_VCS:
-                binding.edtUrl.setText("rtsp://192.168.60.1/main_ch");
+                edt_url.setText("rtsp://192.168.60.1/main_ch");
                 if (index_wlan0 >= 0) {
-                    binding.spinnerIn.setSelection(index_wlan0);
+                    spinner_in.setSelection(index_wlan0);
                 }
                 if (index_cellular >= 0) {
-                    binding.spinnerOut.setSelection(index_cellular);
+                    spinner_out.setSelection(index_cellular);
                 }
-                binding.radioUdp.setChecked(true);
-                binding.radioTcp.setChecked(false);
-                binding.chkAnonymous.setChecked(true);
+                radio_udp.setChecked(true);
+                radio_tcp.setChecked(false);
+                chk_anonymous.setChecked(true);
                 break;
             case AppConstant.WIFI_TYPE_LAWMATE:
-                binding.edtUrl.setText("rtsp://192.168.1.254/xxxx.mov");
+                edt_url.setText("rtsp://192.168.1.254/xxxx.mov");
                 if (index_wlan0 >= 0) {
-                    binding.spinnerIn.setSelection(index_wlan0);
+                    spinner_in.setSelection(index_wlan0);
                 }
                 if (index_cellular >= 0) {
-                    binding.spinnerOut.setSelection(index_cellular);
+                    spinner_out.setSelection(index_cellular);
                 }
-                binding.radioUdp.setChecked(true);
-                binding.radioTcp.setChecked(false);
-                binding.chkAnonymous.setChecked(true);
+                radio_udp.setChecked(true);
+                radio_tcp.setChecked(false);
+                chk_anonymous.setChecked(true);
                 break;
             case AppConstant.WIFI_TYPE_ATN:
-                binding.edtUrl.setText("rtsp://192.168.42.1:554/live");
+                edt_url.setText("rtsp://192.168.42.1:554/live");
                 if (index_wlan0 >= 0) {
-                    binding.spinnerIn.setSelection(index_wlan0);
+                    spinner_in.setSelection(index_wlan0);
                 }
                 if (index_cellular >= 0) {
-                    binding.spinnerOut.setSelection(index_cellular);
+                    spinner_out.setSelection(index_cellular);
                 }
-                binding.edtPassword.setText("atnsmarthd");
-                binding.radioUdp.setChecked(true);
-                binding.radioTcp.setChecked(false);
-                binding.chkAnonymous.setChecked(true);
+                edt_password.setText("atnsmarthd");
+                radio_udp.setChecked(true);
+                radio_tcp.setChecked(false);
+                chk_anonymous.setChecked(true);
                 break;
             case AppConstant.WIFI_TYPE_GENERIC:
                 if (index_wlan0 >= 0) {
-                    binding.spinnerIn.setSelection(index_wlan0);
+                    spinner_in.setSelection(index_wlan0);
                 }
                 if (index_wlan0 >= 0) {
-                    binding.spinnerOut.setSelection(index_wlan0);
+                    spinner_out.setSelection(index_wlan0);
                 }
             case AppConstant.WIFI_TYPE_RTSP:
                 if (index_wlan0 >= 0) {
-                    binding.spinnerIn.setSelection(index_wlan0);
+                    spinner_in.setSelection(index_wlan0);
                 }
                 if (index_wlan0 >= 0) {
-                    binding.spinnerOut.setSelection(index_wlan0);
+                    spinner_out.setSelection(index_wlan0);
                 }
                 break;
         }
@@ -158,90 +183,86 @@ public class CameraDialog extends Dialog {
     private void init(Context context) {
         this.context = context;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogCameraBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_camera);
         setCancelable(false);
 
-        // Set up click listeners
-        binding.btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onSave();
-            }
-        });
-
-        binding.btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onClose();
-            }
-        });
+                edt_name = findViewById(R.id.edt_name);
+        txt_title = findViewById(R.id.txt_title);
+        edt_url = findViewById(R.id.edt_url);
+        edt_username = findViewById(R.id.edt_username);
+        edt_password = findViewById(R.id.edt_password);
+        chk_anonymous = findViewById(R.id.chk_anonymous);
+        edt_port = findViewById(R.id.edt_port);
+        edt_uri = findViewById(R.id.edt_uri);
+        chk_full_address = findViewById(R.id.chk_full_address);
+        radio_udp = findViewById(R.id.radio_udp);
+        radio_tcp = findViewById(R.id.radio_tcp);
 
         initSpinner();
 
-        binding.chkAnonymous.setOnCheckedChangeListener((compoundButton, checked) -> {
-            binding.edtUsername.setEnabled(!checked);
-            binding.edtPassword.setEnabled(!checked);
+        chk_anonymous.setOnCheckedChangeListener((compoundButton, checked) -> {
+            edt_username.setEnabled(!checked);
+            edt_password.setEnabled(!checked);
         });
 
-        binding.radioUdp.setOnClickListener(view -> {
-            binding.radioUdp.setChecked(true);
-            binding.radioTcp.setChecked(false);
+        radio_udp.setOnClickListener(view -> {
+            radio_udp.setChecked(true);
+            radio_tcp.setChecked(false);
         });
-        binding.radioTcp.setOnClickListener(view -> {
-            binding.radioTcp.setChecked(true);
-            binding.radioUdp.setChecked(false);
+        radio_tcp.setOnClickListener(view -> {
+            radio_tcp.setChecked(true);
+            radio_udp.setChecked(false);
         });
-        binding.chkFullAddress.setChecked(true);
+        chk_full_address.setChecked(true);
 
         if (camera != null) {
-            binding.txtTitle.setText(R.string.edit_camera);
-            binding.edtName.setText(camera.camera_name);
+            txt_title.setText(R.string.edit_camera);
+            edt_name.setText(camera.camera_name);
 
-            binding.edtUrl.setText(camera.url);
-            binding.edtUsername.setText(camera.username);
-            binding.edtPassword.setText(camera.password);
-            binding.edtUri.setText(camera.uri);
-            binding.edtPort.setText(String.valueOf(camera.port));
-            binding.chkAnonymous.setChecked(TextUtils.isEmpty(camera.username) && TextUtils.isEmpty(camera.password));
-            binding.chkFullAddress.setChecked(camera.use_full_address);
+            edt_url.setText(camera.url);
+            edt_username.setText(camera.username);
+            edt_password.setText(camera.password);
+            edt_uri.setText(camera.uri);
+            edt_port.setText(String.valueOf(camera.port));
+            chk_anonymous.setChecked(TextUtils.isEmpty(camera.username) && TextUtils.isEmpty(camera.password));
+            chk_full_address.setChecked(camera.use_full_address);
             if (camera.rtsp_type == AppConstant.RTSP_UDP) {
-                binding.radioUdp.setChecked(true);
-                binding.radioTcp.setChecked(false);
+                radio_udp.setChecked(true);
+                radio_tcp.setChecked(false);
             } else {
-                binding.radioUdp.setChecked(false);
-                binding.radioTcp.setChecked(true);
+                radio_udp.setChecked(false);
+                radio_tcp.setChecked(true);
             }
 
             for (int i = 0; i < networks.length; i++) {
                 String network = networks[i];
                 if (TextUtils.equals(network, camera.wifi_in)) {
-                    binding.spinnerIn.setSelection(i);
+                    spinner_in.setSelection(i);
                 }
                 if (TextUtils.equals(network, camera.wifi_out)) {
-                    binding.spinnerOut.setSelection(i);
+                    spinner_out.setSelection(i);
                 }
             }
         } else {
-            binding.txtTitle.setText(R.string.new_camera);
-            binding.edtName.setText("");
-            binding.edtUrl.setText("rtsp://");
-            binding.edtUsername.setText("");
-            binding.edtPassword.setText("");
-            binding.edtUri.setText("");
-            binding.edtPort.setText("");
+            txt_title.setText(R.string.new_camera);
+            edt_name.setText("");
+            edt_url.setText("rtsp://");
+            edt_username.setText("");
+            edt_password.setText("");
+            edt_uri.setText("");
+            edt_port.setText("");
         }
 
-        binding.chkFullAddress.setOnCheckedChangeListener((compoundButton, b) -> {
-            binding.edtPort.setEnabled(!b);
-            binding.edtUri.setEnabled(!b);
-            binding.edtUsername.setEnabled(!b);
-            binding.edtPassword.setEnabled(!b);
-            binding.chkAnonymous.setEnabled(!b);
+        chk_full_address.setOnCheckedChangeListener((compoundButton, b) -> {
+            edt_port.setEnabled(!b);
+            edt_uri.setEnabled(!b);
+            edt_username.setEnabled(!b);
+            edt_password.setEnabled(!b);
+            chk_anonymous.setEnabled(!b);
         });
 
         if (BuildConfig.DEBUG) {
-//            binding.edtUrl.setText("rtsp://admin:Password1@96.69.46.125:7014/stream/profile1=r");
+//            edt_url.setText("rtsp://admin:Password1@96.69.46.125:7014/stream/profile1=r");
         }
 
     }
@@ -279,36 +300,47 @@ public class CameraDialog extends Dialog {
         }
         SpinnerAdapter inAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, networks);
         SpinnerAdapter outAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, networks);
-        binding.spinnerIn.setAdapter(inAdapter);
-        binding.spinnerOut.setAdapter(outAdapter);
+        spinner_in.setAdapter(inAdapter);
+        spinner_out.setAdapter(outAdapter);
+    }
+
+    public void OnClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_save:
+                onSave();
+                break;
+            case R.id.btn_close:
+                onClose();
+                break;
+        }
     }
 
     void onSave() {
-        if (TextUtils.isEmpty(binding.edtName.getText().toString())) {
+        if (TextUtils.isEmpty(edt_name.getText().toString())) {
             MessageUtil.showToast(getContext(), R.string.invalid_name);
             return;
         }
-        if (TextUtils.isEmpty(binding.edtUrl.getText().toString())) {
+        if (TextUtils.isEmpty(edt_url.getText().toString())) {
             MessageUtil.showToast(getContext(), R.string.no_url);
             return;
         }
-        boolean is_anonymous = binding.chkAnonymous.isChecked();
-        if (!binding.chkFullAddress.isChecked()) {
-            if (TextUtils.isEmpty(binding.edtUri.getText().toString())) {
+        boolean is_anonymous = chk_anonymous.isChecked();
+        if (!chk_full_address.isChecked()) {
+            if (TextUtils.isEmpty(edt_uri.getText().toString())) {
                 MessageUtil.showToast(getContext(), R.string.no_uri);
                 return;
             }
-            if (TextUtils.isEmpty(binding.edtPort.getText().toString())) {
+            if (TextUtils.isEmpty(edt_port.getText().toString())) {
                 MessageUtil.showToast(getContext(), R.string.no_port);
                 return;
             }
 
             if (!is_anonymous) {
-                if (TextUtils.isEmpty(binding.edtUsername.getText().toString())) {
+                if (TextUtils.isEmpty(edt_username.getText().toString())) {
                     MessageUtil.showToast(getContext(), R.string.invalid_username);
                     return;
                 }
-                if (TextUtils.isEmpty(binding.edtPassword.getText().toString())) {
+                if (TextUtils.isEmpty(edt_password.getText().toString())) {
                     MessageUtil.showToast(getContext(), R.string.invalid_password);
                     return;
                 }
@@ -316,12 +348,12 @@ public class CameraDialog extends Dialog {
 
         }
 
-        String name = binding.edtName.getText().toString().trim();
-        String url = binding.edtUrl.getText().toString().trim();
-        String uri = binding.edtUri.getText().toString().trim();
+        String name = edt_name.getText().toString().trim();
+        String url = edt_url.getText().toString().trim();
+        String uri = edt_uri.getText().toString().trim();
         int port = 0;
-        if (!TextUtils.isEmpty(binding.edtPort.getText().toString())) {
-            port = Integer.parseInt(binding.edtPort.getText().toString());
+        if (!TextUtils.isEmpty(edt_port.getText().toString())) {
+            port = Integer.parseInt(edt_port.getText().toString());
         }
 
         if (!url.contains("rtsp://") || url.equalsIgnoreCase("rtsp://") && !url.startsWith("rtsp://")) {
@@ -329,17 +361,17 @@ public class CameraDialog extends Dialog {
             return;
         }
 
-        String username = binding.edtUsername.getText().toString().trim();
-        String password = binding.edtPassword.getText().toString().trim();
+        String username = edt_username.getText().toString().trim();
+        String password = edt_password.getText().toString().trim();
         if (is_anonymous) {
             username = "";
             password = "";
         }
 
-        int rtsp_type = binding.radioTcp.isChecked() ? AppConstant.RTSP_TCP : AppConstant.RTSP_UDP;
-        String wifi_in = binding.spinnerIn.getSelectedItem().toString();
-        String wifi_out = binding.spinnerOut.getSelectedItem().toString();
-        Camera camera = new Camera(name, url, port, uri, username, password, ssid, rtsp_type, wifi_in, wifi_out, binding.chkFullAddress.isChecked(), wifi_password);
+        int rtsp_type = radio_tcp.isChecked() ? AppConstant.RTSP_TCP : AppConstant.RTSP_UDP;
+        String wifi_in = spinner_in.getSelectedItem().toString();
+        String wifi_out = spinner_out.getSelectedItem().toString();
+        Camera camera = new Camera(name, url, port, uri, username, password, ssid, rtsp_type, wifi_in, wifi_out, chk_full_address.isChecked(), wifi_password);
         boolean is_updated = false;
         camera.camera_wifi_type = camera_type;
         if (this.camera == null || this.camera.id == -1) {
@@ -360,7 +392,7 @@ public class CameraDialog extends Dialog {
             this.camera.wifi_in = wifi_in;
             this.camera.wifi_out = wifi_out;
             this.camera.wifi_password = wifi_password;
-            this.camera.use_full_address = binding.chkFullAddress.isChecked();
+            this.camera.use_full_address = chk_full_address.isChecked();
             DBManager.getInstance().updateCamera(this.camera);
             is_updated = true;
         }

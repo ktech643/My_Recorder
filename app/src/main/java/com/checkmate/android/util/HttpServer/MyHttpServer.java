@@ -23,24 +23,16 @@ import androidx.annotation.RequiresApi;
 import com.checkmate.android.AppConstant;
 import com.checkmate.android.AppPreference;
 import com.checkmate.android.R;
-import com.checkmate.android.database.FileRecord;
-import com.checkmate.android.database.FileStoreDb;
 import com.checkmate.android.service.LocationManagerService;
-import com.checkmate.android.service.SharedEGL.ServiceType;
-import com.checkmate.android.service.SharedEGL.SharedEglManager;
 import com.checkmate.android.ui.activity.SplashActivity;
 import com.checkmate.android.ui.fragment.LiveFragment;
 import com.checkmate.android.util.CommonUtil;
 import com.checkmate.android.util.MainActivity;
-import com.checkmate.android.util.MessageUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import org.json.JSONObject;
-
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,14 +40,11 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -68,6 +57,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import fi.iki.elonen.NanoHTTPD;
+import toothpick.Toothpick;
 
 public final class MyHttpServer extends NanoHTTPD {
 
@@ -78,7 +68,6 @@ public final class MyHttpServer extends NanoHTTPD {
     private static final int SOCKET_TIMEOUT_MS = 30_000;
     private static final String DEFAULT_KEY_B64 = "VkNTIENoZWNrbWF0ZSBBbmRyb2lkIEFwcA==";
     private static final double BYTES_IN_GB = 1024.0 * 1024.0 * 1024.0;
-    private FileStoreDb fileStoreDb;
 
     // Action constants
     public static final String ACTION_START = "start";
@@ -89,6 +78,8 @@ public final class MyHttpServer extends NanoHTTPD {
     private final Gson gson = new GsonBuilder().serializeNulls().create();
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
     private final String apiKey;
+    private ServiceManager serviceManager;
+    private boolean isRunningAsDaemon = false;
 
     // Route handlers
     private final ConcurrentMap<String, Supplier<Response>> simpleHandlers = new ConcurrentHashMap<>();
@@ -99,12 +90,27 @@ public final class MyHttpServer extends NanoHTTPD {
         Response handle(IHTTPSession session, Map<String, List<String>> params) throws Exception;
     }
 
-    public MyHttpServer(int port, @NonNull Context applicationContext) {
+    public MyHttpServer(int port, @NonNull Context applicationContext, ServiceManager serviceManager) {
         super(port);
         this.ctx = applicationContext.getApplicationContext();
         this.recordingsDir = initRecordingDir();
         this.apiKey = resolveApiKey();
-        fileStoreDb = new FileStoreDb(applicationContext);
+        serviceManager = Toothpick
+                .openScope("APP_SCOPE")
+                .getInstance(ServiceManager.class);
+
+        ServiceManager finalServiceManager = serviceManager;
+        uiHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    finalServiceManager.switchServiceDI("usb");
+                    Log.d("Test", "Service switch successful");
+                } catch (Exception e) {
+                    Log.e("Test", "Service switch failed", e);
+                }
+            }
+        },5000);
         initRoutes();
     }
 
@@ -188,6 +194,12 @@ public final class MyHttpServer extends NanoHTTPD {
             }
 
             Log.w(TAG, "Endpoint not found: " + endpoint + " for method " + session.getMethod());
+            if (MainActivity.getInstance() != null) {
+                if (MainActivity.getInstance().isShowingAccServiceAlert) {
+                    MainActivity.getInstance().isShowingAccServiceAlert = false;
+                    MainActivity.getInstance().alertDialog.dismiss();
+                }
+            }
             return cors(jsonErr(Response.Status.NOT_FOUND, "Endpoint not found"));
         } catch (ResponseException e) {
             Log.e(TAG, "ResponseException during request processing: " + e.getStatus() + " - " + e.getMessage(), e.getStatus() == Response.Status.BAD_REQUEST ? null : e);
@@ -241,8 +253,6 @@ public final class MyHttpServer extends NanoHTTPD {
         }
         return session.getParameters();
     }
-
-    // ==================== API ENDPOINT IMPLEMENTATIONS ====================
 
     private Response systemInfo() {
         BatteryManager bm = (BatteryManager) ctx.getSystemService(Context.BATTERY_SERVICE);
@@ -300,6 +310,29 @@ public final class MyHttpServer extends NanoHTTPD {
         return jsonOk(data);
     }
 
+    private Response audioStatus() {
+        return jsonOk(Map.of(
+                "enabled", AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, true),
+                "type", "Microphone"
+        ));
+    }
+
+    private Response streamingStatus() {
+        boolean isStreaming = AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false);
+        return jsonOk(Map.of(
+                "is_streaming", isStreaming,
+                "streaming_mode", humanReadableCamera(AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, "0"))
+        ));
+    }
+
+    private Response recordingStatus() {
+        boolean isRecording = AppPreference.getBool(AppPreference.KEY.RECORDING_STARTED, false);
+        return jsonOk(Map.of(
+                "is_recording", isRecording,
+                "recording_source", humanReadableCamera(AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, "0"))
+        ));
+    }
+
     private Response cameraStatus() {
         String pref = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, "0");
         return jsonOk(Map.of(
@@ -307,6 +340,26 @@ public final class MyHttpServer extends NanoHTTPD {
                 "selected_camera_name", humanReadableCamera(pref),
                 "is_usb_camera_attached", usbCameraAttached()
         ));
+    }
+
+    private boolean isAppInForeground() {
+        ActivityManager activityManager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
+        if (activityManager == null) {
+            Log.w(TAG, "ActivityManager is null, cannot determine foreground state.");
+            return false;
+        }
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        if (appProcesses == null) {
+            Log.w(TAG, "RunningAppProcessInfo is null, cannot determine foreground state.");
+            return false;
+        }
+        final String packageName = ctx.getPackageName();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND && appProcess.processName.equals(packageName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Response cameraSet(IHTTPSession session, Map<String, List<String>> params) {
@@ -322,47 +375,43 @@ public final class MyHttpServer extends NanoHTTPD {
                 return jsonErr(Response.Status.BAD_REQUEST, "Unknown camera type specified: " + type);
             }
 
-            // Get instances using singleton pattern
-            MainActivity mainActivity = MainActivity.getInstance();
-            LiveFragment liveFragment = LiveFragment.getInstance();
-            SharedEglManager sharedEglManager = SharedEglManager.getInstance();
+            // Map UI position to service type
+            String serviceType = mapCameraPosToServiceType(pos);
+            Log.d(TAG, "Switching to service: " + serviceType);
 
-            if (mainActivity == null) {
-                return jsonErr(Response.Status.INTERNAL_ERROR, "MainActivity not available");
-            }
+            // Use ServiceManager to switch services via DI
+            serviceManager.switchServiceDI(serviceType);
 
             // Update preferences
             String newCameraPrefKey = posToPrefKey(pos);
             AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, newCameraPrefKey);
-            Log.i(TAG, "Camera switched to: " + type + " (ID: " + newCameraPrefKey + ")");
+            Log.i(TAG, "Camera service switched to: " + serviceType + " (ID: " + newCameraPrefKey + ")");
 
             // Reset streaming/recording states
             AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, false);
             AppPreference.setBool(AppPreference.KEY.RECORDING_STARTED, false);
 
-            // Switch camera service using UI thread
-            uiHandler.post(() -> {
-                try {
-                    // Stop current services
-                    mainActivity.stopAllServices();
+            // Update UI if app is in foreground
+            if (isAppInForeground()) {
+                MainActivity mainActivityInstance = MainActivity.getInstance();
+                if (mainActivityInstance != null && !mainActivityInstance.isFinishing()) {
+                    uiHandler.post(() -> {
+                        try {
+                            LiveFragment liveFragmentInstance = LiveFragment.getInstance();
+                            if (liveFragmentInstance != null && liveFragmentInstance.isAdded()) {
+                                Log.d(TAG, "Updating LiveFragment spinner to position: " + pos);
+                                liveFragmentInstance.spinner_camera.setSelectionNew(pos);
+                            }
 
-                    // Wait a bit for services to stop
-                    uiHandler.postDelayed(() -> {
-                        // Update LiveFragment camera selection if available
-                        liveFragment.onItemSelected(null,null,pos,0);
-                        // Change active service in SharedEglManager
-                        if (sharedEglManager != null) {
-                            ServiceType serviceType = mapCameraPosToServiceType(pos);
-                            sharedEglManager.changeActiveService(serviceType);
+                        } catch (Exception e) {
+                            Log.e(TAG, "UI update failed: " + e.getMessage(), e);
                         }
-                    }, 500);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error switching camera via UI", e);
+                    });
                 }
-            });
+            }
 
             return jsonOk(Map.of(
-                    "status", "Camera switched to " + humanReadableCamera(newCameraPrefKey),
+                    "status", "Camera service switched to " + serviceType,
                     "message", "Service changed. Streaming/recording stopped."
             ));
         } catch (Exception e) {
@@ -371,11 +420,21 @@ public final class MyHttpServer extends NanoHTTPD {
         }
     }
 
-    private Response audioStatus() {
-        return jsonOk(Map.of(
-                "enabled", AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, true),
-                "type", "Microphone"
-        ));
+    // Helper to map UI positions to service types
+    private String mapCameraPosToServiceType(int pos) {
+        switch (pos) {
+            case 0: // Rear Camera
+            case 1: // Front Camera
+                return "camera";
+            case 2: // USB Camera
+                return "usb";
+            case 3: // Screen Cast
+                return "cast";
+            case 4: // Audio Only
+                return "audio";
+            default:
+                throw new IllegalArgumentException("Invalid camera position: " + pos);
+        }
     }
 
     private Response audioSet(IHTTPSession session, Map<String, List<String>> params) {
@@ -383,38 +442,20 @@ public final class MyHttpServer extends NanoHTTPD {
         if (enableStr == null) {
             return jsonErr(Response.Status.BAD_REQUEST, "Missing 'enable' parameter (true/false).");
         }
-
         boolean enable = Boolean.parseBoolean(enableStr);
         AppPreference.setBool(AppPreference.KEY.RECORD_AUDIO, enable);
 
-        Log.i(TAG, "Audio " + (enable ? "enabled" : "disabled"));
-        return jsonOk(Map.of(
-                "status", enable ? "Audio enabled" : "Audio disabled",
-                "message", "Audio state updated"
-        ));
-    }
-
-    private Response streamingStatus() {
-        MainActivity mainActivity = MainActivity.getInstance();
-        SharedEglManager sharedEglManager = SharedEglManager.getInstance();
-
-        boolean isStreaming = false;
-        String streamingMode = "None";
-
-        if (mainActivity != null) {
-            isStreaming = mainActivity.isStreaming();
-        } else if (sharedEglManager != null) {
-            isStreaming = sharedEglManager.isStreaming();
+        try {
+            serviceManager.switchAudioDI(enable);
+            Log.i(TAG, "Audio switched to: " + enable);
+            return jsonOk(Map.of(
+                    "status", enable ? "Audio enabled" : "Audio disabled",
+                    "message", "Audio state updated"
+            ));
+        } catch (IllegalStateException e) {
+            Log.e(TAG, "Audio switch failed: " + e.getMessage());
+            return jsonErr(Response.Status.INTERNAL_ERROR, "Audio operation failed: " + e.getMessage());
         }
-
-        if (isStreaming) {
-            streamingMode = humanReadableCamera(AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, "0"));
-        }
-
-        return jsonOk(Map.of(
-                "is_streaming", isStreaming,
-                "streaming_mode", streamingMode
-        ));
     }
 
     private Response streamingSet(IHTTPSession session, Map<String, List<String>> params) {
@@ -426,65 +467,22 @@ public final class MyHttpServer extends NanoHTTPD {
             return jsonErr(Response.Status.BAD_REQUEST, "Invalid 'action'. Must be '" + ACTION_START + "' or '" + ACTION_STOP + "'.");
         }
 
-        MainActivity mainActivity = MainActivity.getInstance();
-        LiveFragment fragment = LiveFragment.getInstance();
-
-        if (mainActivity == null) {
-            return jsonErr(Response.Status.INTERNAL_ERROR, "MainActivity not available");
-        }
-
         try {
-            if (mainActivity.sharedEglManager.isStreaming()) {
-                if (wantStart) {
-                    return jsonOk(Map.of("status", "Streaming already started"));
-                }
+            if (wantStart) {
+                serviceManager.startStreamDI();
+                AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, true);
+                Log.i(TAG, "Streaming started via ServiceManager");
+                return jsonOk(Map.of("status", "Streaming started"));
+            } else {
+                serviceManager.stopStreamDI();
+                AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, false);
+                Log.i(TAG, "Streaming stopped via ServiceManager");
+                return jsonOk(Map.of("status", "Streaming stopped"));
             }
-            if (!mainActivity.sharedEglManager.isStreaming()) {
-                if (wantStop) {
-                    return jsonOk(Map.of("status", "Streaming already stopped"));
-                }
-            }
-            uiHandler.post(() -> {
-                try {
-                    if (wantStart) {
-                        // Start streaming based on current camera type
-                        mainActivity.handleServerStream();
-                        AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, true);
-                        Log.i(TAG, "Streaming started via API");
-                    } else {
-                        mainActivity.handleServerStream();
-                        AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, false);
-                        Log.i(TAG, "Streaming stopped via API");
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Error controlling streaming via API", e);
-                }
-            });
-
-            return jsonOk(Map.of("status", wantStart ? "Streaming started" : "Streaming stopped"));
-        } catch (Exception e) {
-            Log.e(TAG, "Streaming operation failed: " + e.getMessage(), e);
+        } catch (IllegalStateException e) {
+            Log.e(TAG, "Streaming operation failed: " + e.getMessage());
             return jsonErr(Response.Status.INTERNAL_ERROR, "Streaming operation failed: " + e.getMessage());
         }
-    }
-
-    private Response recordingStatus() {
-        MainActivity mainActivity = MainActivity.getInstance();
-
-        boolean isRecording = false;
-        String recordingSource = "None";
-
-        if (mainActivity != null) {
-            if (mainActivity.isRecording()){
-                isRecording = true;
-                recordingSource = humanReadableCamera(AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, "0"));
-            }
-        }
-
-        return jsonOk(Map.of(
-                "is_recording", isRecording,
-                "recording_source", recordingSource
-        ));
     }
 
     private Response recordingSet(IHTTPSession session, Map<String, List<String>> params) {
@@ -496,281 +494,115 @@ public final class MyHttpServer extends NanoHTTPD {
             return jsonErr(Response.Status.BAD_REQUEST, "Invalid 'action'. Must be '" + ACTION_START + "' or '" + ACTION_STOP + "'.");
         }
 
-        MainActivity mainActivity = MainActivity.getInstance();
-        LiveFragment liveFragment = LiveFragment.getInstance();
-
-        if (mainActivity == null) {
-            return jsonErr(Response.Status.INTERNAL_ERROR, "MainActivity not available");
-        }
-
         try {
-            if (mainActivity.sharedEglManager.isRecording()) {
-                if (wantStart) {
-                    return jsonOk(Map.of("status", "Recording already started"));
-                }
+            if (wantStart) {
+                serviceManager.startRecordDI();
+                AppPreference.setBool(AppPreference.KEY.RECORDING_STARTED, true);
+                Log.i(TAG, "Recording started via ServiceManager");
+                return jsonOk(Map.of("status", "Recording started"));
+            } else {
+                serviceManager.stopRecordDI();
+                AppPreference.setBool(AppPreference.KEY.RECORDING_STARTED, false);
+                Log.i(TAG, "Recording stopped via ServiceManager");
+                return jsonOk(Map.of("status", "Recording stopped"));
             }
-            if (!mainActivity.sharedEglManager.isRecording()) {
-                if (wantStop) {
-                    return jsonOk(Map.of("status", "Recording already stopped"));
-                }
-            }
-            uiHandler.post(() -> {
-                try {
-                    if (wantStart) {
-                        // Start recording based on current camera type
-                        if (liveFragment != null) {
-                            liveFragment.onRecServer();
-                        }
-
-                        AppPreference.setBool(AppPreference.KEY.RECORDING_STARTED, true);
-                        Log.i(TAG, "Recording started via API");
-                    } else {
-                        // Stop recording
-                        if (liveFragment != null) {
-                            liveFragment.onRecServer();
-                        }
-                        AppPreference.setBool(AppPreference.KEY.RECORDING_STARTED, false);
-                        Log.i(TAG, "Recording stopped via API");
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Error controlling recording via API", e);
-                }
-            });
-
-            return jsonOk(Map.of("status", wantStart ? "Recording started" : "Recording stopped"));
-        } catch (Exception e) {
-            Log.e(TAG, "Recording operation failed: " + e.getMessage(), e);
+        } catch (IllegalStateException e) {
+            Log.e(TAG, "Recording operation failed: " + e.getMessage());
             return jsonErr(Response.Status.INTERNAL_ERROR, "Recording operation failed: " + e.getMessage());
         }
     }
 
     private Response playbackList(IHTTPSession session, Map<String, List<String>> params) {
-        if (fileStoreDb == null) {
-            Log.w(TAG, "PlaybackList: Database not available");
+        if (recordingsDir == null || !recordingsDir.exists() || !recordingsDir.isDirectory()) {
+            Log.w(TAG, "PlaybackList: Recordings directory not available: " + (recordingsDir == null ? "null" : recordingsDir.getAbsolutePath()));
             return jsonOk(Map.of(
                     "files", Collections.emptyList(),
-                    "message", "Database not available or not configured."
+                    "message", "Recordings directory not available or not configured."
             ));
         }
-
-        try {
-            // Get all files from database using the corrected getAllFiles() method
-            List<FileRecord> dbFiles = fileStoreDb.getAllFiles();
-            List<Map<String, Object>> fileList = new ArrayList<>();
-
-            if (dbFiles != null && !dbFiles.isEmpty()) {
-                // Sort by timestamp (most recent first)
-                dbFiles.sort((f1, f2) -> Long.compare(f2.getTimestamp(), f1.getTimestamp()));
-
-                for (FileRecord fileRecord : dbFiles) {
-                    Map<String, Object> fileInfo = new HashMap<>();
-                    fileInfo.put("filename", fileRecord.getFileName());
-                    fileInfo.put("filepath", fileRecord.getFilePath());
-                    fileInfo.put("size_bytes", fileRecord.getFileSize());
-                    fileInfo.put("size_mb", String.format(Locale.US, "%.2f", fileRecord.getFileSize() / (1024.0 * 1024.0)));
-                    fileInfo.put("timestamp", fileRecord.getTimestamp());
-                    fileInfo.put("formatted_date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US)
-                            .format(new Date(fileRecord.getTimestamp())));
-                    fileInfo.put("file_type", fileRecord.getFileType());
-                    fileInfo.put("encrypted", fileRecord.isEncrypted());
-
-                    // Add media-specific info if available
-                    if ("video".equals(fileRecord.getFileType())) {
-                        fileInfo.put("duration_ms", fileRecord.getDuration());
-                        fileInfo.put("duration_formatted", formatDuration(fileRecord.getDuration()));
-                    }
-
-                    if (fileRecord.getWidth() > 0 && fileRecord.getHeight() > 0) {
-                        fileInfo.put("resolution", fileRecord.getWidth() + "x" + fileRecord.getHeight());
-                        fileInfo.put("width", fileRecord.getWidth());
-                        fileInfo.put("height", fileRecord.getHeight());
-                    }
-
-                    fileList.add(fileInfo);
-                }
+        File[] filesArray = recordingsDir.listFiles((dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".mp4"));
+        List<Map<String, Object>> fileList = new java.util.ArrayList<>();
+        if (filesArray != null) {
+            java.util.Arrays.sort(filesArray, (f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
+            for (File file : filesArray) {
+                Map<String, Object> fileInfo = new HashMap<>();
+                fileInfo.put("filename", file.getName());
+                fileInfo.put("size_bytes", file.length());
+                fileInfo.put("size_mb", String.format(Locale.US, "%.2f", file.length() / (1024.0 * 1024.0)));
+                fileInfo.put("last_modified_timestamp", file.lastModified());
+                fileInfo.put("last_modified_date", new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US).format(new java.util.Date(file.lastModified())));
+                fileList.add(fileInfo);
             }
-
-            return jsonOk(Map.of(
-                    "files", fileList,
-                    "total_files", fileList.size(),
-                    "message", "Files retrieved from database successfully"
-            ));
-
-        } catch (Exception e) {
-            Log.e(TAG, "Error retrieving files from database", e);
-            return jsonOk(Map.of(
-                    "files", Collections.emptyList(),
-                    "message", "Error retrieving files from database: " + e.getMessage()
-            ));
         }
-    }
-
-    // Helper method to format duration from milliseconds to readable format
-    private String formatDuration(long durationMs) {
-        if (durationMs <= 0) return "00:00";
-
-        long seconds = durationMs / 1000;
-        long minutes = seconds / 60;
-        long hours = minutes / 60;
-
-        seconds %= 60;
-        minutes %= 60;
-
-        if (hours > 0) {
-            return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
-        } else {
-            return String.format(Locale.US, "%02d:%02d", minutes, seconds);
-        }
+        return jsonOk(Map.of(
+                "files", fileList,
+                "total_files", fileList.size(),
+                "directory", recordingsDir.getAbsolutePath()
+        ));
     }
 
     private Response playbackDownload(IHTTPSession session, Map<String, List<String>> params) {
-        String filename = null;
-        String filepath = null;
-        String timestampStr = null;
-
-        // Handle GET request with query parameters
-        if ("GET".equalsIgnoreCase(session.getMethod().toString())) {
-            filename = first(params, "filename", null);
-            filepath = first(params, "filepath", null);
-            timestampStr = first(params, "timestamp", null);
+        String filename = first(params, "filename", null);
+        if (filename == null || filename.trim().isEmpty()) {
+            return jsonErr(Response.Status.BAD_REQUEST, "Missing 'filename' parameter.");
         }
-        // Handle POST request with JSON body
-        else if ("POST".equalsIgnoreCase(session.getMethod().toString())) {
-            try {
-                // Read JSON body
-                String body = readRequestBody(session);
-                if (body != null && !body.trim().isEmpty()) {
-                    // Parse JSON (you'll need a JSON parsing library like Gson or org.json)
-                    JSONObject json = new JSONObject(body);
-
-                    if (json.has("filename")) {
-                        filename = json.getString("filename");
-                    }
-                    if (json.has("filepath")) {
-                        filepath = json.getString("filepath");
-                    }
-                    if (json.has("timestamp")) {
-                        timestampStr = json.getString("timestamp");
-                    }
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error parsing JSON body", e);
-                return jsonErr(Response.Status.BAD_REQUEST, "Invalid JSON format.");
-            }
-        }
-
-        if (filename == null && filepath == null && timestampStr == null) {
-            return jsonErr(Response.Status.BAD_REQUEST, "Missing parameter. Provide 'filename', 'filepath', or 'timestamp'.");
-        }
-
-        // Validate filename for security
-        if (filename != null && (filename.contains("..") || filename.contains("/") || filename.contains("\\"))) {
+        if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
             Log.w(TAG, "PlaybackDownload: Invalid characters in filename: " + filename);
             return jsonErr(Response.Status.BAD_REQUEST, "Invalid filename format.");
         }
-
-        if (fileStoreDb == null) {
-            Log.e(TAG, "PlaybackDownload: Database not available.");
-            return jsonErr(Response.Status.INTERNAL_ERROR, "Database not available.");
+        if (recordingsDir == null) {
+            Log.e(TAG, "PlaybackDownload: Recordings directory is not initialized.");
+            return jsonErr(Response.Status.INTERNAL_ERROR, "Recordings storage not available.");
         }
-
         try {
-            FileRecord fileRecord = null;
-
-            // Look up file in database
-            if (filename != null && !filename.trim().isEmpty()) {
-                fileRecord = fileStoreDb.getFileByName(filename.trim());
-            }
-            else if (filepath != null && !filepath.trim().isEmpty()) {
-                fileRecord = fileStoreDb.getFileByPath(filepath.trim());
-            }
-            else if (timestampStr != null && !timestampStr.trim().isEmpty()) {
-                try {
-                    long timestamp = Long.parseLong(timestampStr.trim());
-                    fileRecord = fileStoreDb.getFileByTimestamp(timestamp);
-                } catch (NumberFormatException e) {
-                    return jsonErr(Response.Status.BAD_REQUEST, "Invalid timestamp format.");
-                }
-            }
-
-            if (fileRecord == null) {
-                Log.w(TAG, "PlaybackDownload: File not found in database");
-                return jsonErr(Response.Status.NOT_FOUND, "File not found in database.");
-            }
-
-            // Get the actual file
-            File file = new File(fileRecord.getFilePath());
-
-            if (!file.exists()) {
-                Log.w(TAG, "PlaybackDownload: File exists in database but not on filesystem: " + file.getAbsolutePath());
-                return jsonErr(Response.Status.NOT_FOUND, "File not found on filesystem.");
-            }
-
-            if (!file.canRead()) {
-                Log.w(TAG, "PlaybackDownload: File not readable: " + file.getAbsolutePath());
-                return jsonErr(Response.Status.FORBIDDEN, "File not accessible.");
-            }
-
-            Log.i(TAG, "PlaybackDownload: Streaming file: " + file.getAbsolutePath());
-
-            // Fix for "Duplicate Content-Length" error
-            return createFileStreamResponse(session, file, fileRecord);
-
+            File f = secureRecording(filename);
+            return streamRange(session, f);
+        } catch (FileNotFoundException fnf) {
+            Log.w(TAG, "PlaybackDownload: File not found or not accessible: " + filename, fnf);
+            return jsonErr(Response.Status.NOT_FOUND, fnf.getMessage());
+        } catch (SecurityException sec) {
+            Log.w(TAG, "PlaybackDownload: Security exception for file: " + filename, sec);
+            return jsonErr(Response.Status.FORBIDDEN, sec.getMessage());
+        } catch (IOException ex) {
+            Log.e(TAG, "PlaybackDownload: IO failure for file: " + filename, ex);
+            return jsonErr(Response.Status.INTERNAL_ERROR, "Could not stream file due to IO error.");
         } catch (Exception ex) {
-            Log.e(TAG, "PlaybackDownload: Unexpected failure", ex);
-            return jsonErr(Response.Status.INTERNAL_ERROR, "Could not stream file: " + ex.getMessage());
+            Log.e(TAG, "PlaybackDownload: Unexpected failure for file: " + filename, ex);
+            return jsonErr(Response.Status.INTERNAL_ERROR, "Could not stream file due to an unexpected error.");
         }
     }
 
-    // Helper method to read request body
-    private String readRequestBody(IHTTPSession session) {
-        try {
-            Map<String, String> files = new HashMap<>();
-            session.parseBody(files);
-            return files.get("postData");
-        } catch (Exception e) {
-            Log.e(TAG, "Error reading request body", e);
-            return null;
+    private Response gpsSet(IHTTPSession session, Map<String, List<String>> params) {
+        String action = first(params, "action", null);
+        String intervalStr = first(params, "interval", null);
+
+        if (action == null && intervalStr == null) {
+            return jsonErr(Response.Status.BAD_REQUEST, "Missing parameters. Provide 'action' ("+ACTION_START+"/"+ACTION_STOP+") or 'interval' (minutes).");
         }
+        if (action != null) {
+            boolean enable;
+            if (ACTION_START.equalsIgnoreCase(action)) enable = true;
+            else if (ACTION_STOP.equalsIgnoreCase(action)) enable = false;
+            else return jsonErr(Response.Status.BAD_REQUEST, "Invalid 'action'. Must be '"+ACTION_START+"' or '"+ACTION_STOP+"'.");
+
+            AppPreference.setBool(AppPreference.KEY.GPS_ENABLED, enable);
+            Log.i(TAG, "GPS tracking preference set to: " + enable);
+            return jsonOk(Map.of("status", "GPS tracking " + (enable ? "enabled" : "disabled") + " in preferences. Service notified."));
+        }
+        if (intervalStr != null) {
+            try {
+                int intervalMinutes = Integer.parseInt(intervalStr);
+                if (intervalMinutes <= 0) return jsonErr(Response.Status.BAD_REQUEST, "Invalid 'interval'. Must be a positive integer > 0.");
+                AppPreference.setInt(AppPreference.KEY.FREQUENCY_MIN, intervalMinutes);
+                Log.i(TAG, "GPS update interval preference set to: " + intervalMinutes + " minutes.");
+                return jsonOk(Map.of("status", "GPS update interval preference set to " + intervalMinutes + " minutes. Service notified."));
+            } catch (NumberFormatException e) {
+                return jsonErr(Response.Status.BAD_REQUEST, "Invalid 'interval' format. Must be an integer.");
+            }
+        }
+        return jsonErr(Response.Status.BAD_REQUEST, "No valid GPS parameters processed.");
     }
 
-    // Fixed file streaming method to avoid duplicate Content-Length headers
-    private Response createFileStreamResponse(IHTTPSession session, File file, FileRecord fileRecord) {
-        try {
-            FileInputStream fis = new FileInputStream(file);
-
-            // Use the most compatible NanoHTTPD method
-            Response response = newFixedLengthResponse(
-                    Response.Status.OK,
-                    getMimeType(fileRecord.getFileName()),
-                    fis,
-                    file.length()
-            );
-
-            // Add essential headers for file downloads
-            response.addHeader("Content-Disposition",
-                    "attachment; filename=\"" + fileRecord.getFileName() + "\"");
-            response.addHeader("Accept-Ranges", "bytes");
-
-            return response;
-
-        } catch (IOException e) {
-            Log.e(TAG, "Error creating file stream response", e);
-            return jsonErr(Response.Status.INTERNAL_ERROR, "Could not stream file.");
-        }
-    }
-
-    // Helper method to determine MIME type
-    private String getMimeType(String filename) {
-        String extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
-        switch (extension) {
-            case "mp4": return "video/mp4";
-            case "jpg":
-            case "jpeg": return "image/jpeg";
-            case "png": return "image/png";
-            default: return "application/octet-stream";
-        }
-    }
     private Response gpsStatus() {
         boolean enabled = AppPreference.getBool(AppPreference.KEY.GPS_ENABLED, false);
         String lat = String.format(Locale.US, "%.6f", LocationManagerService.lat);
@@ -787,54 +619,6 @@ public final class MyHttpServer extends NanoHTTPD {
         ));
     }
 
-    private Response gpsSet(IHTTPSession session, Map<String, List<String>> params) {
-        String action = first(params, "action", null);
-        String intervalStr = first(params, "interval", null);
-
-        MainActivity mainActivity = MainActivity.getInstance();
-        if (mainActivity == null) {
-            return jsonErr(Response.Status.INTERNAL_ERROR, "MainActivity not available");
-        }
-
-        if (action == null && intervalStr == null) {
-            return jsonErr(Response.Status.BAD_REQUEST, "Missing parameters. Provide 'action' ("+ACTION_START+"/"+ACTION_STOP+") or 'interval' (minutes).");
-        }
-
-        if (action != null) {
-            boolean enable;
-            if (ACTION_START.equalsIgnoreCase(action)) enable = true;
-            else if (ACTION_STOP.equalsIgnoreCase(action)) enable = false;
-            else return jsonErr(Response.Status.BAD_REQUEST, "Invalid 'action'. Must be '"+ACTION_START+"' or '"+ACTION_STOP+"'.");
-
-            AppPreference.setBool(AppPreference.KEY.GPS_ENABLED, enable);
-
-            uiHandler.post(() -> {
-                if (enable) {
-                    mainActivity.startLocationService();
-                } else {
-                    mainActivity.stopLocationService();
-                }
-            });
-
-            Log.i(TAG, "GPS tracking preference set to: " + enable);
-            return jsonOk(Map.of("status", "GPS tracking " + (enable ? "enabled" : "disabled") + " in preferences. Service notified."));
-        }
-
-        if (intervalStr != null) {
-            try {
-                int intervalMinutes = Integer.parseInt(intervalStr);
-                if (intervalMinutes <= 0) return jsonErr(Response.Status.BAD_REQUEST, "Invalid 'interval'. Must be a positive integer > 0.");
-                AppPreference.setInt(AppPreference.KEY.FREQUENCY_MIN, intervalMinutes);
-                Log.i(TAG, "GPS update interval preference set to: " + intervalMinutes + " minutes.");
-                return jsonOk(Map.of("status", "GPS update interval preference set to " + intervalMinutes + " minutes. Service notified."));
-            } catch (NumberFormatException e) {
-                return jsonErr(Response.Status.BAD_REQUEST, "Invalid 'interval' format. Must be an integer.");
-            }
-        }
-
-        return jsonErr(Response.Status.BAD_REQUEST, "No valid GPS parameters processed.");
-    }
-
     private Response appUpdate(IHTTPSession session, Map<String, List<String>> params) {
         String url = first(params, "url", null);
         if (url == null || url.trim().isEmpty()) {
@@ -846,41 +630,12 @@ public final class MyHttpServer extends NanoHTTPD {
             return jsonErr(Response.Status.BAD_REQUEST, "Invalid 'url' scheme. Must be HTTP or HTTPS.");
         }
 
-        MainActivity mainActivity = MainActivity.getInstance();
-        if (mainActivity != null) {
-            uiHandler.post(() -> {
-                try {
-                    mainActivity.updateApp(url);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error triggering app update", e);
-                }
-            });
-        }
-
         Log.i(TAG, "App update triggered via API with URL: " + url);
+        Log.e(TAG, "SECURITY WARNING: RootCommandExecutor invoked for app update. Ensure extreme caution and validation.");
         return jsonOk(Map.of(
                 "status", "App update process initiated with URL: " + url,
                 "message", "Further status depends on the execution of the update mechanism."
         ));
-    }
-
-    // ==================== HELPER METHODS ====================
-
-    // Helper to map UI positions to service types
-    private ServiceType mapCameraPosToServiceType(int pos) {
-        switch (pos) {
-            case 0: // Rear Camera
-            case 1: // Front Camera
-                return ServiceType.BgCamera;
-            case 2: // USB Camera
-                return ServiceType.BgUSBCamera;
-            case 3: // Screen Cast
-                return ServiceType.BgScreenCast;
-            case 4: // Audio Only
-                return ServiceType.BgAudio;
-            default:
-                throw new IllegalArgumentException("Invalid camera position: " + pos);
-        }
     }
 
     public String getUtcDateTimeString() {
@@ -921,6 +676,15 @@ public final class MyHttpServer extends NanoHTTPD {
         if (params == null) return def;
         List<String> v = params.get(key);
         return (v == null || v.isEmpty() || v.get(0) == null) ? def : v.get(0);
+    }
+
+    private int parseInt(String value, int defaultValue) {
+        if (value == null) return defaultValue;
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 
     private String getGpsIntervalString() {
@@ -1071,7 +835,7 @@ public final class MyHttpServer extends NanoHTTPD {
         return file;
     }
 
-    private static class ChannelRangeInputStream extends java.io.InputStream {
+    private static class ChannelRangeInputStream extends InputStream {
         private final FileChannel channel;
         private final RandomAccessFile raf;
         private long position;
@@ -1154,9 +918,10 @@ public final class MyHttpServer extends NanoHTTPD {
 
     public void startServer() {
         boolean daemon = false;
+        this.isRunningAsDaemon = daemon;
         try {
             start(SOCKET_TIMEOUT_MS, daemon);
-            Log.i(TAG, "HTTP server started on port " + getListeningPort());
+            Log.i(TAG, "HTTP server started on port " + getListeningPort() + ". IsDaemon: " + this.isRunningAsDaemon);
         } catch (IOException e) {
             Log.e(TAG, "Unable to start HTTP server", e);
         }

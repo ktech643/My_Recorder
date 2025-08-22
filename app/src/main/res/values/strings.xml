@@ -41,7 +41,7 @@
     <string name="confirm_convert">This mode hides the recording application behind a fully playable Chess game. To unlock the app, you press the numbers of your Pin code on the left side of the Chessboard. Would you like to use Covert Mode?</string>
     <string name="confirm_update">There is a new version available. Do you want to update now?</string>
     <string name="confirm_wifi">Are you sure want to continue on current wifi connection?</string>
-    <string name="wifi_warning" formatted="false">%s has a wifi profile for %s it appears you are not connected. Would you like to switch network?</string>
+    <string name="wifi_warning">%s has a wifi profile for %s it appears you are not connected. Would you like to switch network?</string>
     <string name="confirm_audio">Does your intended use of this application legally allow AUDIO RECORDING?</string>
 
     <string name="live">Live</string>
@@ -499,20 +499,20 @@
         <item>"320000"</item>
     </string-array>
     <string name="settings_import_body">Do you want to import following settings from the link?</string>
-    <string name="settings_import_connections" formatted="false"><![CDATA[<br>Connections (<b>%d</b> new, <b>%d</b> updated)]]></string>
+    <string name="settings_import_connections"><![CDATA[<br>Connections (<b>%d</b> new, <b>%d</b> updated)]]></string>
     <string name="settings_import_connections_new"><![CDATA[<br>Connections (<b>%d</b> new)]]></string>
     <string name="settings_import_connections_updated"><![CDATA[<br>Connections (<b>%d</b> updated)]]></string>
     <string name="settings_imported_connections">\nImported %s.</string>
-    <string name="settings_imported_connections_and_settings" formatted="false">\nImported %s and %s settings.</string>
+    <string name="settings_imported_connections_and_settings">\nImported %s and %s settings.</string>
     <string name="settings_imported_new">%d new connections</string>
     <string name="settings_imported_updated">%d updated connections.</string>
-    <string name="settings_imported_new_updated" formatted="false">%d connections (%d new, %d updated)</string>
+    <string name="settings_imported_new_updated">%d connections (%d new, %d updated)</string>
     <string name="settings_imported_settings">\nImported %s settings</string>
     <string name="settings_imported_audio">audio</string>
     <string name="settings_imported_video">video</string>
     <string name="settings_imported_record">record</string>
-    <string name="settings_imported_2" formatted="false">%s,%s</string>
-    <string name="settings_imported_3" formatted="false">%s,%s,%s</string>
+    <string name="settings_imported_2">%s,%s</string>
+    <string name="settings_imported_3">%s,%s,%s</string>
     <string name="settings_import_remove_existing"><![CDATA[<br><span style=\'color: red\'>Remove %d existing connections</span>]]></string>
     <string name="pref_fragment_header_video">"Video"</string>
     <string name="pref_fragment_header_audio">"Audio"</string>
@@ -522,7 +522,7 @@
     <string name="pref_fragment_header_help_and_support">"Help &amp; support"</string>
     <string name="settings_error_audio">Audio: %1s\n</string>
     <string name="settings_error_record">Record: %1s\n</string>
-    <string name="settings_error_connection" formatted="false">Connection %1d: %2s\n</string>
+    <string name="settings_error_connection">Connection %1d: %2s\n</string>
     <string name="grove_export_audio">Audio</string>
     <string name="grove_export_video">Video</string>
     <string name="grove_export_record">Record</string>
@@ -616,7 +616,6 @@ Stream resolution is 1280x720."</string>
     <string-array name="adaptive_modes">
         <item>Logarithmic descend</item>
         <item>Ladder ascend</item>
-        <item>Hybrid</item>
         <item>Off</item>
     </string-array>
 

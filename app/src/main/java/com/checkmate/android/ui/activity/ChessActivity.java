@@ -87,7 +87,6 @@ public class ChessActivity extends BaseActivity {
 
     public void OpenMain() {
         MainActivity.is_passed = true;
-        MainActivity.ResumePreview();
         finish();
         if (instanceRef != null && instanceRef.get() != null) {
             if (instanceRef.get() == this) {

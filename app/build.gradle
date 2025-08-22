@@ -30,7 +30,7 @@ android {
         minSdkVersion 29
         targetSdkVersion 31
         versionCode 1
-        versionName "3.387"
+        versionName "4.002"
         setProperty("archivesBaseName", "CheckMate!_" + versionName)
         multiDexEnabled true
         externalNativeBuild {

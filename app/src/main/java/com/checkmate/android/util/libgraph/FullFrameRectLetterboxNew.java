@@ -3,6 +3,8 @@ package com.checkmate.android.util.libgraph;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import com.checkmate.android.util.libgraph.gl.GlResourceManager;
+
 import java.io.Closeable;
 
 public final class FullFrameRectLetterboxNew extends FullFrameRectNew implements Closeable {

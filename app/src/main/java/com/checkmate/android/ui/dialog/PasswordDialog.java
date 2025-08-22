@@ -8,11 +8,17 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.DialogPasswordBinding;
+
 
 public class PasswordDialog extends Dialog {
 
-    private DialogPasswordBinding binding;
+    Button btn_ok;
+
+    Button btn_close;
+
+    public EditText edt_password;
+
+    public EditText edt_repassword;
 
     public PasswordDialog(Context context, int theme) {
         super(context, theme);
@@ -28,9 +34,11 @@ public class PasswordDialog extends Dialog {
 
     private void init(Context context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogPasswordBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_password);
         setCancelable(false);
+                btn_ok = findViewById(R.id.btn_ok);
+        btn_close = findViewById(R.id.btn_close);
+
     }
 
     @Override
@@ -46,20 +54,11 @@ public class PasswordDialog extends Dialog {
     }
 
     public void setOkListener(View.OnClickListener listener) {
-        binding.btnOk.setOnClickListener(listener);
+        btn_ok.setOnClickListener(listener);
     }
 
     public void setCloseListener(View.OnClickListener listner) {
-        binding.btnClose.setOnClickListener(listner);
+        btn_close.setOnClickListener(listner);
     }
 
-    // Getter for the password EditText
-    public EditText getEdtPassword() {
-        return binding.edtPassword;
-    }
-
-    // Getter for the repassword EditText
-    public EditText getEdtRepassword() {
-        return binding.edtRepassword;
-    }
 }

@@ -17,12 +17,21 @@ import android.widget.TextView;
 
 import com.checkmate.android.AppConstant;
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.DialogGeneralBinding;
 import com.checkmate.android.util.MessageUtil;
+
 
 public class GeneralDialog extends Dialog {
 
-    private DialogGeneralBinding binding;
+    TextView txt_title;
+
+    TextView txt_desc;
+
+    EditText edt_value;
+
+    Button btn_ok;
+
+    Button btn_close;
+
     String old_value = "";
     int dialog_type;
 
@@ -48,67 +57,63 @@ public class GeneralDialog extends Dialog {
 
     private void init(Context context, int title_id, int desc_id, int dialog_type, String value) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogGeneralBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_general);
         setCancelable(false);
+                txt_title = findViewById(R.id.txt_title);
+        txt_desc = findViewById(R.id.txt_desc);
+        edt_value = findViewById(R.id.edt_value);
+        btn_ok = findViewById(R.id.btn_ok);
+        btn_close = findViewById(R.id.btn_close);
 
-        binding.txtTitle.setText(title_id);
-        binding.txtDesc.setText(desc_id);
-        binding.edtValue.setHint(title_id);
-        binding.edtValue.setText(value);
+        txt_title.setText(title_id);
+        txt_desc.setText(desc_id);
+        edt_value.setHint(title_id);
+        edt_value.setText(value);
         old_value = value;
         this.dialog_type = dialog_type;
-        
-        // Set up click listeners
-        binding.btnOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handleResult();
-            }
-        });
-
-        binding.btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-            }
-        });
-
         if (dialog_type == AppConstant.GENERAL_SPLIT) {
-            binding.edtValue.setInputType(InputType.TYPE_CLASS_NUMBER);
-            binding.edtValue.setKeyListener(DigitsKeyListener.getInstance("1234567890"));
+            edt_value.setInputType(InputType.TYPE_CLASS_NUMBER);
+            edt_value.setKeyListener(DigitsKeyListener.getInstance("1234567890"));
         } else if (dialog_type == AppConstant.GENERAL_PIN) {
             String strDesc = getContext().getString(desc_id);
-            binding.txtDesc.setText(strDesc);
-            binding.txtDesc.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-            binding.txtDesc.setTextSize(14);
-            binding.edtValue.setInputType(InputType.TYPE_CLASS_NUMBER);
-            binding.edtValue.setKeyListener(DigitsKeyListener.getInstance("123456789"));
-            binding.edtValue.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4)});
+            txt_desc.setText(strDesc);
+            txt_desc.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+            txt_desc.setTextSize(14);
+            edt_value.setInputType(InputType.TYPE_CLASS_NUMBER);
+            edt_value.setKeyListener(DigitsKeyListener.getInstance("123456789"));
+            edt_value.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4)});
         } else if (dialog_type == AppConstant.GENERAL_VIDEO_BITRATE || dialog_type == AppConstant.GENERAL_STREAM_BITRATE) {
-            binding.edtValue.setInputType(InputType.TYPE_CLASS_NUMBER);
-            binding.edtValue.setKeyListener(DigitsKeyListener.getInstance("1234567890"));
-            binding.edtValue.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4)});
+            edt_value.setInputType(InputType.TYPE_CLASS_NUMBER);
+            edt_value.setKeyListener(DigitsKeyListener.getInstance("1234567890"));
+            edt_value.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4)});
         } else if (dialog_type == AppConstant.GENERAL_VIDEO_KEYFRAME || dialog_type == AppConstant.GENERAL_STREAM_KEYFRAME) {
-            binding.edtValue.setInputType(InputType.TYPE_CLASS_NUMBER);
-            binding.edtValue.setKeyListener(DigitsKeyListener.getInstance("1234567890"));
-            binding.edtValue.setFilters(new InputFilter[]{new InputFilter.LengthFilter(3)});
+            edt_value.setInputType(InputType.TYPE_CLASS_NUMBER);
+            edt_value.setKeyListener(DigitsKeyListener.getInstance("1234567890"));
+            edt_value.setFilters(new InputFilter[]{new InputFilter.LengthFilter(3)});
         } else if (dialog_type == AppConstant.GENERAL_USB_MIN_FPS) {
-            binding.edtValue.setInputType(InputType.TYPE_CLASS_NUMBER);
-            binding.edtValue.setKeyListener(DigitsKeyListener.getInstance("1234567890"));
-            binding.edtValue.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
+            edt_value.setInputType(InputType.TYPE_CLASS_NUMBER);
+            edt_value.setKeyListener(DigitsKeyListener.getInstance("1234567890"));
+            edt_value.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
         } else if (dialog_type == AppConstant.GENERAL_USB_MAX_FPS) {
-            binding.edtValue.setInputType(InputType.TYPE_CLASS_NUMBER);
-            binding.edtValue.setKeyListener(DigitsKeyListener.getInstance("1234567890"));
-            binding.edtValue.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
+            edt_value.setInputType(InputType.TYPE_CLASS_NUMBER);
+            edt_value.setKeyListener(DigitsKeyListener.getInstance("1234567890"));
+            edt_value.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
         }
+
+        // Set up click listeners
+        btn_ok.setOnClickListener(this::OnClick);
+        btn_close.setOnClickListener(this::OnClick);
     }
 
     private void init(Context context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogGeneralBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_general);
         setCancelable(false);
+                txt_title = findViewById(R.id.txt_title);
+        txt_desc = findViewById(R.id.txt_desc);
+        edt_value = findViewById(R.id.edt_value);
+        btn_ok = findViewById(R.id.btn_ok);
+        btn_close = findViewById(R.id.btn_close);
     }
 
     @Override
@@ -123,8 +128,19 @@ public class GeneralDialog extends Dialog {
         }
     }
 
+    public void OnClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_ok:
+                handleResult();
+                break;
+            case R.id.btn_close:
+                dismiss();
+                break;
+        }
+    }
+
     void handleResult() {
-        String value = binding.edtValue.getText().toString().trim();
+        String value = edt_value.getText().toString().trim();
         if (TextUtils.isEmpty(value)) {
             MessageUtil.showToast(getContext(), R.string.invalid_value);
             return;

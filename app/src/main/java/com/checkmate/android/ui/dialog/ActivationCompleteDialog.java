@@ -10,12 +10,13 @@ import android.widget.TextView;
 
 import com.checkmate.android.AppConstant;
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.DialogActivationCompleteBinding;
 import com.checkmate.android.util.CommonUtil;
 
 public class ActivationCompleteDialog extends Dialog {
 
-    private DialogActivationCompleteBinding binding;
+    Button btn_ok;
+
+    TextView txt_complete;
 
     public ActivationCompleteDialog(Context context, int theme) {
         super(context, theme);
@@ -31,14 +32,15 @@ public class ActivationCompleteDialog extends Dialog {
 
     private void init(Context context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogActivationCompleteBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_activation_complete);
         setCancelable(false);
+                btn_ok = findViewById(R.id.btn_ok);
+        txt_complete = findViewById(R.id.txt_complete);
 
         if (TextUtils.isEmpty(AppConstant.expire_date)) {
-            binding.txtComplete.setText("The activation process was successful.\n" + "Your license will not expire.");
+            txt_complete.setText("The activation process was successful.\n" + "Your license will not expire.");
         } else {
-            binding.txtComplete.setText("The activation process was successful.\n" + "Your license will expire on " + CommonUtil.expire_date(AppConstant.expire_date));
+            txt_complete.setText("The activation process was successful.\n" + "Your license will expire on " + CommonUtil.expire_date(AppConstant.expire_date));
         }
     }
 
@@ -55,6 +57,6 @@ public class ActivationCompleteDialog extends Dialog {
     }
 
     public void setOkListener(View.OnClickListener listener) {
-        binding.btnOk.setOnClickListener(listener);
+        btn_ok.setOnClickListener(listener);
     }
 }

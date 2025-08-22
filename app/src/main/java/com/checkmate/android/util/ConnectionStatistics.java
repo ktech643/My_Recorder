@@ -10,7 +10,7 @@ public final class ConnectionStatistics {
     private long bps;
     private long videoPacketsLost;
     private long audioPacketsLost;
-    public long udpPacketsLost;
+    private long udpPacketsLost;
     private boolean packetLossIncreased;
 
     public long getBandwidth() {
@@ -66,21 +66,6 @@ public final class ConnectionStatistics {
             udpPacketsLost = streamer.getUdpPacketsLost(connectionId);
             packetLossIncreased = true;
         }
-    }
-
-    public float getPacketLossRate(Streamer streamer, int connectionId) {
-        if (streamer == null) return 0f;
-
-        long audioSent = streamer.getAudioPacketsSent(connectionId);
-        long videoSent = streamer.getVideoPacketsSent(connectionId);
-        long udpSent = streamer.getUdpPacketsSent(connectionId);
-
-        long totalSent = audioSent + videoSent + udpSent;
-        long totalLost = audioPacketsLost + videoPacketsLost + udpPacketsLost;
-
-        if (totalSent == 0) return 0f;
-
-        return (float) totalLost / totalSent;
     }
 
 }

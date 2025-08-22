@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.DialogWifiBinding;
 
 public class WifiDialog extends Dialog {
 
@@ -17,7 +16,12 @@ public class WifiDialog extends Dialog {
         void onResult(String ssid);
     }
 
-    private DialogWifiBinding binding;
+    Button btn_ok;
+
+    Button btn_close;
+
+    public EditText edt_ssid;
+
     onResultListener listener;
 
     public WifiDialog(Context context, int theme) {
@@ -34,24 +38,11 @@ public class WifiDialog extends Dialog {
 
     private void init(Context context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogWifiBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_wifi);
         setCancelable(true);
+                btn_ok = findViewById(R.id.btn_ok);
+        btn_close = findViewById(R.id.btn_close);
 
-        // Set up click listeners
-        binding.btnOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onResult();
-            }
-        });
-
-        binding.btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dismiss();
-            }
-        });
     }
 
     @Override
@@ -66,8 +57,19 @@ public class WifiDialog extends Dialog {
         }
     }
 
+    public void OnClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_ok:
+                onResult();
+                break;
+            case R.id.btn_close:
+                dismiss();
+                break;
+        }
+    }
+
     void onResult() {
-        String ssid = binding.edtSsid.getText().toString().trim();
+        String ssid = edt_ssid.getText().toString().trim();
         if (!TextUtils.isEmpty(ssid)) {
             if (listener != null) {
                 listener.onResult(ssid);
@@ -78,10 +80,5 @@ public class WifiDialog extends Dialog {
 
     public void setOnSetResultListener(onResultListener listener) {
         this.listener = listener;
-    }
-
-    // Getter for the EditText
-    public EditText getEdtSsid() {
-        return binding.edtSsid;
     }
 }

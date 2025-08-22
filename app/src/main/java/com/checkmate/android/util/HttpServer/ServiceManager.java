@@ -10,33 +10,39 @@ import javax.inject.Singleton;
 
 /**
  * Manages switching between multiple BgService implementations at runtime.
- * Uses constructor injection for Hilt dependency injection.
+ * Uses field injection so Toothpick can generate the factory via a no-arg constructor.
  */
 @Singleton
 public class ServiceManager {
-    private final BgService cameraService;
+    @Inject @Named("camera") public BgService cameraService;
+    @Inject @Named("cast")   public BgService castService;
+    @Inject @Named("audio")  public BgService audioService;
+    @Inject @Named("usb")    public BgService usbService;
 
     BgService activeService;
 
     /**
-     * Constructor for Hilt dependency injection
+     * No-arg constructor for Toothpick
      */
     @Inject
-    public ServiceManager(
-            @Named("camera") BgService cameraService,
-            @Named("cast") BgService castService,
-            @Named("usb") BgService usbService) {
-        this.cameraService = cameraService;
-
+    public ServiceManager() {
         Log.d("ServiceManager", "ServiceManager created");
-        Log.d("ServiceManager", "Dependencies injected: " +
-                "\nCamera: " + cameraService);
     }
 
     public void checkServiceAvailability() {
         if (cameraService == null) Log.e("DI", "Camera service not provisioned");
+        if (castService == null) Log.e("DI", "Cast service not provisioned");
+        if (audioService == null) Log.e("DI", "Audio service not provisioned");
+        if (usbService == null) Log.e("DI", "USB service not provisioned");
     }
-
+    @Inject
+    void initialize() {
+        Log.d("ServiceManager", "Dependencies injected: " +
+                "\nCamera: " + cameraService +
+                "\nCast: " + castService +
+                "\nAudio: " + audioService +
+                "\nUSB: " + usbService);
+    }
     /**
      * Switches the active BgService instance.  Stops any currently running service.
      * @param type one of "camera", "cast", "audio", or "usb"
@@ -53,6 +59,18 @@ public class ServiceManager {
             case "camera":
                 if (cameraService == null) throw new IllegalStateException("Camera service not initialized");
                 newService = cameraService;
+                break;
+            case "cast":
+                if (castService == null) throw new IllegalStateException("Cast service not initialized");
+                newService = castService;
+                break;
+            case "audio":
+                if (audioService == null) throw new IllegalStateException("Audio service not initialized");
+                newService = audioService;
+                break;
+            case "usb":
+                if (usbService == null) throw new IllegalStateException("USB service not initialized");
+                newService = usbService;
                 break;
             default:
                 throw new IllegalArgumentException("Unknown service type: " + type);

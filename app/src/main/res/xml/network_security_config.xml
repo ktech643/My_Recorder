@@ -3,17 +3,6 @@
     <base-config cleartextTrafficPermitted="true">
         <trust-anchors>
             <certificates src="system" />
-            <certificates src="user" />
         </trust-anchors>
     </base-config>
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">stream01.vcsrelay.com</domain>
-        <domain includeSubdomains="true">mobileact.vcsrelay.com</domain>
-        <domain includeSubdomains="true">testcloud2.vcsrelay.com</domain>
-        <domain includeSubdomains="true">70.35.203.243</domain>
-        <trust-anchors>
-            <certificates src="system" />
-            <certificates src="user" />
-        </trust-anchors>
-    </domain-config>
 </network-security-config>

@@ -22,6 +22,7 @@ import android.util.Log;
 
 import com.checkmate.android.AppConstant;
 import com.checkmate.android.AppPreference;
+import com.checkmate.android.BuildConfig;
 import com.checkmate.android.R;
 import com.wmspanel.libstream.AudioConfig;
 import com.wmspanel.libstream.ConnectionConfig;
@@ -51,6 +52,7 @@ public final class SettingsUtils {
 
     public static final int AF_MODE_CONTINUOUS_VIDEO = 0;
     public static final int AF_MODE_INFINITY = 1;
+
     public static final int AWB_MODE_AUTO = 0;
     public static final int AWB_MODE_CLOUDY_DAYLIGHT = 1;
     public static final int AWB_MODE_DAYLIGHT = 2;
@@ -83,7 +85,6 @@ public final class SettingsUtils {
     public static final int ADAPTIVE_BITRATE_OFF = 0;
     public static final int ADAPTIVE_BITRATE_MODE1 = 1;
     public static final int ADAPTIVE_BITRATE_MODE2 = 2;
-    public static final int ADAPTIVE_BITRATE_HYBRID = 3;
 
     public static final int ACTION_DO_NOTHING = 0;
     public static final int ACTION_START_STOP = 1;
@@ -1003,11 +1004,6 @@ public final class SettingsUtils {
     }
 
     public static int sampleRate(Context context) {
-        if (context == null) {
-            Log.e("SettingsUtils", "Context is null in sampleRate, using default sample rate");
-            return 44100; // Default sample rate
-        }
-        
         if (useBluetooth(context)) {
             return 8000;
         }
@@ -1055,7 +1051,6 @@ public final class SettingsUtils {
         String[] bitrates = context.getResources().getStringArray(R.array.audio_bitrate);
         int position = AppPreference.getInt(AppPreference.KEY.STREAMING_AUDIO_BITRATE, 0);
         String bitrate = bitrates[position].toLowerCase().replaceAll("kbps", "").replaceAll(" ", "");
-        // Convert from kbps to bps
         return Integer.parseInt(bitrate) * 1000;
     }
 
@@ -1063,26 +1058,22 @@ public final class SettingsUtils {
         String[] bitrates = context.getResources().getStringArray(R.array.audio_bitrate);
         int position = AppPreference.getInt(AppPreference.KEY.USB_AUDIO_BITRATE, 0);
         String bitrate = bitrates[position].toLowerCase().replaceAll("kbps", "").replaceAll(" ", "");
-        // Convert from kbps to bps
         return Integer.parseInt(bitrate) * 1000;
     }
 
     public static int videoBitRate(Context context) {
         int bitRate = AppPreference.getInt(AppPreference.KEY.VIDEO_BITRATE, 1024);
-        // Convert from kbps to bps
         return bitRate * 1000;
     }
 
     public static int castBitRate(Context context) {
         int bitRate = AppPreference.getInt(AppPreference.KEY.CAST_BITRATE, 2048);
-        // Convert from kbps to bps
         return bitRate * 1000;
     }
 
     public static int streamingBitRate(Context context) {
         //Log.d(TAG, "video_bitrate=" + bitRate);1496
         int bitRate = AppPreference.getInt(AppPreference.KEY.STREAMING_BITRATE, 1024);
-        // Convert from kbps to bps
         return bitRate * 1000;
     }
 
@@ -1092,17 +1083,14 @@ public final class SettingsUtils {
         if (vs == 5) {
             int bitRate = AppPreference.getInt(AppPreference.KEY.STREAMING_BITRATE, 1024);
             Log.e(TAG, "streamingBitRate: " + bitRate);
-            // Convert from kbps to bps
             return bitRate * 1000;
         }else {
-            // Convert from kbps to bps
             return 1496 * 1000;
         }
     }
 
     public static int streamingAudioBitRate(Context context) {
-        // Return 100 kbps converted to bps
-        return 100 * 1000;
+        return 100 ;
     }
 
     public static int maxBufferItems(Context context) {
@@ -1161,31 +1149,27 @@ public final class SettingsUtils {
     }
 
     public static int adaptiveBitrate(Context context) {
-        int mode = AppPreference.getInt(AppPreference.KEY.ADAPTIVE_MODE, 3); // Default to "Off" mode
+        int mode = AppPreference.getInt(AppPreference.KEY.ADAPTIVE_MODE, 0);
         if (mode == 0) { // logarithmic
             return SettingsUtils.ADAPTIVE_BITRATE_MODE1;
         } else if (mode == 1) { // ladder ascend
             return SettingsUtils.ADAPTIVE_BITRATE_MODE2;
-        } else if (mode == 2) { // hybrid
-            return SettingsUtils.ADAPTIVE_BITRATE_HYBRID;
-        } else if (mode == 3) { // off
+        } else if (mode == 2) { // off
             return SettingsUtils.ADAPTIVE_BITRATE_OFF;
         }
-        return SettingsUtils.ADAPTIVE_BITRATE_OFF; // Default to "Off" mode
+        return SettingsUtils.ADAPTIVE_BITRATE_MODE1;
     }
 
     public static int castAdaptiveBitrate(Context context) {
-        int mode = AppPreference.getInt(AppPreference.KEY.ADAPTIVE_MODE_CAST, 3); // Default to "Off" mode
+        int mode = AppPreference.getInt(AppPreference.KEY.ADAPTIVE_MODE_CAST, 0);
         if (mode == 0) { // logarithmic
             return SettingsUtils.ADAPTIVE_BITRATE_MODE1;
         } else if (mode == 1) { // ladder ascend
             return SettingsUtils.ADAPTIVE_BITRATE_MODE2;
-        } else if (mode == 2) { // hybrid
-            return SettingsUtils.ADAPTIVE_BITRATE_HYBRID;
-        } else if (mode == 3) { // off
+        } else if (mode == 2) { // off
             return SettingsUtils.ADAPTIVE_BITRATE_OFF;
         }
-        return SettingsUtils.ADAPTIVE_BITRATE_OFF; // Default to "Off" mode
+        return SettingsUtils.ADAPTIVE_BITRATE_MODE1;
     }
 
     public static boolean adaptiveFps(Context context) {
@@ -1248,7 +1232,7 @@ public final class SettingsUtils {
         String channel = AppPreference.getStr(AppPreference.KEY.STREAM_CHANNEL, "");
         if (!TextUtils.isEmpty(channel)) {
             connection.url = String.format("%s/%s", AppPreference.getStr(AppPreference.KEY.STREAM_BASE, ""), channel);
-            if (false) {
+            if (BuildConfig.DEBUG) {
 //                connection.url = "rtsp://41.216.179.31:8554/jorge";
             }
             result.add(connection);
@@ -1331,7 +1315,7 @@ public final class SettingsUtils {
 
     public static UriResult parseUrl(Context context, final String originalUri) {
 
-        // android.net.Uri breaks IPv6 addresses in the wrong places, use Java's own URI class
+        // android.net.Uri breaks IPv6 addresses in the wrong places, use Java’s own URI class
         final UriResult connection = new UriResult();
         String newUri = originalUri;
 
@@ -1450,11 +1434,6 @@ public final class SettingsUtils {
     }
 
     public static int optionSampleRate(Context context) {
-        if (context == null) {
-            Log.e("SettingsUtils", "Context is null in optionSampleRate, using default sample rate");
-            return 44100; // Default sample rate
-        }
-        
         if (useBluetooth(context)) {
             return 8000;
         }
@@ -1491,11 +1470,6 @@ public final class SettingsUtils {
     }
 
     public static int optionAudioBitRate(Context context) {
-        if (context == null) {
-            Log.e("SettingsUtils", "Context is null in optionAudioBitRate, using default bitrate");
-            return 16 * 1000; // Default bitrate
-        }
-        
         String[] bitrates = context.getResources().getStringArray(R.array.audio_option_audio_bitrate);
         int position = AppPreference.getInt(AppPreference.KEY.AUDIO_OPTION_BITRATE, 0);
         if (position == 0) {
@@ -1661,7 +1635,7 @@ public final class SettingsUtils {
     public static SrtConfig toSrtConfig(Connection connection) throws URISyntaxException {
         SrtConfig config = new SrtConfig();
 
-        // android.net.Uri breaks IPv6 addresses in the wrong places, use Java's own URI class
+        // android.net.Uri breaks IPv6 addresses in the wrong places, use Java’s own URI class
         final URI uri = new URI(connection.url);
 
         final IPAddress address = new HostName(uri.getHost()).asAddress();

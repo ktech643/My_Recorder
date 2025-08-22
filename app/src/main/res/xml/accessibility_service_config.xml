@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--<accessibility-service-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:accessibilityEventTypes="typeAllMask"-->
+<!--    android:packageNames="com.checkmate.android"-->
+<!--    android:accessibilityFlags="flagDefault"-->
+<!--    android:notificationTimeout="100"-->
+<!--    android:canRetrieveWindowContent="true"-->
+<!--    />-->
+
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/accessibility_service_description"
-    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged|typeNotificationStateChanged"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
     android:accessibilityFeedbackType="feedbackGeneric"
     android:notificationTimeout="100"
-    android:accessibilityFlags="flagReportViewIds|flagRetrieveInteractiveWindows|flagRequestFilterKeyEvents"
+    android:accessibilityFlags="flagReportViewIds|flagRetrieveInteractiveWindows"
     android:canRetrieveWindowContent="true"
-    android:canRequestFilterKeyEvents="true"
-    android:settingsActivity="com.checkmate.android.ui.activity.MainActivity"
     />

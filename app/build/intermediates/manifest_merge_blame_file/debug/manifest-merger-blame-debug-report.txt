@@ -3,258 +3,258 @@
 3    coreApp="true"
 4    package="com.checkmate.android"
 5    android:versionCode="1"
-6    android:versionName="3.387" >
+6    android:versionName="4.002" >
 7
 8    <uses-sdk
 9        android:minSdkVersion="29"
-9-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml
+9-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
 10        android:targetSdkVersion="31" />
-10-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml
+10-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
 11
 12    <uses-permission android:name="android.hardware.usb.host" />
-12-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:7:5-65
-12-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:7:22-62
+12-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:7:5-65
+12-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:7:22-62
 13
 14    <uses-feature
-14-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:9:5-11:35
+14-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:9:5-11:35
 15        android:name="android.hardware.camera.any"
-15-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:10:9-51
+15-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:10:9-51
 16        android:required="true" />
-16-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:11:9-32
+16-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:11:9-32
 17    <uses-feature
-17-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:12:5-14:35
+17-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:12:5-14:35
 18        android:name="android.hardware.camera"
-18-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:13:9-47
+18-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:13:9-47
 19        android:required="true" />
-19-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:14:9-32
+19-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:14:9-32
 20    <uses-feature android:name="android.hardware.camera.autofocus" />
-20-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:15:5-70
-20-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:15:19-67
+20-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:15:5-70
+20-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:15:19-67
 21    <uses-feature
-21-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:16:5-18:36
+21-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:16:5-18:36
 22        android:name="android.hardware.camera2"
-22-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:17:9-48
+22-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:17:9-48
 23        android:required="false" />
-23-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:18:9-33
+23-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:18:9-33
 24    <uses-feature
-24-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:19:5-21:36
+24-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:19:5-21:36
 25        android:name="android.hardware.camera.flash"
-25-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:20:9-53
+25-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:20:9-53
 26        android:required="false" />
-26-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:21:9-33
+26-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:21:9-33
 27    <uses-feature
-27-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:22:5-24:36
+27-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:22:5-24:36
 28        android:name="android.hardware.microphone"
-28-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:23:9-51
+28-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:23:9-51
 29        android:required="false" />
-29-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:24:9-33
+29-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:24:9-33
 30
 31    <permission android:name="android.permission.MANAGE_DEVICE_ADMINS" />
-31-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:26:5-28:51
-31-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:27:9-63
+31-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:26:5-28:51
+31-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:27:9-63
 32    <permission android:name="android.permission.FACTORY_RESET" />
-32-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:29:5-31:51
-32-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:30:9-56
+32-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:29:5-31:51
+32-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:30:9-56
 33    <permission android:name="android.permission.BIND_DEVICE_ADMIN" />
-33-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:32:5-34:51
-33-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:33:9-60
+33-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:32:5-34:51
+33-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:33:9-60
 34    <permission android:name="android.permission.CLEAR_APP_USER_DATA" />
-34-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:35:5-37:51
-34-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:36:9-62
+34-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:35:5-37:51
+34-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:36:9-62
 35    <permission android:name="android.permission.FORCE_STOP_PACKAGES" />
-35-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:38:5-40:51
-35-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:39:9-62
+35-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:38:5-40:51
+35-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:39:9-62
 36    <permission android:name="android.permission.REBOOT" />
-36-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:41:5-43:51
-36-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:42:9-49
+36-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:41:5-43:51
+36-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:42:9-49
 37    <permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
-37-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:44:5-46:51
-37-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:45:9-69
+37-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:44:5-46:51
+37-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:45:9-69
 38    <permission android:name="android.permission.INJECT_EVENTS" />
-38-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:47:5-49:51
-38-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:48:9-56
+38-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:47:5-49:51
+38-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:48:9-56
 39
 40    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-40-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:50:5-82
-40-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:50:22-80
+40-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:50:5-82
+40-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:50:22-80
 41    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-41-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:52:5-79
-41-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:52:22-76
+41-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:52:5-79
+41-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:52:22-76
 42    <uses-permission android:name="android.permission.CAMERA" />
-42-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:53:5-65
-42-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:53:22-62
+42-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:53:5-65
+42-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:53:22-62
 43    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-43-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:54:5-79
-43-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:54:22-76
+43-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:54:5-79
+43-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:54:22-76
 44    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
-44-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:55:5-86
-44-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:55:22-83
+44-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:55:5-86
+44-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:55:22-83
 45    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-45-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:56:5-79
-45-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:56:22-76
+45-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:56:5-79
+45-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:56:22-76
 46    <uses-permission android:name="android.permission.BLUETOOTH" />
-46-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:57:5-68
-46-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:57:22-65
+46-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:57:5-68
+46-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:57:22-65
 47    <uses-permission android:name="android.permission.INTERNET" />
-47-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:58:5-67
-47-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:58:22-64
+47-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:58:5-67
+47-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:58:22-64
 48    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-48-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:59:5-77
-48-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:59:22-74
+48-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:59:5-77
+48-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:59:22-74
 49    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-49-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:60:5-71
-49-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:60:22-68
+49-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:60:5-71
+49-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:60:22-68
 50    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-50-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:60:5-71
-50-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:60:22-68
+50-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:60:5-71
+50-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:60:22-68
 51    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- Essential Permissions -->
-51-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:62:5-75
-51-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:62:22-72
+51-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:62:5-75
+51-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:62:22-72
 52    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-52-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:62:5-75
-52-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:62:22-72
+52-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:62:5-75
+52-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:62:22-72
 53    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-53-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:64:5-77
-53-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:64:22-74
+53-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:64:5-77
+53-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:64:22-74
 54    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-54-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:64:5-77
-54-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:64:22-74
+54-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:64:5-77
+54-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:64:22-74
 55    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-55-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:66:5-81
-55-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:66:22-78
+55-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:66:5-81
+55-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:66:22-78
 56    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-56-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:67:5-80
-56-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:67:22-77
+56-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:67:5-80
+56-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:67:22-77
 57    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-57-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:67:5-80
-57-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:67:22-77
+57-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:67:5-80
+57-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:67:22-77
 58    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-58-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:69:5-80
-58-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:69:22-77
+58-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:69:5-80
+58-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:69:22-77
 59    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-59-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:69:5-80
-59-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:69:22-77
+59-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:69:5-80
+59-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:69:22-77
 60    <uses-permission android:name="android.permission.MODIFY_AUDIO_ROUTING" />
-60-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:71:5-79
-60-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:71:22-76
+60-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:71:5-79
+60-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:71:22-76
 61    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
-61-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:72:5-75
-61-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:72:22-72
+61-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:72:5-75
+61-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:72:22-72
 62    <uses-permission android:name="android.permission.VIBRATE" />
-62-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:73:5-66
-62-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:73:22-63
+62-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:73:5-66
+62-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:73:22-63
 63    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
-63-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:74:5-86
-63-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:74:22-83
+63-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:74:5-86
+63-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:74:22-83
 64    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-64-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:50:5-82
-64-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:50:22-80
+64-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:50:5-82
+64-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:50:22-80
 65    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-65-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:76:5-76
-65-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:76:22-73
+65-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:76:5-76
+65-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:76:22-73
 66    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-66-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:77:5-76
-66-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:77:22-73
+66-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:77:5-76
+66-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:77:22-73
 67    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-67-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:78:5-81
-67-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:78:22-78
+67-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:78:5-81
+67-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:78:22-78
 68    <uses-permission android:name="android.permission.WAKE_LOCK" />
-68-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:79:5-68
-68-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:79:22-65
+68-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:79:5-68
+68-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:79:22-65
 69    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
-69-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:80:5-82
-69-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:80:22-79
+69-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:80:5-82
+69-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:80:22-79
 70    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
-70-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:81:5-85
-70-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:81:22-82
+70-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:81:5-85
+70-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:81:22-82
 71    <uses-permission android:name="com.android.permission.RECORD_AUDIO_CALL" />
-71-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:82:5-80
-71-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:82:22-77
+71-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:82:5-80
+71-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:82:22-77
 72    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
-72-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:83:5-85
-72-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:83:22-82
+72-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:83:5-85
+72-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:83:22-82
 73    <uses-permission android:name="android.permission.REQUEST_IGNORE_BACKGROUND_RESTRICTIONS" />
-73-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:84:5-97
-73-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:84:22-94
+73-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:84:5-97
+73-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:84:22-94
 74    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-74-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:85:5-78
-74-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:85:22-75
+74-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:85:5-78
+74-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:85:22-75
 75    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-75-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:86:5-95
-75-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:86:22-92
+75-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:86:5-95
+75-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:86:22-92
 76    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
-76-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:87:5-85
-76-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:87:22-82
+76-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:87:5-85
+76-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:87:22-82
 77    <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
-77-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:88:5-75
-77-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:88:22-72
+77-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:88:5-75
+77-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:88:22-72
 78    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-78-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:89:5-73
-78-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:89:22-70
+78-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:89:5-73
+78-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:89:22-70
 79    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
-79-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:90:5-80
-79-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:90:22-77
+79-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:90:5-80
+79-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:90:22-77
 80    <uses-permission android:name="android.permission.MEDIA_PROJECTION" />
-80-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:91:5-75
-80-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:91:22-72
+80-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:91:5-75
+80-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:91:22-72
 81    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
-81-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:92:5-88
-81-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:92:22-85
+81-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:92:5-88
+81-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:92:22-85
 82    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
-82-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:93:5-88
-82-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:93:22-85
+82-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:93:5-88
+82-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:93:22-85
 83    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" /> <!-- Only needed for API 28 and lower -->
-83-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:94:5-75
-83-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:94:22-72
+83-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:94:5-75
+83-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:94:22-72
 84    <uses-permission android:name="android.permission.CAPTURE_VOICE_COMMUNICATION_OUTPUT" />
-84-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:95:5-93
-84-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:95:22-90
+84-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:95:5-93
+84-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:95:22-90
 85    <uses-permission
-85-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:96:5-98:58
+85-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:96:5-98:58
 86        android:name="android.permission.CAPTURE_AUDIO_OUTPUT"
-86-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:97:9-63
+86-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:97:9-63
 87        android:protectionLevel="signature|privileged" />
-87-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:98:9-55
+87-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:98:9-55
 88    <uses-permission android:name="com.samsung.android.providers.context.permission.WRITE_USE_APP_FEATURE_SURVEY" />
-88-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:99:5-117
-88-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:99:22-114
+88-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:99:5-117
+88-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:99:22-114
 89    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" /> <!-- Only works on rooted devices or system apps -->
-89-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:100:5-75
-89-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:100:22-72
+89-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:100:5-75
+89-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:100:22-72
 90    <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_AUDIO_OUTPUT" />
-90-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:101:5-92
-90-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:101:22-89
+90-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:101:5-92
+90-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:101:22-89
 91    <!-- Scoped-storage on Android 13+ -->
 92    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-92-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:103:5-75
-92-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:103:22-73
+92-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:103:5-75
+92-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:103:22-73
 93    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-93-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:104:5-74
-93-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:104:22-72
+93-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:104:5-74
+93-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:104:22-72
 94    <uses-permission
-94-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:105:5-118
+94-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:105:5-118
 95        android:name="android.permission.PROJECT_MEDIA"
-95-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:105:22-69
+95-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:105:22-69
 96        android:protectionLevel="signature|privileged" />
-96-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:105:70-116
+96-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:105:70-116
 97    <uses-permission
-97-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:106:5-125
+97-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:106:5-125
 98        android:name="android.permission.CAPTURE_VIDEO_OUTPUT"
-98-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:106:22-76
+98-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:106:22-76
 99        android:protectionLevel="signature|privileged" />
-99-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:106:77-123
+99-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:106:77-123
 100    <uses-permission
-100-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:107:5-140
+100-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:107:5-140
 101        android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"
-101-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:107:22-91
+101-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:107:22-91
 102        android:protectionLevel="signature|privileged" />
-102-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:107:92-138
+102-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:107:92-138
 103    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
-103-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:108:5-83
-103-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:108:22-81
+103-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:108:5-83
+103-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:108:22-81
 104    <uses-permission android:name="android.permission.ACCESS_SURFACE_FLINGER" />
-104-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:109:5-110:49
-104-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:109:22-78
+104-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:109:5-110:49
+104-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:109:22-78
 105    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE" />
 105-->[com.google.android.gms:play-services-measurement:22.4.0] /Users/jahan/.gradle/caches/transforms-3/7b8d7e58379ed0685569e3a5f9259579/transformed/jetified-play-services-measurement-22.4.0/AndroidManifest.xml:26:5-110
 105-->[com.google.android.gms:play-services-measurement:22.4.0] /Users/jahan/.gradle/caches/transforms-3/7b8d7e58379ed0685569e3a5f9259579/transformed/jetified-play-services-measurement-22.4.0/AndroidManifest.xml:26:22-107
@@ -310,96 +310,96 @@
 130    </queries>
 131
 132    <uses-feature
-132-->[:libuvccamera] /Users/jahan/Desktop/Projects/t3_vcs_recorder/libuvccamera/build/intermediates/merged_manifest/debug/AndroidManifest.xml:12:5-14:36
+132-->[:libuvccamera] /Users/jahan/Desktop/Projects/My_Recorder/libuvccamera/build/intermediates/merged_manifest/debug/AndroidManifest.xml:12:5-14:36
 133        android:name="android.hardware.usb.host"
-133-->[:libuvccamera] /Users/jahan/Desktop/Projects/t3_vcs_recorder/libuvccamera/build/intermediates/merged_manifest/debug/AndroidManifest.xml:13:9-49
+133-->[:libuvccamera] /Users/jahan/Desktop/Projects/My_Recorder/libuvccamera/build/intermediates/merged_manifest/debug/AndroidManifest.xml:13:9-49
 134        android:required="false" />
-134-->[:libuvccamera] /Users/jahan/Desktop/Projects/t3_vcs_recorder/libuvccamera/build/intermediates/merged_manifest/debug/AndroidManifest.xml:14:9-33
+134-->[:libuvccamera] /Users/jahan/Desktop/Projects/My_Recorder/libuvccamera/build/intermediates/merged_manifest/debug/AndroidManifest.xml:14:9-33
 135
 136    <application
-136-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:112:5-292:19
+136-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:112:5-292:19
 137        android:name="com.checkmate.android.MyApp"
-137-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:113:9-30
+137-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:113:9-30
 138        android:allowBackup="false"
-138-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:114:9-36
+138-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:114:9-36
 139        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
 139-->[androidx.core:core:1.13.0] /Users/jahan/.gradle/caches/transforms-3/fb40917988c084779054e417eeed6007/transformed/core-1.13.0/AndroidManifest.xml:28:18-86
 140        android:debuggable="true"
 141        android:extractNativeLibs="false"
 142        android:hardwareAccelerated="true"
-142-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:115:9-43
+142-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:115:9-43
 143        android:icon="@mipmap/ic_launcher"
-143-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:116:9-43
+143-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:116:9-43
 144        android:label="@string/app_name"
-144-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:117:9-41
+144-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:117:9-41
 145        android:largeHeap="true"
-145-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:118:9-33
+145-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:118:9-33
 146        android:networkSecurityConfig="@xml/network_security_config"
-146-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:119:9-69
+146-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:119:9-69
 147        android:requestLegacyExternalStorage="true"
-147-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:120:9-52
+147-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:120:9-52
 148        android:roundIcon="@mipmap/ic_launcher_round"
-148-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:121:9-54
+148-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:121:9-54
 149        android:sharedUserId="android.uid.system"
-149-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:122:9-50
+149-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:122:9-50
 150        android:supportsRtl="true"
 150-->[com.github.blikoon:QRCodeScanner:0.1.2] /Users/jahan/.gradle/caches/transforms-3/d9f454d1152e10e875def12eb045b4ad/transformed/jetified-QRCodeScanner-0.1.2/AndroidManifest.xml:14:9-35
 151        android:testOnly="true"
 152        android:theme="@style/AppTheme"
-152-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:123:9-40
+152-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:123:9-40
 153        android:usesCleartextTraffic="true" >
-153-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:124:9-44
+153-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:124:9-44
 154        <receiver
-154-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:128:9-131:48
+154-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:128:9-131:48
 155            android:name="com.checkmate.android.receiver.MyRestartReceiver"
-155-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:129:13-55
+155-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:129:13-55
 156            android:enabled="true"
-156-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:130:13-35
+156-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:130:13-35
 157            android:exported="true" />
-157-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:131:13-36
+157-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:131:13-36
 158
 159        <activity
-159-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:133:9-138:52
+159-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:133:9-138:52
 160            android:name="com.checkmate.android.RestartActivity"
-160-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:134:13-44
+160-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:134:13-44
 161            android:excludeFromRecents="true"
-161-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:135:13-46
+161-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:135:13-46
 162            android:exported="false"
-162-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:136:13-37
+162-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:136:13-37
 163            android:launchMode="singleTask"
-163-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:137:13-44
+163-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:137:13-44
 164            android:screenOrientation="portrait" />
-164-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:138:13-49
+164-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:138:13-49
 165        <activity
-165-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:140:9-145:52
+165-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:140:9-145:52
 166            android:name="com.checkmate.android.SoftRestartActivity"
-166-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:141:13-48
+166-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:141:13-48
 167            android:excludeFromRecents="true"
-167-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:142:13-46
+167-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:142:13-46
 168            android:exported="false"
-168-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:143:13-37
+168-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:143:13-37
 169            android:launchMode="singleTask"
-169-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:144:13-44
+169-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:144:13-44
 170            android:screenOrientation="portrait" />
-170-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:145:13-49
+170-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:145:13-49
 171        <activity
-171-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:146:9-151:58
+171-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:146:9-151:58
 172            android:name="com.checkmate.android.ui.activity.UsbPopupActivity"
-172-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:147:13-57
+172-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:147:13-57
 173            android:exported="false"
-173-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:148:13-37
+173-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:148:13-37
 174            android:screenOrientation="portrait"
-174-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:149:13-49
+174-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:149:13-49
 175            android:theme="@style/UsbDialogTheme"
-175-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:150:13-50
+175-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:150:13-50
 176            android:windowSoftInputMode="adjustResize" />
-176-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:151:13-55
+176-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:151:13-55
 177        <activity
-177-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:152:9-154:52
+177-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:152:9-154:52
 178            android:name="com.checkmate.android.ui.activity.WebActivity"
-178-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:153:13-52
+178-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:153:13-52
 179            android:screenOrientation="portrait" />
-179-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:154:13-49
+179-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:154:13-49
 180        <!--
 181               Set to true if your app is Standalone, that is, it does not require the handheld
 182               app to run.
@@ -408,248 +408,248 @@
 185        <!-- android:name=".ui.activity.HomeActivity" -->
 186        <!-- android:label="@string/title_activity_home" /> -->
 187        <service
-187-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:162:9-166:40
+187-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:162:9-166:40
 188            android:name="com.checkmate.android.service.BgCameraService"
-188-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:163:13-52
+188-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:163:13-52
 189            android:enabled="true"
-189-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:165:13-35
+189-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:165:13-35
 190            android:exported="false"
-190-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:166:13-37
+190-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:166:13-37
 191            android:foregroundServiceType="camera|microphone" />
-191-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:164:13-62
+191-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:164:13-62
 192        <service
-192-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:167:9-170:74
+192-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:167:9-170:74
 193            android:name="com.checkmate.android.service.BgCastService"
-193-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:168:13-50
+193-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:168:13-50
 194            android:foregroundServiceType="mediaProjection"
-194-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:169:13-60
+194-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:169:13-60
 195            android:permission="android.permission.FOREGROUND_SERVICE" />
-195-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:170:13-71
+195-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:170:13-71
 196        <service
-196-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:171:9-175:40
+196-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:171:9-175:40
 197            android:name="com.checkmate.android.service.BgAudioService"
-197-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:172:13-51
+197-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:172:13-51
 198            android:enabled="true"
-198-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:174:13-35
+198-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:174:13-35
 199            android:exported="false"
-199-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:175:13-37
+199-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:175:13-37
 200            android:foregroundServiceType="camera|microphone" />
-200-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:173:13-62
+200-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:173:13-62
 201        <service
-201-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:176:9-180:40
+201-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:176:9-180:40
 202            android:name="com.checkmate.android.service.BgWifiService"
-202-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:177:13-50
+202-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:177:13-50
 203            android:enabled="true"
-203-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:179:13-35
+203-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:179:13-35
 204            android:exported="false"
-204-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:180:13-37
+204-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:180:13-37
 205            android:foregroundServiceType="camera|microphone" />
-205-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:178:13-62
+205-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:178:13-62
 206        <service
-206-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:181:9-185:40
+206-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:181:9-185:40
 207            android:name="com.checkmate.android.service.BgUSBService"
-207-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:182:13-49
+207-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:182:13-49
 208            android:enabled="true"
-208-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:184:13-35
+208-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:184:13-35
 209            android:exported="false"
-209-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:185:13-37
+209-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:185:13-37
 210            android:foregroundServiceType="camera|microphone" />
-210-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:183:13-62
+210-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:183:13-62
 211        <service
-211-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:186:9-198:19
+211-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:186:9-198:19
 212            android:name="com.checkmate.android.service.MyAccessibilityService"
-212-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:187:13-59
+212-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:187:13-59
 213            android:exported="false"
-213-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:188:13-37
+213-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:188:13-37
 214            android:label="@string/accessibility_service_label"
-214-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:189:13-64
+214-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:189:13-64
 215            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
-215-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:190:13-79
+215-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:190:13-79
 216            <meta-data
-216-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:191:13-193:72
+216-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:191:13-193:72
 217                android:name="android.accessibilityservice"
-217-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:192:17-60
+217-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:192:17-60
 218                android:resource="@xml/accessibility_service_config" />
-218-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:193:17-69
+218-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:193:17-69
 219
 220            <intent-filter>
-220-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:195:13-197:29
+220-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:195:13-197:29
 221                <action android:name="android.accessibilityservice.AccessibilityService" />
-221-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:196:17-92
-221-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:196:25-89
+221-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:196:17-92
+221-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:196:25-89
 222            </intent-filter>
 223        </service>
 224
 225        <activity
-225-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:200:9-202:52
+225-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:200:9-202:52
 226            android:name="com.checkmate.android.ui.activity.HomeActivity"
-226-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:201:13-53
+226-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:201:13-53
 227            android:screenOrientation="portrait" />
-227-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:202:13-49
+227-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:202:13-49
 228        <activity
-228-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:203:9-205:52
+228-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:203:9-205:52
 229            android:name="com.checkmate.android.ui.activity.PinActivity"
-229-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:204:13-52
+229-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:204:13-52
 230            android:screenOrientation="portrait" />
-230-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:205:13-49
+230-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:205:13-49
 231        <activity
-231-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:206:9-208:52
+231-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:206:9-208:52
 232            android:name="com.checkmate.android.ui.activity.ShareActivity"
-232-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:207:13-54
+232-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:207:13-54
 233            android:screenOrientation="portrait" />
-233-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:208:13-49
+233-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:208:13-49
 234        <activity
-234-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:209:9-220:20
+234-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:209:9-220:20
 235            android:name="com.checkmate.android.ui.activity.SplashActivity"
-235-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:210:13-55
+235-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:210:13-55
 236            android:exported="true"
-236-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:211:13-36
+236-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:211:13-36
 237            android:launchMode="singleInstance"
-237-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:212:13-48
+237-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:212:13-48
 238            android:screenOrientation="portrait" >
-238-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:213:13-49
+238-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:213:13-49
 239            <intent-filter>
-239-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:214:13-219:29
+239-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:214:13-219:29
 240                <action android:name="android.intent.action.MAIN" />
-240-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:215:17-69
-240-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:215:25-66
+240-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:215:17-69
+240-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:215:25-66
 241
 242                <category android:name="android.intent.category.DEFAULT" />
-242-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:217:17-76
-242-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:217:27-73
+242-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:217:17-76
+242-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:217:27-73
 243                <category android:name="android.intent.category.LAUNCHER" />
-243-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:218:17-77
-243-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:218:27-74
+243-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:218:17-77
+243-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:218:27-74
 244            </intent-filter>
 245        </activity>
 246        <activity
-246-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:221:9-224:52
+246-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:221:9-224:52
 247            android:name="com.checkmate.android.ui.activity.ChessActivity"
-247-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:222:13-54
+247-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:222:13-54
 248            android:launchMode="singleTop"
-248-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:223:13-43
+248-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:223:13-43
 249            android:screenOrientation="portrait" />
-249-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:224:13-49
+249-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:224:13-49
 250        <activity
-250-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:225:9-244:20
+250-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:225:9-244:20
 251            android:name="com.checkmate.android.util.MainActivity"
-251-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:226:13-46
+251-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:226:13-46
 252            android:alwaysRetainTaskState="true"
-252-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:227:13-49
+252-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:227:13-49
 253            android:configChanges="screenSize|keyboardHidden|orientation"
-253-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:228:13-74
+253-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:228:13-74
 254            android:exported="true"
-254-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:229:13-36
+254-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:229:13-36
 255            android:label="@string/app_name"
-255-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:230:13-45
+255-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:230:13-45
 256            android:launchMode="singleTask"
-256-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:231:13-44
+256-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:231:13-44
 257            android:screenOrientation="portrait"
-257-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:232:13-49
+257-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:232:13-49
 258            android:windowSoftInputMode="adjustResize" >
-258-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:233:13-55
+258-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:233:13-55
 259            <intent-filter>
-259-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:234:13-236:29
+259-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:234:13-236:29
 260                <action android:name="android.intent.action.VIEW" />
-260-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:235:17-69
-260-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:235:25-66
+260-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:235:17-69
+260-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:235:25-66
 261            </intent-filter>
 262            <intent-filter>
-262-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:237:13-239:29
+262-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:237:13-239:29
 263                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
-263-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:238:17-90
-263-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:238:25-87
+263-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:238:17-90
+263-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:238:25-87
 264            </intent-filter>
 265
 266            <meta-data
-266-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:241:13-243:57
+266-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:241:13-243:57
 267                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-267-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:242:17-79
+267-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:242:17-79
 268                android:resource="@xml/device_filter" />
-268-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:243:17-54
+268-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:243:17-54
 269        </activity>
 270
 271        <provider
 272            android:name="androidx.core.content.FileProvider"
-272-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:247:13-62
+272-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:247:13-62
 273            android:authorities="com.checkmate.android.provider"
-273-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:248:13-60
+273-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:248:13-60
 274            android:exported="false"
-274-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:249:13-37
+274-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:249:13-37
 275            android:grantUriPermissions="true" >
-275-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:250:13-47
+275-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:250:13-47
 276            <meta-data
-276-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:251:13-253:54
+276-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:251:13-253:54
 277                android:name="android.support.FILE_PROVIDER_PATHS"
-277-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:252:17-67
+277-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:252:17-67
 278                android:resource="@xml/file_paths" />
-278-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:253:17-51
+278-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:253:17-51
 279        </provider>
 280
 281        <activity
-281-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:256:9-259:52
+281-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:256:9-259:52
 282            android:name="com.checkmate.android.ui.activity.CameraActivity"
-282-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:257:13-55
+282-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:257:13-55
 283            android:configChanges="screenSize|keyboardHidden|orientation"
-283-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:258:13-74
+283-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:258:13-74
 284            android:screenOrientation="portrait" />
-284-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:259:13-49
+284-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:259:13-49
 285
 286        <service android:name="com.checkmate.android.service.PlayService" />
-286-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:261:9-56
-286-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:261:18-53
+286-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:261:9-56
+286-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:261:18-53
 287        <service android:name="com.checkmate.android.service.LocationManagerService" />
-287-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:262:9-67
-287-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:262:18-64
+287-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:262:9-67
+287-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:262:18-64
 288        <service
-288-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:263:9-271:19
+288-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:263:9-271:19
 289            android:name="com.checkmate.android.util.HideNotifListener"
-289-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:264:13-51
+289-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:264:13-51
 290            android:exported="false"
-290-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:265:13-37
+290-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:265:13-37
 291            android:label="Hide Service Notification"
-291-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:266:13-54
+291-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:266:13-54
 292            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
-292-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:267:13-87
+292-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:267:13-87
 293            <intent-filter>
-293-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:268:13-270:29
+293-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:268:13-270:29
 294                <action android:name="android.service.notification.NotificationListenerService" />
-294-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:269:17-98
-294-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:269:25-96
+294-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:269:17-98
+294-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:269:25-96
 295            </intent-filter>
 296        </service>
 297
 298        <receiver android:name="com.checkmate.android.receiver.ScreenReceiver" />
-298-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:273:9-61
-298-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:273:19-58
+298-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:273:9-61
+298-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:273:19-58
 299        <receiver android:name="com.checkmate.android.receiver.WifiBroadcastReceiver" />
-299-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:274:9-68
-299-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:274:19-65
+299-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:274:9-68
+299-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:274:19-65
 300        <receiver
-300-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:275:9-282:20
+300-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:275:9-282:20
 301            android:name="com.checkmate.android.receiver.PowerConnectionReceiver"
-301-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:276:13-61
+301-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:276:13-61
 302            android:exported="true" >
-302-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:277:13-36
+302-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:277:13-36
 303            <intent-filter>
-303-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:278:13-281:29
+303-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:278:13-281:29
 304                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-304-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:279:17-87
-304-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:279:25-84
+304-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:279:17-87
+304-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:279:25-84
 305                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-305-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:280:17-90
-305-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:280:25-87
+305-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:280:17-90
+305-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:280:25-87
 306            </intent-filter>
 307        </receiver>
 308        <receiver android:name="com.thanosfisherman.wifiutils.wifiState.WifiStateReceiver" />
-308-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:283:9-285:45
-308-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:284:13-85
+308-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:283:9-285:45
+308-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:284:13-85
 309        <receiver android:name="com.thanosfisherman.wifiutils.wifiConnect.WifiConnectionReceiver" />
-309-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:286:9-288:45
-309-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:287:13-92
+309-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:286:9-288:45
+309-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:287:13-92
 310        <receiver android:name="com.thanosfisherman.wifiutils.wifiScan.WifiScanReceiver" /> <!-- Sugar ORM -->
-310-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:289:9-291:45
-310-->/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/AndroidManifest.xml:290:13-83
+310-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:289:9-291:45
+310-->/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:290:13-83
 311        <activity android:name="com.blikoon.qrcodescanner.QrCodeActivity" >
 311-->[com.github.blikoon:QRCodeScanner:0.1.2] /Users/jahan/.gradle/caches/transforms-3/d9f454d1152e10e875def12eb045b4ad/transformed/jetified-QRCodeScanner-0.1.2/AndroidManifest.xml:15:9-16:20
 311-->[com.github.blikoon:QRCodeScanner:0.1.2] /Users/jahan/.gradle/caches/transforms-3/d9f454d1152e10e875def12eb045b4ad/transformed/jetified-QRCodeScanner-0.1.2/AndroidManifest.xml:15:19-74

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.checkmate.android.R;
 import com.checkmate.android.util.MainActivity;
 
+
 public class HideFragment extends BaseFragment {
 
     public static HideFragment instance;
@@ -45,6 +46,12 @@ public class HideFragment extends BaseFragment {
     }
 
     boolean is_scrolled = false;
+
+    public void OnClick(View view) {
+        switch (view.getId()) {
+
+        }
+    }
 
     @Override
     public void onRefresh() {

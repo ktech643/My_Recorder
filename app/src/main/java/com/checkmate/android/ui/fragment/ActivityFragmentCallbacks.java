@@ -10,10 +10,18 @@ public interface ActivityFragmentCallbacks {
     void showDialog();
     void dismissDialog();
     void initFragService();
-    void stopFragService();
+    void initFragCastService();
+    void stopFragBgCast();
+    void stopFragUSBService();
+    void stopFragBgCamera();
     void stopFragRecordingTime();
+    void stopFragWifiService();
     void saveFragUSBCameraResolutions();
+    void fragWifiSnapshot();
     void fragTakeSnapshot();
+    void fragInitBGUSBService();
+    void fragStopStreaming();
+    void fragInitBGWifiService();
     void fragLockOrientation();
     void fragStartVolumeService();
     void fragStopVolumeService();
@@ -23,4 +31,8 @@ public interface ActivityFragmentCallbacks {
     void fragStartStream();
     void fragStopLocationService();
     void fragStartLocationService();
+    void initFragAudioService();
+    void stopFragAudio();
+
+    void startCastRecording();
 }

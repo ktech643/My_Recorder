@@ -10,11 +10,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.DialogMachineBinding;
+
 
 public class MachineCodeDialog extends Dialog {
 
-    private DialogMachineBinding binding;
+    TextView btn_ok;
+
+    TextView btn_close;
+
+    TextView txt_code;
+
+    TextView btn_online;
 
     public MachineCodeDialog(Context context, int theme) {
         super(context, theme);
@@ -30,9 +36,13 @@ public class MachineCodeDialog extends Dialog {
 
     private void init(Context context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogMachineBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_machine);
         setCancelable(false);
+                btn_ok = findViewById(R.id.btn_ok);
+        btn_close = findViewById(R.id.btn_close);
+        txt_code = findViewById(R.id.txt_code);
+        btn_online = findViewById(R.id.btn_online);
+
     }
 
     @Override
@@ -48,18 +58,19 @@ public class MachineCodeDialog extends Dialog {
     }
 
     public void setMachineCode(String code) {
-        binding.txtCode.setText(code);
+        txt_code.setText(code);
     }
 
     public void setOkListener(View.OnClickListener listener) {
-        binding.btnOk.setOnClickListener(listener);
+        btn_ok.setOnClickListener(listener);
     }
 
     public void setCloseListener(View.OnClickListener listner) {
-        binding.btnClose.setOnClickListener(listner);
+        btn_close.setOnClickListener(listner);
     }
 
     public void setOnlineListener(View.OnClickListener listener) {
-        binding.btnOnline.setOnClickListener(listener);
+        btn_online.setOnClickListener(listener);
     }
+
 }

@@ -98,7 +98,7 @@
         android:background="#333333"
         android:visibility="gone" />
 
-    <ImageButton
+    <com.nightonke.boommenu.BoomMenuButton
         android:id="@+id/img_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -106,7 +106,9 @@
         android:layout_alignParentTop="true"
         android:layout_margin="@dimen/margin_large"
         android:visibility="gone"
-        android:background="?android:selectableItemBackground" />
+        app:bmb_backgroundEffect="false"
+        app:bmb_hideDuration="1000"
+        app:bmb_showDuration="1000" />
 
     <FrameLayout
         android:id="@+id/flImages"

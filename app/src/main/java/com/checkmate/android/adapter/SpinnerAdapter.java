@@ -17,6 +17,7 @@ import com.checkmate.android.model.RotateModel;
 
 import java.util.List;
 
+
 public class SpinnerAdapter extends ArrayAdapter<RotateModel> {
 
     LayoutInflater layoutInflater;
@@ -39,8 +40,11 @@ public class SpinnerAdapter extends ArrayAdapter<RotateModel> {
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.cell_dropdown_rotate, parent, false);
             holder = new ViewHolder();
+            
+            // Initialize ViewHolder with findViewById calls
             holder.img_item = convertView.findViewById(R.id.img_item);
             holder.txt_item = convertView.findViewById(R.id.txt_item);
+            
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -63,6 +67,8 @@ public class SpinnerAdapter extends ArrayAdapter<RotateModel> {
 
     static class ViewHolder {
         ImageView img_item;
+
         TextView txt_item;
+
     }
 }

@@ -4,7 +4,7 @@
             "outputFile": "com.checkmate.android.app-mergeDebugResources-59:/values-round-v23/values-round-v23.xml",
             "map": [
                 {
-                    "source": "/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/res/values-round/strings.xml",
+                    "source": "/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/res/values-round/strings.xml",
                     "from": {
                         "startLines": "1",
                         "startColumns": "4",

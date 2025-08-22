@@ -10,11 +10,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.DialogWifiPasswordBinding;
+
 
 public class WifiPasswordDialog extends Dialog {
 
-    public DialogWifiPasswordBinding binding;
+    Button btn_ok;
+
+    Button btn_close;
+
+    public EditText edt_password;
 
     public WifiPasswordDialog(Context context, int theme) {
         super(context, theme);
@@ -30,9 +34,11 @@ public class WifiPasswordDialog extends Dialog {
 
     private void init(Context context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogWifiPasswordBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_wifi_password);
         setCancelable(false);
+                btn_ok = findViewById(R.id.btn_ok);
+        btn_close = findViewById(R.id.btn_close);
+
     }
 
     @Override
@@ -48,15 +54,11 @@ public class WifiPasswordDialog extends Dialog {
     }
 
     public void setOkListener(View.OnClickListener listener) {
-        binding.btnOk.setOnClickListener(listener);
+        btn_ok.setOnClickListener(listener);
     }
 
     public void setCloseListener(View.OnClickListener listner) {
-        binding.btnClose.setOnClickListener(listner);
+        btn_close.setOnClickListener(listner);
     }
 
-    // Getter for the EditText
-    public EditText getEdtPassword() {
-        return binding.edtPassword;
-    }
 }

@@ -1,3 +1,4 @@
 # ninja log v5
 0	1558	1755884611	CMakeFiles/native-lib.dir/native-lib.cpp.o	66532e8241386473
 1559	1747	1755884612	/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/build/intermediates/cxx/RelWithDebInfo/4e602056/obj/arm64-v8a/libnative-lib.so	68b9d7017ea05454
+0	26	0	clean	dcfe60f2b99663e1

@@ -25,7 +25,6 @@
     "variantName": "debug",
     "isDebuggableEnabled": true,
     "validAbiList": [
-      "ARMEABI_V7A",
       "ARM64_V8A"
     ],
     "buildTargetSet": [],
@@ -127,6 +126,7 @@
         "rootBuildGradleFolder": "/Users/jahan/Desktop/Projects/My_Recorder",
         "sdkFolder": "/Users/jahan/Library/Android/sdk",
         "isBuildOnlyTargetAbiEnabled": true,
+        "ideBuildTargetAbi": "arm64-v8a,armeabi-v7a,armeabi",
         "isCmakeBuildCohabitationEnabled": false,
         "isPrefabEnabled": false
       },

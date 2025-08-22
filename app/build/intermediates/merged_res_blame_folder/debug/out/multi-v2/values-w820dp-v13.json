@@ -4,7 +4,7 @@
             "outputFile": "com.checkmate.android.app-mergeDebugResources-59:/values-w820dp-v13/values-w820dp-v13.xml",
             "map": [
                 {
-                    "source": "/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/res/values-w820dp/dimens.xml",
+                    "source": "/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/res/values-w820dp/dimens.xml",
                     "from": {
                         "startLines": "7",
                         "startColumns": "4",

@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="blue">#2196F3</color>
-    <color name="blue_dark">#1976D2</color>
-    <color name="textInputLayout">#333333</color>
-    <color name="text_light">#666666</color>
-    <color name="text_normal">#333333</color>
-    <color name="teal">#009688</color>
-    <color name="transparent">#00000000</color>
-    <color name="gray">#999999</color>
-    <color name="gray_dark">#666666</color>
-    <color name="light_gray">#E7E7E7</color>
-    <color name="lighter_gray">#F5F5F5</color>
-    <color name="red">#FF0000</color>
-    <color name="border">#CCCCCC</color>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+
+    <!-- draw -->
+    <color name="white">#ffffff</color>
     <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="translucent_black">#80000000</color>
+
+    <color name="blue">#4a6da7</color>
+    <color name="blue_dark">#3f5d8f</color>
+    <color name="gray">#eeeeee</color>
+    <color name="gray_dark">#a9a9a9</color>
+    <color name="red">#de5249</color>
+    <color name="textInputLayout">#96ffffff</color>
+    <color name="uvv_titlebar_bg">#7f000000</color>
+    <!-- Text -->
+    <color name="text_normal">#313131</color>
+    <color name="text_light">#989898</color>
+
+    <color name="border">#D8D8D8</color>
+    <color name="teal">#4689F2</color>
 </resources>

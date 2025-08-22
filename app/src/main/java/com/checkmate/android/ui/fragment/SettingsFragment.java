@@ -1,6 +1,5 @@
 package com.checkmate.android.ui.fragment;
 
-import android.Manifest;
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.SuppressLint;
@@ -63,12 +62,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.checkmate.android.service.FragmentVisibilityListener;
 import com.checkmate.android.service.MyAccessibilityService;
 import com.checkmate.android.util.OnStoragePathChangeListener;
 import com.checkmate.android.viewmodels.EventType;
@@ -108,10 +104,9 @@ import com.checkmate.android.util.MainActivity;
 import com.checkmate.android.util.MessageUtil;
 import com.checkmate.android.util.ResourceUtil;
 import com.checkmate.android.util.SettingsUtils;
-import com.checkmate.android.util.DefaultStorageUtils;
 import com.codekidlabs.storagechooser.StorageChooser;
-// import com.serenegiant.usb.Size;
-// import com.serenegiant.usb.UVCCamera;
+import com.serenegiant.usb.Size;
+import com.serenegiant.usb.UVCCamera;
 import com.shasin.notificationbanner.Banner;
 import com.thanosfisherman.wifiutils.WifiUtils;
 import com.thanosfisherman.wifiutils.wifiConnect.ConnectionErrorCode;
@@ -141,7 +136,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -152,98 +146,182 @@ import static android.content.Context.ACCESSIBILITY_SERVICE;
 import static com.checkmate.android.util.ResourceUtil.getRecordPath;
 import static com.checkmate.android.util.ResourceUtil.getSdCardPath;
 
-public class SettingsFragment extends BaseFragment implements OnStoragePathChangeListener , FragmentVisibilityListener {
+public class SettingsFragment extends BaseFragment implements OnStoragePathChangeListener {
 
     private  ActivityFragmentCallbacks mListener;
+    //    public static SettingsFragment instance;
     public static WeakReference<SettingsFragment> instance;
     MainActivity mActivity;
     List<Camera> cameraList = new ArrayList<>();
     ListAdapter adapter;
     public static final int REQUEST_CODE_QR_SCAN_WIFI = 10001;
 
-    private ListView list_cameras;
-    private TextView txt_video_details;
-    private TextView tv_expiration_date;
-    private TextView txt_stream_details;
-    private Switch swt_adaptive_fps;
-    private Switch swt_radio_mode;
-    private ViewGroup ly_recording_settings;
-    private ViewGroup ly_streaming_settings;
-    private Switch swt_radio_bluetooth;
-    private Switch usb_radio_bluetooth;
-    private Switch swt_orientation;
-    private TextView txt_location;
-    private TextView txt_space;
-    private TextView txt_update;
-    private TextView txt_check_update;
-    private Switch swt_convert_ui;
-    private Switch swt_rec_audio;
-    private Switch swt_auto_record;
-    private Switch swt_fifo;
-    private TextView txt_version;
-    private EditText edt_pin;
-    private TextView txt_new_version;
-    private Spinner spinner_resolution;
-    private Spinner streaming_audio_bitrate;
-    private Spinner usb_audio_bitrate;
-    private MySpinner spinner_audio_src;
-    private MySpinner usb_audio_src;
-    private MySpinner usb_channel_count;
-    private MySpinner bluetooth_audio_src;
-    private MySpinner usb_bluetooth_src;
-    private MySpinner spinner_sample_rate;
-    private MySpinner usb_sample_rate;
-    private TextView txt_machine;
-    private Spinner spinner_frame;
-    private MySpinner streaming_quality;
-    private Spinner streaming_resolution;
-    private Spinner streaming_frame;
-    private MySpinner spinner_adaptive;
+    ListView list_cameras;
 
-    private ViewGroup ly_streaming_custom;
-    private EditText edt_streaming_bitrate;
-    private EditText edt_streaming_keyFrame;
-    private EditText edt_bitrate;
-    private EditText edt_keyFrame;
-    private Switch swt_secure_multi;
-    private TextView txt_storage;
-    private TextView tv_storage_location;
-    private LinearLayout ly_video_custom;
-    private Spinner spinner_quality;
-    private TextView txt_serial;
-    private TextView txt_expire;
-    private LinearLayout ly_expire;
-    private EditText edt_split;
-    private Switch swt_key_service;
-    private Switch swt_timestamp;
-    private Switch swt_vu_meter;
-    private Switch swt_transcode;
-    private Switch swt_radio_accessbility;
-    private TextView txt_transcode;
-    private ViewGroup ly_vu_meter;
-    private ViewGroup ly_audio;
-    public Switch swt_encryption;
-    private ViewGroup card_beta;
+    TextView txt_video_details;
+
+    TextView tv_expiration_date;
+
+    TextView txt_stream_details;
+
+    Switch swt_adaptive_fps;
+
+    Switch swt_radio_mode;
+
+    ViewGroup ly_recording_settings;
+
+    ViewGroup ly_streaming_settings;
+
+    Switch swt_radio_bluetooth;
+
+    Switch usb_radio_bluetooth;
+
+    Switch swt_orientation;
+
+    TextView txt_location;
+
+    TextView txt_space;
+
+    TextView txt_update;
+
+    TextView txt_check_update;
+
+    Switch swt_convert_ui;
+
+    Switch swt_rec_audio;
+
+    Switch swt_auto_record;
+
+    Switch swt_fifo;
+
+    TextView txt_version;
+
+    EditText edt_pin;
+    
+    // Additional UI Components that were missing
+    private androidx.cardview.widget.CardView card_beta;
     private EditText edt_cloud;
     private TextView txt_beta_update;
-    private TextView txt_acc_status;
-    private ViewGroup ly_usb;
-    private LinearLayout usb_path_ll;
-    private TextView txt_usb_cam;
-    private MySpinner spinner_usb_codec;
-    private MySpinner spinner_usb_resolution;
-    private ViewGroup ly_cast_video_settings;
-    private Spinner spinner_cast_resolution;
-    private Spinner spinner_cast_frame;
-    private EditText edt_cast_bitrate;
-    private EditText edt_cast_keyFrame;
-    private EditText edt_usb_min_fps;
-    private EditText edt_usb_max_fps;
-    private MySpinner audio_src;
-    private MySpinner audio_pref_mic;
-    private MySpinner audio_option_bitrate;
-    private MySpinner audio_option_sample_rate;
-    private MySpinner audio_option_channel_count;
+    private TextView txt_wifi_camera;
+    // TextView txt_acc_status; // Removed - element not in layout
+
+    TextView txt_new_version;
+
+    Spinner spinner_resolution;
+
+    Spinner streaming_audio_bitrate;
+
+    Spinner usb_audio_bitrate;
+
+    MySpinner spinner_audio_src;
+
+    MySpinner usb_audio_src;
+
+    MySpinner usb_channel_count;
+
+    MySpinner bluetooth_audio_src;
+
+    MySpinner usb_bluetooth_src;
+
+    MySpinner spinner_sample_rate;
+
+    MySpinner usb_sample_rate;
+
+    TextView txt_machine;
+
+    Spinner spinner_frame;
+
+    MySpinner streaming_quality;
+
+    Spinner streaming_resolution;
+
+    Spinner streaming_frame;
+
+    MySpinner spinner_adaptive;
+
+    MySpinner spinner_cast_adaptive;
+
+    ViewGroup ly_streaming_custom;
+
+    EditText edt_streaming_bitrate;
+
+    EditText edt_streaming_keyFrame;
+
+    EditText edt_bitrate;
+
+    EditText edt_keyFrame;
+
+    Switch swt_secure_multi;
+
+    TextView txt_storage;
+
+    TextView tv_storage_location;
+
+    LinearLayout ly_video_custom;
+
+    Spinner spinner_quality;
+
+    TextView txt_serial;
+
+    TextView txt_expire;
+
+    LinearLayout ly_expire;
+
+    EditText edt_split;
+
+    Switch swt_key_service;
+
+    Switch swt_timestamp;
+
+    Switch swt_vu_meter;
+
+    Switch swt_transcode;
+
+    Switch swt_radio_accessbility;
+
+    TextView txt_transcode;
+
+    ViewGroup ly_vu_meter;
+
+    ViewGroup ly_audio;
+
+    public Switch swt_encryption;
+
+    // Remove duplicate declarations
+
+    ViewGroup ly_usb;
+
+    LinearLayout usb_path_ll;
+
+    TextView txt_usb_cam;
+
+    MySpinner spinner_usb_codec;
+
+    MySpinner spinner_usb_resolution;
+
+    ViewGroup ly_cast_video_settings;
+
+    Spinner spinner_cast_resolution;
+
+    Spinner spinner_cast_frame;
+
+    EditText edt_cast_bitrate;
+
+    EditText edt_cast_keyFrame;
+
+    EditText edt_usb_min_fps;
+
+    EditText edt_usb_max_fps;
+
+    MySpinner audio_src;
+
+    MySpinner audio_pref_mic;
+
+    MySpinner audio_option_bitrate;
+
+    MySpinner audio_option_sample_rate;
+
+    MySpinner audio_option_channel_count;
 
     private static final int REQUEST_CODE_OPEN_DOCUMENT_TREE = 1;
     private static final int REQUEST_CODE_MOVE_FILES = 11;
@@ -253,7 +331,6 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
     private Uri destinationFileUri;
 
     private SharedViewModel sharedViewModel;
-    private boolean settingsChanged = false; // Track if settings have changed
 
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
@@ -297,7 +374,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        // Initialize all views with findViewById
+        // Initialize UI components
         list_cameras = mView.findViewById(R.id.list_cameras);
         txt_video_details = mView.findViewById(R.id.txt_video_details);
         tv_expiration_date = mView.findViewById(R.id.tv_expiration_date);
@@ -336,7 +413,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         streaming_resolution = mView.findViewById(R.id.streaming_resolution);
         streaming_frame = mView.findViewById(R.id.streaming_frame);
         spinner_adaptive = mView.findViewById(R.id.spinner_adaptive);
-
+        spinner_cast_adaptive = mView.findViewById(R.id.spinner_cast_adaptive);
         ly_streaming_custom = mView.findViewById(R.id.ly_streaming_custom);
         edt_streaming_bitrate = mView.findViewById(R.id.edt_streaming_bitrate);
         edt_streaming_keyFrame = mView.findViewById(R.id.edt_streaming_keyFrame);
@@ -359,11 +436,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         txt_transcode = mView.findViewById(R.id.txt_transcode);
         ly_vu_meter = mView.findViewById(R.id.ly_vu_meter);
         ly_audio = mView.findViewById(R.id.ly_audio);
-        swt_encryption = mView.findViewById(R.id.swt_encryption);
         card_beta = mView.findViewById(R.id.card_beta);
         edt_cloud = mView.findViewById(R.id.edt_cloud);
         txt_beta_update = mView.findViewById(R.id.txt_beta_update);
-        txt_acc_status = mView.findViewById(R.id.accessibility_statis_title);
         ly_usb = mView.findViewById(R.id.ly_usb);
         usb_path_ll = mView.findViewById(R.id.usb_path_ll);
         txt_usb_cam = mView.findViewById(R.id.txt_usb_cam);
@@ -382,18 +457,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_option_sample_rate = mView.findViewById(R.id.audio_option_sample_rate);
         audio_option_channel_count = mView.findViewById(R.id.audio_option_channel_count);
 
-        // Set up click listeners
-        mView.findViewById(R.id.txt_camera).setOnClickListener(v -> onAddCamera());
-        mView.findViewById(R.id.txt_update).setOnClickListener(v -> onUpdate());
-        mView.findViewById(R.id.txt_storage).setOnClickListener(v -> onStorage());
-        mView.findViewById(R.id.txt_reactivate).setOnClickListener(v -> onReactivate());
-        mView.findViewById(R.id.txt_check_update).setOnClickListener(v -> checkUpdate());
-        mView.findViewById(R.id.txt_exit).setOnClickListener(v -> exitApp());
-        mView.findViewById(R.id.txt_wifi_camera).setOnClickListener(v -> onAddWifiCamera(0));
-        mView.findViewById(R.id.txt_beta_update).setOnClickListener(v -> onBetaUpdate());
-        mView.findViewById(R.id.txt_stream_details).setOnClickListener(v -> toggleStreamDetails());
-        mView.findViewById(R.id.txt_video_details).setOnClickListener(v -> toggleVideoDetails());
-        mView.findViewById(R.id.txt_transcode).setOnClickListener(v -> onTranscode());
+        // Remove invalid findViewById calls for non-existent UI elements
 
         // Initialize the SharedViewModel
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
@@ -601,12 +665,12 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
         // If a match is found, return the next lower index if available
         if (matchedIndex != -1 && matchedIndex + 1 < camera_sizes.length) {
-            //     setStreamQuality(matchedIndex + 1);
+       //     setStreamQuality(matchedIndex + 1);
             return matchedIndex + 1;
         }
 
         // If no lower resolution is found, return the last available resolution
-        //   setStreamQuality(camera_sizes.length - 1);
+     //   setStreamQuality(camera_sizes.length - 1);
         return camera_sizes.length - 1;
     }
 
@@ -625,7 +689,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         all_sizes = record_sizes;
     }
 
-    @SuppressLint({"SetTextI18n", "ClickableViewAccessibility"})
+    @SuppressLint("SetTextI18n")
     public void initialize() {
         if (mActivity == null) {
             return;
@@ -646,19 +710,17 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         swt_orientation.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppPreference.setBool(AppPreference.KEY.ORIENTATION_LOCK, isChecked);
             mListener.fragLockOrientation();
-            settingsChanged = true; // Mark that settings have changed
         });
 
         swt_timestamp.setChecked(AppPreference.getBool(AppPreference.KEY.TIMESTAMP, true));
         swt_timestamp.setOnCheckedChangeListener((compoundButton, b) -> {
             AppPreference.setBool(AppPreference.KEY.TIMESTAMP, b);
-            settingsChanged = true; // Mark that settings have changed
         });
 
         swt_vu_meter.setChecked(AppPreference.getBool(AppPreference.KEY.VU_METER, true));
         swt_vu_meter.setOnCheckedChangeListener((compoundButton, b) -> {
             AppPreference.setBool(AppPreference.KEY.VU_METER, b);
-            settingsChanged = true; // Mark that settings have changed
+            mListener.fragCameraRestart(true);
         });
 
         swt_transcode.setChecked(AppPreference.getBool(AppPreference.KEY.TRANS_APPLY_SETTINGS, false));
@@ -666,29 +728,31 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         swt_transcode.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppPreference.setBool(AppPreference.KEY.TRANS_APPLY_SETTINGS, isChecked);
             txt_transcode.setEnabled(isChecked);
-            settingsChanged = true; // Mark that settings have changed
+            mListener.fragCameraRestart(true);
         });
         boolean isEnabled = isAccessibilityServiceEnabled(getContext(), MyAccessibilityService.class);
-        if (isEnabled) {
-            txt_acc_status.setText("On");
-            txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
-        }else {
-            txt_acc_status.setText("Off");
-            txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
-        }
+        // Accessibility status display removed - element not in layout
+        // if (isEnabled) {
+        //     txt_acc_status.setText("On");
+        //     txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
+        // }else {
+        //     txt_acc_status.setText("Off");
+        //     txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.RED));
+        // }
         swt_radio_accessbility.setChecked(isEnabled);
         swt_radio_accessbility.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
             startActivity(intent);
             boolean isEnabledNew = isAccessibilityServiceEnabled(getContext(), MyAccessibilityService.class);
             swt_radio_accessbility.setChecked(isChecked);
-            if (isChecked) {
-                txt_acc_status.setText("On");
-                txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
-            }else {
-                txt_acc_status.setText("Off");
-                txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
-            }
+            // Accessibility status display removed - element not in layout
+            // if (isChecked) {
+            //     txt_acc_status.setText("On");
+            //     txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
+            // }else {
+            //     txt_acc_status.setText("Off");
+            //     txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.RED));
+            // }
         });
 
         String storageType = AppPreference.getStr(AppPreference.KEY.Storage_Type, "Storage Location: Default Storage");
@@ -723,7 +787,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             swt_vu_meter.setEnabled(is_checked);
             swt_vu_meter.setChecked(is_checked);
             AppPreference.setBool(AppPreference.KEY.RECORD_AUDIO, is_checked);
-            settingsChanged = true; // Mark that settings have changed
+            mListener.fragCameraRestart(true);
         });
 
         swt_key_service.setChecked(AppPreference.getBool(AppPreference.KEY.VOLUME_KEY, false));
@@ -771,43 +835,19 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
         try {
             txt_space.setText(String.format("%s available of %s", ResourceUtil.getAvailableInternalMemorySize(), ResourceUtil.getTotalInternalMemorySize()) + "\nStop recording when 10% Available");
-            String storage_location = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-
-            // Check if storage location is valid, if not set default
-            if (storage_location == null || storage_location.isEmpty()) {
-                String defaultPath = DefaultStorageUtils.getDefaultStoragePath();
-                AppPreference.setStr(AppPreference.KEY.STORAGE_LOCATION, defaultPath);
-                storage_location = defaultPath;
-                Log.i("SettingsFragment", "Set default storage path: " + defaultPath);
-            }
-
-            // Validate the storage location before parsing
-            if (isValidSAFUri(storage_location)) {
-                String storagePath = getFullPathFromTreeUri(Uri.parse(storage_location));
-                if (storagePath != null && !storagePath.isEmpty()) {
+            String storage_location = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, getRecordPath());
+            String storagePath = getFullPathFromTreeUri(Uri.parse(storage_location));
+            if (storagePath != null) {
+                if (storagePath.isEmpty()) {
+                    txt_storage.setText("Select Storage Location");
+                }else {
                     txt_storage.setText(storagePath);
-                } else {
-                    txt_storage.setText("SAF Storage Selected");
                 }
-            } else {
-                // Handle file path - create a file URI to get the path
-                try {
-                    Uri fileUri = Uri.fromFile(new File(storage_location));
-                    String storagePath = getFullPathFromTreeUri(fileUri);
-                    if (storagePath != null && !storagePath.isEmpty()) {
-                        txt_storage.setText(storagePath);
-                    } else {
-                        txt_storage.setText(storage_location);
-                    }
-                } catch (Exception e) {
-                    Log.e("SettingsFragment", "Error handling file path: " + storage_location, e);
-                    txt_storage.setText(storage_location);
-                }
-                Log.i("SettingsFragment", "Using file path storage: " + storage_location);
+            }else {
+                txt_storage.setText("Select Storage");
             }
         } catch (Exception e) {
-            Log.e("SettingsFragment", "Error displaying storage path", e);
-            txt_storage.setText("Select Storage Location");
+            e.printStackTrace();
         }
         if (isUSBOpen) {
             if (sharedViewModel != null && sharedViewModel.getCameraResolution() != null) {
@@ -886,13 +926,13 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 } else if (!TextUtils.equals(size, "1280x720")) {
                     int old_position = AppPreference.getInt(AppPreference.KEY.VIDEO_RESOLUTION, record_size_index);
                     if (old_position != position) {
-                        settingsChanged = true;
+                        mListener.fragCameraRestart(true);
                     }
                     AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, position);
                 } else {
                     int old_position = AppPreference.getInt(AppPreference.KEY.VIDEO_RESOLUTION, record_size_index);
                     if (old_position != position) {
-                        settingsChanged = true;
+                        mListener.fragCameraRestart(true);
                     }
                     AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, position);
                 }
@@ -930,7 +970,6 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 }
                 String size = camera_sizes[position];
                 mListener.isDialog(false);
-                settingsChanged = true;
                 if (!SettingsUtils.verifyResolution(size)) {
                     MessageUtil.showToast(requireContext(), getString(R.string.unsupporting_resolution, size));
                     streaming_resolution.setSelection(position);
@@ -938,13 +977,13 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 } else if (!TextUtils.equals(size, "1280x720")) {
                     int old_position = AppPreference.getInt(AppPreference.KEY.STREAMING_RESOLUTION, default_size_index);
                     if (old_position != position) {
-                        settingsChanged = true;
+                        mListener.fragCameraRestart(true);
                     }
                     AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, position);
                 } else {
                     int old_position = AppPreference.getInt(AppPreference.KEY.STREAMING_RESOLUTION, default_size_index);
                     if (old_position != position) {
-                        settingsChanged = true;
+                        mListener.fragCameraRestart(true);
                     }
                     AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, position);
                 }
@@ -978,7 +1017,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 int old_position = AppPreference.getInt(AppPreference.KEY.CAST_RESOLUTION, 0);
                 if (old_position != position) {
-                    settingsChanged = true; // Mark that settings have changed
+                    mListener.fragCameraRestart(true);
                 }
                 AppPreference.setInt(AppPreference.KEY.CAST_RESOLUTION, position);
             }
@@ -1003,11 +1042,13 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 .simple_spinner_dropdown_item);
         spinner_quality.setAdapter(qualityArrayAdapter);
         int video_quality = AppPreference.getInt(AppPreference.KEY.VIDEO_QUALITY, 0);
-        // Always show video custom settings expanded by default
-        ly_video_custom.setVisibility(View.VISIBLE);
-        txt_video_details.setText(R.string.return_defaults);
-        // Apply current video quality settings
-        applyCurrentVideoQualitySettings();
+        if (video_quality != AppConstant.QUALITY_CUSTOM) {
+            ly_video_custom.setVisibility(View.GONE);
+            txt_video_details.setText(R.string.show_details);
+        } else {
+            ly_video_custom.setVisibility(View.VISIBLE);
+            txt_video_details.setText(R.string.return_defaults);
+        }
         spinner_quality.setSelection(video_quality);
         spinner_quality.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -1019,36 +1060,33 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 switch (position) {
                     case 0: // high
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
-                        onVideoHigh();
+                        onVideoDetails(false);
                         break;
                     case 1:
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
-                        onVideoMedium();
+                        onVideoDetails(false);
                         break;
                     case 2:
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
-                        onVideoLow();
+                        onVideoDetails(false);
                         break;
                     case 3:
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
-                        onVideoSuperLow();
+                        onVideoDetails(false);
                         break;
                     case 4:
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
-                        onVideoUSB();
+                        onVideoDetails(false);
                         break;
                     case 5:
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, false);
-                        // For custom, just enable the controls but don't change values
-                        spinner_resolution.setEnabled(true);
-                        spinner_frame.setEnabled(true);
-                        edt_bitrate.setEnabled(true);
-                        edt_keyFrame.setEnabled(true);
+                        onVideoDetails(true);
                         break;
                 }
                 if (video_quality != position) {
-                    settingsChanged = true; // Mark that settings have changed
+                    mListener.fragCameraRestart(true);
                 }
+
             }
 
             @Override
@@ -1070,11 +1108,13 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 .simple_spinner_dropdown_item);
 
         int streaming_position = AppPreference.getInt(AppPreference.KEY.STREAMING_QUALITY, 1);
-        // Always show streaming custom settings expanded by default
-        ly_streaming_custom.setVisibility(View.VISIBLE);
-        txt_stream_details.setText(R.string.return_defaults);
-        // Apply current streaming quality settings
-        applyCurrentStreamingQualitySettings();
+        if (streaming_position == AppConstant.QUALITY_CUSTOM) {
+            ly_streaming_custom.setVisibility(View.GONE);
+            txt_stream_details.setText(R.string.show_details);
+        } else {
+            ly_streaming_custom.setVisibility(View.VISIBLE);
+            txt_stream_details.setText(R.string.return_defaults);
+        }
         streaming_quality.setAdapter(qualityStreamingAdapter);
         streaming_quality.setOnItemSelectedEvenIfUnchangedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -1086,49 +1126,37 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 switch (position) {
                     case 0: // high
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
-                        onStreamHigh();
+                        onStreamDetails(false);
                         break;
                     case 1:
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
-                        onStreamMedium();
+                        onStreamDetails(false);
                         break;
                     case 2:
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
-                        onStreamLow();
+                        onStreamDetails(false);
                         break;
                     case 3:
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
-                        onStreamSuperLow();
+                        onStreamDetails(false);
                         break;
                     case 4:
-                        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
-                        onStreamUSBHigh();
+                        AppPreference.getBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
+                        onStreamDetails(false);
                         break;
                     case 5:
-                        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, false);
-                        // For custom, just enable the controls but don't change values
-                        streaming_resolution.setEnabled(true);
-                        streaming_frame.setEnabled(true);
-                        streaming_audio_bitrate.setEnabled(true);
-                        edt_streaming_bitrate.setEnabled(true);
-                        edt_streaming_keyFrame.setEnabled(true);
-                        swt_radio_mode.setEnabled(true);
-                        swt_radio_bluetooth.setEnabled(true);
-                        spinner_audio_src.setEnabled(true);
-                        spinner_sample_rate.setEnabled(true);
-                        // Adaptive bit rate should always be enabled
-                        spinner_adaptive.setEnabled(true);
-                        swt_adaptive_fps.setEnabled(true);
+                        AppPreference.getBool(AppPreference.KEY.IS_NATIVE_STREAMING, false);
+                        onStreamDetails(true);
                         break;
                 }
                 if (streaming_quality != position) {
-                    settingsChanged = true; // Mark that settings have changed
+                    mListener.fragCameraRestart(true);
                     if (position == AppConstant.QUALITY_LOW || position == AppConstant.QUALITY_SUPER_LOW) { // low, super low
                         showFPSWarning("");
                     }
                 }
                 if (streaming_position != position) {
-                    settingsChanged = true; // Mark that settings have changed
+                    mListener.fragCameraRestart(true);
                 }
             }
 
@@ -1151,13 +1179,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         adaptiveAdapter.setDropDownViewResource(android.R.layout
                 .simple_spinner_dropdown_item);
 
-        int adaptive_mode = AppPreference.getInt(AppPreference.KEY.ADAPTIVE_MODE, -1);
-        if (adaptive_mode == -1) {
-            // Set default to 'Off' (last index in adaptive_modes array)
-            int offIndex = adaptive_modes.size() - 1;
-            adaptive_mode = offIndex;
-            AppPreference.setInt(AppPreference.KEY.ADAPTIVE_MODE, adaptive_mode); // Store immediately to avoid duplication
-        }
+        int adaptive_mode = AppPreference.getInt(AppPreference.KEY.ADAPTIVE_MODE, 0);
         spinner_adaptive.setAdapter(adaptiveAdapter);
         spinner_adaptive.setOnItemSelectedEvenIfUnchangedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -1166,7 +1188,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 AppPreference.setInt(AppPreference.KEY.ADAPTIVE_MODE, position);
                 mListener.isDialog(false);
                 if (mode != position) {
-                    settingsChanged = true; // Mark that settings have changed
+                    mListener.fragCameraRestart(true);
                 }
             }
 
@@ -1183,7 +1205,31 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         });
         spinner_adaptive.setSelection(adaptive_mode);
 
+        int adaptive_mode_cast = AppPreference.getInt(AppPreference.KEY.ADAPTIVE_MODE_CAST, 0);
+        spinner_cast_adaptive.setAdapter(adaptiveAdapter);
+        spinner_cast_adaptive.setOnItemSelectedEvenIfUnchangedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int mode = AppPreference.getInt(AppPreference.KEY.ADAPTIVE_MODE_CAST, 0);
+                AppPreference.setInt(AppPreference.KEY.ADAPTIVE_MODE_CAST, position);
+                mListener.isDialog(false);
+                if (mode != position) {
+                    mListener.fragCameraRestart(true);
+                }
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        spinner_cast_adaptive.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                mListener.isDialog(true);
+            }
+            return false;
+        });
+        spinner_cast_adaptive.setSelection(adaptive_mode_cast);
 
         List<String> spinnerFrame = Arrays.asList(getResources().getStringArray(R.array.video_frame));
         ArrayAdapter<String> frameAdapter = new ArrayAdapter<>(
@@ -1199,7 +1245,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 AppPreference.setInt(AppPreference.KEY.VIDEO_FRAME, value);
                 mListener.isDialog(false);
                 if (value != old)
-                    settingsChanged = true; // Mark that settings have changed
+                    mListener.fragCameraRestart(true);
             }
 
             @Override
@@ -1251,8 +1297,8 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
                 mListener.isDialog(false);
                 if (value != old) {
+                    mListener.fragCameraRestart(true);
                     if (show_warning) {
-                        settingsChanged = true; // Mark that settings have changed
                         showFPSWarning(String.valueOf(value));
                     }
                 }
@@ -1283,7 +1329,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 int old_position = AppPreference.getInt(AppPreference.KEY.STREAMING_AUDIO_BITRATE, 0);
                 if (old_position != position) {
-                    settingsChanged = true; // Mark that settings have changed
+                    mListener.fragCameraRestart(true);
                 }
                 AppPreference.setInt(AppPreference.KEY.STREAMING_AUDIO_BITRATE, position);
             }
@@ -1308,7 +1354,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 int old_position = AppPreference.getInt(AppPreference.KEY.USB_AUDIO_BITRATE, 0);
                 if (old_position != position) {
-                    settingsChanged = true; // Mark that settings have changed
+                    mListener.fragCameraRestart(true);
                 }
                 AppPreference.setInt(AppPreference.KEY.USB_AUDIO_BITRATE, position);
             }
@@ -1339,7 +1385,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(false);
                 int old_position = AppPreference.getInt(AppPreference.KEY.AUDIO_SRC, 0);
                 if (old_position != position && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false)) {
-                    settingsChanged = true; // Mark that settings have changed
+                    mListener.fragCameraRestart(true);
                 }
                 AppPreference.setInt(AppPreference.KEY.AUDIO_SRC, position);
             }
@@ -1365,7 +1411,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(false);
                 int old_position = AppPreference.getInt(AppPreference.KEY.USB_AUDIO_SRC, 0);
                 if (old_position != position && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_USB_MIC, false)) {
-                    settingsChanged = true; // Mark that settings have changed
+                    mListener.fragCameraRestart(true);
                 }
                 AppPreference.setInt(AppPreference.KEY.USB_AUDIO_SRC, position);
             }
@@ -1396,7 +1442,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(false);
                 int old_position = AppPreference.getInt(AppPreference.KEY.CHANNEL_COUNT, 0);
                 if (old_position != position && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false)) {
-                    settingsChanged = true; // Mark that settings have changed
+                    mListener.fragCameraRestart(true);
                 }
                 AppPreference.setInt(AppPreference.KEY.CHANNEL_COUNT, position);
             }
@@ -1413,7 +1459,6 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             return false;
         });
 
-
         bluetooth_audio_src.setAdapter(source_adapter);
         int ble_source = AppPreference.getInt(AppPreference.KEY.BLE_AUDIO_SRC, 0);
         bluetooth_audio_src.setOnItemSelectedEvenIfUnchangedListener(new AdapterView.OnItemSelectedListener() {
@@ -1422,7 +1467,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(false);
                 int old_position = AppPreference.getInt(AppPreference.KEY.BLE_AUDIO_SRC, 0);
                 if (old_position != position && AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false)) {
-                    settingsChanged = true;
+                    mListener.fragCameraRestart(true);
                 }
                 AppPreference.setInt(AppPreference.KEY.BLE_AUDIO_SRC, position);
             }
@@ -1449,7 +1494,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(false);
                 int old_position = AppPreference.getInt(AppPreference.KEY.USB_BLE_AUDIO_SRC, 0);
                 if (old_position != position && AppPreference.getBool(AppPreference.KEY.BLUETOOTH_USB_MIC, false)) {
-                    settingsChanged = true;
+                    mListener.fragCameraRestart(true);
                 }
                 AppPreference.setInt(AppPreference.KEY.USB_BLE_AUDIO_SRC, position);
             }
@@ -1481,7 +1526,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(false);
                 int old_position = AppPreference.getInt(AppPreference.KEY.SAMPLE_RATE, 7);
                 if (old_position != position) {
-                    settingsChanged = true;
+                    mListener.fragCameraRestart(true);
                 }
                 AppPreference.setInt(AppPreference.KEY.SAMPLE_RATE, position);
             }
@@ -1506,7 +1551,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(false);
                 int old_position = AppPreference.getInt(AppPreference.KEY.USB_SAMPLE_RATE, 7);
                 if (old_position != position) {
-                    settingsChanged = true;
+                    mListener.fragCameraRestart(true);
                 }
                 AppPreference.setInt(AppPreference.KEY.USB_SAMPLE_RATE, position);
             }
@@ -1526,20 +1571,20 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         swt_radio_mode.setChecked(AppPreference.getBool(AppPreference.KEY.STREAMING_RADIO_MODE, false));
         swt_radio_mode.setOnClickListener(v -> {
             AppPreference.setBool(AppPreference.KEY.STREAMING_RADIO_MODE, swt_radio_mode.isChecked());
-            settingsChanged = true; // Mark that settings have changed
+            mListener.fragCameraRestart(true);
         });
 
         swt_adaptive_fps.setChecked(AppPreference.getBool(AppPreference.KEY.ADAPTIVE_FRAMERATE, false));
         swt_adaptive_fps.setOnClickListener(v -> {
             AppPreference.setBool(AppPreference.KEY.ADAPTIVE_FRAMERATE, swt_adaptive_fps.isChecked());
-            settingsChanged = true; // Mark that settings have changed
+            mListener.fragCameraRestart(true);
         });
 
         swt_radio_bluetooth.setChecked(AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false));
         swt_radio_bluetooth.setOnClickListener(v -> {
             boolean isOn = swt_radio_bluetooth.isChecked();
             handleBluetoothAudio(isOn);
-            settingsChanged = true; // Mark that settings have changed
+            mListener.fragCameraRestart(true);
         });
         handleBluetoothAudio(swt_radio_bluetooth.isChecked());
 
@@ -1547,7 +1592,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         usb_radio_bluetooth.setOnClickListener(v -> {
             boolean isOn = usb_radio_bluetooth.isChecked();
             handleUSBBluetoothAudio(isOn);
-            settingsChanged = true; // Mark that settings have changed
+            mListener.fragCameraRestart(true);
         });
         handleUSBBluetoothAudio(usb_radio_bluetooth.isChecked());
 
@@ -1672,7 +1717,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         });
 
         if (mActivity != null) {
-            if (LiveFragment.getInstance().is_usb_opened) {
+            if (mActivity.isUSBOpened()) {
                 usb_path_ll.setVisibility(View.VISIBLE);
                 initUSBResolutions();
             } else {
@@ -1761,10 +1806,10 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 mListener.isDialog(false);
-                int old_position = AppPreference.getInt(AppPreference.KEY.AUDIO_OPTION_AUDIO_SETTING, 0);
-                if (old_position != position && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false)) {
-                    settingsChanged = true;
-                }
+//                int old_position = AppPreference.getInt(AppPreference.KEY.AUDIO_OPTION_AUDIO_SETTING, 0);
+//                if (old_position != position && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false)) {
+//                    mListener.fragCameraRestart(true);
+//                }
                 AppPreference.setInt(AppPreference.KEY.AUDIO_OPTION_AUDIO_SETTING, position);
             }
 
@@ -1793,9 +1838,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 mListener.isDialog(false);
                 int old_position = AppPreference.getInt(AppPreference.KEY.AUDIO_OPTION_AUDIO_SRC, 0);
-                if (old_position != position && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false)) {
-                    settingsChanged = true;
-                }
+//                if (old_position != position && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false)) {
+//                    mListener.fragCameraRestart(true);
+//                }
                 AppPreference.setInt(AppPreference.KEY.AUDIO_OPTION_AUDIO_SRC, position);
             }
 
@@ -1823,9 +1868,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 int old_position = AppPreference.getInt(AppPreference.KEY.AUDIO_OPTION_BITRATE, 0);
-                if (old_position != position) {
-                    settingsChanged = true;
-                }
+//                if (old_position != position) {
+//                    mListener.fragCameraRestart(true);
+//                }
                 AppPreference.setInt(AppPreference.KEY.AUDIO_OPTION_BITRATE, position);
             }
 
@@ -1854,9 +1899,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 mListener.isDialog(false);
                 int old_position = AppPreference.getInt(AppPreference.KEY.AUDIO_OPTION_SAMPLE_RATE, 0);
-                if (old_position != position) {
-                    settingsChanged = true;
-                }
+//                if (old_position != position) {
+//                    mListener.fragCameraRestart(true);
+//                }
                 AppPreference.setInt(AppPreference.KEY.AUDIO_OPTION_SAMPLE_RATE, position);
             }
 
@@ -1885,9 +1930,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 mListener.isDialog(false);
                 int old_position = AppPreference.getInt(AppPreference.KEY.AUDIO_OPTION_CHANNEL_COUNT, 0);
-                if (old_position != position && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false)) {
-                    settingsChanged = true;
-                }
+//                if (old_position != position && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false)) {
+//                    mListener.fragCameraRestart(true);
+//                }
                 AppPreference.setInt(AppPreference.KEY.AUDIO_OPTION_CHANNEL_COUNT, position);
             }
 
@@ -1955,7 +2000,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(false);
                 int old_position = AppPreference.getInt(AppPreference.KEY.CODEC_SRC, 0);
                 if (old_position != position) {
-                    settingsChanged = true;
+                    mListener.fragCameraRestart(true);
                 }
                 AppPreference.setInt(AppPreference.KEY.CODEC_SRC, position);
 
@@ -1980,18 +2025,18 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     .simple_spinner_dropdown_item);
             spinner_usb_resolution.setAdapter(res_adapter);
 
-            int res_source = AppPreference.getSafeIntPreference(AppPreference.KEY.USB_RESOLUTION, 0);
+            int res_source = AppPreference.getInt(AppPreference.KEY.USB_RESOLUTION, 0);
             spinner_usb_resolution.setSelection(res_source);
             spinner_usb_resolution.setOnItemSelectedEvenIfUnchangedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                     mListener.isDialog(false);
-                    int old_position = AppPreference.getSafeIntPreference(AppPreference.KEY.USB_RESOLUTION, 0);
+                    int old_position = AppPreference.getInt(AppPreference.KEY.USB_RESOLUTION, 0);
                     if (old_position != position) {
-                        settingsChanged = true;
+                        mListener.fragCameraRestart(true);
                     }
                     if (isUSBOpen) {
-                        //  spinner_resolution.setSelection(position);
+                      //  spinner_resolution.setSelection(position);
                     }
                     AppPreference.setInt(AppPreference.KEY.USB_RESOLUTION, position);
                 }
@@ -2125,7 +2170,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 edt_usb_max_fps.setText(result);
             }
             if (is_changed) {
-                settingsChanged = true;
+                mListener.fragCameraRestart(true);
             }
         });
         dialog.setOnDismissListener(dialog1 -> mListener.isDialog(false));
@@ -2138,14 +2183,8 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
     @Override
     public void onPause() {
+
         super.onPause();
-
-        if (settingsChanged) {
-            Log.d("SettingsFragment", "Applying settings changes on pause");
-            settingsChanged = false;
-            mListener.fragCameraRestart(true);
-        }
-
         if (swt_convert_ui.isChecked()) {
             String pin = AppPreference.getStr(AppPreference.KEY.PIN_NUMBER, "");
             if (TextUtils.isEmpty(pin)) {
@@ -2164,20 +2203,19 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         txt_usb_cam.setText(usbCamName);
         boolean isEnabledNew = isAccessibilityServiceEnabled(getContext(), MyAccessibilityService.class);
         swt_radio_accessbility.setChecked(isEnabledNew);
-        if (isEnabledNew) {
-            txt_acc_status.setText("On");
-            txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
-        }else {
-            txt_acc_status.setText("Off");
-            txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
-        }
-        setCameraname();
+        // Accessibility status display removed - element not in layout
+        // if (isEnabledNew) {
+        //     txt_acc_status.setText("On");
+        //     txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
+        // }else {
+        //     txt_acc_status.setText("Off");
+        //     txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.RED));
+        // }
     }
 
-    public void setCameraname(){
-        String deviceName = AppPreference.getStr(AppPreference.KEY.USB_CAMERA_NAME, "");
+    public void setCameraname(String name ){
         usb_path_ll.setVisibility(View.VISIBLE);
-        txt_usb_cam.setText(deviceName);
+        txt_usb_cam.setText(name);
     }
 
     @Override
@@ -2265,126 +2303,84 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 }).show();
     }
 
-    void onCameraClick() {
-        onAddCamera();
-    }
+    public void OnClick(View view) {
+        switch (view.getId()) {
+            case R.id.txt_camera:
+                onAddCamera();
+                break;
+            case R.id.txt_update:
+                mListener.fragUpdateApp("");
+                break;
+            case R.id.txt_storage:
+                mListener.isDialog(true);
+                if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.Q) {
+                    checkStoragePermissions();
+                } else {
+                    openDirectory();
+                }
+                break;
+            case R.id.txt_reactivate:
+                onReactivate();
+                break;
+            case R.id.txt_check_update:
+                checkUpdate();
+                break;
+            case R.id.txt_exit:
+                exitApp();
+                break;
+            case R.id.txt_wifi_camera:
+//                onAddWifiCamera();
+                break;
+            case R.id.txt_beta_update:
+                mListener.fragUpdateApp(AppConstant.BETA_UPDATE);
+                break;
+            case R.id.txt_stream_details:
+                if (txt_stream_details.getText() == getString(R.string.show_details)) {
+                    ly_streaming_custom.setVisibility(View.VISIBLE);
+                    txt_stream_details.setText(R.string.return_defaults);
+                } else {
+                    ly_streaming_custom.setVisibility(View.GONE);
+                    txt_stream_details.setText(R.string.show_details);
+                    AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
+                    AppPreference.setInt(AppPreference.KEY.STREAMING_QUALITY, 1);
+                    onStreamDetails(false);
+                }
+                break;
+            case R.id.txt_video_details:
+                if (txt_video_details.getText() == getString(R.string.show_details)) {
+                    ly_video_custom.setVisibility(View.VISIBLE);
+                    txt_video_details.setText(R.string.return_defaults);
+                } else {
+                    ly_video_custom.setVisibility(View.GONE);
+                    txt_video_details.setText(R.string.show_details);
+                    AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
+                    AppPreference.setInt(AppPreference.KEY.VIDEO_QUALITY, 0);
+                    onVideoDetails(false);
+                }
+                break;
+            case R.id.txt_transcode:
+                mListener.isDialog(true);
+                TranscodeDialog dlg = new TranscodeDialog(requireContext());
+                dlg.setResultLisetner(is_changed -> {
+                    if (is_changed) {
+                        mListener.fragCameraRestart(true);
+                        mListener.stopFragWifiService();
 
-    void onUpdateClick() {
-        onUpdate();
-    }
-
-    void onStorageClick() {
-        checkStoragePermissions();
-    }
-
-    void onReactivateClick() {
-        onReactivate();
-    }
-
-    void onCheckUpdateClick() {
-        checkUpdate();
-    }
-
-    void onExitClick() {
-        exitApp();
-    }
-
-    void onWifiCameraClick() {
-        onAddWifiCamera(0);
-    }
-
-    void onBetaUpdateClick() {
-        onBetaUpdate();
-    }
-
-    void onStreamDetailsClick() {
-        onStreamDetails(false);
-    }
-
-    void onVideoDetailsClick() {
-        toggleVideoDetails();
-    }
-
-    void onUpdate() {
-        onUpdateClick();
-    }
-
-    void onStorage() {
-        checkStoragePermissions();
-    }
-
-    void onBetaUpdate() {
-        onBetaUpdateClick();
-    }
-
-    void onTranscode() {
-        // Open transcode dialog
-        if (mActivity != null) {
-            TranscodeDialog dialog = new TranscodeDialog(mActivity);
-            dialog.show();
+                    }
+                });
+                dlg.show();
+                break;
         }
     }
 
-    void onTranscodeClick() {
-        onTranscode();
-    }
-
     private void checkStoragePermissions() {
-        try {
-            // Check if fragment is attached to an activity
-            if (!isAdded() || getActivity() == null) {
-                Log.e("SettingsFragment", "Fragment not attached to activity, cannot check permissions");
-                return;
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                // Android 11+ (API 30+) - Use MANAGE_EXTERNAL_STORAGE
-                if (!Environment.isExternalStorageManager()) {
-                    try {
-                        Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                        intent.setData(Uri.parse("package:" + requireActivity().getPackageName()));
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        Log.e("SettingsFragment", "Failed to request MANAGE_EXTERNAL_STORAGE", e);
-                        Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                        startActivity(intent);
-                    }
-                } else {
-                    openDirectory();
-                }
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                // Android 13+ (API 33+) - Use granular media permissions
-                List<String> permissionsToRequest = new ArrayList<>();
-                if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-                    permissionsToRequest.add(Manifest.permission.READ_MEDIA_IMAGES);
-                }
-                if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
-                    permissionsToRequest.add(Manifest.permission.READ_MEDIA_VIDEO);
-                }
-                if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                    permissionsToRequest.add(Manifest.permission.READ_MEDIA_AUDIO);
-                }
-
-                if (!permissionsToRequest.isEmpty()) {
-                    ActivityCompat.requestPermissions(requireActivity(),
-                            permissionsToRequest.toArray(new String[0]),
-                            REQUEST_CODE_STORAGE_PERMISSION);
-                } else {
-                    openDirectory();
-                }
-            } else {
-                // Android 12 and below - Use legacy storage permissions
-                if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(requireActivity(), new String[]{
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_PERMISSION);
-                } else {
-                    openDirectory();
-                }
-            }
-        } catch (Exception e) {
-            Log.e("SettingsFragment", "Error checking storage permissions: " + e.getMessage(), e);
-            Toast.makeText(getContext(), "Error checking permissions: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        if (ContextCompat.checkSelfPermission(requireActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_PERMISSION);
+        } else {
+            openDirectory();
         }
     }
 
@@ -2404,92 +2400,86 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         }
     }
     private static final int REQUEST_CODE_PICK_FOLDER = 100;
-    // === inside SettingsFragment ===============================================
-
-    // Permission request for API ≤ 32 (Tiramisu granular + legacy)
-    private final ActivityResultLauncher<String[]> storagePermLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
-                    result -> openSafPicker());          // always continue
-
-    // SAF tree‑picker
-    private final ActivityResultLauncher<Intent> safLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                    res -> {
-                        if (res.getResultCode() == Activity.RESULT_OK && res.getData() != null) {
-                            Uri treeUri = res.getData().getData();
-                            if (treeUri != null) onSafFolderPicked(treeUri);
-                        }
-                    });
 
     private void openDirectory() {
-        if (!isAdded() || getActivity() == null) return;
-
-        AppPreference.setBool(AppPreference.KEY.IS_FOR_STORAGE_LOCATION, true);
-
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                // 1️⃣ Give OEM file‑managers something to match against
-                .addCategory(Intent.CATEGORY_DEFAULT)
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                        | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-
-        // 2️⃣ Try the stock picker first
-        if (intent.resolveActivity(requireActivity().getPackageManager()) != null) {
-            startActivityForResult(intent, REQUEST_CODE_PICK_FOLDER);
-            return;
-        }
-
-        requireActivity().runOnUiThread(this::checkStoragePermissionsAndPick);
-
+        AppPreference.setBool(AppPreference.KEY.IS_FOR_STORAGE_LOCATION,true);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        // Request read and write permission on the tree URI.
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        startActivityForResult(intent, REQUEST_CODE_PICK_FOLDER);
     }
 
-    private void onSafFolderPicked(@NonNull Uri treeUri) {
-        // Persist across reboots
-        final int flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
-        requireContext().getContentResolver()
-                .takePersistableUriPermission(treeUri, flags);
-
-        // Store and update UI
-        AppPreference.setStr(AppPreference.KEY.STORAGE_LOCATION, treeUri.toString());
-        AppPreference.setStr(AppPreference.KEY.GALLERY_PATH,   treeUri.toString());
-        txt_storage.setText(getFullPathFromTreeUri(treeUri));
-        showSelectedStorage(treeUri);          // your existing helper
-    }
-
-
-    private void checkStoragePermissionsAndPick() {
-        if (!isAdded()) return;
-
-        if (Build.VERSION.SDK_INT >= 33) {                     // Android 13+
-            String[] needed = Stream.of(
-                            Manifest.permission.READ_MEDIA_VIDEO,
-                            Manifest.permission.READ_MEDIA_IMAGES)
-                    .filter(p -> ContextCompat.checkSelfPermission(requireContext(), p)
-                            != PackageManager.PERMISSION_GRANTED)
-                    .toArray(String[]::new);
-
-            if (needed.length > 0) { storagePermLauncher.launch(needed); return; }
-        } else if (Build.VERSION.SDK_INT <= 32) {              // Android 12 and lower
-            if (ContextCompat.checkSelfPermission(requireContext(),
-                    Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                storagePermLauncher.launch(new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE });
-                return;
+    public static String saveImageFromUrl(Context context, String imageUrl) {
+        try {
+            // Create custom folder in external storage
+            File folder = new File(context.getExternalFilesDir(null).getAbsolutePath());
+            if (!folder.exists()) {
+                folder.mkdirs(); // Create the folder if it doesn't exist
             }
-        }
 
-        // permissions OK → open SAF
-        openSafPicker();
+            // Create the file where the image will be saved
+            File imageFile = new File(folder, ".jpg");
+
+            // Download the image from URL
+            URL url = new URL(imageUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream inputStream = connection.getInputStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
+            // Save the bitmap to the file
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            outputStream.flush();
+            outputStream.close();
+
+            return imageFile.getAbsolutePath(); // Return the saved file path
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Return null if an error occurs
+        }
     }
 
-    private void openSafPicker() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                        | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+    void onVideoDetails(boolean isShowDetail) {
+        int video_quality = AppPreference.getInt(AppPreference.KEY.VIDEO_QUALITY, 0);
+        boolean isNative = AppPreference.getBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, false);
+        if (video_quality == 0 && isNative) { // High
+            onVideoHigh();
+        } else if (video_quality == 1 && isNative) { // Medium
+            onVideoMedium();
+        } else if (video_quality == 2 && isNative) { // Low
+            onVideoLow();
+        } else if (video_quality == 3 && isNative) { // super Low
+            onVideoSuperLow();
+        }else if (video_quality == 4 && isNative) {  // USB
+            onVideoUSB();
+        }else if (video_quality == 5) { // custom
+            setStreamValue(5);
+            AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION,false);
+        }
+        if (video_quality >= 5 || isShowDetail) {
+            ly_video_custom.setVisibility(View.VISIBLE);
+        }else {
+            ly_video_custom.setVisibility(View.GONE);
+        }
+        spinner_resolution.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
+        spinner_frame.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
+        edt_bitrate.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
+        edt_keyFrame.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
+    }
+    boolean isUserInteracting = false; // Prevents unnecessary UI loopss
 
-        safLauncher.launch(intent);
+    void setStreamQuality(int index) {
+        streaming_resolution.post(() -> {
+            Log.d("DEBUG", "Restoring Streaming Quality Position: " + index);
+            isUserInteracting = false;
+            AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION,index);
+            streaming_resolution.setSelection(index, false);
+            streaming_resolution.postDelayed(() -> isUserInteracting = true, 200);
+            AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, false);
+            onStreamDetails(false);
+        });
     }
 
     void setStreamValue(int index) {
@@ -2514,33 +2504,20 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
     }
 
     void onVideoLow() {
-        // Find the best available resolution for low quality
-        int index = -1;
-        String targetResolution = "640x360";
-
-        // First try to find exact match
-        index = Arrays.asList(record_sizes).indexOf(targetResolution);
-
-        // If not found, find the closest lower resolution
-        if (index < 0) {
-            for (int i = 0; i < record_sizes.length; i++) {
-                String[] parts = record_sizes[i].split("x");
-                if (parts.length == 2) {
-                    int width = Integer.parseInt(parts[0]);
-                    if (width <= 640) {
-                        index = i;
-                        break;
-                    }
+        int index = Arrays.asList(record_sizes).indexOf("640x360");
+        boolean isUSBOpen = AppPreference.getBool(AppPreference.KEY.IS_USB_OPENED, false);
+        if (isUSBOpen) {
+            if (index < 0) {
+                int resolution = AppPreference.getInt(AppPreference.KEY.VIDEO_RESOLUTION, 0);
+                List<String> sortedResolutions = sharedViewModel.getCameraResolution();
+                if (resolution >= sortedResolutions.size()) {
+                    resolution = 0;
+                    AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, resolution);
                 }
+                index = resolution;
             }
         }
-
-        // If still not found, use the lowest available resolution
-        if (index < 0) {
-            index = record_sizes.length - 1;
-        }
-
-        AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, index);
+        AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, index); // 720x480
         spinner_resolution.setSelection(index);
         AppPreference.setInt(AppPreference.KEY.VIDEO_FRAME, 15);
         spinner_frame.setSelection(3);
@@ -2551,39 +2528,13 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         Log.d("DEBUG", "Saved Position: " + 3);
         setStreamValue(3);
         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
-        ly_video_custom.setVisibility(View.VISIBLE);
-        txt_video_details.setText(R.string.return_defaults);
-        // Don't immediately restart camera - settings will be applied when leaving settings
+        ly_video_custom.setVisibility(View.GONE);
+        txt_video_details.setText(R.string.show_details);
     }
 
     void onVideoSuperLow() {
-        // Find the best available resolution for super low quality
-        int index = -1;
-        String targetResolution = "320x180";
-
-        // First try to find exact match
-        index = Arrays.asList(record_sizes).indexOf(targetResolution);
-
-        // If not found, find the closest lower resolution
-        if (index < 0) {
-            for (int i = 0; i < record_sizes.length; i++) {
-                String[] parts = record_sizes[i].split("x");
-                if (parts.length == 2) {
-                    int width = Integer.parseInt(parts[0]);
-                    if (width <= 320) {
-                        index = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // If still not found, use the lowest available resolution
-        if (index < 0) {
-            index = record_sizes.length - 1;
-        }
-
-        AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, index);
+        int index = Arrays.asList(record_sizes).indexOf("320x180");
+        AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, index); // 640x360
         spinner_resolution.setSelection(index);
         AppPreference.setInt(AppPreference.KEY.VIDEO_FRAME, 15);
         spinner_frame.setSelection(3);
@@ -2594,16 +2545,15 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         Log.d("DEBUG", "Saved Position: " + 3);
         setStreamValue(3);
         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
-        ly_video_custom.setVisibility(View.VISIBLE);
-        txt_video_details.setText(R.string.return_defaults);
-        // Don't immediately restart camera - settings will be applied when leaving settings
+        ly_video_custom.setVisibility(View.GONE);
+        txt_video_details.setText(R.string.show_details);
     }
 
     void onVideoUSB() {
         if (sharedViewModel != null) {
             List<String> sortedResolutions = sharedViewModel.getCameraResolution();
             if (sortedResolutions.isEmpty()) {
-                //   return;
+             //   return;
                 Toast.makeText(getContext(),"USB Device not connected",Toast.LENGTH_SHORT).show();
             }
             int index = Arrays.asList(record_sizes).indexOf("1920x1080");
@@ -2631,38 +2581,24 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         Log.d("DEBUG", "Saved Position: " + 4);
         setStreamValue(4);
         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
-        ly_video_custom.setVisibility(View.VISIBLE);
-        txt_video_details.setText(R.string.return_defaults);
-        // Don't immediately restart camera - settings will be applied when leaving settings
+        ly_video_custom.setVisibility(View.GONE);
+        txt_video_details.setText(R.string.show_details);
     }
 
     void onVideoMedium() {
-        // Find the best available resolution for medium quality
-        int index = -1;
-        String targetResolution = "1280x720";
-
-        // First try to find exact match
-        index = Arrays.asList(record_sizes).indexOf(targetResolution);
-
-        // If not found, find the closest resolution
-        if (index < 0) {
-            for (int i = 0; i < record_sizes.length; i++) {
-                String[] parts = record_sizes[i].split("x");
-                if (parts.length == 2) {
-                    int width = Integer.parseInt(parts[0]);
-                    if (width >= 1280) {
-                        index = i;
-                        break;
-                    }
+        int index = Arrays.asList(record_sizes).indexOf("1280x720");
+        boolean isUSBOpen = AppPreference.getBool(AppPreference.KEY.IS_USB_OPENED, false);
+        if (isUSBOpen) {
+            if (index < 0) {
+                int resolution = AppPreference.getInt(AppPreference.KEY.VIDEO_RESOLUTION, 0);
+                List<String> sortedResolutions = sharedViewModel.getCameraResolution();
+                if (resolution >= sortedResolutions.size()) {
+                    resolution = 0;
+                    AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, resolution);
                 }
+                index = resolution;
             }
         }
-
-        // If still not found, use the highest available resolution
-        if (index < 0) {
-            index = 0;
-        }
-
         AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, index);
         spinner_resolution.setSelection(index);
         AppPreference.setInt(AppPreference.KEY.VIDEO_FRAME, 30);
@@ -2674,39 +2610,25 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         Log.d("DEBUG", "Saved Position: " + 2);
         setStreamValue(2);
         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
-        ly_video_custom.setVisibility(View.VISIBLE);
-        txt_video_details.setText(R.string.return_defaults);
-        // Don't immediately restart camera - settings will be applied when leaving settings
+        ly_video_custom.setVisibility(View.GONE);
+        txt_video_details.setText(R.string.show_details);
     }
 
     public void onVideoHigh() {
-        // Find the best available resolution for high quality
-        int index = -1;
-        String targetResolution = "1920x1080";
-
-        // First try to find exact match
-        index = Arrays.asList(record_sizes).indexOf(targetResolution);
-
-        // If not found, find the closest resolution
-        if (index < 0) {
-            for (int i = 0; i < record_sizes.length; i++) {
-                String[] parts = record_sizes[i].split("x");
-                if (parts.length == 2) {
-                    int width = Integer.parseInt(parts[0]);
-                    if (width >= 1920) {
-                        index = i;
-                        break;
-                    }
+        int index = Arrays.asList(record_sizes).indexOf("1920x1080");
+        boolean isUSBOpen = AppPreference.getBool(AppPreference.KEY.IS_USB_OPENED, false);
+        if (isUSBOpen) {
+            if (index < 0) {
+                int resolution = AppPreference.getInt(AppPreference.KEY.VIDEO_RESOLUTION, 0);
+                List<String> sortedResolutions = sharedViewModel.getCameraResolution();
+                if (resolution >= sortedResolutions.size()) {
+                    resolution = 0;
+                    AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, resolution);
                 }
+                index = resolution;
             }
         }
-
-        // If still not found, use the highest available resolution
-        if (index < 0) {
-            index = 0;
-        }
-
-        AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, index);
+        AppPreference.setInt(AppPreference.KEY.VIDEO_RESOLUTION, index); // 1920x1080
         spinner_resolution.setSelection(index);
         AppPreference.setInt(AppPreference.KEY.VIDEO_FRAME, 30);
         spinner_frame.setSelection(6);
@@ -2717,9 +2639,8 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         Log.d("DEBUG", "Saved Position: " + 1);
         setStreamValue(1);
         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
-        ly_video_custom.setVisibility(View.VISIBLE);
-        txt_video_details.setText(R.string.return_defaults);
-        // Don't immediately restart camera - settings will be applied when leaving settings
+        ly_video_custom.setVisibility(View.GONE);
+        txt_video_details.setText(R.string.show_details);
     }
 
     void onStreamDetails(boolean isShowDetail) {
@@ -2733,61 +2654,44 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             onStreamLow();
         } else if (stream_quality == 3 && isNative) { // super Low
             onStreamSuperLow();
-        } else if (stream_quality == 4 && isNative) { // USB
+        }else if (stream_quality == 4 && isNative) { // USB
             onStreamUSBHigh();
-        } else if (stream_quality == 5) { // custom
+        }else if (stream_quality == 5) { // custom}
             AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, false);
-            // Enable all controls for custom mode
-            streaming_resolution.setEnabled(true);
-            streaming_frame.setEnabled(true);
-            streaming_audio_bitrate.setEnabled(true);
-            edt_streaming_bitrate.setEnabled(true);
-            edt_streaming_keyFrame.setEnabled(true);
-            swt_radio_mode.setEnabled(true);
-            swt_radio_bluetooth.setEnabled(true);
-            spinner_audio_src.setEnabled(true);
-            spinner_sample_rate.setEnabled(true);
-            spinner_adaptive.setEnabled(true);
-            swt_adaptive_fps.setEnabled(true);
         }
-
-        // Always show streaming custom settings expanded by default
-        ly_streaming_custom.setVisibility(View.VISIBLE);
-        txt_stream_details.setText(R.string.return_defaults);
-
-        // Adaptive controls should always be enabled for all modes
-        spinner_adaptive.setEnabled(true);
-        swt_adaptive_fps.setEnabled(true);
+        if (stream_quality >= 5 || isShowDetail) {
+            ly_streaming_custom.setVisibility(View.VISIBLE);
+        }else {
+            ly_streaming_custom.setVisibility(View.GONE);
+        }
+        streaming_resolution.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
+        streaming_frame.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
+        streaming_audio_bitrate.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
+        edt_streaming_bitrate.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
+        edt_streaming_keyFrame.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
+        swt_radio_mode.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
+        swt_radio_bluetooth.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
+        spinner_audio_src.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
+        spinner_sample_rate.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
+        spinner_adaptive.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
+        swt_adaptive_fps.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
     }
 
     void onStreamLow() {
-        // Find the best available resolution for low quality
-        int index = -1;
-        String targetResolution = "640x360";
-
-        // First try to find exact match
-        index = Arrays.asList(camera_sizes).indexOf(targetResolution);
-
-        // If not found, find the closest lower resolution
-        if (index < 0) {
-            for (int i = 0; i < camera_sizes.length; i++) {
-                String[] parts = camera_sizes[i].split("x");
-                if (parts.length == 2) {
-                    int width = Integer.parseInt(parts[0]);
-                    if (width <= 640) {
-                        index = i;
-                        break;
-                    }
+        int index = Arrays.asList(camera_sizes).indexOf("640x360");
+        boolean isUSBOpen = AppPreference.getBool(AppPreference.KEY.IS_USB_OPENED, false);
+        if (isUSBOpen) {
+            if (index < 0) {
+                int resolution = AppPreference.getInt(AppPreference.KEY.STREAMING_RESOLUTION, 0);
+                List<String> sortedResolutions = sharedViewModel.getCameraResolution();
+                if (resolution >= sortedResolutions.size()) {
+                    resolution = 0;
+                    AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, resolution);
                 }
+                index = resolution;
             }
         }
-
-        // If still not found, use the lowest available resolution
-        if (index < 0) {
-            index = camera_sizes.length - 1;
-        }
-
-        AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, index);
+        AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, index); // 640x480
         streaming_resolution.setSelection(index);
         AppPreference.setInt(AppPreference.KEY.STREAMING_FRAME, 15);
         setStreamFPS(15);
@@ -2796,54 +2700,26 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         AppPreference.setInt(AppPreference.KEY.STREAMING_KEYFRAME, 1);
         edt_streaming_keyFrame.setText("1");
         setRecordValue(1);
-        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
-        ly_streaming_custom.setVisibility(View.VISIBLE);
-        txt_stream_details.setText(R.string.return_defaults);
-
-        // Disable custom controls for preset modes
-        streaming_resolution.setEnabled(false);
-        streaming_frame.setEnabled(false);
-        streaming_audio_bitrate.setEnabled(false);
-        edt_streaming_bitrate.setEnabled(false);
-        edt_streaming_keyFrame.setEnabled(false);
-        swt_radio_mode.setEnabled(false);
-        swt_radio_bluetooth.setEnabled(false);
-        spinner_audio_src.setEnabled(false);
-        spinner_sample_rate.setEnabled(false);
-
-        // Adaptive controls should always be enabled
-        spinner_adaptive.setEnabled(true);
-        swt_adaptive_fps.setEnabled(true);
+        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING,true);
+        ly_streaming_custom.setVisibility(View.GONE);
+        txt_stream_details.setText(R.string.show_details);
     }
 
     void onStreamSuperLow() {
-        // Find the best available resolution for super low quality
-        int index = -1;
-        String targetResolution = "320x180";
-
-        // First try to find exact match
-        index = Arrays.asList(camera_sizes).indexOf(targetResolution);
-
-        // If not found, find the closest lower resolution
-        if (index < 0) {
-            for (int i = 0; i < camera_sizes.length; i++) {
-                String[] parts = camera_sizes[i].split("x");
-                if (parts.length == 2) {
-                    int width = Integer.parseInt(parts[0]);
-                    if (width <= 320) {
-                        index = i;
-                        break;
-                    }
+        int index = Arrays.asList(camera_sizes).indexOf("320x180");
+        boolean isUSBOpen = AppPreference.getBool(AppPreference.KEY.IS_USB_OPENED, false);
+        if (isUSBOpen) {
+            if (index < 0) {
+                int resolution = AppPreference.getInt(AppPreference.KEY.STREAMING_RESOLUTION, 0);
+                List<String> sortedResolutions = sharedViewModel.getCameraResolution();
+                if (resolution >= sortedResolutions.size()) {
+                    resolution = 0;
+                    AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, resolution);
                 }
+                index = resolution;
             }
         }
-
-        // If still not found, use the lowest available resolution
-        if (index < 0) {
-            index = camera_sizes.length - 1;
-        }
-
-        AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, index);
+        AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, index); // 640x480
         streaming_resolution.setSelection(index);
         AppPreference.setInt(AppPreference.KEY.STREAMING_FRAME, 15);
         setStreamFPS(15);
@@ -2852,54 +2728,26 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         AppPreference.setInt(AppPreference.KEY.STREAMING_KEYFRAME, 1);
         edt_streaming_keyFrame.setText("1");
         setRecordValue(2);
-        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
-        ly_streaming_custom.setVisibility(View.VISIBLE);
-        txt_stream_details.setText(R.string.return_defaults);
-
-        // Disable custom controls for preset modes
-        streaming_resolution.setEnabled(false);
-        streaming_frame.setEnabled(false);
-        streaming_audio_bitrate.setEnabled(false);
-        edt_streaming_bitrate.setEnabled(false);
-        edt_streaming_keyFrame.setEnabled(false);
-        swt_radio_mode.setEnabled(false);
-        swt_radio_bluetooth.setEnabled(false);
-        spinner_audio_src.setEnabled(false);
-        spinner_sample_rate.setEnabled(false);
-
-        // Adaptive controls should always be enabled
-        spinner_adaptive.setEnabled(true);
-        swt_adaptive_fps.setEnabled(true);
+        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING,true);
+        ly_streaming_custom.setVisibility(View.GONE);
+        txt_stream_details.setText(R.string.show_details);
     }
 
     public void onStreamMedium() {
-        // Find the best available resolution for medium quality
-        int index = -1;
-        String targetResolution = "960x540";
-
-        // First try to find exact match
-        index = Arrays.asList(camera_sizes).indexOf(targetResolution);
-
-        // If not found, find the closest resolution
-        if (index < 0) {
-            for (int i = 0; i < camera_sizes.length; i++) {
-                String[] parts = camera_sizes[i].split("x");
-                if (parts.length == 2) {
-                    int width = Integer.parseInt(parts[0]);
-                    if (width >= 960) {
-                        index = i;
-                        break;
-                    }
+        int index = Arrays.asList(camera_sizes).indexOf("960x540");
+        boolean isUSBOpen = AppPreference.getBool(AppPreference.KEY.IS_USB_OPENED, false);
+        if (isUSBOpen) {
+            if (index < 0) {
+                int resolution = AppPreference.getInt(AppPreference.KEY.STREAMING_RESOLUTION, 0);
+                List<String> sortedResolutions = sharedViewModel.getCameraResolution();
+                if (resolution >= sortedResolutions.size()) {
+                    resolution = 0;
+                    AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, resolution);
                 }
+                index = resolution;
             }
         }
-
-        // If still not found, use the highest available resolution
-        if (index < 0) {
-            index = 0;
-        }
-
-        AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, index);
+        AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, index); // 720x480
         streaming_resolution.setSelection(index);
         AppPreference.setInt(AppPreference.KEY.STREAMING_FRAME, 30);
         setStreamFPS(30);
@@ -2908,53 +2756,25 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         AppPreference.setInt(AppPreference.KEY.STREAMING_KEYFRAME, 1);
         edt_streaming_keyFrame.setText("1");
         setRecordValue(0);
-        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
-        ly_streaming_custom.setVisibility(View.VISIBLE);
-        txt_stream_details.setText(R.string.return_defaults);
-
-        // Disable custom controls for preset modes
-        streaming_resolution.setEnabled(false);
-        streaming_frame.setEnabled(false);
-        streaming_audio_bitrate.setEnabled(false);
-        edt_streaming_bitrate.setEnabled(false);
-        edt_streaming_keyFrame.setEnabled(false);
-        swt_radio_mode.setEnabled(false);
-        swt_radio_bluetooth.setEnabled(false);
-        spinner_audio_src.setEnabled(false);
-        spinner_sample_rate.setEnabled(false);
-
-        // Adaptive controls should always be enabled
-        spinner_adaptive.setEnabled(true);
-        swt_adaptive_fps.setEnabled(true);
+        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING,true);
+        ly_streaming_custom.setVisibility(View.GONE);
+        txt_stream_details.setText(R.string.show_details);
     }
 
     void onStreamHigh() {
-        // Find the best available resolution for high quality
-        int index = -1;
-        String targetResolution = "1280x720";
-
-        // First try to find exact match
-        index = Arrays.asList(camera_sizes).indexOf(targetResolution);
-
-        // If not found, find the closest resolution
-        if (index < 0) {
-            for (int i = 0; i < camera_sizes.length; i++) {
-                String[] parts = camera_sizes[i].split("x");
-                if (parts.length == 2) {
-                    int width = Integer.parseInt(parts[0]);
-                    if (width >= 1280) {
-                        index = i;
-                        break;
-                    }
+        int index = Arrays.asList(camera_sizes).indexOf("1280x720");
+        boolean isUSBOpen = AppPreference.getBool(AppPreference.KEY.IS_USB_OPENED, false);
+        if (isUSBOpen) {
+            if (index < 0) {
+                int resolution = AppPreference.getInt(AppPreference.KEY.STREAMING_RESOLUTION, 0);
+                List<String> sortedResolutions = sharedViewModel.getCameraResolution();
+                if (resolution >= sortedResolutions.size()) {
+                    resolution = 0;
+                    AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, resolution);
                 }
+                index = resolution;
             }
         }
-
-        // If still not found, use the highest available resolution
-        if (index < 0) {
-            index = 0;
-        }
-
         AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, index);
         streaming_resolution.setSelection(index);
         AppPreference.setInt(AppPreference.KEY.STREAMING_FRAME, 30);
@@ -2964,42 +2784,19 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         AppPreference.setInt(AppPreference.KEY.STREAMING_KEYFRAME, 1);
         edt_streaming_keyFrame.setText("1");
         setRecordValue(0);
-        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
-        ly_streaming_custom.setVisibility(View.VISIBLE);
-        txt_stream_details.setText(R.string.return_defaults);
-
-        // Disable custom controls for preset modes
-        streaming_resolution.setEnabled(false);
-        streaming_frame.setEnabled(false);
-        streaming_audio_bitrate.setEnabled(false);
-        edt_streaming_bitrate.setEnabled(false);
-        edt_streaming_keyFrame.setEnabled(false);
-        swt_radio_mode.setEnabled(false);
-        swt_radio_bluetooth.setEnabled(false);
-        spinner_audio_src.setEnabled(false);
-        spinner_sample_rate.setEnabled(false);
-
-        // Adaptive controls should always be enabled
-        spinner_adaptive.setEnabled(true);
-        swt_adaptive_fps.setEnabled(true);
+        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING,true);
+        ly_streaming_custom.setVisibility(View.GONE);
+        txt_stream_details.setText(R.string.show_details);
     }
 
     void onStreamUSBHigh() {
         if (sharedViewModel != null) {
             List<String> sortedResolutions = sharedViewModel.getCameraResolution();
             if (sortedResolutions.isEmpty()) {
+                //   return;
                 Toast.makeText(getContext(), "USB Device not connected", Toast.LENGTH_SHORT).show();
-                return;
             }
-
-            // Find the best available resolution for USB high quality
-            int index = -1;
-            String targetResolution = "1280x720";
-
-            // First try to find exact match
-            index = Arrays.asList(camera_sizes).indexOf(targetResolution);
-
-            // If not found, try other common resolutions
+            int index = Arrays.asList(camera_sizes).indexOf("1280x720");
             if (index < 0) {
                 index = Arrays.asList(camera_sizes).indexOf("640x480");
             }
@@ -3009,12 +2806,6 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             if (index < 0) {
                 index = Arrays.asList(camera_sizes).indexOf("320x180");
             }
-
-            // If still not found, use the highest available resolution
-            if (index < 0) {
-                index = 0;
-            }
-
             AppPreference.setInt(AppPreference.KEY.STREAMING_RESOLUTION, index);
             streaming_resolution.setSelection(index);
             AppPreference.setInt(AppPreference.KEY.STREAMING_FRAME, 30);
@@ -3024,23 +2815,8 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             AppPreference.setInt(AppPreference.KEY.STREAMING_KEYFRAME, 1);
             edt_streaming_keyFrame.setText("1");
             setRecordValue(4);
-            ly_streaming_custom.setVisibility(View.VISIBLE);
-            txt_stream_details.setText(R.string.return_defaults);
-
-            // Disable custom controls for preset modes
-            streaming_resolution.setEnabled(false);
-            streaming_frame.setEnabled(false);
-            streaming_audio_bitrate.setEnabled(false);
-            edt_streaming_bitrate.setEnabled(false);
-            edt_streaming_keyFrame.setEnabled(false);
-            swt_radio_mode.setEnabled(false);
-            swt_radio_bluetooth.setEnabled(false);
-            spinner_audio_src.setEnabled(false);
-            spinner_sample_rate.setEnabled(false);
-
-            // Adaptive controls should always be enabled
-            spinner_adaptive.setEnabled(true);
-            swt_adaptive_fps.setEnabled(true);
+            ly_streaming_custom.setVisibility(View.GONE);
+            txt_stream_details.setText(R.string.show_details);
         }
     }
 
@@ -3120,7 +2896,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             txt_storage.setText(getFullPathFromTreeUri(mSelectedFolderUri));
             showSelectedStorage(mSelectedFolderUri);
             // Persist permissions across device reboots.
-            final int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             mActivity.getContentResolver().takePersistableUriPermission(mSelectedFolderUri, takeFlags);
         }
         else if (requestCode == REQUEST_CODE_MOVE_FILES && resultCode == RESULT_OK && data != null) {
@@ -3215,59 +2991,19 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
     }
 
     public String getFullPathFromTreeUri(Uri treeUri) {
-        if (treeUri == null || treeUri.toString().isEmpty()) return null;
-
-        // Handle file URIs (legacy file paths)
-        if ("file".equals(treeUri.getScheme())) {
-            return treeUri.getPath();
+        if (treeUri == null || treeUri.toString().isEmpty() == true) return null;
+        if (treeUri.toString().contains("/0/")) {
+            return treeUri.toString();
         }
+        String docId = DocumentsContract.getTreeDocumentId(treeUri);
+        String[] split = docId.split(":");
+        String storageType = split[0];
+        String relativePath = "";
 
-        try {
-            if (treeUri.toString().contains("/0/")) {
-                return treeUri.toString();
-            }
-            String docId = DocumentsContract.getTreeDocumentId(treeUri);
-            String[] split = docId.split(":");
-            String storageType = split[0];
-            String relativePath = "";
-
-            if (split.length >= 2) {
-                relativePath = split[1];
-            }
-            return "/storage/" + storageType + "/" + relativePath;
-        } catch (IllegalArgumentException e) {
-            Log.e("SettingsFragment", "Invalid tree URI: " + treeUri, e);
-            return null;
-        } catch (Exception e) {
-            Log.e("SettingsFragment", "Error parsing tree URI: " + treeUri, e);
-            return null;
+        if (split.length >= 2) {
+            relativePath = split[1];
         }
-    }
-
-    private boolean isValidSAFUri(String uriString) {
-        if (uriString == null || uriString.isEmpty()) {
-            return false;
-        }
-
-        try {
-            Uri uri = Uri.parse(uriString);
-            // Check if it's a valid SAF URI (content:// scheme)
-            if (!"content".equals(uri.getScheme())) {
-                return false;
-            }
-
-            // Validate that it's a tree URI
-            if (!uri.toString().contains("/tree/")) {
-                return false;
-            }
-
-            // Try to get the document ID to validate
-            DocumentsContract.getTreeDocumentId(uri);
-            return true;
-        } catch (Exception e) {
-            Log.w("SettingsFragment", "Invalid SAF URI: " + uriString, e);
-            return false;
-        }
+        return "/storage/" + storageType + "/" + relativePath;
     }
 
     private void copyUriToFile(Uri uri, File dst) throws IOException {
@@ -3311,7 +3047,6 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         intent.putExtra(Intent.EXTRA_TITLE, fileName); // Suggest a filename
         startActivityForResult(intent, REQUEST_CODE_SAVE_FILE);
     }
-
 
     void connectWIFI(String ssid, int camera_type, String password) {
         if (TextUtils.isEmpty(password)) {
@@ -3400,7 +3135,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         serialDialog.setOkListener(view -> {
             mListener.isDialog(false);
             serialDialog.dismiss();
-            String password = serialDialog.getEdtPassword().getText().toString();
+            String password = serialDialog.edt_password.getText().toString();
             connectWIFI(ssid, camera_type, password);
         });
         serialDialog.setCloseListener(view -> {
@@ -3506,7 +3241,6 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         });
     }
 
-
     void onReactivate() {
         mListener.isDialog(true);
         MessageDialog messageDialog = MessageDialog
@@ -3537,17 +3271,6 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
     }
 
-    @Override
-    public void onFragmentVisible() {
-
-    }
-
-
-    @Override
-    public void onFragmentHidden() {
-
-    }
-
     public class ListAdapter extends BaseAdapter {
 
         private LayoutInflater mInflater;
@@ -3572,9 +3295,16 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         }
 
         public class ViewHolder {
+            @Nullable
             TextView txt_name;
+
+            @Nullable
             Switch swt_camera;
+
+            @Nullable
             ImageView ic_edit;
+
+            @Nullable
             ImageView ic_delete;
         }
 
@@ -3588,10 +3318,13 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     convertView = mInflater.inflate(R.layout.row_camera, parent, false);
                 }
                 holder = new ViewHolder();
+                
+                // Initialize ViewHolder UI elements
                 holder.txt_name = convertView.findViewById(R.id.txt_name);
                 holder.swt_camera = convertView.findViewById(R.id.swt_camera);
                 holder.ic_edit = convertView.findViewById(R.id.ic_edit);
                 holder.ic_delete = convertView.findViewById(R.id.ic_delete);
+                
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -3646,6 +3379,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                                 @Override
                                 public boolean onClick(MessageDialog baseDialog, View v) {
                                     AppPreference.removeKey(AppPreference.KEY.SELECTED_POSITION);
+                                    mListener.stopFragWifiService();
                                     DBManager.getInstance().deleteCamera(camera.id);
                                     initialize();
                                     mListener.fragUpdateMenu(true);
@@ -3679,7 +3413,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         codeDialog.setOkListener(view -> {
             codeDialog.dismiss();
             mListener.isDialog(false);
-            String encryption_code = codeDialog.getEdtCode().getText().toString();
+            String encryption_code = codeDialog.edt_code.getText().toString();
             if (!TextUtils.isEmpty(encryption_code)) {
                 AppPreference.setStr(AppPreference.KEY.ENCRYPTION_KEY, encryption_code);
                 AppPreference.setBool(AppPreference.KEY.FILE_ENCRYPTION, true);
@@ -3691,98 +3425,5 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             }
         });
         codeDialog.show();
-    }
-
-    // Toggle video details visibility
-    void toggleVideoDetails() {
-        boolean isCurrentlyVisible = ly_video_custom.getVisibility() == View.VISIBLE;
-        if (isCurrentlyVisible) {
-            // Hide details
-            ly_video_custom.setVisibility(View.GONE);
-            txt_video_details.setText(R.string.show_details);
-        } else {
-            // Show details and apply current quality settings
-            ly_video_custom.setVisibility(View.VISIBLE);
-            txt_video_details.setText(R.string.return_defaults);
-            // Apply current quality settings to detail fields
-            applyCurrentVideoQualitySettings();
-        }
-    }
-
-    // Toggle streaming details visibility
-    void toggleStreamDetails() {
-        boolean isCurrentlyVisible = ly_streaming_custom.getVisibility() == View.VISIBLE;
-        if (isCurrentlyVisible) {
-            // Hide details
-            ly_streaming_custom.setVisibility(View.GONE);
-            txt_stream_details.setText(R.string.show_details);
-        } else {
-            // Show details and apply current quality settings
-            ly_streaming_custom.setVisibility(View.VISIBLE);
-            txt_stream_details.setText(R.string.return_defaults);
-            // Apply current quality settings to detail fields
-            applyCurrentStreamingQualitySettings();
-        }
-    }
-
-    // Apply current video quality settings to detail fields
-    void applyCurrentVideoQualitySettings() {
-        int video_quality = AppPreference.getInt(AppPreference.KEY.VIDEO_QUALITY, 0);
-        boolean isNative = AppPreference.getBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, false);
-
-        if (video_quality == 0 && isNative) { // High
-            onVideoHigh();
-        } else if (video_quality == 1 && isNative) { // Medium
-            onVideoMedium();
-        } else if (video_quality == 2 && isNative) { // Low
-            onVideoLow();
-        } else if (video_quality == 3 && isNative) { // super Low
-            onVideoSuperLow();
-        } else if (video_quality == 4 && isNative) {  // USB
-            onVideoUSB();
-        } else if (video_quality == 5) { // custom
-            setStreamValue(5);
-            AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, false);
-        }
-
-        // Enable/disable controls based on quality
-        spinner_resolution.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
-        spinner_frame.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
-        edt_bitrate.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
-        edt_keyFrame.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
-    }
-
-    // Apply current streaming quality settings to detail fields
-    void applyCurrentStreamingQualitySettings() {
-        int stream_quality = AppPreference.getInt(AppPreference.KEY.STREAMING_QUALITY, 1);
-        boolean isNative = AppPreference.getBool(AppPreference.KEY.IS_NATIVE_STREAMING, false);
-
-        if (stream_quality == 0 && isNative) { // High
-            onStreamHigh();
-        } else if (stream_quality == 1 && isNative) { // Medium
-            onStreamMedium();
-        } else if (stream_quality == 2 && isNative) { // Low
-            onStreamLow();
-        } else if (stream_quality == 3 && isNative) { // super Low
-            onStreamSuperLow();
-        } else if (stream_quality == 4 && isNative) { // USB
-            onStreamUSBHigh();
-        } else if (stream_quality == 5) { // custom
-            AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, false);
-            // Enable all controls for custom mode
-            streaming_resolution.setEnabled(true);
-            streaming_frame.setEnabled(true);
-            streaming_audio_bitrate.setEnabled(true);
-            edt_streaming_bitrate.setEnabled(true);
-            edt_streaming_keyFrame.setEnabled(true);
-            swt_radio_mode.setEnabled(true);
-            swt_radio_bluetooth.setEnabled(true);
-            spinner_audio_src.setEnabled(true);
-            spinner_sample_rate.setEnabled(true);
-        }
-
-        // Adaptive controls should always be enabled for all modes
-        spinner_adaptive.setEnabled(true);
-        swt_adaptive_fps.setEnabled(true);
     }
 }

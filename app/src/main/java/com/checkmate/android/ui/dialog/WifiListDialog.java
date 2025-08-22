@@ -13,7 +13,6 @@ import android.widget.BaseAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
 import com.checkmate.android.R;
-import com.checkmate.android.databinding.DialogWifilistBinding;
 import com.checkmate.android.ui.view.DragListView;
 import com.checkmate.android.util.MessageUtil;
 import com.thanosfisherman.wifiutils.WifiUtils;
@@ -38,7 +37,10 @@ public class WifiListDialog extends Dialog implements DragListView.OnRefreshLoad
         void onResult(String ssid);
     }
 
-    private DialogWifilistBinding binding;
+    DragListView list_view;
+    TextView txt_name;
+    Switch swt_camera;
+
     List<ScanResult> mDataList = new ArrayList<>();
 
     onResultListener listener;
@@ -59,16 +61,20 @@ public class WifiListDialog extends Dialog implements DragListView.OnRefreshLoad
 
     private void init(Context context) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogWifilistBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_wifilist);
         setCancelable(true);
+                list_view = findViewById(R.id.list_view);
+
+        txt_name = findViewById(R.id.txt_name);
+        swt_camera = findViewById(R.id.swt_camera);
+
         this.context = context;
 
         adapter = new ListAdapter(context);
-        binding.listView.setAdapter(adapter);
-        binding.listView.setOnRefreshListener(this);
-        binding.listView.refresh();
-        binding.listView.setOnItemClickListener((adapterView, view, position, l) -> {
+        list_view.setAdapter(adapter);
+        list_view.setOnRefreshListener(this);
+        list_view.refresh();
+        list_view.setOnItemClickListener((adapterView, view, position, l) -> {
             ScanResult result = mDataList.get(position - 1);
             if (listener != null) {
                 listener.onResult(result.SSID);
@@ -80,7 +86,7 @@ public class WifiListDialog extends Dialog implements DragListView.OnRefreshLoad
     void getData() {
         mDataList = new ArrayList<>();
         WifiUtils.withContext(context).scanWifi(scanResults -> {
-            binding.listView.onRefreshComplete();
+            list_view.onRefreshComplete();
             for (ScanResult result : scanResults) {
                 if (!TextUtils.isEmpty(result.SSID)) {
                     mDataList.add(result);
@@ -137,6 +143,7 @@ public class WifiListDialog extends Dialog implements DragListView.OnRefreshLoad
 
         public class ViewHolder {
             TextView txt_name;
+
             Switch swt_camera;
         }
 
@@ -146,8 +153,7 @@ public class WifiListDialog extends Dialog implements DragListView.OnRefreshLoad
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.row_camera, parent, false);
                 holder = new ViewHolder();
-                holder.txt_name = convertView.findViewById(R.id.txt_name);
-                holder.swt_camera = convertView.findViewById(R.id.swt_camera);
+                
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();

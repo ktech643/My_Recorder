@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.checkmate.android.R;
-import com.checkmate.android.ui.view.DragListView;
+import com.checkmate.android.ui.view.SwipeDisabledDragListView;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -21,7 +21,7 @@ public final class FragmentPlaybackBinding implements ViewBinding {
   private final RelativeLayout rootView;
 
   @NonNull
-  public final DragListView listView;
+  public final SwipeDisabledDragListView listView;
 
   @NonNull
   public final TextView tvStorageLocation;
@@ -41,10 +41,10 @@ public final class FragmentPlaybackBinding implements ViewBinding {
   @NonNull
   public final TextView txtSelectAll;
 
-  private FragmentPlaybackBinding(@NonNull RelativeLayout rootView, @NonNull DragListView listView,
-      @NonNull TextView tvStorageLocation, @NonNull TextView tvStoragePath,
-      @NonNull TextView txtDelete, @NonNull TextView txtNoData, @NonNull TextView txtSelect,
-      @NonNull TextView txtSelectAll) {
+  private FragmentPlaybackBinding(@NonNull RelativeLayout rootView,
+      @NonNull SwipeDisabledDragListView listView, @NonNull TextView tvStorageLocation,
+      @NonNull TextView tvStoragePath, @NonNull TextView txtDelete, @NonNull TextView txtNoData,
+      @NonNull TextView txtSelect, @NonNull TextView txtSelectAll) {
     this.rootView = rootView;
     this.listView = listView;
     this.tvStorageLocation = tvStorageLocation;
@@ -83,7 +83,7 @@ public final class FragmentPlaybackBinding implements ViewBinding {
     int id;
     missingId: {
       id = R.id.list_view;
-      DragListView listView = ViewBindings.findChildViewById(rootView, id);
+      SwipeDisabledDragListView listView = ViewBindings.findChildViewById(rootView, id);
       if (listView == null) {
         break missingId;
       }

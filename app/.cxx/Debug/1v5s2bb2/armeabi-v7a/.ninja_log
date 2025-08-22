@@ -1,3 +1,6 @@
 # ninja log v5
 0	1426	1755884504	CMakeFiles/native-lib.dir/native-lib.cpp.o	bbccffbb9134b104
 1427	1632	1755884504	/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/build/intermediates/cxx/Debug/1v5s2bb2/obj/armeabi-v7a/libnative-lib.so	1944c6c149c71089
+0	30	0	clean	dcfe60f2b99663e1
+1	1243	1755889987	CMakeFiles/native-lib.dir/native-lib.cpp.o	bbccffbb9134b104
+1245	1380	1755889987	/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/build/intermediates/cxx/Debug/1v5s2bb2/obj/armeabi-v7a/libnative-lib.so	1944c6c149c71089

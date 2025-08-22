@@ -425,14 +425,4 @@ public final class EglCoreNew /* implements AutoCloseable */ {
             throw new RuntimeException(msg + ": EGL error: 0x" + Integer.toHexString(error));
         }
     }
-
-    /**
-     * Check if the EGL context is valid
-     */
-    public boolean isEglContextValid() {
-        return !mReleased &&
-                mEGLDisplay != null && mEGLDisplay != EGL14.EGL_NO_DISPLAY &&
-                mEGLContext != null && mEGLContext != EGL14.EGL_NO_CONTEXT &&
-                mEGLConfig != null;
-    }
 }

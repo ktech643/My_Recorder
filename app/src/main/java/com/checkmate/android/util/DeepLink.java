@@ -82,7 +82,7 @@ public class DeepLink {
     private static final int AUDIO_ERROR_INDEX = -2;
     private static final int RECORD_ERROR_INDEX = -3;
 
-    private final String[] ADAPTIVE_BITRATE_MODES = {"0", "1", "2", "3"};
+    private final String[] ADAPTIVE_BITRATE_MODES = {"0", "1", "2"};
 
     static private Map<String, Streamer.MODE> createStremerModesMap() {
         Map<String, Streamer.MODE> result = new HashMap<String, Streamer.MODE>();

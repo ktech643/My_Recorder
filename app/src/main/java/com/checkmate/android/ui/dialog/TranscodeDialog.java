@@ -23,7 +23,6 @@ import com.checkmate.android.AppPreference;
 import com.checkmate.android.BuildConfig;
 import com.checkmate.android.R;
 import com.checkmate.android.database.DBManager;
-import com.checkmate.android.databinding.DialogTranscodeBinding;
 import com.checkmate.android.model.Camera;
 import com.checkmate.android.ui.fragment.SettingsFragment;
 import com.checkmate.android.ui.view.MySpinner;
@@ -38,28 +37,66 @@ public class TranscodeDialog extends Dialog {
         void onResult(boolean is_changed);
     }
 
-    private DialogTranscodeBinding binding;
     onSaveListener listener;
+
     Context context;
+
+    ViewGroup ly_box;
+
+    EditText edt_bitrate;
+
+    EditText edt_framerate;
+
+    CheckBox chk_overlay;
+
+    CheckBox chk_box;
+
+    EditText edt_font_color;
+
+    EditText edt_width;
+
+    EditText edt_height;
+
+    CheckBox chk_audio;
+
+    CheckBox chk_mp4_audio;
+
+    EditText edt_color;
+
+    EditText edt_font;
+
+    EditText edt_text;
+
+    EditText edt_x0;
+
+    EditText edt_y0;
+
+    EditText edt_font_size;
+
+    CheckBox chk_use_mic;
 
     public static TranscodeDialog instance = null;
 
     public TranscodeDialog(Context context, Camera camera) {
         super(context);
         // TODO Auto-generated constructor stub
+
         init(context);
     }
 
     public TranscodeDialog(Context context, String ssid) {
         super(context);
         // TODO Auto-generated constructor stub
+
         init(context);
     }
 
     public TranscodeDialog(Context context) {
         super(context);
         // TODO Auto-generated constructor stub
+
         init(context);
+
         instance = this;
     }
 
@@ -67,6 +104,7 @@ public class TranscodeDialog extends Dialog {
         super(context);
         // TODO Auto-generated constructor stub
         init(context);
+
         instance = this;
     }
 
@@ -74,110 +112,124 @@ public class TranscodeDialog extends Dialog {
         super(context);
         // TODO Auto-generated constructor stub
         init(context);
+
         instance = this;
     }
 
     private void init(Context context) {
         this.context = context;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        binding = DialogTranscodeBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.dialog_transcode);
         setCancelable(false);
 
-        // Set up click listeners
-        binding.btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onSave();
-            }
-        });
-
-        binding.btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (listener != null) {
-                    listener.onResult(false);
-                }
-                onClose();
-            }
-        });
+        ly_box = findViewById(R.id.ly_box);
+        edt_bitrate = findViewById(R.id.edt_bitrate);
+        edt_framerate = findViewById(R.id.edt_framerate);
+        chk_overlay = findViewById(R.id.chk_overlay);
+        chk_box = findViewById(R.id.chk_box);
+        edt_font_color = findViewById(R.id.edt_font_color);
+        edt_width = findViewById(R.id.edt_width);
+        edt_height = findViewById(R.id.edt_height);
+        chk_audio = findViewById(R.id.chk_audio);
+        chk_mp4_audio = findViewById(R.id.chk_mp4_audio);
+        edt_color = findViewById(R.id.edt_color);
+        edt_font = findViewById(R.id.edt_font);
+        edt_text = findViewById(R.id.edt_text);
+        edt_x0 = findViewById(R.id.edt_x0);
+        edt_y0 = findViewById(R.id.edt_y0);
+        edt_font_size = findViewById(R.id.edt_font_size);
+        chk_use_mic = findViewById(R.id.chk_use_mic);
 
         boolean box_enabled = AppPreference.getBool(AppPreference.KEY.TRANS_BOX_ENABLE, false);
-        binding.chkBox.setChecked(box_enabled);
-        binding.chkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        chk_box.setChecked(box_enabled);
+        chk_box.setOnCheckedChangeListener((buttonView, isChecked) -> {
             AppPreference.setBool(AppPreference.KEY.TRANS_BOX_ENABLE, isChecked);
             if (!isChecked) {
-                binding.lyBox.setVisibility(View.GONE);
+                ly_box.setVisibility(View.GONE);
             } else {
-                binding.lyBox.setVisibility(View.VISIBLE);
+                ly_box.setVisibility(View.VISIBLE);
             }
         });
 
-        binding.edtWidth.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_WIDTH, 640)));
-        binding.edtHeight.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_HEIGHT, 360)));
+        edt_width.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_WIDTH, 640)));
+        edt_height.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_HEIGHT, 360)));
         boolean audio_push = AppPreference.getBool(AppPreference.KEY.TRANS_AUDIO_PUSH, false);
-        binding.chkAudio.setChecked(audio_push);
-        binding.chkAudio.setOnCheckedChangeListener((buttonView, isChecked) -> AppPreference.setBool(AppPreference.KEY.TRANS_AUDIO_PUSH, isChecked));
+        chk_audio.setChecked(audio_push);
+        chk_audio.setOnCheckedChangeListener((buttonView, isChecked) -> AppPreference.setBool(AppPreference.KEY.TRANS_AUDIO_PUSH, isChecked));
         boolean audio_mp4 = AppPreference.getBool(AppPreference.KEY.TRANS_AUDIO_MP4, false);
-        binding.chkMp4Audio.setChecked(audio_mp4);
-        binding.chkMp4Audio.setOnCheckedChangeListener((buttonView, isChecked) -> AppPreference.setBool(AppPreference.KEY.TRANS_AUDIO_MP4, isChecked));
+        chk_mp4_audio.setChecked(audio_mp4);
+        chk_mp4_audio.setOnCheckedChangeListener((buttonView, isChecked) -> AppPreference.setBool(AppPreference.KEY.TRANS_AUDIO_MP4, isChecked));
         boolean enable_overlay = AppPreference.getBool(AppPreference.KEY.TRANS_OVERLAY, false);
-        binding.chkOverlay.setChecked(enable_overlay);
-        binding.chkOverlay.setOnCheckedChangeListener((buttonView, isChecked) -> AppPreference.setBool(AppPreference.KEY.TRANS_OVERLAY, isChecked));
+        chk_overlay.setChecked(enable_overlay);
+        chk_overlay.setOnCheckedChangeListener((buttonView, isChecked) -> AppPreference.setBool(AppPreference.KEY.TRANS_OVERLAY, isChecked));
 
-        binding.edtColor.setText(AppPreference.getStr(AppPreference.KEY.TRANS_BOX_COLOR, "white"));
+        edt_color.setText(AppPreference.getStr(AppPreference.KEY.TRANS_BOX_COLOR, "white"));
         String path = AppPreference.getStr(AppPreference.KEY.TRNAS_BOX_FONT, "/storage/emulated/0/Fonts/arial.ttf");
         if (TextUtils.isEmpty(path)) {
             path = "/storage/emulated/0/Fonts/arial.ttf";
         }
-        binding.edtFont.setText(path);
-        binding.edtText.setText(AppPreference.getStr(AppPreference.KEY.TRANS_BOX_FORMAT, "'%{localtime\\:}%X'"));
-        binding.edtX0.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_BOX_X0, 0)));
-        binding.edtY0.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_BOX_Y0, 0)));
-        binding.edtFontSize.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_BOX_FONT_SIZE, 28)));
-        binding.chkUseMic.setChecked(AppPreference.getBool(AppPreference.KEY.TRANS_BOX_USE_MIC, false));
-        binding.chkUseMic.setOnCheckedChangeListener((buttonView, isChecked) -> AppPreference.setBool(AppPreference.KEY.TRANS_BOX_USE_MIC, isChecked));
-        binding.edtFontColor.setText(AppPreference.getStr(AppPreference.KEY.TRNAS_BOX_FONT_COLOR, "white"));
-        binding.edtBitrate.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_BITRATE, 200000)));
-        binding.edtFramerate.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_FRAMERATE, 15)));
+        edt_font.setText(path);
+        edt_text.setText(AppPreference.getStr(AppPreference.KEY.TRANS_BOX_FORMAT, "'%{localtime\\:}%X'"));
+        edt_x0.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_BOX_X0, 0)));
+        edt_y0.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_BOX_Y0, 0)));
+        edt_font_size.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_BOX_FONT_SIZE, 28)));
+        chk_use_mic.setChecked(AppPreference.getBool(AppPreference.KEY.TRANS_BOX_USE_MIC, false));
+        chk_use_mic.setOnCheckedChangeListener((buttonView, isChecked) -> AppPreference.setBool(AppPreference.KEY.TRANS_BOX_USE_MIC, isChecked));
+        edt_font_color.setText(AppPreference.getStr(AppPreference.KEY.TRNAS_BOX_FONT_COLOR, "white"));
+        edt_bitrate.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_BITRATE, 200000)));
+        edt_framerate.setText(String.valueOf(AppPreference.getInt(AppPreference.KEY.TRANS_FRAMERATE, 15)));
+    }
+
+    public void OnClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_save:
+                onSave();
+                break;
+            case R.id.btn_close:
+                if (listener != null) {
+                    listener.onResult(false);
+                }
+                onClose();
+                break;
+        }
     }
 
     void onSave() {
-        String width = binding.edtWidth.getText().toString().trim();
+        String width = edt_width.getText().toString().trim();
         if (TextUtils.isEmpty(width)) {
             width = "0";
         }
         AppPreference.setInt(AppPreference.KEY.TRANS_WIDTH, Integer.parseInt(width));
-        String height = binding.edtHeight.getText().toString().trim();
+        String height = edt_height.getText().toString().trim();
         if (TextUtils.isEmpty(height)) {
             height = "0";
         }
         AppPreference.setInt(AppPreference.KEY.TRANS_HEIGHT, Integer.parseInt(height));
-        AppPreference.setStr(AppPreference.KEY.TRANS_BOX_COLOR, binding.edtColor.getText().toString().trim());
-        AppPreference.setStr(AppPreference.KEY.TRNAS_BOX_FONT, binding.edtFont.getText().toString().trim());
-        AppPreference.setStr(AppPreference.KEY.TRANS_BOX_FORMAT, binding.edtText.getText().toString().trim());
-        String x0 = binding.edtX0.getText().toString().trim();
+        AppPreference.setStr(AppPreference.KEY.TRANS_BOX_COLOR, edt_color.getText().toString().trim());
+        AppPreference.setStr(AppPreference.KEY.TRNAS_BOX_FONT, edt_font.getText().toString().trim());
+        AppPreference.setStr(AppPreference.KEY.TRANS_BOX_FORMAT, edt_text.getText().toString().trim());
+        String x0 = edt_x0.getText().toString().trim();
         if (TextUtils.isEmpty(x0)) {
             x0 = "0";
         }
         AppPreference.setInt(AppPreference.KEY.TRANS_BOX_X0, Integer.parseInt(x0));
-        String bitrate = binding.edtBitrate.getText().toString().trim();
+        String bitrate = edt_bitrate.getText().toString().trim();
         if (TextUtils.isEmpty(bitrate)) {
             bitrate = "0";
         }
         AppPreference.setInt(AppPreference.KEY.TRANS_BITRATE, Integer.parseInt(bitrate));
-        String framerate = binding.edtFramerate.getText().toString().trim();
+        String framerate = edt_framerate.getText().toString().trim();
         if (TextUtils.isEmpty(framerate)) {
             framerate = "0";
         }
         AppPreference.setInt(AppPreference.KEY.TRANS_FRAMERATE, Integer.parseInt(framerate));
-        String y0 = binding.edtY0.getText().toString().trim();
+        String y0 = edt_y0.getText().toString().trim();
         if (TextUtils.isEmpty(y0)) {
             y0 = "0";
         }
         AppPreference.setInt(AppPreference.KEY.TRANS_BOX_Y0, Integer.parseInt(y0));
-        AppPreference.setStr(AppPreference.KEY.TRNAS_BOX_FONT_COLOR, binding.edtFontColor.getText().toString().trim());
-        String font_size = binding.edtFontSize.getText().toString().trim();
+        AppPreference.setStr(AppPreference.KEY.TRNAS_BOX_FONT_COLOR, edt_font_color.getText().toString().trim());
+        String font_size = edt_font_size.getText().toString().trim();
         if (TextUtils.isEmpty(font_size)) {
             font_size = "0";
         }

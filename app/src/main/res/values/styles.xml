@@ -106,55 +106,5 @@
         <item name="android:spinnerMode">dropdown</item>
     </style>
 
-    <!-- Add this style for playback items -->
-    <style name="PlaybackItemStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">4dp</item>
-        <item name="android:layout_marginRight">4dp</item>
-        <item name="android:layout_marginTop">6dp</item>
-        <item name="android:layout_marginBottom">6dp</item>
-        <item name="android:background">@drawable/playback_item_elegant</item>
-        <item name="android:padding">16dp</item>
-    </style>
-
-    <!-- Elegant playback item style with enhanced visual appeal -->
-    <style name="PlaybackItemElegantStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">4dp</item>
-        <item name="android:layout_marginRight">4dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="android:background">@drawable/playback_item_elegant</item>
-        <item name="android:padding">20dp</item>
-        <item name="android:elevation">2dp</item>
-    </style>
-
-    <!-- Add this style for light gray cards -->
-    <style name="LightGrayCardStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/card_background_light_gray</item>
-        <item name="android:layout_margin">8dp</item>
-        <item name="android:padding">16dp</item>
-    </style>
-
-    <!-- Enhanced Card Style with white background and shadow -->
-    <style name="EnhancedCardStyle">
-        <item name="cardBackgroundColor">@android:color/white</item>
-        <item name="cardCornerRadius">8dp</item>
-        <item name="cardElevation">4dp</item>
-        <item name="cardUseCompatPadding">true</item>
-        <item name="cardPreventCornerOverlap">true</item>
-    </style>
-    
-    <!-- Bottom Navigation Text Appearance -->
-    <style name="BottomNavigationTextAppearance" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/colorAccent</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
-
 
 </resources>
