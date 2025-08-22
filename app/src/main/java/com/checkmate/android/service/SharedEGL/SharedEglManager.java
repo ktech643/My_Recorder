@@ -3388,7 +3388,7 @@ public class SharedEglManager {
             setFlip(service.getFlipState());
             
             // Apply service-specific parameters
-            ServiceType serviceType = service.getServiceType();
+            ServiceType serviceType = MainActivity.getServiceType();
             if (serviceType == ServiceType.BgUSBCamera) {
                 // USB camera specific settings
                 Log.d(TAG, "Applying USB camera configuration");
@@ -3398,7 +3398,7 @@ public class SharedEglManager {
             }
         }
     }
-    
+
     /**
      * Process pending operations
      */
@@ -3420,7 +3420,7 @@ public class SharedEglManager {
         if (cameraTexture != null) {
             try {
                 // Clear the handler queue of pending frame updates
-                mCameraHandler.removeCallbacksAndMessages(null);
+                mCameraHandler.removeCallbacks(null);
                 
                 // Update texture to latest frame
                 cameraTexture.updateTexImage();
@@ -3437,16 +3437,6 @@ public class SharedEglManager {
         synchronized (mServiceLock) {
             WeakReference<BaseBackgroundService> ref = mRegisteredServices.get(type);
             return ref != null ? ref.get() : null;
-        }
-    }
-    
-    /**
-     * Get the currently active service type
-     * @return The currently active service type or null if none
-     */
-    public ServiceType getCurrentActiveService() {
-        synchronized (mServiceLock) {
-            return mCurrentActiveService;
         }
     }
 
@@ -3621,46 +3611,6 @@ public class SharedEglManager {
                 }
                 break;
         }
-    }
-    
-    /**
-     * Log performance metrics for monitoring 24/7 operation
-     */
-    private void logPerformanceMetrics() {
-        if (mLastPerformanceLogTime == 0) {
-            mLastPerformanceLogTime = System.currentTimeMillis();
-            return;
-        }
-        
-        long now = System.currentTimeMillis();
-        long elapsed = now - mLastPerformanceLogTime;
-        
-        if (elapsed < PERFORMANCE_LOG_INTERVAL_MS) {
-            return;
-        }
-        
-        // Calculate metrics
-        float fps = mFrameCount > 0 ? (mFrameCount * 1000f / elapsed) : 0;
-        float dropRate = mFrameCount > 0 ? (mDroppedFrames * 100f / mFrameCount) : 0;
-        
-        // Log performance data
-        Log.i(TAG, String.format("Performance: FPS=%.2f, Frames=%d, Dropped=%d (%.2f%%), " +
-                "Streaming=%s, Recording=%s, ActiveService=%s",
-                fps, mFrameCount, mDroppedFrames, dropRate,
-                mStreaming, mRecording, mCurrentActiveService));
-        
-        // Reset counters
-        mFrameCount = 0;
-        mDroppedFrames = 0;
-        mLastPerformanceLogTime = now;
-        
-        // Check for performance issues
-        if (dropRate > 10.0f) {
-            Log.w(TAG, "High frame drop rate detected: " + dropRate + "%");
-        }
-        
-        // Memory check
-        checkMemoryUsage();
     }
     
     /**

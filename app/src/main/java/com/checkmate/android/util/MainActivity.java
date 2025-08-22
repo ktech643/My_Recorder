@@ -1912,6 +1912,19 @@ public class MainActivity extends BaseActivity
 
     }
 
+    public static ServiceType getServiceType() {
+        String pos = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION,"0");
+        if (pos.equals("0")||pos.equals("1")){
+            return  ServiceType.BgCamera;
+        }else if (pos.equals("2")) {
+            return ServiceType.BgUSBCamera;
+        }else if (pos.equals("3")) {
+            return ServiceType.BgScreenCast;
+        }else {
+            return ServiceType.BgAudio;
+        }
+    }
+
     /* ------------------------------------------------------------------------
      *  Stop front/rear camera streaming quickly (USB handled elsewhere)
      * --------------------------------------------------------------------- */

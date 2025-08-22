@@ -394,12 +394,8 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (is_camera_opened || is_usb_opened || is_audio_only) {
                     boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
                     if (is_audio_only) {
-                        if (isAudioEnabled) {
-                            activity.startStream();
-                            streamStarted = activity.isStreaming();
-                        } else {
-                            showAudioEnablePopup();
-                        }
+                        activity.startStream();
+                        streamStarted = activity.isStreaming();
                     } else {
                         activity.startStream();
                         streamStarted = activity.isStreaming();
@@ -434,14 +430,10 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                     recordStarted = activity.isCastRecording();
                 } else if (is_audio_only && !activity.isAudioRecording()) {
                     boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
-                    if (isAudioEnabled) {
-                        activity.startRecord();
-                        recordStarted = activity.isAudioRecording();
-                        if (recordStarted) {
-                            ic_rec.setImageResource(R.mipmap.ic_radio_active);
-                        }
-                    } else {
-                        showAudioEnablePopup();
+                    activity.startRecord();
+                    recordStarted = activity.isAudioRecording();
+                    if (recordStarted) {
+                        ic_rec.setImageResource(R.mipmap.ic_radio_active);
                     }
                 } else if (!activity.isWifiRecording()) {
                     activity.startRecordStream();
@@ -1015,18 +1007,12 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (mActivityRef != null && mActivityRef.get() != null) {
             MainActivity activity = mActivityRef.get();
             // Stop camera service first
-            if (activity.mCamService != null) {
-                activity.mCamService.stopSafe();
-                activity.mCamService = null;
-            }
-            mListener.stopFragBgCamera();
-            
             // Stop other services
             if (is_usb_opened) {
                 mListener.stopFragUSBService();
             }
-            if (is_wifi_opened) {
-                mListener.stopFragWifiService();
+            if (is_camera_opened) {
+                mListener.stopFragBgCamera();
             }
             if (is_cast_opened) {
                 mListener.stopFragBgCast();
@@ -1242,7 +1228,6 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                     }
                     mListener.initFragAudioService();
                     updateSharedViewModel();
-                    scheduleAudioCheck();
                 }
             }, UI_UPDATE_DELAY);
 
@@ -1256,14 +1241,6 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         ic_stream.setImageResource(R.mipmap.ic_stream);
     }
 
-    private void scheduleAudioCheck() {
-        handler.postDelayed(() -> {
-            boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
-            if (!isAudioEnabled) {
-                showAudioEnablePopup();
-            }
-        }, AUDIO_CHECK_DELAY);
-    }
 
     private void updateSharedViewModel() {
         if (!isValidFragmentState()) {
@@ -1703,12 +1680,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             } else if (is_cast_opened) {
                 activity.onCastStream();
             } else if (is_audio_only) {
-                boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
-                if (isAudioEnabled) {
-                    mActivityRef.get().startStream();
-                } else {
-                    showAudioEnablePopup();
-                }
+                mActivityRef.get().startStream();
             } else {
                 if (!AppConstant.is_library_use || mActivityRef.get().mWifiService == null) {
                     return;
@@ -1842,26 +1814,11 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                         messageDialog.setCancelTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
                     }
                 }
-            } else {
-                showAudioEnablePopup();
             }
         } else {
             recordStream();
         }
     }
-
-    void showAudioEnablePopup() {
-        MessageDialog messageDialog = MessageDialog
-                .show(getString(R.string.confirmation_title), getString(R.string.audio_disbaled), getString(R.string.Okay))
-                .setCancelButton((dialog, v) -> {
-                    if (instance != null && instance.get() != null && instance.get().isAdded()) {
-                        dialog.dismiss();
-                    }
-                    return false;
-                });
-        messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-    }
-
     void recordStream() {
         if (mActivityRef != null && mActivityRef.get() != null && !mActivityRef.get().isWifiRecording()) {
             mActivityRef.get().startRecordStream();
