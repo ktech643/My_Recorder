@@ -21,17 +21,34 @@ public class ServiceSwitcher {
     public static void switchService(Context context, ServiceType newServiceType) {
         Log.d(TAG, "Switching to service: " + newServiceType);
         
+        SharedEglManager eglManager = SharedEglManager.getInstance();
+        
+        // Check if we're already on this service
+        ServiceType currentService = getCurrentActiveService();
+        if (currentService == newServiceType) {
+            Log.d(TAG, "Already on service: " + newServiceType);
+            return;
+        }
+        
         // Start new service if not already running
         if (!isServiceRunning(context, newServiceType)) {
             startService(context, newServiceType);
+            
+            // Wait a bit for service to initialize
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Interrupted while waiting for service start", e);
+            }
         }
         
         // Get new service instance and activate it
         BaseBackgroundService newService = getRunningService(newServiceType);
         
         if (newService != null) {
-            // Activate the new service with its surface
-            newService.activateService(
+            // Use the enhanced EGL change method for seamless switching
+            eglManager.eglChangeActiveService(
+                newServiceType,
                 newService.getSurfaceTexture(), 
                 newService.getSurfaceWidth(),
                 newService.getSurfaceHeight()
@@ -41,6 +58,15 @@ public class ServiceSwitcher {
         } else {
             Log.w(TAG, "Failed to get running service instance for: " + newServiceType);
         }
+    }
+    
+    /**
+     * Get the currently active service type
+     * @return The active service type or null if none
+     */
+    private static ServiceType getCurrentActiveService() {
+        SharedEglManager eglManager = SharedEglManager.getInstance();
+        return eglManager.getCurrentActiveService();
     }
 
     /**
