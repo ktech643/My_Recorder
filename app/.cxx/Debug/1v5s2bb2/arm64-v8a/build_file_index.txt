@@ -1,1 +1,1 @@
-/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/cpp/CMakeLists.txt
+/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/cpp/CMakeLists.txt
