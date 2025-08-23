@@ -33,6 +33,13 @@ android {
 		sourceCompatibility JavaVersion.VERSION_11
 		targetCompatibility JavaVersion.VERSION_11
 	}
+	
+	// Ensure consistent Java toolchain
+	java {
+		toolchain {
+			languageVersion = JavaLanguageVersion.of(11)
+		}
+	}
 
     defaultConfig {
 		minSdkVersion 26
@@ -61,30 +68,78 @@ String getNdkBuildPath() {
 	Properties properties = new Properties()
 	def ndkBuildPath = "";
 	def ndkBuildingDir = "";
+	
+	// Try multiple sources for NDK path
 	if (project.rootProject.file("local.properties").exists()) {
 		properties.load(project.rootProject.file('local.properties').newDataInputStream())
-		ndkBuildingDir = properties.getProperty("ndk.dir") + '/'
+		ndkBuildingDir = properties.getProperty("ndk.dir")
 	}
-	if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-		ndkBuildPath = ndkBuildingDir + 'ndk-build.cmd'
-	} else {
-		ndkBuildPath = ndkBuildingDir + 'ndk-build'
+	
+	// If no NDK path found, try to use Android SDK NDK
+	if (!ndkBuildingDir) {
+		def androidSdkDir = properties.getProperty("sdk.dir")
+		if (androidSdkDir) {
+			// Check for NDK in Android SDK
+			def possibleNdkPaths = [
+				"${androidSdkDir}/ndk/25.2.9519653", // Primary NDK version
+				"${androidSdkDir}/ndk/25.1.8937393", // Fallback version
+				"${androidSdkDir}/ndk/29.0.13113456", // Newer version
+				"${androidSdkDir}/ndk", // Generic NDK directory
+				"${androidSdkDir}/ndk-bundle" // Legacy NDK bundle
+			]
+			
+			for (def path : possibleNdkPaths) {
+				if (new File(path).exists()) {
+					ndkBuildingDir = path
+					println("Using NDK path: ${ndkBuildingDir}")
+					break
+				}
+			}
+		}
 	}
+	
+	if (ndkBuildingDir) {
+		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			ndkBuildPath = ndkBuildingDir + '/ndk-build.cmd'
+		} else {
+			ndkBuildPath = ndkBuildingDir + '/ndk-build'
+		}
+		
+		// Verify the ndk-build executable exists
+		if (!new File(ndkBuildPath).exists()) {
+			println("NDK build executable not found at: ${ndkBuildPath}")
+			return null
+		}
+	}
+	
 	return ndkBuildPath
 }
 
 task ndkBuild(type: Exec, description: 'Compile JNI source via NDK') {
 	println('executing ndkBuild')
 	def ndkBuildPath = getNdkBuildPath();
-	commandLine ndkBuildPath, '-j8', '-C', file('src/main').absolutePath
+	if (ndkBuildPath && new File(ndkBuildPath).exists()) {
+		commandLine ndkBuildPath, '-j8', '-C', file('src/main').absolutePath
+	} else {
+		println('NDK path not found or invalid, skipping ndkBuild')
+		// Create a dummy command that does nothing
+		commandLine 'echo', 'NDK build skipped - NDK not available'
+	}
 }
 
-//task ndkClean(type: Exec, description: 'clean JNI libraries') {
-//	println('executing ndkBuild clean')
-//	def ndkBuildPath = getNdkBuildPath();
-//	commandLine ndkBuildPath, 'clean', '-C', file('src/main').absolutePath
-//}
+task ndkClean(type: Exec, description: 'clean JNI libraries') {
+	println('executing ndkBuild clean')
+	def ndkBuildPath = getNdkBuildPath();
+	if (ndkBuildPath && new File(ndkBuildPath).exists()) {
+		commandLine ndkBuildPath, 'clean', '-C', file('src/main').absolutePath
+	} else {
+		println('NDK path not found or invalid, skipping ndkClean')
+		// Create a dummy command that does nothing
+		commandLine 'echo', 'NDK clean skipped - NDK not available'
+	}
+}
 
+// Always depend on ndkClean, but handle NDK availability gracefully
 clean.dependsOn 'ndkClean'
 
 dependencies {

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.checkmate.android.app-mergeDebugResources-59:/values-v24/values-v24.xml",
+            "outputFile": "com.checkmate.android.app-mergeDebugResources-63:/values-v24/values-v24.xml",
             "map": [
                 {
                     "source": "/Users/jahan/.gradle/caches/transforms-3/60e30ebb9e7ca17d68b025e4a7456f19/transformed/material-1.12.0/res/values-v24/values-v24.xml",
@@ -23,7 +23,7 @@
                     }
                 },
                 {
-                    "source": "/Users/jahan/.gradle/caches/transforms-3/9f800540dc66183cdc013516d865a47f/transformed/media-1.0.0/res/values-v24/values-v24.xml",
+                    "source": "/Users/jahan/.gradle/caches/transforms-3/f21323a0235669e5b07d9cf1d0837986/transformed/media-1.6.0/res/values-v24/values-v24.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",
