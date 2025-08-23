@@ -50,6 +50,16 @@ subprojects {
             '--add-opens=java.base/java.io=ALL-UNNAMED'
         ]
     }
+    
+    // Ensure consistent Java toolchain across all subprojects
+    afterEvaluate {
+        if (project.hasProperty('android')) {
+            project.android.compileOptions {
+                sourceCompatibility JavaVersion.VERSION_11
+                targetCompatibility JavaVersion.VERSION_11
+            }
+        }
+    }
 }
 
 task clean(type: Delete) {

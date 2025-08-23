@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.checkmate.android.app-mergeDebugResources-59:/values-watch-v20/values-watch-v20.xml",
+            "outputFile": "com.checkmate.android.app-mergeDebugResources-63:/values-watch-v20/values-watch-v20.xml",
             "map": [
                 {
                     "source": "/Users/jahan/.gradle/caches/transforms-3/a6db7b5abc981cc625b1f2af139edd8c/transformed/appcompat-1.6.1/res/values-watch-v20/values-watch-v20.xml",

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.checkmate.android.app-mergeDebugResources-59:/values-as/values-as.xml",
+            "outputFile": "com.checkmate.android.app-mergeDebugResources-63:/values-as/values-as.xml",
             "map": [
                 {
                     "source": "/Users/jahan/.gradle/caches/transforms-3/12bdd10dbde542cb232ff3a686b80dc5/transformed/jetified-play-services-base-18.5.0/res/values-as/values.xml",
