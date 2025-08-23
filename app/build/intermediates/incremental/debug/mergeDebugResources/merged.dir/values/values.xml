@@ -894,21 +894,6 @@
     <bool name="abc_config_actionMenuItemAllCaps">true</bool>
     <bool name="acra_enable_job_service">false</bool>
     <bool name="acra_enable_legacy_service">true</bool>
-    <bool name="default_bmb_autoBoom">false</bool>
-    <bool name="default_bmb_autoBoomImmediately">false</bool>
-    <bool name="default_bmb_autoHide">true</bool>
-    <bool name="default_bmb_backPressListened">true</bool>
-    <bool name="default_bmb_background_effect">true</bool>
-    <bool name="default_bmb_boomInWholeScreen">true</bool>
-    <bool name="default_bmb_cacheOptimization">true</bool>
-    <bool name="default_bmb_cancelable">true</bool>
-    <bool name="default_bmb_draggable">false</bool>
-    <bool name="default_bmb_inFragment">false</bool>
-    <bool name="default_bmb_inList">false</bool>
-    <bool name="default_bmb_orientationAdaptable">false</bool>
-    <bool name="default_bmb_ripple_effect">true</bool>
-    <bool name="default_bmb_shadow_effect">true</bool>
-    <bool name="default_bmb_use3DTransformAnimation">false</bool>
     <bool name="mtrl_btn_textappearance_all_caps">true</bool>
     <color name="ALICEBLUE">#fff0f8ff</color>
     <color name="ANTIQUEWHITE">#fffaebd7</color>
@@ -1127,13 +1112,6 @@
     <color name="common_google_signin_btn_text_light_pressed">#DE000000</color>
     <color name="contents_text">@color/BLACK</color>
     <color name="dark">#353535</color>
-    <color name="default_bmb_dimColor">#55000000</color>
-    <color name="default_bmb_highlighted_color">#00000000</color>
-    <color name="default_bmb_normal_color">#FF4081</color>
-    <color name="default_bmb_shadow_color">#88757575</color>
-    <color name="default_bmb_shareLine1Color">#ffffffff</color>
-    <color name="default_bmb_shareLine2Color">#ffffffff</color>
-    <color name="default_bmb_unable_color">#00000000</color>
     <color name="design_bottom_navigation_shadow_color">#14000000</color>
     <color name="design_dark_default_color_background">#121212</color>
     <color name="design_dark_default_color_error">#CF6679</color>
@@ -1438,6 +1416,8 @@
     <color name="mtrl_textinput_filled_box_default_background_color">#0A000000</color>
     <color name="mtrl_textinput_focused_box_stroke_color">#00000000</color>
     <color name="mtrl_textinput_hovered_box_stroke_color">#DE000000</color>
+    <color name="nav_background">#FFFFFF</color>
+    <color name="nav_item_unselected">#757575</color>
     <color name="new_folder_color">#c14b84</color>
     <color name="notification_action_color_filter">#ffffffff</color>
     <color name="notification_icon_bg_color">#ff9e9e9e</color>
@@ -1599,39 +1579,6 @@
     <dimen name="control_button_radius">24dp</dimen>
     <dimen name="control_button_size">48dp</dimen>
     <dimen name="def_drawer_elevation">10dp</dimen>
-    <dimen name="default_bmb_bottomHamButtonTopMargin">-1dp</dimen>
-    <dimen name="default_bmb_buttonBottomMargin">30dp</dimen>
-    <dimen name="default_bmb_buttonHorizontalMargin">20dp</dimen>
-    <dimen name="default_bmb_buttonInclinedMargin">20dp</dimen>
-    <dimen name="default_bmb_buttonLeftMargin">30dp</dimen>
-    <dimen name="default_bmb_buttonRightMargin">30dp</dimen>
-    <dimen name="default_bmb_buttonTopMargin">30dp</dimen>
-    <dimen name="default_bmb_buttonVerticalMargin">25dp</dimen>
-    <dimen name="default_bmb_button_radius">28dp</dimen>
-    <dimen name="default_bmb_dotRadius">3dp</dimen>
-    <dimen name="default_bmb_edgeInsetsBottom">15dp</dimen>
-    <dimen name="default_bmb_edgeInsetsLeft">15dp</dimen>
-    <dimen name="default_bmb_edgeInsetsRight">15dp</dimen>
-    <dimen name="default_bmb_edgeInsetsTop">15dp</dimen>
-    <dimen name="default_bmb_hamHeight">3dp</dimen>
-    <dimen name="default_bmb_hamWidth">20dp</dimen>
-    <dimen name="default_bmb_ham_button_height">60dp</dimen>
-    <dimen name="default_bmb_ham_button_width">300dp</dimen>
-    <dimen name="default_bmb_pieceCornerRadius">-1dp</dimen>
-    <dimen name="default_bmb_pieceHorizontalMargin">2.5dp</dimen>
-    <dimen name="default_bmb_pieceInclinedMargin">3.535533905932738dp</dimen>
-    <dimen name="default_bmb_pieceVerticalMargin">2.5dp</dimen>
-    <dimen name="default_bmb_shadow_offset_x">0dp</dimen>
-    <dimen name="default_bmb_shadow_offset_y">3dp</dimen>
-    <dimen name="default_bmb_shadow_radius">8dp</dimen>
-    <dimen name="default_bmb_shareLineWidth">1.5dp</dimen>
-    <dimen name="default_bmb_sharedLineLength">18dp</dimen>
-    <dimen name="default_bmb_simple_circle_height">80dp</dimen>
-    <dimen name="default_bmb_simple_circle_width">80dp</dimen>
-    <dimen name="default_bmb_text_inside_circle_height">80dp</dimen>
-    <dimen name="default_bmb_text_inside_circle_width">80dp</dimen>
-    <dimen name="default_bmb_text_outside_circle_height">80dp</dimen>
-    <dimen name="default_bmb_text_outside_circle_width">80dp</dimen>
     <dimen name="design_appbar_elevation">4dp</dimen>
     <dimen name="design_bottom_navigation_active_item_max_width">168dp</dimen>
     <dimen name="design_bottom_navigation_active_item_min_width">96dp</dimen>
@@ -2640,24 +2587,6 @@
     <integer name="bottom_sheet_slide_duration">150</integer>
     <integer name="cancel_button_image_alpha">127</integer>
     <integer name="config_tooltipAnimTime">150</integer>
-    <integer name="default_bmb_boomEnum">6</integer>
-    <integer name="default_bmb_buttonPlaceAlignmentEnum">0</integer>
-    <integer name="default_bmb_buttonPlaceEnum">-1</integer>
-    <integer name="default_bmb_button_enum">-1</integer>
-    <integer name="default_bmb_frames">60</integer>
-    <integer name="default_bmb_hideDelay">50</integer>
-    <integer name="default_bmb_hideDuration">300</integer>
-    <integer name="default_bmb_hideMoveEaseEnum">21</integer>
-    <integer name="default_bmb_hideRotateEaseEnum">21</integer>
-    <integer name="default_bmb_hideScaleEaseEnum">21</integer>
-    <integer name="default_bmb_orderEnum">2</integer>
-    <integer name="default_bmb_pieceEnum">-1</integer>
-    <integer name="default_bmb_rotateDegree">720</integer>
-    <integer name="default_bmb_showDelay">50</integer>
-    <integer name="default_bmb_showDuration">300</integer>
-    <integer name="default_bmb_showMoveEaseEnum">22</integer>
-    <integer name="default_bmb_showRotateEaseEnum">22</integer>
-    <integer name="default_bmb_showScaleEaseEnum">22</integer>
     <integer name="design_snackbar_text_max_lines">2</integer>
     <integer name="design_tab_indicator_anim_duration_ms">300</integer>
     <integer name="exo_media_button_opacity_percentage_disabled">33</integer>
@@ -7139,6 +7068,18 @@ Stream resolution is 1280x720."</string>
     <item name="shapeAppearanceOverlay">@null</item>
   </style>
     <style name="Base.Widget.MaterialComponents.TextView" parent="Widget.AppCompat.TextView"/>
+    <style name="BottomNavigationView" parent="Widget.Design.BottomNavigationView">
+        <item name="itemTextAppearanceActive">@style/BottomNavigationViewActiveText</item>
+        <item name="itemTextAppearanceInactive">@style/BottomNavigationViewInactiveText</item>
+    </style>
+    <style name="BottomNavigationViewActiveText" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="BottomNavigationViewInactiveText" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
     <style name="CardView" parent="Base.CardView">
     </style>
     <style name="CardView.Dark">
@@ -11161,11 +11102,11 @@ Stream resolution is 1280x720."</string>
     <declare-styleable name="ActionBar">
         
         <attr name="navigationMode">
-            
+            <!-- Normal static title text -->
             <enum name="normal" value="0"/>
-            
+            <!-- The action bar will use a selection list for navigation. -->
             <enum name="listMode" value="1"/>
-            
+            <!-- The action bar will use a series of horizontal tabs for navigation. -->
             <enum name="tabMode" value="2"/>
         </attr>
         
@@ -11350,32 +11291,45 @@ Stream resolution is 1280x720."</string>
   </declare-styleable>
     <declare-styleable name="AppBarLayout_Layout">
     <attr name="layout_scrollFlags">
-      
+      <!-- Disable scrolling on the view. This flag should not be combined with any of the other
+           scroll flags. -->
       <flag name="noScroll" value="0x0"/>
 
-      
+      <!-- The view will be scroll in direct relation to scroll events. This flag needs to be
+           set for any of the other flags to take effect. If any sibling views
+           before this one do not have this flag, then this value has no effect. -->
       <flag name="scroll" value="0x1"/>
 
-      
+      <!-- When exiting (scrolling off screen) the view will be scrolled until it is
+           'collapsed'. The collapsed height is defined by the view's minimum height. -->
       <flag name="exitUntilCollapsed" value="0x2"/>
 
-      
+      <!-- When entering (scrolling on screen) the view will scroll on any downwards
+           scroll event, regardless of whether the scrolling view is also scrolling. This
+           is commonly referred to as the 'quick return' pattern. -->
       <flag name="enterAlways" value="0x4"/>
 
-      
+      <!-- An additional flag for 'enterAlways' which modifies the returning view to
+           only initially scroll back to it's collapsed height. Once the scrolling view has
+           reached the end of it's scroll range, the remainder of this view will be scrolled
+           into view. -->
       <flag name="enterAlwaysCollapsed" value="0x8"/>
 
-      
+      <!-- Upon a scroll ending, if the view is only partially visible then it will be
+           snapped and scrolled to it's closest edge. -->
       <flag name="snap" value="0x10"/>
 
-      
+      <!-- An additional flag to be used with 'snap'. If set, the view will be snapped to its
+           top and bottom margins, as opposed to the edges of the view itself. -->
       <flag name="snapMargins" value="0x20"/>
     </attr>
 
     <attr format="enum" name="layout_scrollEffect">
-      
+      <!-- No effect will be applied to this child when its parent
+           AppBarLayout's offset changes.-->
       <enum name="none" value="0"/>
-      
+      <!-- This view will be compressed (masked and parallaxed) when it reaches
+           the top of the screen and continues to scroll out of view.-->
       <enum name="compress" value="1"/>
     </attr>
 
@@ -11395,17 +11349,22 @@ Stream resolution is 1280x720."</string>
 
         
         <attr name="tintMode">
-            
+            <!-- The tint is drawn on top of the drawable.
+                 [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
             <enum name="src_over" value="3"/>
-            
+            <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+                 color channels are thrown out. [Sa * Da, Sc * Da] -->
             <enum name="src_in" value="5"/>
-            
+            <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+                 channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
             <enum name="src_atop" value="9"/>
-            
+            <!-- Multiplies the color and alpha channels of the drawable with those of
+                 the tint. [Sa * Da, Sc * Dc] -->
             <enum name="multiply" value="14"/>
-            
+            <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
             <enum name="screen" value="15"/>
-            
+            <!-- Combines the tint and icon color and alpha channels, clamping the
+                 result to valid color values. Saturate(S + D) -->
             <enum name="add" value="16"/>
         </attr>
     </declare-styleable>
@@ -11417,17 +11376,22 @@ Stream resolution is 1280x720."</string>
         <attr format="color" name="tickMarkTint"/>
         
         <attr name="tickMarkTintMode">
-            
+            <!-- The tint is drawn on top of the drawable.
+                 [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
             <enum name="src_over" value="3"/>
-            
+            <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+                 color channels are thrown out. [Sa * Da, Sc * Da] -->
             <enum name="src_in" value="5"/>
-            
+            <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+                 channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
             <enum name="src_atop" value="9"/>
-            
+            <!-- Multiplies the color and alpha channels of the drawable with those of
+                 the tint. [Sa * Da, Sc * Dc] -->
             <enum name="multiply" value="14"/>
-            
+            <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
             <enum name="screen" value="15"/>
-            
+            <!-- Combines the tint and drawable color and alpha channels, clamping the
+                 result to valid color values. Saturate(S + D) -->
             <enum name="add" value="16"/>
         </attr>
     </declare-styleable>
@@ -11448,9 +11412,10 @@ Stream resolution is 1280x720."</string>
         <attr name="android:textAppearance"/>
         
         <attr format="enum" name="autoSizeTextType">
-            
+            <!-- No auto-sizing (default). -->
             <enum name="none" value="0"/>
-            
+            <!-- Uniform horizontal and vertical text size scaling to fit within the
+            container. -->
             <enum name="uniform" value="1"/>
         </attr>
         
@@ -11482,17 +11447,22 @@ Stream resolution is 1280x720."</string>
         <attr format="color" name="drawableTint"/>
         
         <attr name="drawableTintMode">
-            
+            <!-- The tint is drawn on top of the drawable.
+                 [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
             <enum name="src_over" value="3"/>
-            
+            <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+                 color channels are thrown out. [Sa * Da, Sc * Da] -->
             <enum name="src_in" value="5"/>
-            
+            <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+                 channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
             <enum name="src_atop" value="9"/>
-            
+            <!-- Multiplies the color and alpha channels of the drawable with those of
+                 the tint. [Sa * Da, Sc * Dc] -->
             <enum name="multiply" value="14"/>
-            
+            <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
             <enum name="screen" value="15"/>
-            
+            <!-- Combines the tint and drawable color and alpha channels, clamping the
+                 result to valid color values. Saturate(S + D) -->
             <enum name="add" value="16"/>
         </attr>
         
@@ -11894,13 +11864,13 @@ Stream resolution is 1280x720."</string>
     <attr format="string" name="badgeText"/>
     <attr format="integer" name="number"/>
     <attr name="badgeGravity">
-      
+      <!-- Gravity.TOP | Gravity.END -->
       <enum name="TOP_END" value="8388661"/>
-      
+      <!-- Gravity.TOP | Gravity.START -->
       <enum name="TOP_START" value="8388659"/>
-      
+      <!-- Gravity.BOTTOM | Gravity.END -->
       <enum name="BOTTOM_END" value="8388693"/>
-      
+      <!-- Gravity.BOTTOM | Gravity.START -->
       <enum name="BOTTOM_START" value="8388691"/>
     </attr>
     
@@ -11916,9 +11886,11 @@ Stream resolution is 1280x720."</string>
 
     
     <attr name="offsetAlignmentMode">
-      
+      <!-- The offsets begin at the edge of the anchor. -->
       <enum name="edge" value="0"/>
-      
+      <!-- Follows the legacy offset alignment behavior. The horizontal offset begins at a variable
+           permanent inset from the edge of the anchor, and the vertical offset begins at the center
+           of the badge aligned with the edge of the anchor. -->
       <enum name="legacy" value="1"/>
     </attr>
 
@@ -11948,22 +11920,37 @@ Stream resolution is 1280x720."</string>
     <attr name="trackColor"/>
     
     <attr name="showAnimationBehavior">
-      
+      <!-- No animation used; appears immediately. -->
       <enum name="none" value="0"/>
-      
+      <!--
+        Expands from the bottom edge to the top edge for the linear type;
+        expands from the inner edge to the outer edge for the circular type.
+      -->
       <enum name="outward" value="1"/>
-      
+      <!--
+        Expands from the top edge to the bottom edge for the linear type;
+        expands from the outer edge to the inner edge for the circular type.
+      -->
       <enum name="inward" value="2"/>
     </attr>
     
     <attr name="hideAnimationBehavior">
-      
+      <!-- No animation used; disappears immediately. -->
       <enum name="none" value="0"/>
-      
+      <!--
+        Collapses from the bottom edge to the top edge for the linear type;
+        collapses from the inner edge to the outer edge for the circular type.
+      -->
       <enum name="outward" value="1"/>
-      
+      <!--
+        Collapses from the top edge to the bottom edge for the linear type;
+        collapses from the outer edge to the inner edge for the circular type.
+      -->
       <enum name="inward" value="2"/>
-      
+      <!--
+        Escapes in the progression direction for the linear type;
+        no effect for the circular type.
+      -->
       <enum name="escape" value="3"/>
     </attr>
     
@@ -11973,396 +11960,6 @@ Stream resolution is 1280x720."</string>
     
     <attr format="dimension" name="indicatorTrackGapSize"/>
   </declare-styleable>
-    <declare-styleable name="BoomMenuButton">
-    
-    <attr format="boolean|reference" name="bmb_cacheOptimization"/>
-    <attr format="boolean|reference" name="bmb_boomInWholeScreen"/>
-    <attr format="boolean|reference" name="bmb_inList"/>
-    <attr format="boolean|reference" name="bmb_inFragment"/>
-    <attr format="boolean|reference" name="bmb_backPressListened"/>
-    <attr format="boolean|reference" name="bmb_orientationAdaptable"/>
-
-    
-    <attr format="boolean|reference" name="bmb_shadowEffect"/>
-    <attr format="dimension|reference" name="bmb_shadowRadius"/>
-    <attr format="color|reference" name="bmb_shadowColor"/>
-    <attr format="dimension|reference" name="bmb_shadowOffsetX"/>
-    <attr format="dimension|reference" name="bmb_shadowOffsetY"/>
-
-    
-    <attr format="dimension|reference" name="bmb_buttonRadius"/>
-    <attr format="enum|reference" name="bmb_buttonEnum">
-        <enum name="simpleCircle" value="0"/>
-        <enum name="textInsideCircle" value="1"/>
-        <enum name="textOutsideCircle" value="2"/>
-        <enum name="ham" value="3"/>
-    </attr>
-    <attr format="boolean|reference" name="bmb_backgroundEffect"/>
-    <attr format="boolean|reference" name="bmb_rippleEffect"/>
-    <attr format="color|reference" name="bmb_normalColor"/>
-    <attr format="color|reference" name="bmb_highlightedColor"/>
-    <attr format="color|reference" name="bmb_unableColor"/>
-    <attr format="boolean|reference" name="bmb_draggable"/>
-    <attr format="dimension|reference" name="bmb_edgeInsetsLeft"/>
-    <attr format="dimension|reference" name="bmb_edgeInsetsTop"/>
-    <attr format="dimension|reference" name="bmb_edgeInsetsRight"/>
-    <attr format="dimension|reference" name="bmb_edgeInsetsBottom"/>
-
-    
-    <attr format="dimension|reference" name="bmb_dotRadius"/>
-    <attr format="dimension|reference" name="bmb_hamWidth"/>
-    <attr format="dimension|reference" name="bmb_hamHeight"/>
-    <attr format="dimension|reference" name="bmb_pieceCornerRadius"/>
-    <attr format="dimension|reference" name="bmb_pieceHorizontalMargin"/>
-    <attr format="dimension|reference" name="bmb_pieceVerticalMargin"/>
-    <attr format="dimension|reference" name="bmb_pieceInclinedMargin"/>
-    <attr format="enum|reference" name="bmb_piecePlaceEnum">
-        <enum name="piecePlace_dot_1" value="0"/>
-        <enum name="piecePlace_dot_2_1" value="1"/>
-        <enum name="piecePlace_dot_2_2" value="2"/>
-        <enum name="piecePlace_dot_3_1" value="3"/>
-        <enum name="piecePlace_dot_3_2" value="4"/>
-        <enum name="piecePlace_dot_3_3" value="5"/>
-        <enum name="piecePlace_dot_3_4" value="6"/>
-        <enum name="piecePlace_dot_4_1" value="7"/>
-        <enum name="piecePlace_dot_4_2" value="8"/>
-        <enum name="piecePlace_dot_5_1" value="9"/>
-        <enum name="piecePlace_dot_5_2" value="10"/>
-        <enum name="piecePlace_dot_5_3" value="11"/>
-        <enum name="piecePlace_dot_5_4" value="12"/>
-        <enum name="piecePlace_dot_6_1" value="13"/>
-        <enum name="piecePlace_dot_6_2" value="14"/>
-        <enum name="piecePlace_dot_6_3" value="15"/>
-        <enum name="piecePlace_dot_6_4" value="16"/>
-        <enum name="piecePlace_dot_6_5" value="17"/>
-        <enum name="piecePlace_dot_6_6" value="18"/>
-        <enum name="piecePlace_dot_7_1" value="19"/>
-        <enum name="piecePlace_dot_7_2" value="20"/>
-        <enum name="piecePlace_dot_7_3" value="21"/>
-        <enum name="piecePlace_dot_7_4" value="22"/>
-        <enum name="piecePlace_dot_7_5" value="23"/>
-        <enum name="piecePlace_dot_7_6" value="24"/>
-        <enum name="piecePlace_dot_8_1" value="25"/>
-        <enum name="piecePlace_dot_8_2" value="26"/>
-        <enum name="piecePlace_dot_8_3" value="27"/>
-        <enum name="piecePlace_dot_8_4" value="28"/>
-        <enum name="piecePlace_dot_8_5" value="29"/>
-        <enum name="piecePlace_dot_8_6" value="30"/>
-        <enum name="piecePlace_dot_8_7" value="31"/>
-        <enum name="piecePlace_dot_9_1" value="32"/>
-        <enum name="piecePlace_dot_9_2" value="33"/>
-        <enum name="piecePlace_dot_9_3" value="34"/>
-
-        <enum name="piecePlace_ham_1" value="35"/>
-        <enum name="piecePlace_ham_2" value="36"/>
-        <enum name="piecePlace_ham_3" value="37"/>
-        <enum name="piecePlace_ham_4" value="38"/>
-        <enum name="piecePlace_ham_5" value="39"/>
-        <enum name="piecePlace_ham_6" value="40"/>
-
-        <enum name="piecePlace_share" value="41"/>
-        <enum name="piecePlace_custom" value="42"/>
-    </attr>
-    <attr format="dimension|reference" name="bmb_sharedLineLength"/>
-    <attr format="color|reference" name="bmb_shareLine1Color"/>
-    <attr format="color|reference" name="bmb_shareLine2Color"/>
-    <attr format="dimension|reference" name="bmb_shareLineWidth"/>
-
-    
-    <attr format="color|reference" name="bmb_dimColor"/>
-    <attr format="integer|reference" name="bmb_showDuration"/>
-    <attr format="integer|reference" name="bmb_showDelay"/>
-    <attr format="integer|reference" name="bmb_hideDuration"/>
-    <attr format="integer|reference" name="bmb_hideDelay"/>
-    <attr format="boolean|reference" name="bmb_cancelable"/>
-    <attr format="boolean|reference" name="bmb_autoHide"/>
-    <attr format="enum|reference" name="bmb_orderEnum">
-        <enum name="orderDefault" value="0"/>
-        <enum name="orderReverse" value="1"/>
-        <enum name="orderRandom" value="2"/>
-    </attr>
-    <attr format="integer|reference" name="bmb_frames"/>
-    <attr format="enum|reference" name="bmb_boomEnum">
-        <enum name="boomLine" value="0"/>
-        <enum name="boomParabola_1" value="1"/>
-        <enum name="boomParabola_2" value="2"/>
-        <enum name="boomParabola_3" value="3"/>
-        <enum name="boomParabola_4" value="4"/>
-        <enum name="boomHorizontalThrow_1" value="5"/>
-        <enum name="boomHorizontalThrow_2" value="6"/>
-        <enum name="boomRandom" value="7"/>
-    </attr>
-    <attr format="enum|reference" name="bmb_showMoveEaseEnum">
-        <enum name="inSine" value="0"/>
-        <enum name="outSine" value="1"/>
-        <enum name="inOutSine" value="2"/>
-        <enum name="inQuad" value="3"/>
-        <enum name="outQuad" value="4"/>
-        <enum name="inOutQuad" value="5"/>
-        <enum name="inCubic" value="6"/>
-        <enum name="outCubic" value="7"/>
-        <enum name="inOutCubic" value="8"/>
-        <enum name="inQuart" value="9"/>
-        <enum name="outQuart" value="10"/>
-        <enum name="inOutQuart" value="11"/>
-        <enum name="inQuint" value="12"/>
-        <enum name="outQuint" value="13"/>
-        <enum name="inOutQuint" value="14"/>
-        <enum name="inExpo" value="15"/>
-        <enum name="outExpo" value="16"/>
-        <enum name="inOutExpo" value="17"/>
-        <enum name="inCirc" value="18"/>
-        <enum name="outCirc" value="19"/>
-        <enum name="inOutCirc" value="20"/>
-        <enum name="inBack" value="21"/>
-        <enum name="outBack" value="22"/>
-        <enum name="inOutBack" value="23"/>
-        <enum name="inElastic" value="24"/>
-        <enum name="outElastic" value="25"/>
-        <enum name="inOutElastic" value="26"/>
-        <enum name="inBounce" value="27"/>
-        <enum name="outBounce" value="28"/>
-        <enum name="inOutBounce" value="29"/>
-        <enum name="linear" value="30"/>
-    </attr>
-    <attr format="enum|reference" name="bmb_showScaleEaseEnum">
-        <enum name="inSine" value="0"/>
-        <enum name="outSine" value="1"/>
-        <enum name="inOutSine" value="2"/>
-        <enum name="inQuad" value="3"/>
-        <enum name="outQuad" value="4"/>
-        <enum name="inOutQuad" value="5"/>
-        <enum name="inCubic" value="6"/>
-        <enum name="outCubic" value="7"/>
-        <enum name="inOutCubic" value="8"/>
-        <enum name="inQuart" value="9"/>
-        <enum name="outQuart" value="10"/>
-        <enum name="inOutQuart" value="11"/>
-        <enum name="inQuint" value="12"/>
-        <enum name="outQuint" value="13"/>
-        <enum name="inOutQuint" value="14"/>
-        <enum name="inExpo" value="15"/>
-        <enum name="outExpo" value="16"/>
-        <enum name="inOutExpo" value="17"/>
-        <enum name="inCirc" value="18"/>
-        <enum name="outCirc" value="19"/>
-        <enum name="inOutCirc" value="20"/>
-        <enum name="inBack" value="21"/>
-        <enum name="outBack" value="22"/>
-        <enum name="inOutBack" value="23"/>
-        <enum name="inElastic" value="24"/>
-        <enum name="outElastic" value="25"/>
-        <enum name="inOutElastic" value="26"/>
-        <enum name="inBounce" value="27"/>
-        <enum name="outBounce" value="28"/>
-        <enum name="inOutBounce" value="29"/>
-        <enum name="linear" value="30"/>
-    </attr>
-    <attr format="enum|reference" name="bmb_showRotateEaseEnum">
-        <enum name="inSine" value="0"/>
-        <enum name="outSine" value="1"/>
-        <enum name="inOutSine" value="2"/>
-        <enum name="inQuad" value="3"/>
-        <enum name="outQuad" value="4"/>
-        <enum name="inOutQuad" value="5"/>
-        <enum name="inCubic" value="6"/>
-        <enum name="outCubic" value="7"/>
-        <enum name="inOutCubic" value="8"/>
-        <enum name="inQuart" value="9"/>
-        <enum name="outQuart" value="10"/>
-        <enum name="inOutQuart" value="11"/>
-        <enum name="inQuint" value="12"/>
-        <enum name="outQuint" value="13"/>
-        <enum name="inOutQuint" value="14"/>
-        <enum name="inExpo" value="15"/>
-        <enum name="outExpo" value="16"/>
-        <enum name="inOutExpo" value="17"/>
-        <enum name="inCirc" value="18"/>
-        <enum name="outCirc" value="19"/>
-        <enum name="inOutCirc" value="20"/>
-        <enum name="inBack" value="21"/>
-        <enum name="outBack" value="22"/>
-        <enum name="inOutBack" value="23"/>
-        <enum name="inElastic" value="24"/>
-        <enum name="outElastic" value="25"/>
-        <enum name="inOutElastic" value="26"/>
-        <enum name="inBounce" value="27"/>
-        <enum name="outBounce" value="28"/>
-        <enum name="inOutBounce" value="29"/>
-        <enum name="linear" value="30"/>
-    </attr>
-    <attr format="enum|reference" name="bmb_hideMoveEaseEnum">
-        <enum name="inSine" value="0"/>
-        <enum name="outSine" value="1"/>
-        <enum name="inOutSine" value="2"/>
-        <enum name="inQuad" value="3"/>
-        <enum name="outQuad" value="4"/>
-        <enum name="inOutQuad" value="5"/>
-        <enum name="inCubic" value="6"/>
-        <enum name="outCubic" value="7"/>
-        <enum name="inOutCubic" value="8"/>
-        <enum name="inQuart" value="9"/>
-        <enum name="outQuart" value="10"/>
-        <enum name="inOutQuart" value="11"/>
-        <enum name="inQuint" value="12"/>
-        <enum name="outQuint" value="13"/>
-        <enum name="inOutQuint" value="14"/>
-        <enum name="inExpo" value="15"/>
-        <enum name="outExpo" value="16"/>
-        <enum name="inOutExpo" value="17"/>
-        <enum name="inCirc" value="18"/>
-        <enum name="outCirc" value="19"/>
-        <enum name="inOutCirc" value="20"/>
-        <enum name="inBack" value="21"/>
-        <enum name="outBack" value="22"/>
-        <enum name="inOutBack" value="23"/>
-        <enum name="inElastic" value="24"/>
-        <enum name="outElastic" value="25"/>
-        <enum name="inOutElastic" value="26"/>
-        <enum name="inBounce" value="27"/>
-        <enum name="outBounce" value="28"/>
-        <enum name="inOutBounce" value="29"/>
-        <enum name="linear" value="30"/>
-    </attr>
-    <attr format="enum|reference" name="bmb_hideScaleEaseEnum">
-        <enum name="inSine" value="0"/>
-        <enum name="outSine" value="1"/>
-        <enum name="inOutSine" value="2"/>
-        <enum name="inQuad" value="3"/>
-        <enum name="outQuad" value="4"/>
-        <enum name="inOutQuad" value="5"/>
-        <enum name="inCubic" value="6"/>
-        <enum name="outCubic" value="7"/>
-        <enum name="inOutCubic" value="8"/>
-        <enum name="inQuart" value="9"/>
-        <enum name="outQuart" value="10"/>
-        <enum name="inOutQuart" value="11"/>
-        <enum name="inQuint" value="12"/>
-        <enum name="outQuint" value="13"/>
-        <enum name="inOutQuint" value="14"/>
-        <enum name="inExpo" value="15"/>
-        <enum name="outExpo" value="16"/>
-        <enum name="inOutExpo" value="17"/>
-        <enum name="inCirc" value="18"/>
-        <enum name="outCirc" value="19"/>
-        <enum name="inOutCirc" value="20"/>
-        <enum name="inBack" value="21"/>
-        <enum name="outBack" value="22"/>
-        <enum name="inOutBack" value="23"/>
-        <enum name="inElastic" value="24"/>
-        <enum name="outElastic" value="25"/>
-        <enum name="inOutElastic" value="26"/>
-        <enum name="inBounce" value="27"/>
-        <enum name="outBounce" value="28"/>
-        <enum name="inOutBounce" value="29"/>
-        <enum name="linear" value="30"/>
-    </attr>
-    <attr format="enum|reference" name="bmb_hideRotateEaseEnum">
-        <enum name="inSine" value="0"/>
-        <enum name="outSine" value="1"/>
-        <enum name="inOutSine" value="2"/>
-        <enum name="inQuad" value="3"/>
-        <enum name="outQuad" value="4"/>
-        <enum name="inOutQuad" value="5"/>
-        <enum name="inCubic" value="6"/>
-        <enum name="outCubic" value="7"/>
-        <enum name="inOutCubic" value="8"/>
-        <enum name="inQuart" value="9"/>
-        <enum name="outQuart" value="10"/>
-        <enum name="inOutQuart" value="11"/>
-        <enum name="inQuint" value="12"/>
-        <enum name="outQuint" value="13"/>
-        <enum name="inOutQuint" value="14"/>
-        <enum name="inExpo" value="15"/>
-        <enum name="outExpo" value="16"/>
-        <enum name="inOutExpo" value="17"/>
-        <enum name="inCirc" value="18"/>
-        <enum name="outCirc" value="19"/>
-        <enum name="inOutCirc" value="20"/>
-        <enum name="inBack" value="21"/>
-        <enum name="outBack" value="22"/>
-        <enum name="inOutBack" value="23"/>
-        <enum name="inElastic" value="24"/>
-        <enum name="outElastic" value="25"/>
-        <enum name="inOutElastic" value="26"/>
-        <enum name="inBounce" value="27"/>
-        <enum name="outBounce" value="28"/>
-        <enum name="inOutBounce" value="29"/>
-        <enum name="linear" value="30"/>
-    </attr>
-    <attr format="integer|reference" name="bmb_rotateDegree"/>
-    <attr format="boolean|reference" name="bmb_use3DTransformAnimation"/>
-    <attr format="boolean|reference" name="bmb_autoBoom"/>
-    <attr format="boolean|reference" name="bmb_autoBoomImmediately"/>
-
-    
-    <attr format="enum|reference" name="bmb_buttonPlaceEnum">
-        <enum name="buttonPlace_sc_1" value="0"/>
-        <enum name="buttonPlace_sc_2_1" value="1"/>
-        <enum name="buttonPlace_sc_2_2" value="2"/>
-        <enum name="buttonPlace_sc_3_1" value="3"/>
-        <enum name="buttonPlace_sc_3_2" value="4"/>
-        <enum name="buttonPlace_sc_3_3" value="5"/>
-        <enum name="buttonPlace_sc_3_4" value="6"/>
-        <enum name="buttonPlace_sc_4_1" value="7"/>
-        <enum name="buttonPlace_sc_4_2" value="8"/>
-        <enum name="buttonPlace_sc_5_1" value="9"/>
-        <enum name="buttonPlace_sc_5_2" value="10"/>
-        <enum name="buttonPlace_sc_5_3" value="11"/>
-        <enum name="buttonPlace_sc_5_4" value="12"/>
-        <enum name="buttonPlace_sc_6_1" value="13"/>
-        <enum name="buttonPlace_sc_6_2" value="14"/>
-        <enum name="buttonPlace_sc_6_3" value="15"/>
-        <enum name="buttonPlace_sc_6_4" value="16"/>
-        <enum name="buttonPlace_sc_6_5" value="17"/>
-        <enum name="buttonPlace_sc_6_6" value="18"/>
-        <enum name="buttonPlace_sc_7_1" value="19"/>
-        <enum name="buttonPlace_sc_7_2" value="20"/>
-        <enum name="buttonPlace_sc_7_3" value="21"/>
-        <enum name="buttonPlace_sc_7_4" value="22"/>
-        <enum name="buttonPlace_sc_7_5" value="23"/>
-        <enum name="buttonPlace_sc_7_6" value="24"/>
-        <enum name="buttonPlace_sc_8_1" value="25"/>
-        <enum name="buttonPlace_sc_8_2" value="26"/>
-        <enum name="buttonPlace_sc_8_3" value="27"/>
-        <enum name="buttonPlace_sc_8_4" value="28"/>
-        <enum name="buttonPlace_sc_8_5" value="29"/>
-        <enum name="buttonPlace_sc_8_6" value="30"/>
-        <enum name="buttonPlace_sc_8_7" value="31"/>
-        <enum name="buttonPlace_sc_9_1" value="32"/>
-        <enum name="buttonPlace_sc_9_2" value="33"/>
-        <enum name="buttonPlace_sc_9_3" value="34"/>
-        <enum name="buttonPlace_ham_1" value="35"/>
-        <enum name="buttonPlace_ham_2" value="36"/>
-        <enum name="buttonPlace_ham_3" value="37"/>
-        <enum name="buttonPlace_ham_4" value="38"/>
-        <enum name="buttonPlace_ham_5" value="39"/>
-        <enum name="buttonPlace_ham_6" value="40"/>
-        <enum name="buttonPlace_horizontal" value="41"/>
-        <enum name="buttonPlace_vertical" value="42"/>
-        <enum name="buttonPlace_custom" value="43"/>
-    </attr>
-    <attr format="enum|reference" name="bmb_buttonPlaceAlignmentEnum">
-        <enum name="buttonPlaceAlignment_center" value="0"/>
-        <enum name="buttonPlaceAlignment_top" value="1"/>
-        <enum name="buttonPlaceAlignment_bottom" value="2"/>
-        <enum name="buttonPlaceAlignment_left" value="3"/>
-        <enum name="buttonPlaceAlignment_right" value="4"/>
-        <enum name="buttonPlaceAlignment_tl" value="5"/>
-        <enum name="buttonPlaceAlignment_tr" value="6"/>
-        <enum name="buttonPlaceAlignment_bl" value="7"/>
-        <enum name="buttonPlaceAlignment_br" value="8"/>
-    </attr>
-    <attr format="dimension|reference" name="bmb_buttonHorizontalMargin"/>
-    <attr format="dimension|reference" name="bmb_buttonVerticalMargin"/>
-    <attr format="dimension|reference" name="bmb_buttonInclinedMargin"/>
-    <attr format="dimension|reference" name="bmb_buttonTopMargin"/>
-    <attr format="dimension|reference" name="bmb_buttonBottomMargin"/>
-    <attr format="dimension|reference" name="bmb_buttonLeftMargin"/>
-    <attr format="dimension|reference" name="bmb_buttonRightMargin"/>
-    <attr format="dimension|reference" name="bmb_bottomHamButtonTopMargin"/>
-
-</declare-styleable>
     <declare-styleable name="BottomAppBar">
     
     <attr name="backgroundTint"/>
@@ -12372,23 +11969,23 @@ Stream resolution is 1280x720."</string>
     <attr name="elevation"/>
     
     <attr name="fabAlignmentMode">
-      
+      <!-- Mode that aligns the fab to the center. -->
       <enum name="center" value="0"/>
-      
+      <!-- Mode that aligns the fab to the end. -->
       <enum name="end" value="1"/>
     </attr>
     
     <attr name="fabAnchorMode">
-      
+      <!-- Mode that anchors the fab embedded inside the BottomAppBar. -->
       <enum name="embed" value="0"/>
-      
+      <!-- Mode that anchors the fab to be cradled within the top edge of the BottomAppBar. -->
       <enum name="cradle" value="1"/>
     </attr>
     
     <attr name="fabAnimationMode">
-      
+      <!-- Mode that scales the fab down to a point, moves it, then scales the fab back to its normal size. -->
       <enum name="scale" value="0"/>
-      
+      <!-- Mode that slides the fab from one alignment mode to the next. -->
       <enum name="slide" value="1"/>
     </attr>
     
@@ -12413,9 +12010,10 @@ Stream resolution is 1280x720."</string>
     <attr name="paddingRightSystemWindowInsets"/>
     
     <attr name="menuAlignmentMode">
-      
+      <!-- Mode that aligns the menu automatically to avoid the FAB. Menu will be aligned at the end
+           when the FAB is center aligned, and start when the FAB is end aligned. -->
       <enum name="auto" value="0"/>
-      
+      <!-- Mode that aligns the menu to the start. -->
       <enum name="start" value="1"/>
     </attr>
   </declare-styleable>
@@ -12434,7 +12032,7 @@ Stream resolution is 1280x720."</string>
     <declare-styleable name="BottomSheetBehavior_Layout">
     
     <attr format="dimension" name="behavior_peekHeight">
-      
+      <!-- Peek at the 16:9 ratio keyline of its parent -->
       <enum name="auto" value="-1"/>
     </attr>
     
@@ -12459,17 +12057,19 @@ Stream resolution is 1280x720."</string>
     <attr name="backgroundTint"/>
     
     <attr name="behavior_saveFlags">
-      
+      <!-- This flag will preserve the peekHeight on configuration change. -->
       <flag name="peekHeight" value="0x1"/>
-      
+      <!-- This flag will preserve the fitToContents boolean value on configuration change. -->
       <flag name="fitToContents" value="0x2"/>
-      
+      <!-- This flag will preserve the hideable boolean value on configuration change. -->
       <flag name="hideable" value="0x4"/>
-      
+      <!-- This flag will preserve the skipCollapsed boolean value on configuration change. -->
       <flag name="skipCollapsed" value="0x8"/>
-      
+      <!-- This flag will preserve the all the aforementioned values on configuration change. -->
       <flag name="all" value="-1"/>
-      
+      <!-- This flag will not preserve the aforementioned values on configuration change. The only
+           value preserved will be the positional state, e.g. collapsed, hidden, expanded, etc.
+           This is the default behavior. -->
       <flag name="none" value="0"/>
     </attr>
     
@@ -12547,17 +12147,22 @@ Stream resolution is 1280x720."</string>
 
         
         <attr name="checkMarkTintMode">
-            
+            <!-- The tint is drawn on top of the drawable.
+                 [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
             <enum name="src_over" value="3"/>
-            
+            <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+                 color channels are thrown out. [Sa * Da, Sc * Da] -->
             <enum name="src_in" value="5"/>
-            
+            <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+                 channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
             <enum name="src_atop" value="9"/>
-            
+            <!-- Multiplies the color and alpha channels of the drawable with those of
+                 the tint. [Sa * Da, Sc * Dc] -->
             <enum name="multiply" value="14"/>
-            
+            <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
             <enum name="screen" value="15"/>
-            
+            <!-- Combines the tint and icon color and alpha channels, clamping the
+                 result to valid color values. Saturate(S + D) -->
             <enum name="add" value="16"/>
         </attr>
     </declare-styleable>
@@ -12697,9 +12302,17 @@ Stream resolution is 1280x720."</string>
     <attr format="dimension" name="indicatorInset"/>
     
     <attr name="indicatorDirectionCircular">
-      
+      <!--
+        In the indeterminate mode, the spinner will spin clockwise; in the
+        determinate mode, the indicator will progress from the top (12 o'clock)
+        clockwise.
+      -->
       <enum name="clockwise" value="0"/>
-      
+      <!--
+        In the indeterminate mode, the spinner will spin counter-clockwise; in
+        the determinate mode, the indicator will progress from the top (12
+        o'clock) counter-clockwise.
+      -->
       <enum name="counterclockwise" value="1"/>
     </attr>
   </declare-styleable>
@@ -12756,49 +12369,49 @@ Stream resolution is 1280x720."</string>
 
     
     <attr name="collapsedTitleGravity">
-      
+      <!-- Push title to the top of its container, not changing its size. -->
       <flag name="top" value="0x30"/>
-      
+      <!-- Push title to the bottom of its container, not changing its size. -->
       <flag name="bottom" value="0x50"/>
-      
+      <!-- Push title to the left of its container, not changing its size. -->
       <flag name="left" value="0x03"/>
-      
+      <!-- Push title to the right of its container, not changing its size. -->
       <flag name="right" value="0x05"/>
-      
+      <!-- Place title in the vertical center of its container, not changing its size. -->
       <flag name="center_vertical" value="0x10"/>
-      
+      <!-- Grow the vertical size of the title if needed so it completely fills its container. -->
       <flag name="fill_vertical" value="0x70"/>
-      
+      <!-- Place title in the horizontal center of its container, not changing its size. -->
       <flag name="center_horizontal" value="0x01"/>
-      
+      <!-- Place the title in the center of its container in both the vertical and horizontal axis, not changing its size. -->
       <flag name="center" value="0x11"/>
-      
+      <!-- Push title to the beginning of its container, not changing its size. -->
       <flag name="start" value="0x00800003"/>
-      
+      <!-- Push title to the end of its container, not changing its size. -->
       <flag name="end" value="0x00800005"/>
     </attr>
 
     
     <attr name="expandedTitleGravity">
-      
+      <!-- Push title to the top of its container, not changing its size. -->
       <flag name="top" value="0x30"/>
-      
+      <!-- Push title to the bottom of its container, not changing its size. -->
       <flag name="bottom" value="0x50"/>
-      
+      <!-- Push title to the left of its container, not changing its size. -->
       <flag name="left" value="0x03"/>
-      
+      <!-- Push title to the right of its container, not changing its size. -->
       <flag name="right" value="0x05"/>
-      
+      <!-- Place title in the vertical center of its container, not changing its size. -->
       <flag name="center_vertical" value="0x10"/>
-      
+      <!-- Grow the vertical size of the title if needed so it completely fills its container. -->
       <flag name="fill_vertical" value="0x70"/>
-      
+      <!-- Place title in the horizontal center of its container, not changing its size. -->
       <flag name="center_horizontal" value="0x01"/>
-      
+      <!-- Place the title in the center of its container in both the vertical and horizontal axis, not changing its size. -->
       <flag name="center" value="0x11"/>
-      
+      <!-- Push title to the beginning of its container, not changing its size. -->
       <flag name="start" value="0x00800003"/>
-      
+      <!-- Push title to the end of its container, not changing its size. -->
       <flag name="end" value="0x00800005"/>
     </attr>
 
@@ -12808,9 +12421,9 @@ Stream resolution is 1280x720."</string>
     <attr name="title"/>
     
     <attr name="titleCollapseMode">
-      
+      <!-- The expanded title will continuously scale and translate to its final collapsed position. -->
       <enum name="scale" value="0"/>
-      
+      <!-- The expanded title will fade out and translate, and the collapsed title will fade in. -->
       <enum name="fade" value="1"/>
     </attr>
     
@@ -12825,11 +12438,12 @@ Stream resolution is 1280x720."</string>
   </declare-styleable>
     <declare-styleable name="CollapsingToolbarLayout_Layout">
     <attr name="layout_collapseMode">
-      
+      <!-- The view will act as normal with no collapsing behavior. -->
       <enum name="none" value="0"/>
-      
+      <!-- The view will pin in place. -->
       <enum name="pin" value="1"/>
-      
+      <!-- The view will scroll in a parallax fashion. See the
+           layout_collapseParallaxMultiplier attribute to change the multiplier. -->
       <enum name="parallax" value="2"/>
     </attr>
 
@@ -12855,17 +12469,22 @@ Stream resolution is 1280x720."</string>
 
         
         <attr name="buttonTintMode">
-            
+            <!-- The tint is drawn on top of the drawable.
+                 [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
             <enum name="src_over" value="3"/>
-            
+            <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+                 color channels are thrown out. [Sa * Da, Sc * Da] -->
             <enum name="src_in" value="5"/>
-            
+            <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+                 channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
             <enum name="src_atop" value="9"/>
-            
+            <!-- Multiplies the color and alpha channels of the drawable with those of
+                 the tint. [Sa * Da, Sc * Dc] -->
             <enum name="multiply" value="14"/>
-            
+            <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
             <enum name="screen" value="15"/>
-            
+            <!-- Combines the tint and icon color and alpha channels, clamping the
+                 result to valid color values. Saturate(S + D) -->
             <enum name="add" value="16"/>
         </attr>
     </declare-styleable>
@@ -13483,70 +13102,76 @@ Stream resolution is 1280x720."</string>
 
         
         <attr name="layout_anchorGravity">
-            
+            <!-- Push object to the top of its container, not changing its size. -->
             <flag name="top" value="0x30"/>
-            
+            <!-- Push object to the bottom of its container, not changing its size. -->
             <flag name="bottom" value="0x50"/>
-            
+            <!-- Push object to the left of its container, not changing its size. -->
             <flag name="left" value="0x03"/>
-            
+            <!-- Push object to the right of its container, not changing its size. -->
             <flag name="right" value="0x05"/>
-            
+            <!-- Place object in the vertical center of its container, not changing its size. -->
             <flag name="center_vertical" value="0x10"/>
-            
+            <!-- Grow the vertical size of the object if needed so it completely fills its container. -->
             <flag name="fill_vertical" value="0x70"/>
-            
+            <!-- Place object in the horizontal center of its container, not changing its size. -->
             <flag name="center_horizontal" value="0x01"/>
-            
+            <!-- Grow the horizontal size of the object if needed so it completely fills its container. -->
             <flag name="fill_horizontal" value="0x07"/>
-            
+            <!-- Place the object in the center of its container in both the vertical and horizontal axis, not changing its size. -->
             <flag name="center" value="0x11"/>
-            
+            <!-- Grow the horizontal and vertical size of the object if needed so it completely fills its container. -->
             <flag name="fill" value="0x77"/>
-            
+            <!-- Additional option that can be set to have the top and/or bottom edges of
+                 the child clipped to its container's bounds.
+                 The clip will be based on the vertical gravity: a top gravity will clip the bottom
+                 edge, a bottom gravity will clip the top edge, and neither will clip both edges. -->
             <flag name="clip_vertical" value="0x80"/>
-            
+            <!-- Additional option that can be set to have the left and/or right edges of
+                 the child clipped to its container's bounds.
+                 The clip will be based on the horizontal gravity: a left gravity will clip the right
+                 edge, a right gravity will clip the left edge, and neither will clip both edges. -->
             <flag name="clip_horizontal" value="0x08"/>
-            
+            <!-- Push object to the beginning of its container, not changing its size. -->
             <flag name="start" value="0x00800003"/>
-            
+            <!-- Push object to the end of its container, not changing its size. -->
             <flag name="end" value="0x00800005"/>
         </attr>
 
         
         <attr format="enum" name="layout_insetEdge">
-            
+            <!-- Don't inset. -->
             <enum name="none" value="0x0"/>
-            
+            <!-- Inset the top edge. -->
             <enum name="top" value="0x30"/>
-            
+            <!-- Inset the bottom edge. -->
             <enum name="bottom" value="0x50"/>
-            
+            <!-- Inset the left edge. -->
             <enum name="left" value="0x03"/>
-            
+            <!-- Inset the right edge. -->
             <enum name="right" value="0x05"/>
-            
+            <!-- Inset the start edge. -->
             <enum name="start" value="0x00800003"/>
-            
+            <!-- Inset the end edge. -->
             <enum name="end" value="0x00800005"/>
         </attr>
         
         <attr name="layout_dodgeInsetEdges">
-            
+            <!-- Don't dodge any edges -->
             <flag name="none" value="0x0"/>
-            
+            <!-- Dodge the top inset edge. -->
             <flag name="top" value="0x30"/>
-            
+            <!-- Dodge the bottom inset edge. -->
             <flag name="bottom" value="0x50"/>
-            
+            <!-- Dodge the left inset edge. -->
             <flag name="left" value="0x03"/>
-            
+            <!-- Dodge the right inset edge. -->
             <flag name="right" value="0x05"/>
-            
+            <!-- Dodge the start inset edge. -->
             <flag name="start" value="0x00800003"/>
-            
+            <!-- Dodge the end inset edge. -->
             <flag name="end" value="0x00800005"/>
-            
+            <!-- Dodge all the inset edges. -->
             <flag name="all" value="0x77"/>
         </attr>
     </declare-styleable>
@@ -13619,11 +13244,11 @@ Stream resolution is 1280x720."</string>
     <attr name="elevation"/>
     
     <attr name="extendStrategy">
-      
+      <!-- Strategy to extend FAB back to the width it shrunk from. -->
       <enum name="auto" value="0"/>
-      
+      <!-- Strategy to extend FAB to wrap content. -->
       <enum name="wrap_content" value="1"/>
-      
+      <!-- Strategy to extend FAB to match parent. -->
       <enum name="match_parent" value="2"/>
     </attr>
     
@@ -13656,11 +13281,11 @@ Stream resolution is 1280x720."</string>
 
     
     <attr name="fabSize">
-      
+      <!-- A size which will change based on the window size. -->
       <enum name="auto" value="-1"/>
-      
+      <!-- The normal sized button. -->
       <enum name="normal" value="0"/>
-      
+      <!-- The mini sized button. -->
       <enum name="mini" value="1"/>
     </attr>
     
@@ -13709,14 +13334,23 @@ Stream resolution is 1280x720."</string>
         <attr format="reference" name="fontProviderCerts"/>
         
         <attr name="fontProviderFetchStrategy">
-            
+            <!-- The blocking font fetch works as follows.
+              First, check the local cache, then if the requested font is not cached, request the
+              font from the provider and wait until it is finished.  You can change the length of
+              the timeout by modifying fontProviderFetchTimeout.  If the timeout happens, the
+              default typeface will be used instead. -->
             <enum name="blocking" value="0"/>
-            
+            <!-- The async font fetch works as follows.
+              First, check the local cache, then if the requeted font is not cached, trigger a
+              request the font and continue with layout inflation. Once the font fetch succeeds, the
+              target text view will be refreshed with the downloaded font data. The
+              fontProviderFetchTimeout will be ignored if async loading is specified. -->
             <enum name="async" value="1"/>
         </attr>
         
         <attr format="integer" name="fontProviderFetchTimeout">
-            
+            <!-- A special value for the timeout. In this case, the blocking font fetching will not
+              timeout and wait until a reply is received from the font provider. -->
             <enum name="forever" value="-1"/>
         </attr>
         
@@ -14071,20 +13705,32 @@ Stream resolution is 1280x720."</string>
     <declare-styleable name="LinearProgressIndicator">
     
     <attr name="indeterminateAnimationType">
-      
+      <!--
+        The track will be filled with three adjacent segments in iterative different colors.
+        This type is only available when there are three or more indicator
+        colors.
+      -->
       <enum name="contiguous" value="0"/>
-      
+      <!--
+        There will be two disjoint segments in the same color per cycle. The color iterates between cycles.
+      -->
       <enum name="disjoint" value="1"/>
     </attr>
     
     <attr name="indicatorDirectionLinear">
-      
+      <!-- Animated from the left end to the right end of the track. -->
       <enum name="leftToRight" value="0"/>
-      
+      <!-- Animated from the right end to the left end of the track. -->
       <enum name="rightToLeft" value="1"/>
-      
+      <!--
+        Animated from the start position to the end position of the track.
+        This will be same as the leftToRight for API before 17.
+      -->
       <enum name="startToEnd" value="2"/>
-      
+      <!--
+        Animated from the end position to the start position of the track.
+        This will be same as the rightToLeft for API before 17.
+      -->
       <enum name="endToStart" value="3"/>
     </attr>
     
@@ -14160,17 +13806,20 @@ Stream resolution is 1280x720."</string>
     <attr format="dimension" name="iconPadding"/>
     
     <attr name="iconGravity">
-      
+      <!-- Push icon to the start of the button. -->
       <flag name="start" value="0x1"/>
-      
+      <!-- Push the icon to the start of the text keeping a distance equal to
+           {@code iconPadding} from the text. -->
       <flag name="textStart" value="0x2"/>
-      
+      <!-- Push icon to the end of the button. -->
       <flag name="end" value="0x3"/>
-      
+      <!-- Push the icon to the end of the text keeping a distance equal to
+           {@code iconPadding} from the text. -->
       <flag name="textEnd" value="0x4"/>
-      
+      <!-- Push the icon to the top of the button. -->
       <flag name="top" value="0x10"/>
-      
+      <!-- Push the icon to the top of the text keeping a distance equal to
+           {@code iconPadding} from the text. -->
       <flag name="textTop" value="0x20"/>
     </attr>
     
@@ -14243,13 +13892,13 @@ Stream resolution is 1280x720."</string>
     <attr format="dimension" name="checkedIconMargin"/>
     
     <attr name="checkedIconGravity">
-      
+      <!-- Gravity.TOP | Gravity.END -->
       <enum name="TOP_END" value="8388661"/>
-      
+      <!-- Gravity.TOP | Gravity.START -->
       <enum name="TOP_START" value="8388659"/>
-      
+      <!-- Gravity.BOTTOM | Gravity.END -->
       <enum name="BOTTOM_END" value="8388693"/>
-      
+      <!-- Gravity.BOTTOM | Gravity.START -->
       <enum name="BOTTOM_START" value="8388691"/>
     </attr>
     
@@ -14279,17 +13928,22 @@ Stream resolution is 1280x720."</string>
     <attr format="reference|color" name="buttonIconTint"/>
     
     <attr name="buttonIconTintMode">
-      
+      <!-- The tint is drawn on top of the drawable.
+           [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
       <enum name="src_over" value="3"/>
-      
+      <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+           color channels are thrown out. [Sa * Da, Sc * Da] -->
       <enum name="src_in" value="5"/>
-      
+      <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+           channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
       <enum name="src_atop" value="9"/>
-      
+      <!-- Multiplies the color and alpha channels of the drawable with those of
+           the tint. [Sa * Da, Sc * Dc] -->
       <enum name="multiply" value="14"/>
-      
+      <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
       <enum name="screen" value="15"/>
-      
+      <!-- Combines the tint and drawable color and alpha channels, clamping the
+           result to valid color values. Saturate(S + D) -->
       <enum name="add" value="16"/>
     </attr>
     
@@ -14300,11 +13954,11 @@ Stream resolution is 1280x720."</string>
     <attr format="string" name="errorAccessibilityLabel"/>
     
     <attr name="checkedState">
-      
+      <!-- The unchecked state of the checkbox. -->
       <enum name="unchecked" value="0"/>
-      
+      <!-- The checked state of the checkbox. -->
       <enum name="checked" value="1"/>
-      
+      <!-- The indeterminate state of the checkbox. -->
       <enum name="indeterminate" value="2"/>
     </attr>
   </declare-styleable>
@@ -14345,17 +13999,22 @@ Stream resolution is 1280x720."</string>
     <attr format="color" name="thumbIconTint"/>
     
     <attr name="thumbIconTintMode">
-      
+      <!-- The tint is drawn on top of the drawable.
+           [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
       <enum name="src_over" value="3"/>
-      
+      <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+           color channels are thrown out. [Sa * Da, Sc * Da] -->
       <enum name="src_in" value="5"/>
-      
+      <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+           channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
       <enum name="src_atop" value="9"/>
-      
+      <!-- Multiplies the color and alpha channels of the drawable with those of
+           the tint. [Sa * Da, Sc * Dc] -->
       <enum name="multiply" value="14"/>
-      
+      <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
       <enum name="screen" value="15"/>
-      
+      <!-- Combines the tint and drawable color and alpha channels, clamping the
+           result to valid color values. Saturate(S + D) -->
       <enum name="add" value="16"/>
     </attr>
     
@@ -14366,17 +14025,22 @@ Stream resolution is 1280x720."</string>
     <attr format="color" name="trackDecorationTint"/>
     
     <attr name="trackDecorationTintMode">
-      
+      <!-- The tint is drawn on top of the drawable.
+           [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
       <enum name="src_over" value="3"/>
-      
+      <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+           color channels are thrown out. [Sa * Da, Sc * Da] -->
       <enum name="src_in" value="5"/>
-      
+      <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+           channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
       <enum name="src_atop" value="9"/>
-      
+      <!-- Multiplies the color and alpha channels of the drawable with those of
+           the tint. [Sa * Da, Sc * Dc] -->
       <enum name="multiply" value="14"/>
-      
+      <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
       <enum name="screen" value="15"/>
-      
+      <!-- Combines the tint and drawable color and alpha channels, clamping the
+           result to valid color values. Saturate(S + D) -->
       <enum name="add" value="16"/>
     </attr>
   </declare-styleable>
@@ -14408,21 +14072,27 @@ Stream resolution is 1280x720."</string>
     <attr format="boolean" name="logoAdjustViewBounds"/>
     
     <attr name="logoScaleType">
-      
+      <!-- Scale using the image matrix when drawing. See
+           {@link android.widget.ImageView#setImageMatrix(Matrix)}. -->
       <enum name="matrix" value="0"/>
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#FILL}. -->
       <enum name="fitXY" value="1"/>
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#START}. -->
       <enum name="fitStart" value="2"/>
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#CENTER}. -->
       <enum name="fitCenter" value="3"/>
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#END}. -->
       <enum name="fitEnd" value="4"/>
-      
+      <!-- Center the image in the view, but perform no scaling. -->
       <enum name="center" value="5"/>
-      
+      <!-- Scale the image uniformly (maintain the image's aspect ratio) so both dimensions
+           (width and height) of the image will be equal to or larger than the corresponding
+           dimension of the view (minus padding). The image is then centered in the view. -->
       <enum name="centerCrop" value="6"/>
-      
+      <!-- Scale the image uniformly (maintain the image's aspect ratio) so that both
+           dimensions (width and height) of the image will be equal to or less than the
+           corresponding dimension of the view (minus padding). The image is then centered in
+           the view. -->
       <enum name="centerInside" value="7"/>
     </attr>
   </declare-styleable>
@@ -14510,15 +14180,24 @@ Stream resolution is 1280x720."</string>
 
         
         <attr name="showAsAction">
-            
+            <!-- Never show this item in an action bar, show it in the overflow menu instead.
+                 Mutually exclusive with "ifRoom" and "always". -->
             <flag name="never" value="0"/>
-            
+            <!-- Show this item in an action bar if there is room for it as determined
+                 by the system. Favor this option over "always" where possible.
+                 Mutually exclusive with "never" and "always". -->
             <flag name="ifRoom" value="1"/>
-            
+            <!-- Always show this item in an actionbar, even if it would override
+                 the system's limits of how much stuff to put there. This may make
+                 your action bar look bad on some screens. In most cases you should
+                 use "ifRoom" instead. Mutually exclusive with "ifRoom" and "never". -->
             <flag name="always" value="2"/>
-            
+            <!-- When this item is shown as an action in the action bar, show a text
+                 label with it even if it has an icon representation. -->
             <flag name="withText" value="4"/>
-            
+            <!-- This item's action view collapses to a normal menu
+                 item. When expanded, the action view takes over a
+                 larger segment of its container. -->
             <flag name="collapseActionView" value="8"/>
         </attr>
 
@@ -14542,17 +14221,22 @@ Stream resolution is 1280x720."</string>
 
         
         <attr name="iconTintMode">
-            
+            <!-- The tint is drawn on top of the icon.
+                 [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
             <enum name="src_over" value="3"/>
-            
+            <!-- The tint is masked by the alpha channel of the icon. The icon’s
+                 color channels are thrown out. [Sa * Da, Sc * Da] -->
             <enum name="src_in" value="5"/>
-            
+            <!-- The tint is drawn above the icon, but with the icon’s alpha
+                 channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
             <enum name="src_atop" value="9"/>
-            
+            <!-- Multiplies the color and alpha channels of the icon with those of
+                 the tint. [Sa * Da, Sc * Dc] -->
             <enum name="multiply" value="14"/>
-            
+            <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
             <enum name="screen" value="15"/>
-            
+            <!-- Combines the tint and icon color and alpha channels, clamping the
+                 result to valid color values. Saturate(S + D) -->
             <enum name="add" value="16"/>
         </attr>
 
@@ -14694,13 +14378,14 @@ Stream resolution is 1280x720."</string>
     <attr name="menu"/>
     
     <attr name="labelVisibilityMode">
-      
+      <!-- Label behaves as "labeled" when there are 3 items or less, or "selected" when there are
+           4 items or more. -->
       <enum name="auto" value="-1"/>
-      
+      <!-- Label is shown on the selected navigation item. -->
       <enum name="selected" value="0"/>
-      
+      <!-- Label is shown on all navigation items. -->
       <enum name="labeled" value="1"/>
-      
+      <!-- Label is not shown on any navigation items. -->
       <enum name="unlabeled" value="2"/>
     </attr>
     
@@ -14740,14 +14425,14 @@ Stream resolution is 1280x720."</string>
     <attr name="headerLayout"/>
    
     <attr name="menuGravity">
-      
-      
+      <!-- Navigation rail destinations will be aligned as a group at the top. This is the default behavior. -->
+      <!-- Gravity.TOP | Gravity.CENTER_HORIZONTAL-->
       <enum name="top" value="49"/>
-      
-      
+      <!-- Navigation rail destinations will be aligned as a group at the center. -->
+      <!-- Gravity.CENTER -->
       <enum name="center" value="17"/>
-      
-      
+      <!-- Navigation rail destinations will be aligned as a group at the bottom. -->
+      <!-- Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL -->
       <enum name="bottom" value="81"/>
     </attr>
     
@@ -15175,13 +14860,13 @@ Stream resolution is 1280x720."</string>
     <attr format="dimension" name="haloRadius"/>
     
     <attr name="labelBehavior">
-      
+      <!-- Mode that draws the label floating above the bounds of this view. -->
       <enum name="floating" value="0"/>
-      
+      <!-- Mode that draws the label within the bounds of the view. -->
       <enum name="withinBounds" value="1"/>
-      
+      <!-- Mode that prevents the label from being drawn. -->
       <enum name="gone" value="2"/>
-      
+      <!-- Mode that always draws the label. -->
       <enum name="visible" value="3"/>
     </attr>
     
@@ -15243,9 +14928,9 @@ Stream resolution is 1280x720."</string>
     <attr format="dimension" name="maxActionInlineWidth"/>
     
     <attr format="enum" name="animationMode">
-      
+      <!-- Mode that corresponds to the slide in and out animations. -->
       <enum name="slide" value="0"/>
-      
+      <!-- Mode that corresponds to the fade in and out animations. -->
       <enum name="fade" value="1"/>
     </attr>
     
@@ -15376,17 +15061,22 @@ Stream resolution is 1280x720."</string>
         <attr format="color" name="thumbTint"/>
         
         <attr name="thumbTintMode">
-            
+            <!-- The tint is drawn on top of the drawable.
+                 [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
             <enum name="src_over" value="3"/>
-            
+            <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+                 color channels are thrown out. [Sa * Da, Sc * Da] -->
             <enum name="src_in" value="5"/>
-            
+            <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+                 channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
             <enum name="src_atop" value="9"/>
-            
+            <!-- Multiplies the color and alpha channels of the drawable with those of
+                 the tint. [Sa * Da, Sc * Dc] -->
             <enum name="multiply" value="14"/>
-            
+            <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
             <enum name="screen" value="15"/>
-            
+            <!-- Combines the tint and drawable color and alpha channels, clamping the
+                 result to valid color values. Saturate(S + D) -->
             <enum name="add" value="16"/>
         </attr>
         
@@ -15395,17 +15085,22 @@ Stream resolution is 1280x720."</string>
         <attr format="color" name="trackTint"/>
         
         <attr name="trackTintMode">
-            
+            <!-- The tint is drawn on top of the drawable.
+                 [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
             <enum name="src_over" value="3"/>
-            
+            <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+                 color channels are thrown out. [Sa * Da, Sc * Da] -->
             <enum name="src_in" value="5"/>
-            
+            <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+                 channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
             <enum name="src_atop" value="9"/>
-            
+            <!-- Multiplies the color and alpha channels of the drawable with those of
+                 the tint. [Sa * Da, Sc * Dc] -->
             <enum name="multiply" value="14"/>
-            
+            <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
             <enum name="screen" value="15"/>
-            
+            <!-- Combines the tint and drawable color and alpha channels, clamping the
+                 result to valid color values. Saturate(S + D) -->
             <enum name="add" value="16"/>
         </attr>
         
@@ -15450,13 +15145,13 @@ Stream resolution is 1280x720."</string>
     <attr format="reference" name="tabIndicator"/>
     
     <attr name="tabIndicatorGravity">
-      
+      <!-- Align indicator to the bottom of this tab layout. -->
       <enum name="bottom" value="0"/>
-      
+      <!-- Align indicator along the center of this tab layout. -->
       <enum name="center" value="1"/>
-      
+      <!-- Align indicator to the top of this tab layout. -->
       <enum name="top" value="2"/>
-      
+      <!-- Stretch indicator to match the height and width of a tab item in this layout. -->
       <enum name="stretch" value="3"/>
     </attr>
     
@@ -15465,11 +15160,17 @@ Stream resolution is 1280x720."</string>
     <attr format="boolean" name="tabIndicatorFullWidth"/>
     
     <attr name="tabIndicatorAnimationMode">
-      
+      <!-- Animate the selection indicator's left and right bounds in step with
+           each other. -->
       <enum name="linear" value="0"/>
-      
+      <!-- Animate the selection indicator's left and right bounds out of step
+           with each other, decelerating the front and accelerating the back.
+           This causes the indicator to look like it stretches between destinations
+           an then shrinks back down to fit the size of it's target tab. -->
       <enum name="elastic" value="1"/>
-      
+      <!-- Animate the selection indicator by sequentially fading it out from
+           its current destination and then fading it in at its new
+           destination. -->
       <enum name="fade" value="2"/>
     </attr>
     
@@ -15625,15 +15326,19 @@ Stream resolution is 1280x720."</string>
     <attr format="reference" name="errorIconTint"/>
     
     <attr name="errorIconTintMode">
-      
+      <!-- The tint is drawn on top of the drawable.
+           [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
       <enum name="src_over" value="3"/>
-      
+      <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+           color channels are thrown out. [Sa * Da, Sc * Da] -->
       <enum name="src_in" value="5"/>
-      
+      <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+           channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
       <enum name="src_atop" value="9"/>
-      
+      <!-- Multiplies the color and alpha channels of the drawable with those of
+           the tint. [Sa * Da, Sc * Dc] -->
       <enum name="multiply" value="14"/>
-      
+      <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
       <enum name="screen" value="15"/>
     </attr>
 
@@ -15685,47 +15390,56 @@ Stream resolution is 1280x720."</string>
     <attr format="color" name="startIconTint"/>
     
     <attr name="startIconTintMode">
-      
+      <!-- The tint is drawn on top of the drawable.
+           [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
       <enum name="src_over" value="3"/>
-      
+      <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+           color channels are thrown out. [Sa * Da, Sc * Da] -->
       <enum name="src_in" value="5"/>
-      
+      <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+           channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
       <enum name="src_atop" value="9"/>
-      
+      <!-- Multiplies the color and alpha channels of the drawable with those of
+           the tint. [Sa * Da, Sc * Dc] -->
       <enum name="multiply" value="14"/>
-      
+      <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
       <enum name="screen" value="15"/>
     </attr>
     
     <attr format="dimension" name="startIconMinSize"/>
     
     <attr name="startIconScaleType">
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#FILL}. -->
       <enum name="fitXY" value="0"/>
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#START}. -->
       <enum name="fitStart" value="1"/>
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#CENTER}. -->
       <enum name="fitCenter" value="2"/>
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#END}. -->
       <enum name="fitEnd" value="3"/>
-      
+      <!-- Center the image in the view, but perform no scaling. -->
       <enum name="center" value="4"/>
-      
+      <!-- Scale the image uniformly (maintain the image's aspect ratio) so both dimensions
+           (width and height) of the image will be equal to or larger than the corresponding
+           dimension of the view (minus padding). The image is then centered in the view. -->
       <enum name="centerCrop" value="5"/>
-      
+      <!-- Scale the image uniformly (maintain the image's aspect ratio) so that both
+           dimensions (width and height) of the image will be equal to or less than the
+           corresponding dimension of the view (minus padding). The image is then centered in
+           the view. -->
       <enum name="centerInside" value="6"/>
     </attr>
     
     <attr name="endIconMode">
-      
+      <!-- The view will display a custom icon specified by the user. -->
       <enum name="custom" value="-1"/>
-      
+      <!-- No end icon. -->
       <enum name="none" value="0"/>
-      
+      <!-- The view will display a toggle when the EditText has a password. -->
       <enum name="password_toggle" value="1"/>
-      
+      <!-- The view will display a clear text button while the EditText contains input. -->
       <enum name="clear_text" value="2"/>
-      
+      <!-- The view will display a toggle that displays/hides a dropdown menu. -->
       <enum name="dropdown_menu" value="3"/>
     </attr>
     
@@ -15738,44 +15452,53 @@ Stream resolution is 1280x720."</string>
     <attr format="color" name="endIconTint"/>
     
     <attr name="endIconTintMode">
-      
+      <!-- The tint is drawn on top of the drawable.
+           [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
       <enum name="src_over" value="3"/>
-      
+      <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+           color channels are thrown out. [Sa * Da, Sc * Da] -->
       <enum name="src_in" value="5"/>
-      
+      <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+           channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
       <enum name="src_atop" value="9"/>
-      
+      <!-- Multiplies the color and alpha channels of the drawable with those of
+           the tint. [Sa * Da, Sc * Dc] -->
       <enum name="multiply" value="14"/>
-      
+      <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
       <enum name="screen" value="15"/>
     </attr>
     
     <attr format="dimension" name="endIconMinSize"/>
     
     <attr name="endIconScaleType">
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#FILL}. -->
       <enum name="fitXY" value="0"/>
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#START}. -->
       <enum name="fitStart" value="1"/>
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#CENTER}. -->
       <enum name="fitCenter" value="2"/>
-      
+      <!-- Scale the image using {@link android.graphics.Matrix.ScaleToFit#END}. -->
       <enum name="fitEnd" value="3"/>
-      
+      <!-- Center the image in the view, but perform no scaling. -->
       <enum name="center" value="4"/>
-      
+      <!-- Scale the image uniformly (maintain the image's aspect ratio) so both dimensions
+           (width and height) of the image will be equal to or larger than the corresponding
+           dimension of the view (minus padding). The image is then centered in the view. -->
       <enum name="centerCrop" value="5"/>
-      
+      <!-- Scale the image uniformly (maintain the image's aspect ratio) so that both
+           dimensions (width and height) of the image will be equal to or less than the
+           corresponding dimension of the view (minus padding). The image is then centered in
+           the view. -->
       <enum name="centerInside" value="6"/>
     </attr>
 
     
     <attr name="boxBackgroundMode">
-      
+      <!-- Specifies that there should be no box set on the text input area. -->
       <enum name="none" value="0"/>
-      
+      <!-- Filled box mode for the text input box. -->
       <enum name="filled" value="1"/>
-      
+      <!-- Outline box mode for the text input box. -->
       <enum name="outline" value="2"/>
     </attr>
     
@@ -15814,15 +15537,19 @@ Stream resolution is 1280x720."</string>
     <attr format="color" name="passwordToggleTint"/>
     
     <attr name="passwordToggleTintMode">
-      
+      <!-- The tint is drawn on top of the drawable.
+           [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
       <enum name="src_over" value="3"/>
-      
+      <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+           color channels are thrown out. [Sa * Da, Sc * Da] -->
       <enum name="src_in" value="5"/>
-      
+      <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+           channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
       <enum name="src_atop" value="9"/>
-      
+      <!-- Multiplies the color and alpha channels of the drawable with those of
+           the tint. [Sa * Da, Sc * Dc] -->
       <enum name="multiply" value="14"/>
-      
+      <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
       <enum name="screen" value="15"/>
     </attr>
   </declare-styleable>
@@ -15860,11 +15587,11 @@ Stream resolution is 1280x720."</string>
         <attr name="contentInsetEndWithActions"/>
         <attr format="dimension" name="maxButtonHeight"/>
         <attr name="buttonGravity">
-            
+            <!-- Place object in the vertical center of its container, not changing its size. -->
             <flag name="center_vertical" value="0x10"/>
-            
+            <!-- Push object to the top of its container, not changing its size. -->
             <flag name="top" value="0x30"/>
-            
+            <!-- Push object to the bottom of its container, not changing its size. -->
             <flag name="bottom" value="0x50"/>
         </attr>
         
@@ -15998,17 +15725,22 @@ Stream resolution is 1280x720."</string>
 
         
         <attr name="backgroundTintMode">
-            
+            <!-- The tint is drawn on top of the drawable.
+                 [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc] -->
             <enum name="src_over" value="3"/>
-            
+            <!-- The tint is masked by the alpha channel of the drawable. The drawable’s
+                 color channels are thrown out. [Sa * Da, Sc * Da] -->
             <enum name="src_in" value="5"/>
-            
+            <!-- The tint is drawn above the drawable, but with the drawable’s alpha
+                 channel masking the result. [Da, Sc * Da + (1 - Sa) * Dc] -->
             <enum name="src_atop" value="9"/>
-            
+            <!-- Multiplies the color and alpha channels of the drawable with those of
+                 the tint. [Sa * Da, Sc * Dc] -->
             <enum name="multiply" value="14"/>
-            
+            <!-- [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc] -->
             <enum name="screen" value="15"/>
-            
+            <!-- Combines the tint and icon color and alpha channels, clamping the
+                 result to valid color values. Saturate(S + D) -->
             <enum name="add" value="16"/>
         </attr>
     </declare-styleable>

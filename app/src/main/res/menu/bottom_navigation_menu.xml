@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item
+        android:id="@+id/nav_live"
+        android:title="Live"
+        android:icon="@drawable/ic_live_tv" />
+    
+    <item
+        android:id="@+id/nav_playback"
+        android:title="Playback"
+        android:icon="@drawable/ic_play_circle" />
+    
+    <item
+        android:id="@+id/nav_streaming"
+        android:title="Streaming"
+        android:icon="@drawable/ic_cast" />
+    
+    <item
+        android:id="@+id/nav_settings"
+        android:title="Settings"
+        android:icon="@drawable/ic_settings" />
+    
+    <item
+        android:id="@+id/nav_hide"
+        android:title="Hide"
+        android:icon="@drawable/ic_visibility_off" />
+        
+</menu>
