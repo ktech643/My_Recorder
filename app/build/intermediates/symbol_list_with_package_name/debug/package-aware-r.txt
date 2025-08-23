@@ -3543,6 +3543,9 @@ drawable button_resume
 drawable button_settings
 drawable button_shoot
 drawable camera_logo
+drawable camera_spinner_background
+drawable camera_spinner_popup_bg
+drawable camera_spinner_title_bg
 drawable cat
 drawable clear
 drawable com_loading_arrow
@@ -3670,6 +3673,7 @@ drawable flashlight_turn_on
 drawable font
 drawable googleg_disabled_color_18
 drawable googleg_standard_color_18
+drawable gradient_overlay
 drawable horse
 drawable ic_action_add
 drawable ic_action_back
@@ -3865,6 +3869,9 @@ drawable rect_dialogx_material_poptip_bkg
 drawable rect_dialogx_material_poptip_bkg_night
 drawable rect_dialogx_material_wait_bkg
 drawable ripple
+drawable rotate_spinner_background
+drawable rotate_spinner_popup_bg
+drawable rotate_spinner_title_bg
 drawable round_border_background
 drawable screen
 drawable screenshot_shot
@@ -3877,7 +3884,11 @@ drawable slt_as_ios7_other_bt_middle
 drawable slt_as_ios7_other_bt_single
 drawable slt_as_ios7_other_bt_top
 drawable snake
+drawable speed_indicator_background
 drawable spinner_background
+drawable spinner_background_enhanced
+drawable spinner_popup_background
+drawable spinner_title_background
 drawable squirrel
 drawable temp_icon
 drawable test_level_drawable
@@ -4062,6 +4073,7 @@ id btn_ok
 id btn_online
 id btn_password
 id btn_qr
+id btn_record
 id btn_refresh
 id btn_reset_password
 id btn_save
@@ -4072,9 +4084,10 @@ id btn_send
 id btn_settings
 id btn_share
 id btn_shoot
+id btn_snapshot
 id btn_start
-id btn_start_streaming
 id btn_stop
+id btn_stream
 id buttonPanel
 id button_frequency
 id button_mode
@@ -4082,6 +4095,9 @@ id button_reset
 id button_start_rec_main
 id cache_measures
 id callMeasure
+id camera_container
+id camera_spinner
+id camera_spinner_title
 id cancel_action
 id cancel_button
 id card_beta
@@ -4607,6 +4623,8 @@ id rightToLeft
 id right_icon
 id right_side
 id rlCancel
+id rotate_spinner
+id rotate_spinner_title
 id rounded
 id row_frequency
 id row_gps
@@ -4662,13 +4680,11 @@ id spinner
 id spinner1
 id spinner_adaptive
 id spinner_audio_src
-id spinner_bitrate
 id spinner_camera
 id spinner_cast_adaptive
 id spinner_cast_frame
 id spinner_cast_resolution
 id spinner_frame
-id spinner_framerate
 id spinner_in
 id spinner_mode
 id spinner_out
@@ -5064,6 +5080,7 @@ layout activity_usb_popup
 layout activity_video_player
 layout activity_web
 layout afl_surface
+layout camera_spinner_layout
 layout cell_dropdown_rotate
 layout controls
 layout custom_dialog
@@ -5226,6 +5243,7 @@ layout notification_template_part_time
 layout progress_bar
 layout refresh_footer
 layout refresh_head
+layout rotate_spinner_layout
 layout row_camera
 layout row_custom_paths
 layout row_media

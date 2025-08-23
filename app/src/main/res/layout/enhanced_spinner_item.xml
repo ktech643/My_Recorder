@@ -7,4 +7,6 @@
     android:textColor="#333333"
     android:background="?android:attr/selectableItemBackground"
     android:gravity="center_vertical"
-    android:minHeight="48dp" />
+    android:minHeight="56dp"
+    android:textStyle="normal"
+    android:fontFamily="sans-serif-medium" />
