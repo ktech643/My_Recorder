@@ -46,6 +46,7 @@ import com.checkmate.android.util.CommonUtil;
 import com.checkmate.android.util.DeviceUtils;
 import com.checkmate.android.util.MainActivity;
 import com.checkmate.android.util.MessageUtil;
+import com.checkmate.android.util.CameraIconUtils;
 import com.checkmate.android.viewmodels.EventType;
 import com.checkmate.android.viewmodels.SharedViewModel;
 import com.kongzue.dialogx.dialogs.MessageDialog;
@@ -357,6 +358,9 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         } else {
             initialize();
         }
+        
+        // Set initial camera icon based on current camera type
+        setInitialCameraIcon();
     }
 
     private void checkAndAutoStart() {
@@ -574,7 +578,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     private void updateUI(boolean isRecording, boolean isLandscape) {
         ic_rec.setImageResource(R.mipmap.ic_radio);
         ic_snapshot.setImageResource(R.mipmap.ic_camera);
-        ic_sel.setImageResource(R.mipmap.ic_refresh);
+        // ic_sel icon will be set dynamically based on camera type
         ic_rotate.setImageResource(R.mipmap.ic_rotate);
         ly_snap.setEnabled(true);
         ly_rotate.setEnabled(true);
@@ -597,12 +601,12 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
 
                 if (mActivityRef != null && mActivityRef.get() != null) {
                     if (mActivityRef.get().isStreaming()) {
-                        ic_sel.setImageResource(R.mipmap.ic_refresh);
+                        // ic_sel icon will be set dynamically based on camera type
                         ic_rotate.setImageResource(R.mipmap.ic_rotate);
                         ly_camera_type.setEnabled(true);
                         ly_rotate.setEnabled(true);
                     } else {
-                        ic_sel.setImageResource(R.mipmap.ic_refresh);
+                        // ic_sel icon will be set dynamically based on camera type
                         ic_rotate.setImageResource(R.mipmap.ic_rotate);
                         ly_camera_type.setEnabled(true);
                         ly_rotate.setEnabled(true);
@@ -865,6 +869,9 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     }
 
     private void handleCameraSelection(String item, int position) {
+        // Update camera icon based on selection
+        updateCameraIcon(item);
+        
         if (TextUtils.equals(getString(R.string.rear_camera), item)) {
             handleRearCameraSelection();
         } else if (TextUtils.equals(getString(R.string.front_camera), item)) {
@@ -877,6 +884,53 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             handleAudioOnlySelection();
         } else {
             handleWifiCameraSelection(position);
+        }
+    }
+    
+    /**
+     * Update the camera type icon based on the selected camera
+     * @param cameraType The selected camera type string
+     */
+    private void updateCameraIcon(String cameraType) {
+        if (ic_sel != null && cameraType != null) {
+            CameraIconUtils.setCameraIconByString(ic_sel, cameraType);
+        }
+    }
+    
+    /**
+     * Get the current camera selection from the spinner
+     * @return The current camera selection string or null if not available
+     */
+    private String getCurrentCameraSelection() {
+        if (spinner_camera != null && cam_spinnerArray != null && !cam_spinnerArray.isEmpty()) {
+            int position = spinner_camera.getSelectedItemPosition();
+            if (position >= 0 && position < cam_spinnerArray.size()) {
+                return cam_spinnerArray.get(position);
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Set the initial camera icon based on the current camera type
+     */
+    private void setInitialCameraIcon() {
+        String cameraID = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
+        if (ic_sel != null) {
+            if (TextUtils.equals(cameraID, AppConstant.REAR_CAMERA)) {
+                CameraIconUtils.setCameraIconByString(ic_sel, getString(R.string.rear_camera));
+            } else if (TextUtils.equals(cameraID, AppConstant.FRONT_CAMERA)) {
+                CameraIconUtils.setCameraIconByString(ic_sel, getString(R.string.front_camera));
+            } else if (TextUtils.equals(cameraID, AppConstant.USB_CAMERA)) {
+                CameraIconUtils.setCameraIconByString(ic_sel, getString(R.string.usb_camera));
+            } else if (TextUtils.equals(cameraID, AppConstant.SCREEN_CAST)) {
+                CameraIconUtils.setCameraIconByString(ic_sel, getString(R.string.screen_cast));
+            } else if (TextUtils.equals(cameraID, AppConstant.AUDIO_ONLY)) {
+                CameraIconUtils.setCameraIconByString(ic_sel, getString(R.string.audio_only_text));
+            } else {
+                // Default to camera icon
+                ic_sel.setImageResource(R.mipmap.ic_camera);
+            }
         }
     }
 
@@ -1964,13 +2018,25 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
 
     public void wifiCameraStarted(String url) {
         txt_speed.setText(url);
-        ic_sel.setImageResource(R.mipmap.ic_refresh_disabled);
+        // Set disabled icon for WiFi camera
+        if (ic_sel != null) {
+            ic_sel.setImageResource(R.mipmap.ic_refresh_disabled);
+        }
         ly_camera_type.setEnabled(true);
     }
 
     public void stopWifiStream() {
         txt_speed.setText("");
-        ic_sel.setImageResource(R.mipmap.ic_refresh);
+        // Set appropriate icon based on current camera type
+        if (ic_sel != null) {
+            // Get current camera selection and update icon accordingly
+            String currentCamera = getCurrentCameraSelection();
+            if (currentCamera != null) {
+                CameraIconUtils.setCameraIconByString(ic_sel, currentCamera);
+            } else {
+                ic_sel.setImageResource(R.mipmap.ic_refresh);
+            }
+        }
         ly_camera_type.setEnabled(true);
         clearPreview();
         forceTextureViewRefresh();

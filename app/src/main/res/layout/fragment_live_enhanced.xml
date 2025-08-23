@@ -1,60 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="@color/black">
 
-    <LinearLayout
+    <!-- Camera Preview Container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/camera_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:background="@color/black">
+
+        <!-- Camera Surface -->
+        <FrameLayout
+            android:id="@+id/frame_camera"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/black"
+            app:layout_constraintDimensionRatio="H,4:3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <include layout="@layout/afl_surface" />
+
+        </FrameLayout>
+
+        <!-- Overlay Controls -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@drawable/gradient_overlay"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- Enhanced Spinners Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <!-- Camera Selection Spinner -->
+                <com.checkmate.android.ui.components.EnhancedSpinner
+                    android:id="@+id/spinner_camera"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp" />
+
+                <!-- Rotation Spinner -->
+                <com.checkmate.android.ui.components.EnhancedSpinner
+                    android:id="@+id/spinner_rotate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp" />
+
+            </LinearLayout>
+
+            <!-- Action Buttons Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="16dp">
+
+                <!-- Stream Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_stream"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Stream"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:icon="@mipmap/ic_stream"
+                    app:iconGravity="textStart"
+                    app:iconSize="20dp"
+                    app:iconTint="@android:color/white"
+                    app:cornerRadius="28dp"
+                    android:backgroundTint="@color/colorPrimary" />
+
+                <!-- Record Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_record"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Record"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:icon="@mipmap/ic_radio"
+                    app:iconGravity="textStart"
+                    app:iconSize="20dp"
+                    app:iconTint="@android:color/white"
+                    app:cornerRadius="28dp"
+                    android:backgroundTint="@color/red" />
+
+                <!-- Snapshot Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_snapshot"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Snap"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:icon="@mipmap/ic_camera"
+                    app:iconGravity="textStart"
+                    app:iconSize="20dp"
+                    app:iconTint="@android:color/white"
+                    app:cornerRadius="28dp"
+                    android:backgroundTint="@color/colorAccent" />
+
+            </LinearLayout>
+
+            <!-- Status Information -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <!-- Recording Timer -->
+                <TextView
+                    android:id="@+id/txt_record"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00:00"
+                    android:textColor="@color/red"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Network Status -->
+                <TextView
+                    android:id="@+id/txt_network"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Network: Connected"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    android:layout_marginBottom="4dp" />
+
+                <!-- GPS Status -->
+                <TextView
+                    android:id="@+id/txt_gps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GPS: ON"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Cast Overlay -->
+    <FrameLayout
+        android:id="@+id/ly_cast"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:visibility="gone">
 
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/txt_cast_screen"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Live Streaming Settings"
+            android:layout_gravity="center"
+            android:text="@string/screen_casting"
+            android:textColor="@color/red"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/colorPrimary"
-            android:layout_marginBottom="24dp"
-            android:gravity="center" />
+            android:textStyle="bold" />
 
-        <com.checkmate.android.ui.components.EnhancedSpinner
-            android:id="@+id/spinner_quality"
-            android:layout_width="match_parent"
+    </FrameLayout>
+
+    <!-- Audio Overlay -->
+    <FrameLayout
+        android:id="@+id/ly_audio"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/txt_audio_screen"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+            android:layout_gravity="center"
+            android:text="@string/audio_only_txt"
+            android:textColor="@color/red"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
-        <com.checkmate.android.ui.components.EnhancedSpinner
-            android:id="@+id/spinner_resolution"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+    </FrameLayout>
 
-        <com.checkmate.android.ui.components.EnhancedSpinner
-            android:id="@+id/spinner_bitrate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+    <!-- Speed Indicator -->
+    <TextView
+        android:id="@+id/txt_speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:text="0 Mbps"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:background="@drawable/speed_indicator_background"
+        android:padding="8dp" />
 
-        <com.checkmate.android.ui.components.EnhancedSpinner
-            android:id="@+id/spinner_framerate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp" />
+    <!-- Refresh Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:src="@mipmap/btn_refresh"
+        android:visibility="gone"
+        app:backgroundTint="@color/colorPrimary"
+        app:tint="@android:color/white"
+        app:fabSize="normal" />
 
-        <!-- Additional controls can be added here -->
-        <Button
-            android:id="@+id/btn_start_streaming"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Start Live Streaming"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:background="@drawable/button_primary"
-            android:textColor="@android:color/white"
-            android:layout_marginTop="16dp" />
+    <!-- VU Meter -->
+    <include layout="@layout/vumeter" />
 
-    </LinearLayout>
-
-</ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
