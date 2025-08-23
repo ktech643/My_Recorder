@@ -1,635 +1,679 @@
 [
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_camera.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_camera.xml"
-    },
-    {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xxhdpi_ic_record.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xxhdpi/ic_record.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_name.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_name.xml"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/xml_file_paths.xml.flat",
         "source": "com.checkmate.android.app-main-63:/xml/file_paths.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-hdpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-hdpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_edit.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_edit.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_btn_mute_a.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/btn_mute_a.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_middle_normal.9.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_middle_normal.9.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_flip.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/button_flip.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_bg_camera.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_bg_camera.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/anim_out_down.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/anim/out_down.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_details_background.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/details_background.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_home.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/fragment_home.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_shape_oval_normal.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-mdpi/shape_oval_normal.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate_disabled.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate_disabled.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_tile_layout.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/tile_layout.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_resume.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/button_resume.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_top_pressed.9.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_top_pressed.9.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_ic_warning_black_48dp.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/ic_warning_black_48dp.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/anim_out_left.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/anim/out_left.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_flash.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/btn_flash.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/anim_in_up.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/anim/in_up.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_activation.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_activation.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout-land_activity_chess.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout-land/activity_chess.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_queen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_queen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_edit.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_edit.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_normal.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_normal.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_elephant.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/elephant.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_row_media.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/row_media.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_camera_disabled.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_camera_disabled.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_back.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_back.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_queen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_queen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_usb_popup.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_usb_popup.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_floating_bar.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/floating_bar.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_rotate_90.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_rotate_90.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_delete.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_delete.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_butterfly.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/butterfly.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_accessibility_overlay.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/accessibility_overlay.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate_white.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate_white.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_mirror.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_mirror.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_lan_connect_black_24dp.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/ic_lan_connect_black_24dp.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_settings.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_settings.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_cat.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/cat.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_dark_no_border.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/dark_no_border.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_bg_border.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/bg_border.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_temp_icon.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/temp_icon.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_bat.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/bat.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_stream.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_stream.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/color_focus_button_tint.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/color/focus_button_tint.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_pig.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/pig.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_btn_start.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/btn_start.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_text_inpu_password.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/text_inpu_password.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/menu_tab_bar.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/menu/tab_bar.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_deer.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/deer.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_afl_surface.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/afl_surface.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_share.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_share.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_light_border.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/light_border.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_single.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_single.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_home.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_home.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_row_wifi_camera.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/row_wifi_camera.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_splash.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_splash.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/color_camera_selector_text.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/color/camera_selector_text.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_text_input_activation.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/text_input_activation.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_lock.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_lock.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/ic_launcher_round.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_camera.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_camera.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/anim_in_left.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/anim/in_left.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_shape_rectangle_normal.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-mdpi/shape_rectangle_normal.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/anim_out_right.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/anim/out_right.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_com_loading_arrow.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/com_loading_arrow.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_service.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_service.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_menu.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_menu.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_record.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_record.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate_disabled.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate_disabled.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_transcode.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_transcode.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_rat.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/rat.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_chess.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_chess.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_single_normal.9.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_single_normal.9.png"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout-land_activity_service.xml.flat",
         "source": "com.checkmate.android.app-main-63:/layout-land/activity_service.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-mdpi_ic_launcher.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-mdpi/ic_launcher.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_zoom_in.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_zoom_in.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_dark_border.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/dark_border.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_cast.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_cast.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_activation_complete.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_activation_complete.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_playback_fragment_background.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/playback_fragment_background.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_close_white_16dp.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/ic_close_white_16dp.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_rotate_active.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_rotate_active.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-hdpi/ic_launcher_round.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_machine.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_machine.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_text.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_text.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_camera_rear.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_camera_rear.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_flip.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_flip.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_ic_warning_black_48dp.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-mdpi/ic_warning_black_48dp.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_bottom.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_bottom.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/raw_t3thercloudworker.pfx.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/raw/t3thercloudworker.pfx"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_com_loading_arrow.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/com_loading_arrow.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_progress.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_progress.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_blue_button.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/blue_button.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_title.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_title.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_owl.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/owl.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_wifilist.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_wifilist.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_hide.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_hide.png"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout_bmb_text_outside_circle_button.xml.flat",
         "source": "com.checkmate.android.app-main-63:/layout/bmb_text_outside_circle_button.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_piece_dot.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/piece_dot.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_wifi.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_wifi.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-mdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_wifi_password.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_wifi_password.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_camera_disabled.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_camera_disabled.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_btn_stop.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/btn_stop.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-xxhdpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-xxhdpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout-land_activity_chess.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout-land/activity_chess.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_b_bishop.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/b_bishop.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_back.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_back.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_floating_bar.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/floating_bar.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bg_white.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/bg_white.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/anim_out_right.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/anim/out_right.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_question.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_question.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_delete.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_delete.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-ldpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-ldpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_button_inverse.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/button_inverse.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_middle_pressed.9.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_middle_pressed.9.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_progress.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_progress.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_bmb_text_inside_circle_button.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/bmb_text_inside_circle_button.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_shoot.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/btn_shoot.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_stream_white.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_stream_white.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_squirrel.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/squirrel.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_wifilist.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_wifilist.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_king.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_king.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_pin.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_pin.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxxhdpi/ic_launcher_round.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_plus.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_plus.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_test.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_test.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_place_holder_image.jpg.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/place_holder_image.jpg"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_mute_on.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/button_mute_on.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bee.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/bee.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/xml_device_filter.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/xml/device_filter.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_accessibility_overlay.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/accessibility_overlay.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_single.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_single.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/anim_in_down.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/anim/in_down.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_password.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_password.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_horse.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/horse.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-ldpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-ldpi/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-xxxhdpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-xxxhdpi/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_encryption.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_encryption.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_lan_connect_black_24dp.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_lan_connect_black_24dp.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_simple_list_item.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/simple_list_item.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_light_no_border.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/light_no_border.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_single_pressed.9.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_single_pressed.9.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-mdpi_ic_record.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-mdpi/ic_record.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_controls.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/controls.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xxxhdpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xxxhdpi/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_piece.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/piece.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_button.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/button.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_chess.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_chess.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_vumeter.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/vumeter.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_middle_normal.9.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_middle_normal.9.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_splash.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_splash.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_actionbar_title.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/actionbar_title.xml"
-    },
-    {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_edit.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_edit.png"
-    },
-    {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_camera_white.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_camera_white.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_info.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_info.xml"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/xml_network_security_config.xml.flat",
         "source": "com.checkmate.android.app-main-63:/xml/network_security_config.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_person.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_person.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_top.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_top.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_row_camera.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/row_camera.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_rotate.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_rotate.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/anim_in_right.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/anim/in_right.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_launcher_background.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/ic_launcher_background.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/anim_none.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/anim/none.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_playback.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_playback.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_b_queen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/b_queen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_mirror.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_mirror.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_camera.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_camera.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-hdpi_ic_launcher.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-hdpi/ic_launcher.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_dot_fill.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/dot_fill.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/anim_none.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/anim/none.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-mdpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-mdpi/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_pause.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/ic_pause.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_camera_logo.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/camera_logo.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_flip.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/btn_flip.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_erroe_reporter.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_erroe_reporter.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_rat.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/rat.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_close.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_close.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_rec_stop.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/ic_rec_stop.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_delete.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_delete.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-mdpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-mdpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_shoot.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/btn_shoot.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_home.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_home.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_bmb_simple_circle_button.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/bmb_simple_circle_button.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_camera.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_camera.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio_white.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio_white.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_king.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_king.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_bg_dialog_progress.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/bg_dialog_progress.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_stats.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/stats.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_single_pressed.9.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_single_pressed.9.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_help.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_help.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_controls.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/controls.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_transcode.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_transcode.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/anim_rotate.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/anim/rotate.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_pin.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_pin.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_button_mute_off.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/button_mute_off.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_btn_start.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/btn_start.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_question.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_question.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_knight.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_knight.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_video_player.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_video_player.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_menu.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_menu.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_settings.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/btn_settings.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-ldpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-ldpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_image_viewer.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_image_viewer.xml"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_playback.xml.flat",
         "source": "com.checkmate.android.app-main-63:/layout/fragment_playback.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_middle.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_middle.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-xhdpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-xhdpi/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_text_input_serial.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/text_input_serial.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_test.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_test.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_ic_warning_black_36dp.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/ic_warning_black_36dp.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_cell_dropdown_rotate.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/cell_dropdown_rotate.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_delete.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_delete.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_fragment_settings.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/fragment_settings.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_screenshot_shot.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/screenshot_shot.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_bg_ios6.9.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_bg_ios6.9.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_general.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_general.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_rotate_270.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_rotate_270.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_add.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_add.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_btn_update.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/btn_update.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/screen.png"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_streaming.xml.flat",
         "source": "com.checkmate.android.app-main-63:/layout/fragment_streaming.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_email.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_email.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_edit.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_edit.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bear.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/bear.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_piece.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-mdpi/piece.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_top_pressed.9.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_top_pressed.9.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_top_normal.9.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_top_normal.9.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-mdpi/ic_launcher_round.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_delete_button_background.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/delete_button_background.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_refresh.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_refresh.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_audio.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_audio.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_rec_indicator.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/rec_indicator.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_activation_complete.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_activation_complete.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/anim_in_right.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/anim/in_right.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate_90.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate_90.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_launcher.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_button_shoot.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/button_shoot.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_tile_layout.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/tile_layout.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_rotate_180.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_rotate_180.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bat.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/bat.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_dark_no_border.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/dark_no_border.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_eagle.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/eagle.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_share.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_share.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_plus.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_plus.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_flip.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_flip.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/color_focus_text_color.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/color/focus_text_color.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-hdpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-hdpi/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/raw_t3thercloudworker.pfx.flat",
-        "source": "com.checkmate.android.app-main-63:/raw/t3thercloudworker.pfx"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_restart.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_restart.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_label.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/label.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/raw_t3thercloudworker2023a.pfx.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/raw/t3thercloudworker2023a.pfx"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bg_border.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/bg_border.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_text.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_text.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_otc.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_otc.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_transparent_icon.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/transparent_icon.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_mute_off.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/button_mute_off.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_row_text.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/row_text.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_cell_dropdown_rotate.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/cell_dropdown_rotate.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate_white.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate_white.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi-v9_ic_fiber_manual_record_trans.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi-v9/ic_fiber_manual_record_trans.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-hdpi_ic_notif.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-hdpi/ic_notif.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_afl_surface.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/afl_surface.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_navigation_view_header.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/navigation_view_header.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio_active_white.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio_active_white.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_pig.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/pig.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_settings.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_settings.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_usb.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_usb.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_stream_active.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_stream_active.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_rounded_corner_background.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/rounded_corner_background.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-hdpi_ic_notif.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-hdpi/ic_notif.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_error_image.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_error_image.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_btn_mute_a.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/btn_mute_a.png"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/xml_accessibility_service_config.xml.flat",
         "source": "com.checkmate.android.app-main-63:/xml/accessibility_service_config.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/anim_rotate.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/anim/rotate.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_record.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_record.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_rook.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_rook.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_blue_button.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/blue_button.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_help.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_help.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_pause.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/ic_pause.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_lan_connect_white_16dp.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/ic_lan_connect_white_16dp.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio_active.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio_active.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_mirror.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_mirror.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_ic_launcher_foreground.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_info_card_background.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/info_card_background.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_flip.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_flip.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_b_rook.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/b_rook.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_button_flash.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/button_flash.xml"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout_bmb.xml.flat",
         "source": "com.checkmate.android.app-main-63:/layout/bmb.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_bottom_normal.9.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_bottom_normal.9.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/color_bottom_nav_color_selector.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/color/bottom_nav_color_selector.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_bishop.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_bishop.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_dark_border.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/dark_border.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_round_border_background.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/round_border_background.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_email.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_email.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_light_border.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/light_border.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_button_settings.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/button_settings.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi-v9_ic_fiber_manual_record_red.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi-v9/ic_fiber_manual_record_red.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_w_pawn.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/w_pawn.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_squirrel.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/squirrel.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_serial.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_serial.xml"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_share.xml.flat",
@@ -640,415 +684,611 @@
         "source": "com.checkmate.android.app-main-63:/layout/row_media.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_btn_update.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/btn_update.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_hide.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_hide.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_progress_bar.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/progress_bar.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_text_inpu_password.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/text_inpu_password.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_cancel_bt.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_cancel_bt.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_stop_bg.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/ic_stop_bg.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_snake.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/snake.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_camera_recorder.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_camera_recorder.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_camera_logo.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/camera_logo.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_home.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_home.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_trash.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_trash.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_middle_pressed.9.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_middle_pressed.9.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_inverse.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/button_inverse.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_middle.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_middle.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_hide.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/fragment_hide.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_w_knight.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/w_knight.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bg_circle_progress.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/bg_circle_progress.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_bear.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/bear.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_arrow_down.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/arrow_down.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_general.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_general.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_rook.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_rook.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_button_mute_on.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/button_mute_on.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_row_wifi_camera.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/row_wifi_camera.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_bmb_text_outside_circle_button.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/bmb_text_outside_circle_button.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_shape_oval_normal.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/shape_oval_normal.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_actionbar_title.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/actionbar_title.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_shoot.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/button_shoot.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_button_resume.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/button_resume.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_light_no_border.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/light_no_border.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_encryption.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_encryption.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-xxxhdpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-xxxhdpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_round_border_background.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/round_border_background.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/anim_out_left.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/anim/out_left.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_playback_item_elegant.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/playback_item_elegant.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-mdpi_ic_record.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-mdpi/ic_record.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/anim_out_down.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/anim/out_down.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_owl.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/owl.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_clear.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/clear.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_refresh_head.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/refresh_head.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xxhdpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xxhdpi/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_refresh_disabled.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_refresh_disabled.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_card_border_light_gray.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/card_border_light_gray.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_ic_launcher_foreground.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/ic_launcher_foreground.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_w_queen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/w_queen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_cancel_bt_bg.9.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_cancel_bt_bg.9.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_record.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/ic_record.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_dolphin.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/dolphin.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_flip.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/btn_flip.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_camera_recorder.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_camera_recorder.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_bg_rectangle.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/bg_rectangle.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/ic_launcher.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_web.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_web.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_settings.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_settings.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_help.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_help.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_refresh_footer.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/refresh_footer.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_gradient_top.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/gradient_top.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_bg_camera.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/ic_bg_camera.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_person.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_person.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_knight.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_knight.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_activation.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_activation.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_navigation_view_header.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/navigation_view_header.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_cancel_bt_bg.9.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_cancel_bt_bg.9.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio_active.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio_active.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_android_debug_bridge_black_24dp.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_android_debug_bridge_black_24dp.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_bottom_pressed.9.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_bottom_pressed.9.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_elephant.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/elephant.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_mute.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/btn_mute.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_add.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_add.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/menu_tab_bar.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/menu/tab_bar.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_fragment_live.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/fragment_live.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_camera.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_camera.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_item_camera_selector.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/item_camera_selector.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/color_focus_button_tint.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/color/focus_button_tint.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_header_background.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/header_background.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/xml_device_filter.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/xml/device_filter.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_progress_bar.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/progress_bar.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_refresh_white.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_refresh_white.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_camera_front.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_camera_front.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_bottom_normal.9.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_bottom_normal.9.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_main_gles.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_main_gles.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_main.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/main.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/anim_in_left.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/anim/in_left.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_bmb_ham_button.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/bmb_ham_button.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_no_data_background.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/no_data_background.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_cancel_bt.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_cancel_bt.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-ldpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-ldpi/screen.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xxhdpi_ic_record.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xxhdpi/ic_record.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_frequency_selection.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_frequency_selection.xml"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_main.xml.flat",
         "source": "com.checkmate.android.app-main-63:/layout/activity_main.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_peacock.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/peacock.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bg_rectangle.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/bg_rectangle.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_live.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_live.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_record.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/ic_record.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_label.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/label.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_logout.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_logout.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_service.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_service.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_item_spinner.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/item_spinner.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_mute.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/btn_mute.png"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout_bmb_simple_circle_button.xml.flat",
         "source": "com.checkmate.android.app-main-63:/layout/bmb_simple_circle_button.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_bg_ios6.9.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_bg_ios6.9.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-mdpi/ic_launcher.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_erroe_reporter.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_erroe_reporter.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-mdpi/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_custom_notif.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/custom_notif.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_snake.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/snake.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_place_holder_image.jpg.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/place_holder_image.jpg"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_bg_circle_progress.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/bg_circle_progress.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_pawn.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_pawn.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_close_white_16dp.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_close_white_16dp.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_frequency_selection.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_frequency_selection.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_stream.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_stream.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_shape_rectangle_normal.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-mdpi/shape_rectangle_normal.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_text_input_serial.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/text_input_serial.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_launcher_round.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_b_pawn.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/b_pawn.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_restart.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_restart.xml"
-    },
-    {
-        "merged": "com.checkmate.android.app-merged_res-61:/anim_in_up.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/anim/in_up.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_dolphin.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/dolphin.png"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_settings.xml.flat",
         "source": "com.checkmate.android.app-main-63:/layout/fragment_settings.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_main_gles.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_main_gles.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/menu_bottom_navigation_menu.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/menu/bottom_navigation_menu.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate_90.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate_90.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_card_background_light_gray.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/card_background_light_gray.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_home.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_home.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_stream_active.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_stream_active.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_other_bt_bg.9.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_other_bt_bg.9.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_ic_warning_black_36dp.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-mdpi/ic_warning_black_36dp.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_stop_bg.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/ic_stop_bg.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_text_input_activation.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/text_input_activation.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_machine.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_machine.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_gradient_bottom.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/gradient_bottom.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_main.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/main.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_code.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_code.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xxhdpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xxhdpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_btn_refresh.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/btn_refresh.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_lock.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_lock.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/anim_out_up.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/anim/out_up.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-land-xhdpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-land-xhdpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_fragment_playback.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/fragment_playback.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_ic_android_debug_bridge_black_24dp.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/ic_android_debug_bridge_black_24dp.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_camera.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_camera.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/anim_out_up.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/anim/out_up.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_bmb.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/bmb.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_peacock.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/peacock.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_enhanced_card_background.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/enhanced_card_background.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_row_text.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/row_text.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_bg_white.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/bg_white.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_logout.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_logout.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_zoom_out.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_zoom_out.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_top_normal.9.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_top_normal.9.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_b_king.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/b_king.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_flash.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/button_flash.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_fragment_hide.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/fragment_hide.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_refresh.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_refresh.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_popup_spinner.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/popup_spinner.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_bee.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/bee.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_btn_stop.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/btn_stop.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_wifi_password.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_wifi_password.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_screenshot_shot.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/screenshot_shot.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_lan_connect_white_16dp.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_lan_connect_white_16dp.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_bottom_pressed.9.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_bottom_pressed.9.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_ic_rec_stop.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/ic_rec_stop.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_b_knight.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/b_knight.png"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout_bmb_ham_button.xml.flat",
         "source": "com.checkmate.android.app-main-63:/layout/bmb_ham_button.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_serial.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_serial.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_wifi.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_wifi.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_code.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_code.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_otc.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_otc.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_popup_camera_selector.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/popup_camera_selector.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xxxhdpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xxxhdpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_refresh_disabled.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_refresh_disabled.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio_white.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio_white.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_custom_notif.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/custom_notif.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button_settings.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/button_settings.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/color_focus_text_color.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/color/focus_text_color.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_btn_refresh.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/btn_refresh.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_button_flip.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/button_flip.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-xhdpi_screen.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-xhdpi/screen.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_help.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_help.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_bg_dialog_progress.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/bg_dialog_progress.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_flash.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/btn_flash.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_b_bishop.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/b_bishop.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-xxhdpi_screen.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-xxhdpi/screen.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_web.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_web.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_simple_list_item.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/simple_list_item.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_activity_usb_popup.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/activity_usb_popup.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_eagle.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/eagle.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_button.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/button.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_rotate_0.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_rotate_0.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/xml_network_security_config.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/xml/network_security_config.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_refresh_head.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/refresh_head.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_temp_icon.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/temp_icon.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_arrow_down.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/arrow_down.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_rec_indicator.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/rec_indicator.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_rotate.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_rotate.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_w_rook.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/w_rook.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-hdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_playback.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_playback.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_row_camera.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/row_camera.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_fragment_streaming.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/fragment_streaming.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/xml_accessibility_service_config.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/xml/accessibility_service_config.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout-land_activity_service.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout-land/activity_service.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi_ic_action_settings.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi/ic_action_settings.png"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout_fragment_live.xml.flat",
         "source": "com.checkmate.android.app-main-63:/layout/fragment_live.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_dot_fill.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/dot_fill.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_stats.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/stats.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_transparent_icon.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/transparent_icon.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_bottom.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_bottom.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_clear.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/clear.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi-v9_ic_fiber_manual_record_trans.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi-v9/ic_fiber_manual_record_trans.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/raw_t3thercloudworker2023a.pfx.flat",
-        "source": "com.checkmate.android.app-main-63:/raw/t3thercloudworker2023a.pfx"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_horse.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/horse.png"
     },
     {
         "merged": "com.checkmate.android.app-merged_res-61:/layout_bmb_text_inside_circle_button.xml.flat",
         "source": "com.checkmate.android.app-main-63:/layout/bmb_text_inside_circle_button.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_stream_white.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_stream_white.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_playback_item_background.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/playback_item_background.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_refresh_white.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_refresh_white.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_share.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_share.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_password.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_password.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_activity_main.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/activity_main.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_live.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_live.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_trash.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_trash.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_vumeter.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/vumeter.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_refresh_footer.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/refresh_footer.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_btn_settings.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/btn_settings.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_w_king.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/w_king.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-v24_w_pawn.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-v24/w_pawn.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_launcher_background.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_launcher_background.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable_cat.png.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable/cat.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_title.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_title.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/layout_dialog_name.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/layout/dialog_name.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-v24_w_bishop.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-v24/w_bishop.png"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/drawable-hdpi_slt_as_ios7_other_bt_top.xml.flat",
-        "source": "com.checkmate.android.app-main-63:/drawable-hdpi/slt_as_ios7_other_bt_top.xml"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_dialog_service_initialization.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/dialog_service_initialization.xml"
     },
     {
-        "merged": "com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_single_normal.9.png.flat",
-        "source": "com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_single_normal.9.png"
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-xhdpi-v9_ic_fiber_manual_record_red.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-xhdpi-v9/ic_fiber_manual_record_red.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xxhdpi_actionsheet_other_bt_bg.9.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xxhdpi/actionsheet_other_bt_bg.9.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_radio_active_white.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_radio_active_white.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/mipmap-xhdpi_ic_camera_white.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/mipmap-xhdpi/ic_camera_white.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/anim_in_down.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/anim/in_down.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_butterfly.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/butterfly.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/layout_fragment_home.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/layout/fragment_home.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_deer.png.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/deer.png"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable_ic_check.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable/ic_check.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/xml_file_paths.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/xml/file_paths.xml"
+    },
+    {
+        "merged": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-merged_res-61:/drawable-land-mdpi_piece_dot.xml.flat",
+        "source": "/Users/jahan/.gradle/daemon/8.4/com.checkmate.android.app-main-63:/drawable-land-mdpi/piece_dot.xml"
     }
 ]

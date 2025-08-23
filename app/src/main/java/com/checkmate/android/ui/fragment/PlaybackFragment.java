@@ -95,13 +95,13 @@ public class PlaybackFragment extends BaseFragment
         PlaybackFragment fragment = new PlaybackFragment();
         Bundle args = new Bundle();
         String storage_location = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-        
+
         // Only set treeUri if it's a valid content URI
         if (storage_location.startsWith("content://")) {
             Uri treeUri = Uri.parse(storage_location);
             args.putParcelable(ARG_TREE_URI, treeUri);
         }
-        
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -168,7 +168,7 @@ public class PlaybackFragment extends BaseFragment
     private void handleArguments() {
         if (getArguments() != null) {
             String storage_location = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-            
+
             // Check if storage_location is a valid content URI or just a file path
             if (storage_location.startsWith("content://")) {
                 treeUri = Uri.parse(storage_location);
@@ -179,7 +179,7 @@ public class PlaybackFragment extends BaseFragment
                 tv_storage_location.setText("Storage Location: File Path (Limited Access)");
                 return;
             }
-            
+
             String strName = getFullPathFromTreeUri(treeUri);
             tv_storage_path.setText(strName);
             String storageType = AppPreference.getStr(AppPreference.KEY.Storage_Type, "Storage Location: Default Storage");

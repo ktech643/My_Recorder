@@ -86,6 +86,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -309,7 +310,21 @@ public class SharedEglManager {
     private final Runnable timestampUpdater = new Runnable() {
         @Override
         public void run() {
-            setTextForTime(getCurrentDateTime());
+            try {
+                // Periodically validate timezone and refresh if needed
+                if (!isTimezoneValid()) {
+                    Log.w(TAG, "Timezone validation failed, refreshing...");
+                    refreshTimezone();
+                }
+                
+                setTextForTime(getCurrentDateTime());
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error in timestamp updater", e);
+                // Use fallback timestamp
+                setTextForTime(getFallbackDateTime());
+            }
+            
             mCameraHandler.postDelayed(this, 1_000);
         }
     };
@@ -656,7 +671,8 @@ public class SharedEglManager {
             sharedViewModel = new ViewModelProvider(MainActivity.getInstance()).get(SharedViewModel.class);
         }
         mFormatter = new Formatter(context);
-        timeZone = TimeZone.getDefault();
+        // Safe timezone initialization with fallback
+        timeZone = getSafeTimeZone();
         
         // Initialize database
         fileStoreDb = new FileStoreDb(context);
@@ -2507,10 +2523,129 @@ public class SharedEglManager {
     }
 
     public String getCurrentDateTime() {
-        Date now = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        sdf.setTimeZone(timeZone);
-        return sdf.format(now);
+        try {
+            Date now = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            
+            // Safe timezone handling with fallback
+            TimeZone safeTimeZone = getSafeTimeZone();
+            if (safeTimeZone != null) {
+                sdf.setTimeZone(safeTimeZone);
+            } else {
+                // Fallback to system default timezone
+                sdf.setTimeZone(TimeZone.getDefault());
+            }
+            
+            return sdf.format(now);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error formatting current date/time, using fallback", e);
+            return getFallbackDateTime();
+        }
+    }
+    
+    /**
+     * Get a safe timezone with fallback mechanisms
+     */
+    private TimeZone getSafeTimeZone() {
+        try {
+            // Check if our timezone is valid
+            if (timeZone != null) {
+                // Test if the timezone is working
+                try {
+                    timeZone.getOffset(System.currentTimeMillis());
+                    return timeZone;
+                } catch (Exception e) {
+                    Log.w(TAG, "Stored timezone is invalid, getting new one", e);
+                }
+            }
+            
+            // Try to get system default timezone
+            TimeZone systemTimeZone = TimeZone.getDefault();
+            if (systemTimeZone != null) {
+                try {
+                    systemTimeZone.getOffset(System.currentTimeMillis());
+                    // Update our stored timezone
+                    timeZone = systemTimeZone;
+                    return systemTimeZone;
+                } catch (Exception e) {
+                    Log.w(TAG, "System timezone is invalid, using UTC", e);
+                }
+            }
+            
+            // Final fallback to UTC
+            TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
+            if (utcTimeZone != null) {
+                timeZone = utcTimeZone;
+                return utcTimeZone;
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting safe timezone", e);
+        }
+        
+        // Last resort fallback
+        return TimeZone.getTimeZone("GMT");
+    }
+    
+    /**
+     * Fallback date/time formatting when normal formatting fails
+     */
+    private String getFallbackDateTime() {
+        try {
+            long currentTime = System.currentTimeMillis();
+            
+            // Use Calendar for more robust date handling
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(currentTime);
+            
+            // Format manually as fallback
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is 0-based
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+            int second = calendar.get(Calendar.SECOND);
+            
+            return String.format(Locale.getDefault(), "%04d-%02d-%02d %02d:%02d:%02d", 
+                               year, month, day, hour, minute, second);
+                               
+        } catch (Exception e) {
+            Log.e(TAG, "Fallback date formatting also failed", e);
+            // Return a basic timestamp as last resort
+            return "1970-01-01 00:00:00";
+        }
+    }
+    
+    /**
+     * Refresh timezone if it becomes invalid
+     */
+    public void refreshTimezone() {
+        try {
+            TimeZone currentTimeZone = getSafeTimeZone();
+            if (currentTimeZone != null && currentTimeZone != timeZone) {
+                Log.i(TAG, "Refreshing timezone from " + 
+                          (timeZone != null ? timeZone.getID() : "null") + 
+                          " to " + currentTimeZone.getID());
+                timeZone = currentTimeZone;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error refreshing timezone", e);
+        }
+    }
+    
+    /**
+     * Check if current timezone is valid
+     */
+    public boolean isTimezoneValid() {
+        try {
+            if (timeZone == null) return false;
+            timeZone.getOffset(System.currentTimeMillis());
+            return true;
+        } catch (Exception e) {
+            Log.w(TAG, "Timezone validation failed", e);
+            return false;
+        }
     }
 
     private void handleError(String message) {

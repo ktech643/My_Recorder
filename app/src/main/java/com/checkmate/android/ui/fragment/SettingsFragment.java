@@ -66,7 +66,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.checkmate.android.service.MyAccessibilityService;
-import com.checkmate.android.service.SharedEGL.SharedEglManager;
 import com.checkmate.android.util.OnStoragePathChangeListener;
 import com.checkmate.android.viewmodels.EventType;
 import com.checkmate.android.viewmodels.SharedViewModel;
@@ -2192,12 +2191,6 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 swt_convert_ui.setChecked(false);
                 AppPreference.setBool(AppPreference.KEY.UI_CONVERT_MODE, false);
             }
-        }
-        
-        // Reinitialize EGL when leaving settings to ensure proper service switching
-        SharedEglManager eglManager = SharedEglManager.getInstance();
-        if (eglManager != null) {
-            eglManager.reinitializeEglOnSettingsExit();
         }
     }
 
