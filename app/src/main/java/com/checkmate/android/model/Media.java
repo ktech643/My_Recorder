@@ -27,4 +27,16 @@ public class Media {
     public Uri contentUri;
     public boolean is_selected;
     public boolean is_encrypted = false;
+    
+    // Additional metadata fields
+    public String mimeType;
+    public String format; // File extension/format
+    public float frameRate; // FPS for videos
+    public int bitrate; // Bitrate for videos
+    public String codec; // Video codec
+    public String cameraModel; // EXIF camera model
+    public String iso; // EXIF ISO value
+    public String aperture; // EXIF aperture
+    public String shutterSpeed; // EXIF shutter speed
+    public String focalLength; // EXIF focal length
 }

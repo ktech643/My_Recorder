@@ -255,6 +255,10 @@ public class ModernMediaAdapter extends RecyclerView.Adapter<ModernMediaAdapter.
             Intent intent = new Intent(context, VideoPlayerActivity.class);
             intent.putExtra(VideoPlayerActivity.EXTRA_VIDEO_URI, media.contentUri.toString());
             intent.putExtra(VideoPlayerActivity.EXTRA_VIDEO_NAME, media.name);
+            intent.putExtra(VideoPlayerActivity.EXTRA_FILE_SIZE, media.fileSize);
+            if (media.date != null) {
+                intent.putExtra(VideoPlayerActivity.EXTRA_DATE, media.date.getTime());
+            }
             context.startActivity(intent);
         }
         
@@ -269,6 +273,10 @@ public class ModernMediaAdapter extends RecyclerView.Adapter<ModernMediaAdapter.
             Intent intent = new Intent(context, ImageViewerActivity.class);
             intent.putExtra(ImageViewerActivity.EXTRA_IMAGE_URI, media.contentUri.toString());
             intent.putExtra(ImageViewerActivity.EXTRA_IMAGE_NAME, media.name);
+            intent.putExtra(ImageViewerActivity.EXTRA_FILE_SIZE, media.fileSize);
+            if (media.date != null) {
+                intent.putExtra(ImageViewerActivity.EXTRA_DATE, media.date.getTime());
+            }
             
             String imageInfo = ResourceUtil.date(media.date) + " • " + ResourceUtil.time(media.date);
             if (media.resolutionWidth > 0 && media.resolutionHeight > 0) {

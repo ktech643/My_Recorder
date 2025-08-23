@@ -456,6 +456,8 @@ public class PlaybackFragment extends BaseFragment
                     // Extract and store metadata for non-encrypted files
                     if (!media.is_encrypted) {
                         extractAndStoreMetadata(context, media);
+                        // Extract additional metadata using new utility
+                        com.checkmate.android.util.MetadataExtractor.extractAndPopulateMetadata(context, media);
                     }
 
                     // Insert into database
