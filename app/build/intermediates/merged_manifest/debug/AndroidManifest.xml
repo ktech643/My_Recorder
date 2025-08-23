@@ -232,6 +232,14 @@
             android:name="com.checkmate.android.ui.activity.ShareActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name="com.checkmate.android.ui.activity.ImageViewerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
+        <activity
+            android:name="com.checkmate.android.ui.activity.VideoPlayerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
+        <activity
             android:name="com.checkmate.android.ui.activity.SplashActivity"
             android:exported="true"
             android:launchMode="singleInstance"

@@ -160,6 +160,10 @@ public class PlaybackFragment extends BaseFragment
         if (list_view != null) {
             list_view.refresh();
         }
+        // Also notify the modern adapter
+        if (modernAdapter != null) {
+            modernAdapter.notifyDataSetChanged();
+        }
     }
 
     public void updateUI() {
@@ -169,7 +173,8 @@ public class PlaybackFragment extends BaseFragment
     }
 
     private void initViews() {
-        list_view = mView.findViewById(R.id.list_view);
+        // Note: list_view doesn't exist in the current layout, only recycler_view
+        list_view = mView.findViewById(R.id.list_view); // This will be null
         recyclerView = mView.findViewById(R.id.recycler_view);
         txt_no_data = mView.findViewById(R.id.txt_no_data);
         txt_select = mView.findViewById(R.id.txt_select);
@@ -178,9 +183,16 @@ public class PlaybackFragment extends BaseFragment
         tv_storage_path = mView.findViewById(R.id.tv_storage_path);
         tv_storage_location = mView.findViewById(R.id.tv_storage_location);
 
-        txt_select.setOnClickListener(v -> onSelect());
-        txt_delete.setOnClickListener(v -> onDelete());
-        txt_select_all.setOnClickListener(v -> onSelectAll());
+        // Add null checks for click listeners
+        if (txt_select != null) {
+            txt_select.setOnClickListener(v -> onSelect());
+        }
+        if (txt_delete != null) {
+            txt_delete.setOnClickListener(v -> onDelete());
+        }
+        if (txt_select_all != null) {
+            txt_select_all.setOnClickListener(v -> onSelectAll());
+        }
     }
 
     private void handleArguments() {
@@ -193,8 +205,12 @@ public class PlaybackFragment extends BaseFragment
             } else {
                 // It's a file path, not a content URI - we can't use DocumentFile with this
                 treeUri = null;
-                tv_storage_path.setText(storage_location);
-                tv_storage_location.setText("Storage Location: File Path (Limited Access)");
+                if (tv_storage_path != null) {
+                    tv_storage_path.setText(storage_location);
+                }
+                if (tv_storage_location != null) {
+                    tv_storage_location.setText("Storage Location: File Path (Limited Access)");
+                }
                 return;
             }
 
@@ -241,6 +257,12 @@ public class PlaybackFragment extends BaseFragment
     private void initialize() {
         is_selectable = false;
         
+        // Only proceed if recyclerView is available
+        if (recyclerView == null) {
+            Log.e("PlaybackFragment", "RecyclerView not found in layout");
+            return;
+        }
+        
         // Setup modern RecyclerView adapter
         modernAdapter = new ModernMediaAdapter(getActivity());
         modernAdapter.setOnDeleteClickListener(this);
@@ -250,17 +272,19 @@ public class PlaybackFragment extends BaseFragment
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(modernAdapter);
-        
-        // Hide old list view and show new RecyclerView
-        if (list_view != null) {
-            list_view.setVisibility(android.view.View.GONE);
-        }
         recyclerView.setVisibility(android.view.View.VISIBLE);
         
-        // Setup old adapter for compatibility (can be removed later)
-        adapter = new ListAdapter(getActivity());
-        list_view.setAdapter(adapter);
-        list_view.setOnRefreshListener(this);
+        // Hide old list view if it exists (it won't in current layout)
+        if (list_view != null) {
+            list_view.setVisibility(android.view.View.GONE);
+            // Setup old adapter for compatibility only if list_view exists
+            adapter = new ListAdapter(getActivity());
+            list_view.setAdapter(adapter);
+            list_view.setOnRefreshListener(this);
+        } else {
+            // list_view doesn't exist in current layout, so create adapter but don't set it anywhere
+            adapter = new ListAdapter(getActivity());
+        }
         
         // Load initial data
         resetPagination();
@@ -772,7 +796,11 @@ public class PlaybackFragment extends BaseFragment
                                 if (media.file != null) {
                                     media.file.delete();
                                     fileStoreDb.deleteByPath(media.contentUri.toString());
-                                    list_view.refresh();
+                                    if (list_view != null) {
+                                        list_view.refresh();
+                                    }
+                                    // Also refresh the modern adapter
+                                    refreshData();
                                 }
                                 return false;
                             }));

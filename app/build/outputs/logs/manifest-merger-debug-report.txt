@@ -1,26 +1,27 @@
 -- Merging decision tree log ---
 provider#androidx.core.content.FileProvider
-INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:246:9-254:20
+INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:254:9-262:20
 	android:grantUriPermissions
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:250:13-47
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:258:13-47
 	android:authorities
 		INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:248:13-60
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:256:13-60
 	android:exported
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:249:13-37
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:257:13-37
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:247:13-62
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:255:13-62
 manifest
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-294:12
-INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-294:12
-INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-294:12
-INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-294:12
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-302:12
+INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-302:12
+INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-302:12
+INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-302:12
 MERGED from [:libstream-release:] /Users/jahan/.gradle/caches/transforms-3/a027d73c6b6100f3b9cd4ab6e34afb19/transformed/jetified-libstream-release/AndroidManifest.xml:2:1-9:12
 MERGED from [com.github.mveroukis:storage-chooser:2.0.4.4a] /Users/jahan/.gradle/caches/transforms-3/55d419d6cd516a6cce324324a2346563/transformed/jetified-storage-chooser-2.0.4.4a/AndroidManifest.xml:2:1-11:12
 MERGED from [com.google.android.material:material:1.12.0] /Users/jahan/.gradle/caches/transforms-3/60e30ebb9e7ca17d68b025e4a7456f19/transformed/material-1.12.0/AndroidManifest.xml:17:1-24:12
 MERGED from [com.kongzue.dialogx:DialogX:0.0.49] /Users/jahan/.gradle/caches/transforms-3/2248674e248b5ba88edaa1a04efde97c/transformed/jetified-DialogX-0.0.49/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/jahan/.gradle/caches/transforms-3/319ae00626fabbcaf9948a1485198ea3/transformed/constraintlayout-2.1.4/AndroidManifest.xml:2:1-11:12
 MERGED from [com.github.volsahin:bottomify-navigation-view:v1.0.1] /Users/jahan/.gradle/caches/transforms-3/335d05bab203a2ea8f85b7f38da4549c/transformed/jetified-bottomify-navigation-view-v1.0.1/AndroidManifest.xml:2:1-11:12
+MERGED from [com.github.chrisbanes:PhotoView:2.3.0] /Users/jahan/.gradle/caches/transforms-3/0301f0cac87e56c33385eaa57e6c264d/transformed/jetified-PhotoView-2.3.0/AndroidManifest.xml:2:1-11:12
 MERGED from [com.github.shasin89:NotificationBanner:1.1.0] /Users/jahan/.gradle/caches/transforms-3/ace6bd5ef6c7dcf8fae26b60bad9bdf6/transformed/jetified-NotificationBanner-1.1.0/AndroidManifest.xml:2:1-14:12
 MERGED from [com.github.blikoon:QRCodeScanner:0.1.2] /Users/jahan/.gradle/caches/transforms-3/d9f454d1152e10e875def12eb045b4ad/transformed/jetified-QRCodeScanner-0.1.2/AndroidManifest.xml:2:1-19:12
 MERGED from [io.github.chaosleung:pinview:1.4.4] /Users/jahan/.gradle/caches/transforms-3/a0fd2ae52fec97bbab8738f2cbb00977/transformed/jetified-pinview-1.4.4/AndroidManifest.xml:17:1-24:12
@@ -32,7 +33,11 @@ MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /Users/jahan/.gradle/cache
 MERGED from [com.github.bumptech.glide:glide:4.16.0] /Users/jahan/.gradle/caches/transforms-3/e8e7840644f1d10f3388ac512734147f/transformed/jetified-glide-4.16.0/AndroidManifest.xml:2:1-9:12
 MERGED from [com.github.permissions-dispatcher:permissionsdispatcher:4.8.0] /Users/jahan/.gradle/caches/transforms-3/8650953649e0dd824446ca1a533b63ff/transformed/jetified-permissionsdispatcher-4.8.0/AndroidManifest.xml:2:1-9:12
 MERGED from [com.google.android.play:core-ktx:1.8.1] /Users/jahan/.gradle/caches/transforms-3/6ef26a403b103fb2e77672cc2ffdf41b/transformed/jetified-core-ktx-1.8.1/AndroidManifest.xml:2:1-9:12
-MERGED from [androidx.viewpager2:viewpager2:1.0.0] /Users/jahan/.gradle/caches/transforms-3/5f7075f0bbd81592bc8c5d935d87e3c8/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer:2.19.1] /Users/jahan/.gradle/caches/transforms-3/0dc02bfcf81da5514815b8b2b20f89e8/transformed/jetified-exoplayer-2.19.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer-ui:2.19.1] /Users/jahan/.gradle/caches/transforms-3/1d429dc073990463bc83626e326463c9/transformed/jetified-exoplayer-ui-2.19.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.recyclerview:recyclerview-selection:1.1.0] /Users/jahan/.gradle/caches/transforms-3/87e68a2544fbc01f1e940db9f7089274/transformed/recyclerview-selection-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.recyclerview:recyclerview:1.3.2] /Users/jahan/.gradle/caches/transforms-3/1a99e55605d6742a004bbec2fee126a8/transformed/recyclerview-1.3.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager2:viewpager2:1.1.0-beta02] /Users/jahan/.gradle/caches/transforms-3/1b1aa553fca73bd7f76ce9f357c24ce8/transformed/jetified-viewpager2-1.1.0-beta02/AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.firebase:firebase-analytics:22.4.0] /Users/jahan/.gradle/caches/transforms-3/efa7bcdeccfa17bf0df87c610932fe05/transformed/jetified-firebase-analytics-22.4.0/AndroidManifest.xml:2:1-9:12
 MERGED from [com.google.android.gms:play-services-measurement:22.4.0] /Users/jahan/.gradle/caches/transforms-3/7b8d7e58379ed0685569e3a5f9259579/transformed/jetified-play-services-measurement-22.4.0/AndroidManifest.xml:17:1-46:12
 MERGED from [com.google.android.gms:play-services-measurement-api:22.4.0] /Users/jahan/.gradle/caches/transforms-3/83eaa9915c38f44250a33b6a5a47df19/transformed/jetified-play-services-measurement-api-22.4.0/AndroidManifest.xml:17:1-39:12
@@ -61,15 +66,20 @@ MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /Users/jahan/.g
 MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /Users/jahan/.gradle/caches/transforms-3/762e028cc3231fdbc743d1ef8ab95ac0/transformed/drawerlayout-1.1.1/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/jahan/.gradle/caches/transforms-3/e5a7e4afc652170a13701037b69143bd/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/jahan/.gradle/caches/transforms-3/1dbbacded24112e9036eb9bf2fc768e2/transformed/vectordrawable-1.1.0/AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.media:media:1.0.0] /Users/jahan/.gradle/caches/transforms-3/9f800540dc66183cdc013516d865a47f/transformed/media-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.google.android.exoplayer:exoplayer-dash:2.19.1] /Users/jahan/.gradle/caches/transforms-3/c738d9910cc14188132049d5df1236f8/transformed/jetified-exoplayer-dash-2.19.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer-hls:2.19.1] /Users/jahan/.gradle/caches/transforms-3/d58a022f58933411ece05016b4579f07/transformed/jetified-exoplayer-hls-2.19.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer-rtsp:2.19.1] /Users/jahan/.gradle/caches/transforms-3/9647fec1d21c1883721741baa8f647dc/transformed/jetified-exoplayer-rtsp-2.19.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer-smoothstreaming:2.19.1] /Users/jahan/.gradle/caches/transforms-3/fad3fe1bf2cdce8ff1ea2d29c5895f4d/transformed/jetified-exoplayer-smoothstreaming-2.19.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer-core:2.19.1] /Users/jahan/.gradle/caches/transforms-3/1e352e2a4aeff8b626f8d58d5a299cec/transformed/jetified-exoplayer-core-2.19.1/AndroidManifest.xml:17:1-26:12
+MERGED from [androidx.media:media:1.6.0] /Users/jahan/.gradle/caches/transforms-3/f21323a0235669e5b07d9cf1d0837986/transformed/media-1.6.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /Users/jahan/.gradle/caches/transforms-3/d0fae19bb0112f81f48673e77331cc1b/transformed/jetified-emoji2-views-helper-1.2.0/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.emoji2:emoji2:1.2.0] /Users/jahan/.gradle/caches/transforms-3/9ea9155a2972ba53aed2dbcec56686b9/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:17:1-35:12
-MERGED from [androidx.recyclerview:recyclerview:1.1.0] /Users/jahan/.gradle/caches/transforms-3/2d941436f98bb806c2fc3c2736cca2c2/transformed/recyclerview-1.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /Users/jahan/.gradle/caches/transforms-3/74ae669ff771eeda7c8e601a6a8daf88/transformed/slidingpanelayout-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.customview:customview:1.1.0] /Users/jahan/.gradle/caches/transforms-3/ac9e92d583f6b2f729079eb4dfec0757/transformed/customview-1.1.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /Users/jahan/.gradle/caches/transforms-3/412aa438f3d3d75bff849b00efaa69ca/transformed/swiperefreshlayout-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /Users/jahan/.gradle/caches/transforms-3/e1463f77cbd236d5f01d91a2078a36c4/transformed/asynclayoutinflater-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [com.github.tonyofrancis.Fetch:xfetch2:3.1.6] /Users/jahan/.gradle/caches/transforms-3/32e52dfaa4a0e9050f5e680da04245df/transformed/jetified-xfetch2-3.1.6/AndroidManifest.xml:2:1-15:12
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /Users/jahan/.gradle/caches/transforms-3/06ad540ff6b7d86289b8f06d9723a010/transformed/jetified-customview-poolingcontainer-1.0.0/AndroidManifest.xml:17:1-23:12
 MERGED from [androidx.privacysandbox.ads:ads-adservices-java:1.1.0-beta11] /Users/jahan/.gradle/caches/transforms-3/39a993d7cf63b1c25720696b28d97db7/transformed/jetified-ads-adservices-java-1.1.0-beta11/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.privacysandbox.ads:ads-adservices:1.1.0-beta11] /Users/jahan/.gradle/caches/transforms-3/f3f0da52bdbbb470fd0c6aeca685a078/transformed/jetified-ads-adservices-1.1.0-beta11/AndroidManifest.xml:17:1-28:12
 MERGED from [androidx.core:core-ktx:1.13.0] /Users/jahan/.gradle/caches/transforms-3/8d7a4af4ff36a90545b6cd0e742afca8/transformed/jetified-core-ktx-1.13.0/AndroidManifest.xml:2:1-7:12
@@ -99,13 +109,19 @@ MERGED from [ch.acra:acra-core:5.12.0] /Users/jahan/.gradle/caches/transforms-3/
 MERGED from [androidx.annotation:annotation-experimental:1.4.0] /Users/jahan/.gradle/caches/transforms-3/2f1a134b8c14f4ddfc6427231e04fb70/transformed/jetified-annotation-experimental-1.4.0/AndroidManifest.xml:2:1-7:12
 MERGED from [:libuvccamera] /Users/jahan/Desktop/Projects/My_Recorder/libuvccamera/build/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-16:12
 MERGED from [androidx.cardview:cardview:1.0.0] /Users/jahan/.gradle/caches/transforms-3/5f8eced5b63e7153a566c02fde331e9f/transformed/cardview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.exifinterface:exifinterface:1.3.6] /Users/jahan/.gradle/caches/transforms-3/1b6fed7e0b118872eb31ad192d13328d/transformed/exifinterface-1.3.6/AndroidManifest.xml:17:1-24:12
 MERGED from [me.impa:Pinger:0.1] /Users/jahan/.gradle/caches/transforms-3/ad7733dcc490a5561d61966cb8a19bc8/transformed/jetified-Pinger-0.1/AndroidManifest.xml:22:1-31:12
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/jahan/.gradle/caches/transforms-3/7c12e0c0eaa85e52fc813ba07815c9d2/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
 MERGED from [com.github.bumptech.glide:gifdecoder:4.16.0] /Users/jahan/.gradle/caches/transforms-3/198c817e20f971e9192d797b3286ace8/transformed/jetified-gifdecoder-4.16.0/AndroidManifest.xml:2:1-9:12
-MERGED from [androidx.exifinterface:exifinterface:1.3.6] /Users/jahan/.gradle/caches/transforms-3/1b6fed7e0b118872eb31ad192d13328d/transformed/exifinterface-1.3.6/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/jahan/.gradle/caches/transforms-3/a298a333b83a44cd9db83fb5003831d7/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:17:1-55:12
 MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/jahan/.gradle/caches/transforms-3/3b176c83fc5efbbcfd6023e8789f3549/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:17:1-33:12
 MERGED from [androidx.tracing:tracing:1.0.0] /Users/jahan/.gradle/caches/transforms-3/044c22238ba6b09619d3612bf59bf46a/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer-datasource:2.19.1] /Users/jahan/.gradle/caches/transforms-3/7ce49080eada945165e176717b5e7d88/transformed/jetified-exoplayer-datasource-2.19.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer-database:2.19.1] /Users/jahan/.gradle/caches/transforms-3/c2d83ed011bcd5d24eece7dfbe6edb47/transformed/jetified-exoplayer-database-2.19.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer-extractor:2.19.1] /Users/jahan/.gradle/caches/transforms-3/c5db302735152e25bc82cd03b8526e07/transformed/jetified-exoplayer-extractor-2.19.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer-decoder:2.19.1] /Users/jahan/.gradle/caches/transforms-3/024b645e0943550e769dfeea426155e1/transformed/jetified-exoplayer-decoder-2.19.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer-container:2.19.1] /Users/jahan/.gradle/caches/transforms-3/3e2b19a860ac5ad8c3eec76c4d6b38cd/transformed/jetified-exoplayer-container-2.19.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.exoplayer:exoplayer-common:2.19.1] /Users/jahan/.gradle/caches/transforms-3/a149dc0266577835fe9a915bea5b1c49/transformed/jetified-exoplayer-common-2.19.1/AndroidManifest.xml:17:1-26:12
 MERGED from [com.google.firebase:firebase-components:18.0.0] /Users/jahan/.gradle/caches/transforms-3/33b65ba4998b2ea3989377bf159d8f7b/transformed/jetified-firebase-components-18.0.0/AndroidManifest.xml:15:1-20:12
 MERGED from [com.google.android.datatransport:transport-runtime:3.3.0] /Users/jahan/.gradle/caches/transforms-3/04f927949fa5a081d89a461529b1cc01/transformed/jetified-transport-runtime-3.3.0/AndroidManifest.xml:15:1-39:12
 MERGED from [com.google.android.datatransport:transport-api:3.2.0] /Users/jahan/.gradle/caches/transforms-3/c681c7498290d3376ba4c60ba2482da2/transformed/jetified-transport-api-3.2.0/AndroidManifest.xml:15:1-20:12
@@ -125,22 +141,22 @@ MERGED from [com.github.satyan:sugar:1.5] /Users/jahan/.gradle/caches/transforms
 MERGED from [com.kaopiz:kprogresshud:1.2.0] /Users/jahan/.gradle/caches/transforms-3/88de1f744ac0c544f3659d140dfcf012/transformed/jetified-kprogresshud-1.2.0/AndroidManifest.xml:2:1-15:12
 MERGED from [com.google.android.play:core:1.8.0] /Users/jahan/.gradle/caches/transforms-3/d8d8aa3d9b8dfd3ab917932df01f8f88/transformed/jetified-core-1.8.0/AndroidManifest.xml:2:1-19:12
 MERGED from [com.kongzue.dialogx.style:DialogXInterface:5] /Users/jahan/.gradle/caches/transforms-3/d15e1cc1592bb782cd08a5a40bf2b011/transformed/jetified-DialogXInterface-5/AndroidManifest.xml:2:1-10:12
-INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-294:12
-INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-294:12
-INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-294:12
+INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-302:12
+INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-302:12
+INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-302:12
 	package
 		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:5:5-36
 		INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
 		INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
 	android:versionName
 		INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-294:12
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-302:12
 		INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
 	xmlns:tools
 		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:3:5-51
 	android:versionCode
 		INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-294:12
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:1-302:12
 		INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
 	xmlns:android
 		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:2:11-69
@@ -250,12 +266,16 @@ MERGED from [com.google.android.gms:play-services-measurement-impl:22.4.0] /User
 MERGED from [com.google.android.gms:play-services-measurement-impl:22.4.0] /Users/jahan/.gradle/caches/transforms-3/158301666c7e391b35740796c11a1709/transformed/jetified-play-services-measurement-impl-22.4.0/AndroidManifest.xml:24:5-79
 MERGED from [com.google.android.gms:play-services-measurement-sdk-api:22.4.0] /Users/jahan/.gradle/caches/transforms-3/d0b942d605456441e197fbba26970362/transformed/jetified-play-services-measurement-sdk-api-22.4.0/AndroidManifest.xml:24:5-79
 MERGED from [com.google.android.gms:play-services-measurement-sdk-api:22.4.0] /Users/jahan/.gradle/caches/transforms-3/d0b942d605456441e197fbba26970362/transformed/jetified-play-services-measurement-sdk-api-22.4.0/AndroidManifest.xml:24:5-79
+MERGED from [com.google.android.exoplayer:exoplayer-core:2.19.1] /Users/jahan/.gradle/caches/transforms-3/1e352e2a4aeff8b626f8d58d5a299cec/transformed/jetified-exoplayer-core-2.19.1/AndroidManifest.xml:24:5-79
+MERGED from [com.google.android.exoplayer:exoplayer-core:2.19.1] /Users/jahan/.gradle/caches/transforms-3/1e352e2a4aeff8b626f8d58d5a299cec/transformed/jetified-exoplayer-core-2.19.1/AndroidManifest.xml:24:5-79
 MERGED from [com.github.tonyofrancis.Fetch:xfetch2:3.1.6] /Users/jahan/.gradle/caches/transforms-3/32e52dfaa4a0e9050f5e680da04245df/transformed/jetified-xfetch2-3.1.6/AndroidManifest.xml:13:5-79
 MERGED from [com.github.tonyofrancis.Fetch:xfetch2:3.1.6] /Users/jahan/.gradle/caches/transforms-3/32e52dfaa4a0e9050f5e680da04245df/transformed/jetified-xfetch2-3.1.6/AndroidManifest.xml:13:5-79
 MERGED from [com.google.android.datatransport:transport-backend-cct:3.3.0] /Users/jahan/.gradle/caches/transforms-3/b92a290d844d551674755e5350040209/transformed/jetified-transport-backend-cct-3.3.0/AndroidManifest.xml:22:5-79
 MERGED from [com.google.android.datatransport:transport-backend-cct:3.3.0] /Users/jahan/.gradle/caches/transforms-3/b92a290d844d551674755e5350040209/transformed/jetified-transport-backend-cct-3.3.0/AndroidManifest.xml:22:5-79
 MERGED from [com.github.tonyofrancis.Fetch:xfetch2core:3.1.6] /Users/jahan/.gradle/caches/transforms-3/5327b3e4de0a58fcf3379a3a85932837/transformed/jetified-xfetch2core-3.1.6/AndroidManifest.xml:12:5-79
 MERGED from [com.github.tonyofrancis.Fetch:xfetch2core:3.1.6] /Users/jahan/.gradle/caches/transforms-3/5327b3e4de0a58fcf3379a3a85932837/transformed/jetified-xfetch2core-3.1.6/AndroidManifest.xml:12:5-79
+MERGED from [com.google.android.exoplayer:exoplayer-common:2.19.1] /Users/jahan/.gradle/caches/transforms-3/a149dc0266577835fe9a915bea5b1c49/transformed/jetified-exoplayer-common-2.19.1/AndroidManifest.xml:24:5-79
+MERGED from [com.google.android.exoplayer:exoplayer-common:2.19.1] /Users/jahan/.gradle/caches/transforms-3/a149dc0266577835fe9a915bea5b1c49/transformed/jetified-exoplayer-common-2.19.1/AndroidManifest.xml:24:5-79
 MERGED from [com.google.android.datatransport:transport-runtime:3.3.0] /Users/jahan/.gradle/caches/transforms-3/04f927949fa5a081d89a461529b1cc01/transformed/jetified-transport-runtime-3.3.0/AndroidManifest.xml:20:5-79
 MERGED from [com.google.android.datatransport:transport-runtime:3.3.0] /Users/jahan/.gradle/caches/transforms-3/04f927949fa5a081d89a461529b1cc01/transformed/jetified-transport-runtime-3.3.0/AndroidManifest.xml:20:5-79
 MERGED from [io.github.thanosfisherman.wifiutils:wifiutils:1.6.6] /Users/jahan/.gradle/caches/transforms-3/47bdfd55330160032c458dd9b241fe29/transformed/jetified-wifiutils-1.6.6/AndroidManifest.xml:10:5-79
@@ -505,7 +525,7 @@ ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifes
 	android:name
 		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:109:22-78
 application
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:112:5-292:19
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:112:5-300:19
 MERGED from [com.google.android.material:material:1.12.0] /Users/jahan/.gradle/caches/transforms-3/60e30ebb9e7ca17d68b025e4a7456f19/transformed/material-1.12.0/AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.12.0] /Users/jahan/.gradle/caches/transforms-3/60e30ebb9e7ca17d68b025e4a7456f19/transformed/material-1.12.0/AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/jahan/.gradle/caches/transforms-3/319ae00626fabbcaf9948a1485198ea3/transformed/constraintlayout-2.1.4/AndroidManifest.xml:9:5-20
@@ -757,148 +777,164 @@ ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifes
 		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:208:13-49
 	android:name
 		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:207:13-54
+activity#com.checkmate.android.ui.activity.ImageViewerActivity
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:209:9-212:81
+	android:screenOrientation
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:211:13-49
+	android:theme
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:212:13-78
+	android:name
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:210:13-60
+activity#com.checkmate.android.ui.activity.VideoPlayerActivity
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:213:9-216:81
+	android:screenOrientation
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:215:13-49
+	android:theme
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:216:13-78
+	android:name
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:214:13-60
 activity#com.checkmate.android.ui.activity.SplashActivity
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:209:9-220:20
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:217:9-228:20
 	android:screenOrientation
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:213:13-49
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:221:13-49
 	android:launchMode
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:212:13-48
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:220:13-48
 	android:exported
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:211:13-36
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:219:13-36
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:210:13-55
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:218:13-55
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.DEFAULT+category:name:android.intent.category.LAUNCHER
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:214:13-219:29
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:222:13-227:29
 action#android.intent.action.MAIN
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:215:17-69
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:223:17-69
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:215:25-66
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:223:25-66
 category#android.intent.category.DEFAULT
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:217:17-76
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:225:17-76
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:217:27-73
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:225:27-73
 category#android.intent.category.LAUNCHER
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:218:17-77
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:226:17-77
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:218:27-74
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:226:27-74
 activity#com.checkmate.android.ui.activity.ChessActivity
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:221:9-224:52
-	android:screenOrientation
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:224:13-49
-	android:launchMode
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:223:13-43
-	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:222:13-54
-activity#com.checkmate.android.util.MainActivity
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:225:9-244:20
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:229:9-232:52
 	android:screenOrientation
 		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:232:13-49
-	android:label
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:230:13-45
 	android:launchMode
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:231:13-44
-	android:windowSoftInputMode
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:233:13-55
-	android:exported
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:229:13-36
-	android:configChanges
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:228:13-74
-	android:alwaysRetainTaskState
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:227:13-49
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:231:13-43
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:226:13-46
-intent-filter#action:name:android.intent.action.VIEW
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:234:13-236:29
-action#android.intent.action.VIEW
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:235:17-69
-	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:235:25-66
-intent-filter#action:name:android.hardware.usb.action.USB_DEVICE_ATTACHED
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:237:13-239:29
-action#android.hardware.usb.action.USB_DEVICE_ATTACHED
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:238:17-90
-	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:238:25-87
-meta-data#android.hardware.usb.action.USB_DEVICE_ATTACHED
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:241:13-243:57
-	android:resource
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:243:17-54
-	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:242:17-79
-activity#com.checkmate.android.ui.activity.CameraActivity
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:256:9-259:52
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:230:13-54
+activity#com.checkmate.android.util.MainActivity
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:233:9-252:20
 	android:screenOrientation
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:259:13-49
-	android:configChanges
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:258:13-74
-	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:257:13-55
-service#com.checkmate.android.service.PlayService
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:261:9-56
-	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:261:18-53
-service#com.checkmate.android.service.LocationManagerService
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:262:9-67
-	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:262:18-64
-service#com.checkmate.android.util.HideNotifListener
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:263:9-271:19
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:240:13-49
 	android:label
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:266:13-54
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:238:13-45
+	android:launchMode
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:239:13-44
+	android:windowSoftInputMode
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:241:13-55
 	android:exported
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:265:13-37
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:237:13-36
+	android:configChanges
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:236:13-74
+	android:alwaysRetainTaskState
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:235:13-49
+	android:name
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:234:13-46
+intent-filter#action:name:android.intent.action.VIEW
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:242:13-244:29
+action#android.intent.action.VIEW
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:243:17-69
+	android:name
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:243:25-66
+intent-filter#action:name:android.hardware.usb.action.USB_DEVICE_ATTACHED
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:245:13-247:29
+action#android.hardware.usb.action.USB_DEVICE_ATTACHED
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:246:17-90
+	android:name
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:246:25-87
+meta-data#android.hardware.usb.action.USB_DEVICE_ATTACHED
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:249:13-251:57
+	android:resource
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:251:17-54
+	android:name
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:250:17-79
+activity#com.checkmate.android.ui.activity.CameraActivity
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:264:9-267:52
+	android:screenOrientation
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:267:13-49
+	android:configChanges
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:266:13-74
+	android:name
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:265:13-55
+service#com.checkmate.android.service.PlayService
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:269:9-56
+	android:name
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:269:18-53
+service#com.checkmate.android.service.LocationManagerService
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:270:9-67
+	android:name
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:270:18-64
+service#com.checkmate.android.util.HideNotifListener
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:271:9-279:19
+	android:label
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:274:13-54
+	android:exported
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:273:13-37
 	android:permission
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:267:13-87
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:275:13-87
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:264:13-51
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:272:13-51
 intent-filter#action:name:android.service.notification.NotificationListenerService
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:268:13-270:29
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:276:13-278:29
 action#android.service.notification.NotificationListenerService
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:269:17-98
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:277:17-98
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:269:25-96
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:277:25-96
 receiver#com.checkmate.android.receiver.ScreenReceiver
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:273:9-61
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:281:9-61
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:273:19-58
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:281:19-58
 receiver#com.checkmate.android.receiver.WifiBroadcastReceiver
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:274:9-68
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:282:9-68
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:274:19-65
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:282:19-65
 receiver#com.checkmate.android.receiver.PowerConnectionReceiver
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:275:9-282:20
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:283:9-290:20
 	android:exported
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:277:13-36
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:285:13-36
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:276:13-61
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:284:13-61
 intent-filter#action:name:android.intent.action.ACTION_POWER_CONNECTED+action:name:android.intent.action.ACTION_POWER_DISCONNECTED
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:278:13-281:29
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:286:13-289:29
 action#android.intent.action.ACTION_POWER_CONNECTED
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:279:17-87
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:287:17-87
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:279:25-84
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:287:25-84
 action#android.intent.action.ACTION_POWER_DISCONNECTED
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:280:17-90
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:288:17-90
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:280:25-87
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:288:25-87
 receiver#com.thanosfisherman.wifiutils.wifiState.WifiStateReceiver
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:283:9-285:45
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:291:9-293:45
 	tools:ignore
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:285:13-42
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:293:13-42
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:284:13-85
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:292:13-85
 receiver#com.thanosfisherman.wifiutils.wifiConnect.WifiConnectionReceiver
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:286:9-288:45
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:294:9-296:45
 	tools:ignore
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:288:13-42
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:296:13-42
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:287:13-92
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:295:13-92
 receiver#com.thanosfisherman.wifiutils.wifiScan.WifiScanReceiver
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:289:9-291:45
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:297:9-299:45
 	tools:ignore
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:291:13-42
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:299:13-42
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:290:13-83
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:298:13-83
 uses-sdk
 INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
@@ -915,6 +951,8 @@ MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/jahan/.gra
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/jahan/.gradle/caches/transforms-3/319ae00626fabbcaf9948a1485198ea3/transformed/constraintlayout-2.1.4/AndroidManifest.xml:5:5-7:41
 MERGED from [com.github.volsahin:bottomify-navigation-view:v1.0.1] /Users/jahan/.gradle/caches/transforms-3/335d05bab203a2ea8f85b7f38da4549c/transformed/jetified-bottomify-navigation-view-v1.0.1/AndroidManifest.xml:7:5-9:41
 MERGED from [com.github.volsahin:bottomify-navigation-view:v1.0.1] /Users/jahan/.gradle/caches/transforms-3/335d05bab203a2ea8f85b7f38da4549c/transformed/jetified-bottomify-navigation-view-v1.0.1/AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.chrisbanes:PhotoView:2.3.0] /Users/jahan/.gradle/caches/transforms-3/0301f0cac87e56c33385eaa57e6c264d/transformed/jetified-PhotoView-2.3.0/AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.chrisbanes:PhotoView:2.3.0] /Users/jahan/.gradle/caches/transforms-3/0301f0cac87e56c33385eaa57e6c264d/transformed/jetified-PhotoView-2.3.0/AndroidManifest.xml:7:5-9:41
 MERGED from [com.github.shasin89:NotificationBanner:1.1.0] /Users/jahan/.gradle/caches/transforms-3/ace6bd5ef6c7dcf8fae26b60bad9bdf6/transformed/jetified-NotificationBanner-1.1.0/AndroidManifest.xml:7:5-9:41
 MERGED from [com.github.shasin89:NotificationBanner:1.1.0] /Users/jahan/.gradle/caches/transforms-3/ace6bd5ef6c7dcf8fae26b60bad9bdf6/transformed/jetified-NotificationBanner-1.1.0/AndroidManifest.xml:7:5-9:41
 MERGED from [com.github.blikoon:QRCodeScanner:0.1.2] /Users/jahan/.gradle/caches/transforms-3/d9f454d1152e10e875def12eb045b4ad/transformed/jetified-QRCodeScanner-0.1.2/AndroidManifest.xml:7:5-9:41
@@ -937,8 +975,16 @@ MERGED from [com.github.permissions-dispatcher:permissionsdispatcher:4.8.0] /Use
 MERGED from [com.github.permissions-dispatcher:permissionsdispatcher:4.8.0] /Users/jahan/.gradle/caches/transforms-3/8650953649e0dd824446ca1a533b63ff/transformed/jetified-permissionsdispatcher-4.8.0/AndroidManifest.xml:5:5-7:41
 MERGED from [com.google.android.play:core-ktx:1.8.1] /Users/jahan/.gradle/caches/transforms-3/6ef26a403b103fb2e77672cc2ffdf41b/transformed/jetified-core-ktx-1.8.1/AndroidManifest.xml:5:5-43
 MERGED from [com.google.android.play:core-ktx:1.8.1] /Users/jahan/.gradle/caches/transforms-3/6ef26a403b103fb2e77672cc2ffdf41b/transformed/jetified-core-ktx-1.8.1/AndroidManifest.xml:5:5-43
-MERGED from [androidx.viewpager2:viewpager2:1.0.0] /Users/jahan/.gradle/caches/transforms-3/5f7075f0bbd81592bc8c5d935d87e3c8/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.viewpager2:viewpager2:1.0.0] /Users/jahan/.gradle/caches/transforms-3/5f7075f0bbd81592bc8c5d935d87e3c8/transformed/jetified-viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer:2.19.1] /Users/jahan/.gradle/caches/transforms-3/0dc02bfcf81da5514815b8b2b20f89e8/transformed/jetified-exoplayer-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer:2.19.1] /Users/jahan/.gradle/caches/transforms-3/0dc02bfcf81da5514815b8b2b20f89e8/transformed/jetified-exoplayer-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-ui:2.19.1] /Users/jahan/.gradle/caches/transforms-3/1d429dc073990463bc83626e326463c9/transformed/jetified-exoplayer-ui-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-ui:2.19.1] /Users/jahan/.gradle/caches/transforms-3/1d429dc073990463bc83626e326463c9/transformed/jetified-exoplayer-ui-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview-selection:1.1.0] /Users/jahan/.gradle/caches/transforms-3/87e68a2544fbc01f1e940db9f7089274/transformed/recyclerview-selection-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview-selection:1.1.0] /Users/jahan/.gradle/caches/transforms-3/87e68a2544fbc01f1e940db9f7089274/transformed/recyclerview-selection-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.recyclerview:recyclerview:1.3.2] /Users/jahan/.gradle/caches/transforms-3/1a99e55605d6742a004bbec2fee126a8/transformed/recyclerview-1.3.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.3.2] /Users/jahan/.gradle/caches/transforms-3/1a99e55605d6742a004bbec2fee126a8/transformed/recyclerview-1.3.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager2:viewpager2:1.1.0-beta02] /Users/jahan/.gradle/caches/transforms-3/1b1aa553fca73bd7f76ce9f357c24ce8/transformed/jetified-viewpager2-1.1.0-beta02/AndroidManifest.xml:5:5-44
+MERGED from [androidx.viewpager2:viewpager2:1.1.0-beta02] /Users/jahan/.gradle/caches/transforms-3/1b1aa553fca73bd7f76ce9f357c24ce8/transformed/jetified-viewpager2-1.1.0-beta02/AndroidManifest.xml:5:5-44
 MERGED from [com.google.firebase:firebase-analytics:22.4.0] /Users/jahan/.gradle/caches/transforms-3/efa7bcdeccfa17bf0df87c610932fe05/transformed/jetified-firebase-analytics-22.4.0/AndroidManifest.xml:5:5-44
 MERGED from [com.google.firebase:firebase-analytics:22.4.0] /Users/jahan/.gradle/caches/transforms-3/efa7bcdeccfa17bf0df87c610932fe05/transformed/jetified-firebase-analytics-22.4.0/AndroidManifest.xml:5:5-44
 MERGED from [com.google.android.gms:play-services-measurement:22.4.0] /Users/jahan/.gradle/caches/transforms-3/7b8d7e58379ed0685569e3a5f9259579/transformed/jetified-play-services-measurement-22.4.0/AndroidManifest.xml:20:5-44
@@ -995,14 +1041,22 @@ MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/jahan
 MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /Users/jahan/.gradle/caches/transforms-3/e5a7e4afc652170a13701037b69143bd/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/jahan/.gradle/caches/transforms-3/1dbbacded24112e9036eb9bf2fc768e2/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /Users/jahan/.gradle/caches/transforms-3/1dbbacded24112e9036eb9bf2fc768e2/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.media:media:1.0.0] /Users/jahan/.gradle/caches/transforms-3/9f800540dc66183cdc013516d865a47f/transformed/media-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.media:media:1.0.0] /Users/jahan/.gradle/caches/transforms-3/9f800540dc66183cdc013516d865a47f/transformed/media-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.exoplayer:exoplayer-dash:2.19.1] /Users/jahan/.gradle/caches/transforms-3/c738d9910cc14188132049d5df1236f8/transformed/jetified-exoplayer-dash-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-dash:2.19.1] /Users/jahan/.gradle/caches/transforms-3/c738d9910cc14188132049d5df1236f8/transformed/jetified-exoplayer-dash-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-hls:2.19.1] /Users/jahan/.gradle/caches/transforms-3/d58a022f58933411ece05016b4579f07/transformed/jetified-exoplayer-hls-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-hls:2.19.1] /Users/jahan/.gradle/caches/transforms-3/d58a022f58933411ece05016b4579f07/transformed/jetified-exoplayer-hls-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-rtsp:2.19.1] /Users/jahan/.gradle/caches/transforms-3/9647fec1d21c1883721741baa8f647dc/transformed/jetified-exoplayer-rtsp-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-rtsp:2.19.1] /Users/jahan/.gradle/caches/transforms-3/9647fec1d21c1883721741baa8f647dc/transformed/jetified-exoplayer-rtsp-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-smoothstreaming:2.19.1] /Users/jahan/.gradle/caches/transforms-3/fad3fe1bf2cdce8ff1ea2d29c5895f4d/transformed/jetified-exoplayer-smoothstreaming-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-smoothstreaming:2.19.1] /Users/jahan/.gradle/caches/transforms-3/fad3fe1bf2cdce8ff1ea2d29c5895f4d/transformed/jetified-exoplayer-smoothstreaming-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-core:2.19.1] /Users/jahan/.gradle/caches/transforms-3/1e352e2a4aeff8b626f8d58d5a299cec/transformed/jetified-exoplayer-core-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-core:2.19.1] /Users/jahan/.gradle/caches/transforms-3/1e352e2a4aeff8b626f8d58d5a299cec/transformed/jetified-exoplayer-core-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.media:media:1.6.0] /Users/jahan/.gradle/caches/transforms-3/f21323a0235669e5b07d9cf1d0837986/transformed/media-1.6.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.media:media:1.6.0] /Users/jahan/.gradle/caches/transforms-3/f21323a0235669e5b07d9cf1d0837986/transformed/media-1.6.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /Users/jahan/.gradle/caches/transforms-3/d0fae19bb0112f81f48673e77331cc1b/transformed/jetified-emoji2-views-helper-1.2.0/AndroidManifest.xml:5:5-44
 MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /Users/jahan/.gradle/caches/transforms-3/d0fae19bb0112f81f48673e77331cc1b/transformed/jetified-emoji2-views-helper-1.2.0/AndroidManifest.xml:5:5-44
 MERGED from [androidx.emoji2:emoji2:1.2.0] /Users/jahan/.gradle/caches/transforms-3/9ea9155a2972ba53aed2dbcec56686b9/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:21:5-44
 MERGED from [androidx.emoji2:emoji2:1.2.0] /Users/jahan/.gradle/caches/transforms-3/9ea9155a2972ba53aed2dbcec56686b9/transformed/jetified-emoji2-1.2.0/AndroidManifest.xml:21:5-44
-MERGED from [androidx.recyclerview:recyclerview:1.1.0] /Users/jahan/.gradle/caches/transforms-3/2d941436f98bb806c2fc3c2736cca2c2/transformed/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.recyclerview:recyclerview:1.1.0] /Users/jahan/.gradle/caches/transforms-3/2d941436f98bb806c2fc3c2736cca2c2/transformed/recyclerview-1.1.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /Users/jahan/.gradle/caches/transforms-3/74ae669ff771eeda7c8e601a6a8daf88/transformed/slidingpanelayout-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /Users/jahan/.gradle/caches/transforms-3/74ae669ff771eeda7c8e601a6a8daf88/transformed/slidingpanelayout-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.customview:customview:1.1.0] /Users/jahan/.gradle/caches/transforms-3/ac9e92d583f6b2f729079eb4dfec0757/transformed/customview-1.1.0/AndroidManifest.xml:20:5-22:41
@@ -1013,6 +1067,8 @@ MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /Users/jaha
 MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /Users/jahan/.gradle/caches/transforms-3/e1463f77cbd236d5f01d91a2078a36c4/transformed/asynclayoutinflater-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [com.github.tonyofrancis.Fetch:xfetch2:3.1.6] /Users/jahan/.gradle/caches/transforms-3/32e52dfaa4a0e9050f5e680da04245df/transformed/jetified-xfetch2-3.1.6/AndroidManifest.xml:7:5-9:41
 MERGED from [com.github.tonyofrancis.Fetch:xfetch2:3.1.6] /Users/jahan/.gradle/caches/transforms-3/32e52dfaa4a0e9050f5e680da04245df/transformed/jetified-xfetch2-3.1.6/AndroidManifest.xml:7:5-9:41
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /Users/jahan/.gradle/caches/transforms-3/06ad540ff6b7d86289b8f06d9723a010/transformed/jetified-customview-poolingcontainer-1.0.0/AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /Users/jahan/.gradle/caches/transforms-3/06ad540ff6b7d86289b8f06d9723a010/transformed/jetified-customview-poolingcontainer-1.0.0/AndroidManifest.xml:20:5-21:38
 MERGED from [androidx.privacysandbox.ads:ads-adservices-java:1.1.0-beta11] /Users/jahan/.gradle/caches/transforms-3/39a993d7cf63b1c25720696b28d97db7/transformed/jetified-ads-adservices-java-1.1.0-beta11/AndroidManifest.xml:5:5-44
 MERGED from [androidx.privacysandbox.ads:ads-adservices-java:1.1.0-beta11] /Users/jahan/.gradle/caches/transforms-3/39a993d7cf63b1c25720696b28d97db7/transformed/jetified-ads-adservices-java-1.1.0-beta11/AndroidManifest.xml:5:5-44
 MERGED from [androidx.privacysandbox.ads:ads-adservices:1.1.0-beta11] /Users/jahan/.gradle/caches/transforms-3/f3f0da52bdbbb470fd0c6aeca685a078/transformed/jetified-ads-adservices-1.1.0-beta11/AndroidManifest.xml:20:5-44
@@ -1071,20 +1127,32 @@ MERGED from [:libuvccamera] /Users/jahan/Desktop/Projects/My_Recorder/libuvccame
 MERGED from [:libuvccamera] /Users/jahan/Desktop/Projects/My_Recorder/libuvccamera/build/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-44
 MERGED from [androidx.cardview:cardview:1.0.0] /Users/jahan/.gradle/caches/transforms-3/5f8eced5b63e7153a566c02fde331e9f/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.cardview:cardview:1.0.0] /Users/jahan/.gradle/caches/transforms-3/5f8eced5b63e7153a566c02fde331e9f/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.exifinterface:exifinterface:1.3.6] /Users/jahan/.gradle/caches/transforms-3/1b6fed7e0b118872eb31ad192d13328d/transformed/exifinterface-1.3.6/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.exifinterface:exifinterface:1.3.6] /Users/jahan/.gradle/caches/transforms-3/1b6fed7e0b118872eb31ad192d13328d/transformed/exifinterface-1.3.6/AndroidManifest.xml:20:5-22:41
 MERGED from [me.impa:Pinger:0.1] /Users/jahan/.gradle/caches/transforms-3/ad7733dcc490a5561d61966cb8a19bc8/transformed/jetified-Pinger-0.1/AndroidManifest.xml:27:5-29:41
 MERGED from [me.impa:Pinger:0.1] /Users/jahan/.gradle/caches/transforms-3/ad7733dcc490a5561d61966cb8a19bc8/transformed/jetified-Pinger-0.1/AndroidManifest.xml:27:5-29:41
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/jahan/.gradle/caches/transforms-3/7c12e0c0eaa85e52fc813ba07815c9d2/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/jahan/.gradle/caches/transforms-3/7c12e0c0eaa85e52fc813ba07815c9d2/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
 MERGED from [com.github.bumptech.glide:gifdecoder:4.16.0] /Users/jahan/.gradle/caches/transforms-3/198c817e20f971e9192d797b3286ace8/transformed/jetified-gifdecoder-4.16.0/AndroidManifest.xml:5:5-7:41
 MERGED from [com.github.bumptech.glide:gifdecoder:4.16.0] /Users/jahan/.gradle/caches/transforms-3/198c817e20f971e9192d797b3286ace8/transformed/jetified-gifdecoder-4.16.0/AndroidManifest.xml:5:5-7:41
-MERGED from [androidx.exifinterface:exifinterface:1.3.6] /Users/jahan/.gradle/caches/transforms-3/1b6fed7e0b118872eb31ad192d13328d/transformed/exifinterface-1.3.6/AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.exifinterface:exifinterface:1.3.6] /Users/jahan/.gradle/caches/transforms-3/1b6fed7e0b118872eb31ad192d13328d/transformed/exifinterface-1.3.6/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/jahan/.gradle/caches/transforms-3/a298a333b83a44cd9db83fb5003831d7/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
 MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /Users/jahan/.gradle/caches/transforms-3/a298a333b83a44cd9db83fb5003831d7/transformed/jetified-profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
 MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/jahan/.gradle/caches/transforms-3/3b176c83fc5efbbcfd6023e8789f3549/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
 MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/jahan/.gradle/caches/transforms-3/3b176c83fc5efbbcfd6023e8789f3549/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
 MERGED from [androidx.tracing:tracing:1.0.0] /Users/jahan/.gradle/caches/transforms-3/044c22238ba6b09619d3612bf59bf46a/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.tracing:tracing:1.0.0] /Users/jahan/.gradle/caches/transforms-3/044c22238ba6b09619d3612bf59bf46a/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-datasource:2.19.1] /Users/jahan/.gradle/caches/transforms-3/7ce49080eada945165e176717b5e7d88/transformed/jetified-exoplayer-datasource-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-datasource:2.19.1] /Users/jahan/.gradle/caches/transforms-3/7ce49080eada945165e176717b5e7d88/transformed/jetified-exoplayer-datasource-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-database:2.19.1] /Users/jahan/.gradle/caches/transforms-3/c2d83ed011bcd5d24eece7dfbe6edb47/transformed/jetified-exoplayer-database-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-database:2.19.1] /Users/jahan/.gradle/caches/transforms-3/c2d83ed011bcd5d24eece7dfbe6edb47/transformed/jetified-exoplayer-database-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-extractor:2.19.1] /Users/jahan/.gradle/caches/transforms-3/c5db302735152e25bc82cd03b8526e07/transformed/jetified-exoplayer-extractor-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-extractor:2.19.1] /Users/jahan/.gradle/caches/transforms-3/c5db302735152e25bc82cd03b8526e07/transformed/jetified-exoplayer-extractor-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-decoder:2.19.1] /Users/jahan/.gradle/caches/transforms-3/024b645e0943550e769dfeea426155e1/transformed/jetified-exoplayer-decoder-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-decoder:2.19.1] /Users/jahan/.gradle/caches/transforms-3/024b645e0943550e769dfeea426155e1/transformed/jetified-exoplayer-decoder-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-container:2.19.1] /Users/jahan/.gradle/caches/transforms-3/3e2b19a860ac5ad8c3eec76c4d6b38cd/transformed/jetified-exoplayer-container-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-container:2.19.1] /Users/jahan/.gradle/caches/transforms-3/3e2b19a860ac5ad8c3eec76c4d6b38cd/transformed/jetified-exoplayer-container-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-common:2.19.1] /Users/jahan/.gradle/caches/transforms-3/a149dc0266577835fe9a915bea5b1c49/transformed/jetified-exoplayer-common-2.19.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.exoplayer:exoplayer-common:2.19.1] /Users/jahan/.gradle/caches/transforms-3/a149dc0266577835fe9a915bea5b1c49/transformed/jetified-exoplayer-common-2.19.1/AndroidManifest.xml:20:5-22:41
 MERGED from [com.google.firebase:firebase-components:18.0.0] /Users/jahan/.gradle/caches/transforms-3/33b65ba4998b2ea3989377bf159d8f7b/transformed/jetified-firebase-components-18.0.0/AndroidManifest.xml:18:5-44
 MERGED from [com.google.firebase:firebase-components:18.0.0] /Users/jahan/.gradle/caches/transforms-3/33b65ba4998b2ea3989377bf159d8f7b/transformed/jetified-firebase-components-18.0.0/AndroidManifest.xml:18:5-44
 MERGED from [com.google.android.datatransport:transport-runtime:3.3.0] /Users/jahan/.gradle/caches/transforms-3/04f927949fa5a081d89a461529b1cc01/transformed/jetified-transport-runtime-3.3.0/AndroidManifest.xml:18:5-44
@@ -1134,11 +1202,11 @@ INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidMani
 		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
 		INJECTED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml
 meta-data#android.support.FILE_PROVIDER_PATHS
-ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:251:13-253:54
+ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:259:13-261:54
 	android:resource
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:253:17-51
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:261:17-51
 	android:name
-		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:252:17-67
+		ADDED from /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/AndroidManifest.xml:260:17-67
 activity#com.blikoon.qrcodescanner.QrCodeActivity
 ADDED from [com.github.blikoon:QRCodeScanner:0.1.2] /Users/jahan/.gradle/caches/transforms-3/d9f454d1152e10e875def12eb045b4ad/transformed/jetified-QRCodeScanner-0.1.2/AndroidManifest.xml:15:9-16:20
 	android:name

@@ -1,7 +1,7 @@
 [
 {
-  "directory": "/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/.cxx/Debug/1v5s2bb2/armeabi-v7a",
-  "command": "/Users/jahan/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=armv7-none-linux-androideabi29 --sysroot=/Users/jahan/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DANDROID_STL=c++_shared -D_ANDROID -D_LIB_MODE -D_LIN -D_M64 -D_NO_NV -D_STREAM_MANAGER -Dnative_lib_EXPORTS -I/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/cpp/../jniLibs/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security   -std=c++14 -std=c++17 -fno-limit-debug-info  -fPIC   -o CMakeFiles/native-lib.dir/native-lib.cpp.o -c /Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/cpp/native-lib.cpp",
-  "file": "/Users/jahan/Desktop/Projects/t3_vcs_recorder/app/src/main/cpp/native-lib.cpp"
+  "directory": "/Users/jahan/Desktop/Projects/My_Recorder/app/.cxx/Debug/4h2m4k2f/armeabi-v7a",
+  "command": "/Users/jahan/Library/Android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=armv7-none-linux-androideabi29 --sysroot=/Users/jahan/Library/Android/sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DANDROID_STL=c++_shared -D_ANDROID -D_LIB_MODE -D_LIN -D_M64 -D_NO_NV -D_STREAM_MANAGER -Dnative_lib_EXPORTS -I/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/cpp/../jniLibs/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security   -std=c++14 -std=c++17 -fno-limit-debug-info  -fPIC   -o CMakeFiles/native-lib.dir/native-lib.cpp.o -c /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/cpp/native-lib.cpp",
+  "file": "/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/cpp/native-lib.cpp"
 }
 ]

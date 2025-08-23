@@ -115,9 +115,9 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 player.setPlayWhenReady(playWhenReady);
                 player.seekTo(currentWindow, playbackPosition);
                 
-                // Set rewind and fast forward increments to 10 seconds
-                player.setSeekBackIncrementMs(10000);
-                player.setSeekForwardIncrementMs(10000);
+                // Note: Seek increment methods not available in ExoPlayer 2.19.1
+                // These methods were introduced in later versions
+                // For now, users can manually seek using the seek bar
                 
                 player.prepare();
                 

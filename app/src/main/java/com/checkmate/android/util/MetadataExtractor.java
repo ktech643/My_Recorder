@@ -82,22 +82,21 @@ public class MetadataExtractor {
                 }
             }
             
-            // Codec information
-            String codec = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_CODEC_MIME_TYPE);
-            if (codec != null) {
-                // Simplify codec name for display
-                if (codec.contains("avc")) {
+            // Codec information - METADATA_KEY_VIDEO_CODEC_MIME_TYPE not available in this API level
+            // Try to infer codec from MIME type or file extension
+            if (mimeType != null) {
+                if (mimeType.contains("video/avc") || mimeType.contains("video/mp4")) {
                     media.codec = "H.264/AVC";
-                } else if (codec.contains("hevc")) {
+                } else if (mimeType.contains("video/hevc") || mimeType.contains("video/mp4")) {
                     media.codec = "H.265/HEVC";
-                } else if (codec.contains("vp8")) {
+                } else if (mimeType.contains("video/x-vnd.on2.vp8")) {
                     media.codec = "VP8";
-                } else if (codec.contains("vp9")) {
+                } else if (mimeType.contains("video/x-vnd.on2.vp9")) {
                     media.codec = "VP9";
-                } else if (codec.contains("av01")) {
+                } else if (mimeType.contains("video/av01")) {
                     media.codec = "AV1";
                 } else {
-                    media.codec = codec;
+                    media.codec = mimeType;
                 }
             }
             

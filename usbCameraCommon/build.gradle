@@ -32,6 +32,13 @@ namespace 'com.serenegiant.usbcameracommon'
    		sourceCompatibility JavaVersion.VERSION_11
    		targetCompatibility JavaVersion.VERSION_11
    	}
+	
+	// Ensure consistent Java toolchain
+	java {
+		toolchain {
+			languageVersion = JavaLanguageVersion.of(11)
+		}
+	}
 
     defaultConfig {
         minSdkVersion 26

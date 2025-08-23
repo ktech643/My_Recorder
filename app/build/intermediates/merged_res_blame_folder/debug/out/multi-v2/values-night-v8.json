@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.checkmate.android.app-mergeDebugResources-59:/values-night-v8/values-night-v8.xml",
+            "outputFile": "com.checkmate.android.app-mergeDebugResources-63:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
                     "source": "/Users/jahan/.gradle/caches/transforms-3/55d419d6cd516a6cce324324a2346563/transformed/jetified-storage-chooser-2.0.4.4a/res/values-night-v8/values-night-v8.xml",
