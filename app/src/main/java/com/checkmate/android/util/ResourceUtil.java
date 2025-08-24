@@ -174,13 +174,13 @@ public class ResourceUtil {
         }
     }
 
-    public static String date(Date date) {
+    public static String date(long date) {
         SimpleDateFormat df = new SimpleDateFormat("MM/dd/YYYY");
         String time = df.format(date);
         return time;
     }
 
-    public static String time(Date date) {
+    public static String time(long date) {
         SimpleDateFormat df = new SimpleDateFormat("h:mm a");
         String time = df.format(date);
         return time;

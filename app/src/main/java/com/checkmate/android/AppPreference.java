@@ -235,5 +235,28 @@ public class AppPreference {
         editor.remove(key);
         editor.apply();
     }
+    
+    // Rotation settings methods
+    public static void saveRotationSettings(int rotation, boolean isFlipped, boolean isMirrored) {
+        setInt(KEY.IS_ROTATED, rotation);
+        setBool(KEY.IS_FLIPPED, isFlipped);
+        setBool(KEY.IS_MIRRORED, isMirrored);
+    }
+    
+    public static int getRotation() {
+        return getInt(KEY.IS_ROTATED, 0);
+    }
+    
+    public static boolean isFlipped() {
+        return getBool(KEY.IS_FLIPPED, false);
+    }
+    
+    public static boolean isMirrored() {
+        return getBool(KEY.IS_MIRRORED, false);
+    }
+    
+    public static void resetRotationSettings() {
+        saveRotationSettings(0, false, false);
+    }
 
 }

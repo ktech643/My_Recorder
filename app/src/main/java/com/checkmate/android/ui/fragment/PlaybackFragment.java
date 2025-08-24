@@ -8,7 +8,9 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,6 +33,8 @@ import com.checkmate.android.R;
 import com.checkmate.android.database.FileStoreDb;
 import com.checkmate.android.model.Media;
 import com.checkmate.android.ui.view.DragListView;
+import com.checkmate.android.ui.activity.ImageViewerActivity;
+import com.checkmate.android.ui.activity.VideoPlayerActivity;
 import com.checkmate.android.util.MessageUtil;
 import com.checkmate.android.util.ResourceUtil;
 import com.checkmate.android.viewmodels.EventType;
@@ -90,6 +94,7 @@ public class PlaybackFragment extends BaseFragment
     TextView txt_delete;
     TextView tv_storage_path;
     TextView tv_storage_location;
+    TextView tv_refresh_hint;
 
     public static PlaybackFragment newInstance() {
         PlaybackFragment fragment = new PlaybackFragment();
@@ -140,7 +145,7 @@ public class PlaybackFragment extends BaseFragment
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser && isResumed()) {
-            list_view.refresh();
+            loadMediaFromAllSources();
             updateUI();
         }
     }
@@ -159,6 +164,7 @@ public class PlaybackFragment extends BaseFragment
         txt_delete = mView.findViewById(R.id.txt_delete);
         tv_storage_path = mView.findViewById(R.id.tv_storage_path);
         tv_storage_location = mView.findViewById(R.id.tv_storage_location);
+        tv_refresh_hint = mView.findViewById(R.id.tv_refresh_hint);
 
         txt_select.setOnClickListener(v -> onSelect());
         txt_delete.setOnClickListener(v -> onDelete());
@@ -225,7 +231,9 @@ public class PlaybackFragment extends BaseFragment
         adapter = new ListAdapter(getActivity());
         list_view.setAdapter(adapter);
         list_view.setOnRefreshListener(this);
-        list_view.refresh();
+        
+        // Load from all available sources
+        loadMediaFromAllSources();
 
         list_view.setOnItemClickListener((adapterView, view, i, l) -> {
             Media media = mDataList.get(i - 1);
@@ -243,12 +251,10 @@ public class PlaybackFragment extends BaseFragment
         if (media.is_encrypted) {
             decryptAndOpen(media, "video/mp4");
         } else {
-            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-            Uri contentUri = media.contentUri;
-            viewIntent.setType("video/mp4");
-            viewIntent.setDataAndType(contentUri, "video/*");
-            viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(viewIntent, null));
+            Intent intent = new Intent(getActivity(), VideoPlayerActivity.class);
+            intent.putExtra(VideoPlayerActivity.EXTRA_VIDEO_URI, media.contentUri.toString());
+            intent.putExtra(VideoPlayerActivity.EXTRA_IS_ENCRYPTED, false);
+            startActivity(intent);
         }
     }
 
@@ -256,12 +262,10 @@ public class PlaybackFragment extends BaseFragment
         if (media.is_encrypted) {
             decryptAndOpen(media, "image/*");
         } else {
-            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-            Uri contentUri = media.contentUri;
-            viewIntent.setType("image/*");
-            viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            viewIntent.setDataAndType(contentUri, "image/*");
-            startActivity(Intent.createChooser(viewIntent, null));
+            Intent intent = new Intent(getActivity(), ImageViewerActivity.class);
+            intent.putExtra(ImageViewerActivity.EXTRA_IMAGE_URI, media.contentUri.toString());
+            intent.putExtra(ImageViewerActivity.EXTRA_IS_ENCRYPTED, false);
+            startActivity(intent);
         }
     }
 
@@ -278,10 +282,20 @@ public class PlaybackFragment extends BaseFragment
                 boolean result = decryptFile(media.contentUri, tempDecryptedFile, password);
                 if (result) {
                     Uri fileUri = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName() + ".provider", tempDecryptedFile);
-                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    viewIntent.setDataAndType(fileUri, mimeType);
-                    viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(Intent.createChooser(viewIntent, null));
+                    
+                    // Launch appropriate in-app viewer based on mime type
+                    Intent intent;
+                    if (mimeType.startsWith("video/")) {
+                        intent = new Intent(getActivity(), VideoPlayerActivity.class);
+                        intent.putExtra(VideoPlayerActivity.EXTRA_VIDEO_URI, fileUri.toString());
+                        intent.putExtra(VideoPlayerActivity.EXTRA_IS_ENCRYPTED, true);
+                    } else {
+                        intent = new Intent(getActivity(), ImageViewerActivity.class);
+                        intent.putExtra(ImageViewerActivity.EXTRA_IMAGE_URI, fileUri.toString());
+                        intent.putExtra(ImageViewerActivity.EXTRA_IS_ENCRYPTED, true);
+                    }
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(intent);
                 } else {
                     MessageUtil.showToast(getActivity(), "Failed to decrypt");
                 }
@@ -337,21 +351,27 @@ public class PlaybackFragment extends BaseFragment
     }
 
     @Override
-    public void onRefresh() {}
+    public void onRefresh() {
+        loadMediaFromAllSources();
+    }
 
     @Override
     public void onDragRefresh() {
-        loadFromTreeUriSingleDirectory();
+        loadMediaFromAllSources();
     }
 
     @Override
     public void onDragLoadMore() {}
 
+    private void loadMediaFromAllSources() {
+        txt_no_data.setVisibility(View.GONE);
+        new LoadAllMediaTask().execute();
+    }
+    
     private void loadFromTreeUriSingleDirectory() {
         if (treeUri == null) {
-            // This means we're using file path storage, not content URI storage
-            txt_no_data.setVisibility(View.VISIBLE);
-            txt_no_data.setText("Content URI access required for this feature");
+            // Load from file paths instead
+            loadMediaFromAllSources();
             return;
         }
         txt_no_data.setVisibility(View.GONE);
@@ -415,12 +435,15 @@ public class PlaybackFragment extends BaseFragment
                         media.type = Media.TYPE.PHOTO;
                         media.is_encrypted = true;
                     } else if (lowerName.endsWith(".mp4") || lowerName.endsWith(".mov") ||
-                            lowerName.endsWith(".mkv") || lowerName.endsWith(".avi")) {
+                            lowerName.endsWith(".mkv") || lowerName.endsWith(".avi") ||
+                            lowerName.endsWith(".3gp") || lowerName.endsWith(".webm")) {
                         media.type = Media.TYPE.VIDEO;
                     } else if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") ||
-                            lowerName.endsWith(".png") || lowerName.endsWith(".gif")) {
-                        media.type = Media.TYPE.PHOTO;
+                            lowerName.endsWith(".png") || lowerName.endsWith(".gif") ||
+                            lowerName.endsWith(".bmp") || lowerName.endsWith(".webp")) {
+                        media.type = Media.TYPE.IMAGE;
                     } else {
+                        // Skip non-media files - only include VIDEO, PHOTO, and IMAGE types
                         continue;
                     }
 
@@ -434,7 +457,8 @@ public class PlaybackFragment extends BaseFragment
                             media.name,
                             uriString,
                             media.date.getTime(),
-                            media.type == Media.TYPE.VIDEO ? "video" : "photo",
+                            media.type == Media.TYPE.VIDEO ? "video" : 
+                            media.type == Media.TYPE.IMAGE ? "image" : "photo",
                             media.is_encrypted,
                             media.duration,
                             media.resolutionWidth,
@@ -522,6 +546,245 @@ public class PlaybackFragment extends BaseFragment
             list_view.onRefreshComplete();
         }
     }
+
+    private class LoadAllMediaTask extends AsyncTask<Void, Void, List<Media>> {
+        
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+        
+        @Override
+        protected List<Media> doInBackground(Void... voids) {
+            List<Media> result = new ArrayList<>();
+            
+            try {
+                // Only load from database (SAF and file paths) - ignore MediaStore
+                result.addAll(loadFromSAF());
+                result.addAll(loadFromFilePaths());
+                
+                // Sort by date (newest first)
+                if (!result.isEmpty()) {
+                    Collections.sort(result, (m1, m2) -> Long.compare(m2.date.getTime(), m1.date.getTime()));
+                }
+                
+            } catch (Exception e) {
+                Log.e("LoadAllMedia", "Error loading media", e);
+            }
+            
+            return result;
+        }
+        
+        private List<Media> loadFromSAF() {
+            List<Media> result = new ArrayList<>();
+            
+            try {
+                Context context = requireContext();
+                DocumentFile rootDoc = DocumentFile.fromTreeUri(context, treeUri);
+                if (rootDoc == null || !rootDoc.isDirectory()) {
+                    return result;
+                }
+
+                // Get existing records from DB
+                Map<String, Media> dbMediaMap = new HashMap<>();
+                List<Media> dbMediaList = fileStoreDb.getMediaForPath(treeUri.toString());
+                for (Media media : dbMediaList) {
+                    dbMediaMap.put(media.contentUri.toString(), media);
+                }
+
+                // Scan directory
+                DocumentFile[] children = rootDoc.listFiles();
+                if (children == null) return result;
+
+                for (DocumentFile doc : children) {
+                    if (doc.isDirectory()) continue;
+                    String name = doc.getName();
+                    if (TextUtils.isEmpty(name)) continue;
+
+                    Uri contentUri = doc.getUri();
+                    String uriString = contentUri.toString();
+
+                    Media media = dbMediaMap.get(uriString);
+                    if (media == null) {
+                        media = new Media();
+                        media.name = name;
+                        media.contentUri = contentUri;
+                        media.path = treeUri.toString();
+                        media.date = new Date(doc.lastModified());
+                        media.file = doc;
+
+                        // Determine media type - only include VIDEO and IMAGE types
+                        if (isVideoFile(name)) {
+                            media.type = Media.TYPE.VIDEO;
+                            extractVideoMetadata(media);
+                        } else if (isImageFile(name)) {
+                            media.type = Media.TYPE.IMAGE;
+                        } else {
+                            // Skip non-media files
+                            continue;
+                        }
+
+                        // Check if encrypted
+                        media.is_encrypted = name.endsWith(".enc");
+
+                        // Save to database
+                        long id = fileStoreDb.insert(media);
+                        media.id = id;
+                    }
+                    result.add(media);
+                }
+                
+            } catch (Exception e) {
+                Log.e("LoadSAF", "Error loading from SAF", e);
+            }
+            
+            return result;
+        }
+        
+        private List<Media> loadFromFilePaths() {
+            List<Media> result = new ArrayList<>();
+            
+            try {
+                String storagePath = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
+                
+                // If storage path is not a SAF URI, treat it as a file path
+                if (!storagePath.startsWith("content://") && !storagePath.isEmpty()) {
+                    File directory = new File(storagePath);
+                    if (directory.exists() && directory.isDirectory()) {
+                        File[] files = directory.listFiles();
+                        if (files != null) {
+                            for (File file : files) {
+                                if (file.isFile()) {
+                                    String name = file.getName();
+                                    if (isImageFile(name) || isVideoFile(name)) {
+                                        Media media = new Media();
+                                        media.name = name;
+                                        media.contentUri = Uri.fromFile(file);
+                                        media.path = storagePath;
+                                        media.date = new Date(file.lastModified());
+                                        media.fileSize = file.length();
+                                        
+                                        // Determine media type - only include VIDEO and IMAGE types
+                                        if (isVideoFile(name)) {
+                                            media.type = Media.TYPE.VIDEO;
+                                            extractVideoMetadata(media);
+                                        } else if (isImageFile(name)) {
+                                            media.type = Media.TYPE.IMAGE;
+                                        } else {
+                                            // Skip non-media files
+                                            continue;
+                                        }
+                                        
+                                        // Check if encrypted
+                                        media.is_encrypted = name.endsWith(".enc");
+                                        
+                                        result.add(media);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            } catch (Exception e) {
+                Log.e("LoadFilePaths", "Error loading from file paths", e);
+            }
+            
+            return result;
+        }
+        
+        private boolean isImageFile(String fileName) {
+            String ext = fileName.toLowerCase();
+            return ext.endsWith(".jpg") || ext.endsWith(".jpeg") || ext.endsWith(".png") || 
+                   ext.endsWith(".gif") || ext.endsWith(".bmp") || ext.endsWith(".webp") ||
+                   ext.endsWith(".jpg.enc") || ext.endsWith(".jpeg.enc") || ext.endsWith(".png.enc");
+        }
+        
+        private boolean isVideoFile(String fileName) {
+            String ext = fileName.toLowerCase();
+            return ext.endsWith(".mp4") || ext.endsWith(".avi") || ext.endsWith(".mkv") || 
+                   ext.endsWith(".mov") || ext.endsWith(".wmv") || ext.endsWith(".flv") ||
+                   ext.endsWith(".webm") || ext.endsWith(".3gp") || ext.endsWith(".mp4.enc");
+        }
+        
+        private void extractVideoMetadata(Media media) {
+            try (Cursor cursor = requireContext().getContentResolver().query(media.contentUri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                    if (sizeIndex != -1) {
+                        media.fileSize = cursor.getLong(sizeIndex);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("Metadata", "Error extracting metadata", e);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(List<Media> result) {
+            mDataList.clear();
+            mDataList.addAll(result);
+            adapter.notifyDataSetChanged();
+            
+            // Center the no data message and make it more prominent
+            if (mDataList.isEmpty()) {
+                txt_no_data.setVisibility(View.VISIBLE);
+                txt_no_data.setText("No media files found\nPull down to refresh");
+                list_view.setVisibility(View.GONE);
+            } else {
+                txt_no_data.setVisibility(View.GONE);
+                list_view.setVisibility(View.VISIBLE);
+            }
+            
+            list_view.onRefreshComplete();
+        }
+        
+        private void updateStorageLocationDisplay(List<Media> mediaList) {
+            int safCount = 0;
+            int filePathCount = 0;
+            int mediaStoreCount = 0;
+            
+            for (Media media : mediaList) {
+                if (media.path != null) {
+                    if (media.path.startsWith("content://")) {
+                        safCount++;
+                    } else if (media.path.equals("MediaStore")) {
+                        mediaStoreCount++;
+                    } else {
+                        filePathCount++;
+                    }
+                }
+            }
+            
+            StringBuilder displayText = new StringBuilder();
+            displayText.append("Multiple Sources: ");
+            
+            if (safCount > 0) {
+                displayText.append("SAF (").append(safCount).append(") ");
+            }
+            if (filePathCount > 0) {
+                displayText.append("Files (").append(filePathCount).append(") ");
+            }
+            if (mediaStoreCount > 0) {
+                displayText.append("MediaStore (").append(mediaStoreCount).append(")");
+            }
+            
+            tv_storage_location.setText(displayText.toString());
+            
+            // Show combined path info
+            String storagePath = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
+            if (!storagePath.isEmpty()) {
+                if (storagePath.startsWith("content://")) {
+                    tv_storage_path.setText("SAF: " + getFullPathFromTreeUri(treeUri));
+                } else {
+                    tv_storage_path.setText("Path: " + storagePath);
+                }
+            } else {
+                tv_storage_path.setText("All available storage locations");
+            }
+        }
+    }
+
     private void onSelect() {
         is_selectable = !is_selectable;
         for (Media media : mDataList) {
@@ -616,8 +879,8 @@ public class PlaybackFragment extends BaseFragment
             holder = (ViewHolder) convertView.getTag();
             final Media media = mDataList.get(position);
             holder.txt_name.setText(media.name);
-            holder.txt_date.setText(ResourceUtil.date(media.date));
-            holder.txt_time.setText(ResourceUtil.time(media.date));
+            holder.txt_date.setText(ResourceUtil.date(media.date.getTime()));
+            holder.txt_time.setText(ResourceUtil.time(media.date.getTime()));
 
             if (media.type == Media.TYPE.VIDEO) {
                 holder.txt_type.setText(R.string.video);
@@ -640,7 +903,19 @@ public class PlaybackFragment extends BaseFragment
                     }
                 }
                 holder.txt_duration.setVisibility(View.VISIBLE);
+            } else if (media.type == Media.TYPE.IMAGE) {
+                holder.txt_type.setText("Image");
+                holder.txt_duration.setVisibility(View.GONE);
+                if (media.is_encrypted) {
+                    holder.img_thumbnail.setImageResource(R.mipmap.ic_lock);
+                } else {
+                    Glide.with(getActivity())
+                            .load(media.contentUri)
+                            .thumbnail(0.1f)
+                            .into(holder.img_thumbnail);
+                }
             } else {
+                // Handle PHOTO type (legacy)
                 holder.txt_type.setText(R.string.photo);
                 holder.txt_duration.setVisibility(View.GONE);
                 if (media.is_encrypted) {
@@ -659,12 +934,37 @@ public class PlaybackFragment extends BaseFragment
                     media.is_selected = isChecked);
 
             holder.ic_share.setOnClickListener(v -> {
-                String mimeType = media.type == Media.TYPE.VIDEO ? "video/mp4" : "image/*";
-                ShareCompat.IntentBuilder.from(requireActivity())
-                        .setType(mimeType)
-                        .setStream(media.contentUri)
-                        .setChooserTitle("Share media...")
-                        .startChooser();
+                try {
+                    String mimeType = media.type == Media.TYPE.VIDEO ? "video/mp4" : "image/*";
+                    
+                    // Use FileProvider for safe sharing
+                    Uri shareUri;
+                    if (media.contentUri.getScheme().equals("file")) {
+                        // Convert file URI to content URI using FileProvider
+                        shareUri = FileProvider.getUriForFile(
+                            requireActivity(),
+                            requireActivity().getPackageName() + ".provider",
+                            new File(media.contentUri.getPath())
+                        );
+                    } else {
+                        // Already a content URI, use as is
+                        shareUri = media.contentUri;
+                    }
+                    
+                    ShareCompat.IntentBuilder.from(requireActivity())
+                            .setType(mimeType)
+                            .setStream(shareUri)
+                            .setChooserTitle("Share media...")
+                            .startChooser();
+                } catch (Exception e) {
+                    Log.e("Share", "Error sharing media", e);
+                    // Fallback to simple text sharing
+                    ShareCompat.IntentBuilder.from(requireActivity())
+                            .setType("text/plain")
+                            .setText("Media: " + media.name)
+                            .setChooserTitle("Share media...")
+                            .startChooser();
+                }
             });
 
             holder.ic_trash.setOnClickListener(v ->

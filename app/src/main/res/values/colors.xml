@@ -23,4 +23,7 @@
 
     <color name="border">#D8D8D8</color>
     <color name="teal">#4689F2</color>
+    
+    <!-- New colors for image/video viewers -->
+    <color name="black_transparent">#B0000000</color>
 </resources>

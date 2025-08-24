@@ -929,12 +929,6 @@ public class MainActivity extends BaseActivity
      *  Snapshot helper (delegates to whichever cam is active)
      * ──────────────────────────────────────────────────────────────────────── */
     public void takeSnapshot() {
-        String storage = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-        if (storage.isEmpty() || storage.contains("/0/")) {      // external path not set
-            isSnapShot = true;
-            openDirectory();
-            return;
-        }
         if (mCamService != null) {
             mCamService.takeSnapshot();
         } else if (mUSBService != null) {
@@ -2346,9 +2340,6 @@ public class MainActivity extends BaseActivity
     public void startCastRecording() {
         if (mCastService == null) return;
 
-        String storage = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-        if (storage.isEmpty() || storage.contains("/0/")) { openDirectory(); return; }
-
         if (!mCastService.isStreaming()) {
             Toast.makeText(this, "Please start casting first", Toast.LENGTH_SHORT).show();
             return;
@@ -2381,9 +2372,6 @@ public class MainActivity extends BaseActivity
     public void startAudioRecord() {
         if (mAudioService == null) return;
 
-        String storage = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-        if (storage.isEmpty() || storage.contains("/0/")) { openDirectory(); return; }
-
         if (mAudioService.isRecording()) mAudioService.stopRecording();
         else                             mAudioService.startRecording();
     }
@@ -2393,18 +2381,6 @@ public class MainActivity extends BaseActivity
      * ──────────────────────────────────────────────────────────────────────── */
     public void startRecord() {
       //  if (mUSBService != null || mCamService != null || mAudioService != null || mCastService != null) return;
-
-        String storage = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-        if (storage.isEmpty() || storage.contains("/0/")) {
-            // Use app's public external folder
-            File externalFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), "YourAppName");
-            if (!externalFolder.exists()) {
-                externalFolder.mkdirs();
-            }
-            storage = externalFolder.getAbsolutePath();
-            // Optionally, save this new path for future use
-            AppPreference.setStr(AppPreference.KEY.STORAGE_LOCATION, storage);
-        }
 
         boolean usbCam = AppPreference.getBool(AppPreference.KEY.IS_USB_OPENED, false);
 
