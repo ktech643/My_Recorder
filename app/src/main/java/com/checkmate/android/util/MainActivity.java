@@ -72,13 +72,7 @@ import com.checkmate.android.AppConstant;
 import com.checkmate.android.AppPreference;
 import com.checkmate.android.BuildConfig;
 import com.checkmate.android.R;
-import com.checkmate.android.boommenu.BoomMenuButton;
-import com.checkmate.android.boommenu.BoomButtons.BoomButton;
-import com.checkmate.android.boommenu.BoomButtons.ButtonPlaceEnum;
-import com.checkmate.android.boommenu.BoomButtons.TextOutsideCircleButton;
-import com.checkmate.android.boommenu.ButtonEnum;
-import com.checkmate.android.boommenu.OnBoomListener;
-import com.checkmate.android.boommenu.Piece.PiecePlaceEnum;
+
 import com.checkmate.android.model.Camera;
 import com.checkmate.android.networking.HttpApiService;
 import com.checkmate.android.networking.Responses;
@@ -191,8 +185,7 @@ public class MainActivity extends BaseActivity
     BottomifyNavigationView bottom_tab;
     TextView                 txt_record;
     FrameLayout              flImages;
-    @Nullable
-    BoomMenuButton           img_menu;
+
     public AlertDialog alertDialog;
 
     /*  ╭──────────────────────────────────────────────────────────────────────╮
@@ -520,7 +513,6 @@ public class MainActivity extends BaseActivity
         bottom_tab = findViewById(R.id.bottom_tab);
         txt_record = findViewById(R.id.txt_record);
         flImages = findViewById(R.id.flImages);
-        img_menu = findViewById(R.id.img_menu);
         
         flImages.setVisibility(View.GONE);
 
@@ -572,37 +564,7 @@ public class MainActivity extends BaseActivity
             SwitchContent(position, null);
         });
 
-        /* ── Boom-menu setup ─────────────────────────────────────────────── */
-        if (img_menu != null) {
-            img_menu.setButtonEnum(ButtonEnum.TextOutsideCircle);
-            img_menu.setPiecePlaceEnum(PiecePlaceEnum.DOT_5_3);
-            img_menu.setButtonPlaceEnum(ButtonPlaceEnum.SC_5_3);
 
-            img_menu.addBuilder(new TextOutsideCircleButton.Builder()
-                    .normalImageRes(R.mipmap.ic_live).normalTextRes(R.string.live)
-                    .normalColor(Color.WHITE).pieceColor(Color.WHITE));
-            img_menu.addBuilder(new TextOutsideCircleButton.Builder()
-                    .normalImageRes(R.mipmap.ic_playback).normalTextRes(R.string.playback)
-                    .normalColor(Color.WHITE).pieceColor(Color.WHITE));
-            img_menu.addBuilder(new TextOutsideCircleButton.Builder()
-                    .normalImageRes(R.mipmap.ic_stream).normalTextRes(R.string.stream)
-                    .normalColor(Color.WHITE).pieceColor(Color.WHITE));
-            img_menu.addBuilder(new TextOutsideCircleButton.Builder()
-                    .normalImageRes(R.mipmap.ic_settings).normalTextRes(R.string.settings)
-                    .normalColor(Color.WHITE).pieceColor(Color.WHITE));
-            img_menu.addBuilder(new TextOutsideCircleButton.Builder()
-                    .normalImageRes(R.mipmap.ic_hide).normalTextRes(R.string.hide)
-                    .normalColor(Color.WHITE).pieceColor(Color.WHITE));
-
-            img_menu.setOnBoomListener(new OnBoomListener() {
-                @Override public void onClicked(int idx, BoomButton b) { SwitchContent(idx, null); }
-                @Override public void onBackgroundClick() {}
-                @Override public void onBoomWillHide()    {}
-                @Override public void onBoomDidHide()     {}
-                @Override public void onBoomWillShow()    {}
-                @Override public void onBoomDidShow()     {}
-            });
-        }
 
         /* ── Add & hide fragments up-front for quick switching ───────────── */
         FragmentManager fm = getSupportFragmentManager();
@@ -697,7 +659,7 @@ public class MainActivity extends BaseActivity
         mCurrentFragment  = null;
 
         /* Views & misc */
-        bottom_tab = null; txt_record = null; flImages = null; img_menu = null;
+        bottom_tab = null; txt_record = null; flImages = null;
         if (fetch != null) fetch.close();        fetch = null;
         _connectivityManager = null;
 
