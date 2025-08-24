@@ -86,7 +86,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -245,24 +244,6 @@ public class SharedEglManager {
     public MediaProjection mMediaProjection;
     private final static int STATISTICS_TIMEOUT = 1000;
     private CountDownLatch shutdownLatch;
-    
-    // Enhanced EGL Surface Management
-    private volatile boolean mEglSurfaceValid = false;
-    private final Object mEglSurfaceLock = new Object();
-    private volatile Surface mCurrentPreviewSurface = null;
-    private volatile boolean mIsServiceSwitching = false;
-    private final Object mServiceSwitchingLock = new Object();
-    
-    // Enhanced Performance monitoring
-    private long mLastFrameTimeNs = 0;
-    private long mFrameCount = 0;
-    private long mDroppedFrames = 0;
-    
-    // Buffer management
-    private final Queue<Runnable> mPendingOperations = new ArrayDeque<>();
-    private volatile boolean mBufferOverflow = false;
-    private static final int MAX_PENDING_OPERATIONS = 10;
-    
     private final Runnable mUpdateStatistics = new Runnable() {
         @Override
         public void run() {
@@ -310,21 +291,7 @@ public class SharedEglManager {
     private final Runnable timestampUpdater = new Runnable() {
         @Override
         public void run() {
-            try {
-                // Periodically validate timezone and refresh if needed
-                if (!isTimezoneValid()) {
-                    Log.w(TAG, "Timezone validation failed, refreshing...");
-                    refreshTimezone();
-                }
-                
-                setTextForTime(getCurrentDateTime());
-                
-            } catch (Exception e) {
-                Log.e(TAG, "Error in timestamp updater", e);
-                // Use fallback timestamp
-                setTextForTime(getFallbackDateTime());
-            }
-            
+            setTextForTime(getCurrentDateTime());
             mCameraHandler.postDelayed(this, 1_000);
         }
     };
@@ -444,11 +411,6 @@ public class SharedEglManager {
      * @return true if registration was successful
      */
     public boolean registerService(ServiceType serviceType, BaseBackgroundService service) {
-        if (serviceType == null || service == null) {
-            Log.e(TAG, "Cannot register null service type or service");
-            return false;
-        }
-        
         synchronized (mServiceLock) {
             Log.d(TAG, "Registering service: " + serviceType);
             
@@ -671,8 +633,7 @@ public class SharedEglManager {
             sharedViewModel = new ViewModelProvider(MainActivity.getInstance()).get(SharedViewModel.class);
         }
         mFormatter = new Formatter(context);
-        // Safe timezone initialization with fallback
-        timeZone = getSafeTimeZone();
+        timeZone = TimeZone.getDefault();
         
         // Initialize database
         fileStoreDb = new FileStoreDb(context);
@@ -931,30 +892,11 @@ public class SharedEglManager {
 
     public void drawFrame() {
         if (mClosing || eglCore == null || !eglIsReady) return;
-        
-        // Check for buffer overflow
-        if (mBufferOverflow) {
-            Log.w(TAG, "Buffer overflow detected, clearing pending frames");
-            clearPendingFrames();
-            mBufferOverflow = false;
-        }
 
         mCameraHandler.post(() -> {
             if (shouldSkipFrame()) {
                 return;
             }
-            
-            // Track frame timing for performance monitoring
-            long currentFrameTime = System.nanoTime();
-            if (mLastFrameTimeNs != 0) {
-                long frameInterval = currentFrameTime - mLastFrameTimeNs;
-                if (frameInterval > SLOW_FRAME_THRESHOLD_NS * 2) {
-                    mDroppedFrames++;
-                    Log.w(TAG, "Dropped frame detected, interval: " + (frameInterval / 1_000_000) + "ms");
-                }
-            }
-            mLastFrameTimeNs = currentFrameTime;
-            mFrameCount++;
 
             if (mServiceType == ServiceType.BgAudio) {
                 // Draw a blank frame with overlay for BgAudio
@@ -2238,11 +2180,6 @@ public class SharedEglManager {
     }
 
     public void setPreviewSurface(final SurfaceTexture surfaceTexture, int width, int height) {
-        if (mCameraHandler == null) {
-            Log.e(TAG, "Camera handler is null, cannot set preview surface");
-            return;
-        }
-        
         mCameraHandler.post(() -> {
             Log.d(TAG, String.format("setPreviewSurface %d x %d", width, height));
 
@@ -2523,129 +2460,10 @@ public class SharedEglManager {
     }
 
     public String getCurrentDateTime() {
-        try {
-            Date now = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            
-            // Safe timezone handling with fallback
-            TimeZone safeTimeZone = getSafeTimeZone();
-            if (safeTimeZone != null) {
-                sdf.setTimeZone(safeTimeZone);
-            } else {
-                // Fallback to system default timezone
-                sdf.setTimeZone(TimeZone.getDefault());
-            }
-            
-            return sdf.format(now);
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error formatting current date/time, using fallback", e);
-            return getFallbackDateTime();
-        }
-    }
-    
-    /**
-     * Get a safe timezone with fallback mechanisms
-     */
-    private TimeZone getSafeTimeZone() {
-        try {
-            // Check if our timezone is valid
-            if (timeZone != null) {
-                // Test if the timezone is working
-                try {
-                    timeZone.getOffset(System.currentTimeMillis());
-                    return timeZone;
-                } catch (Exception e) {
-                    Log.w(TAG, "Stored timezone is invalid, getting new one", e);
-                }
-            }
-            
-            // Try to get system default timezone
-            TimeZone systemTimeZone = TimeZone.getDefault();
-            if (systemTimeZone != null) {
-                try {
-                    systemTimeZone.getOffset(System.currentTimeMillis());
-                    // Update our stored timezone
-                    timeZone = systemTimeZone;
-                    return systemTimeZone;
-                } catch (Exception e) {
-                    Log.w(TAG, "System timezone is invalid, using UTC", e);
-                }
-            }
-            
-            // Final fallback to UTC
-            TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
-            if (utcTimeZone != null) {
-                timeZone = utcTimeZone;
-                return utcTimeZone;
-            }
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error getting safe timezone", e);
-        }
-        
-        // Last resort fallback
-        return TimeZone.getTimeZone("GMT");
-    }
-    
-    /**
-     * Fallback date/time formatting when normal formatting fails
-     */
-    private String getFallbackDateTime() {
-        try {
-            long currentTime = System.currentTimeMillis();
-            
-            // Use Calendar for more robust date handling
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(currentTime);
-            
-            // Format manually as fallback
-            int year = calendar.get(Calendar.YEAR);
-            int month = calendar.get(Calendar.MONTH) + 1; // Calendar.MONTH is 0-based
-            int day = calendar.get(Calendar.DAY_OF_MONTH);
-            int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            int minute = calendar.get(Calendar.MINUTE);
-            int second = calendar.get(Calendar.SECOND);
-            
-            return String.format(Locale.getDefault(), "%04d-%02d-%02d %02d:%02d:%02d", 
-                               year, month, day, hour, minute, second);
-                               
-        } catch (Exception e) {
-            Log.e(TAG, "Fallback date formatting also failed", e);
-            // Return a basic timestamp as last resort
-            return "1970-01-01 00:00:00";
-        }
-    }
-    
-    /**
-     * Refresh timezone if it becomes invalid
-     */
-    public void refreshTimezone() {
-        try {
-            TimeZone currentTimeZone = getSafeTimeZone();
-            if (currentTimeZone != null && currentTimeZone != timeZone) {
-                Log.i(TAG, "Refreshing timezone from " + 
-                          (timeZone != null ? timeZone.getID() : "null") + 
-                          " to " + currentTimeZone.getID());
-                timeZone = currentTimeZone;
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error refreshing timezone", e);
-        }
-    }
-    
-    /**
-     * Check if current timezone is valid
-     */
-    public boolean isTimezoneValid() {
-        try {
-            if (timeZone == null) return false;
-            timeZone.getOffset(System.currentTimeMillis());
-            return true;
-        } catch (Exception e) {
-            Log.w(TAG, "Timezone validation failed", e);
-            return false;
-        }
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        sdf.setTimeZone(timeZone);
+        return sdf.format(now);
     }
 
     private void handleError(String message) {
@@ -3391,182 +3209,6 @@ public class SharedEglManager {
             }
         }
     }
-    
-    /**
-     * Enhanced method to change active service without destroying EGL context
-     * This method ensures that only the necessary parameters are modified while
-     * keeping the EGL surface intact for seamless transitions
-     * 
-     * @param newServiceType The new service type to activate
-     * @param newSurface The surface texture for the new service
-     * @param width The width of the surface
-     * @param height The height of the surface
-     */
-    public void eglChangeActiveService(ServiceType newServiceType, SurfaceTexture newSurface, int width, int height) {
-        synchronized (mServiceSwitchingLock) {
-            // Skip if already the active service
-            if (newServiceType != null && newServiceType.equals(mCurrentActiveService)) {
-                Log.d(TAG, "Service already active: " + newServiceType);
-                return;
-            }
-            
-            mIsServiceSwitching = true;
-            
-            try {
-                Log.d(TAG, "EGL Change Active Service to: " + newServiceType);
-                
-                // Validate EGL state before switching
-                if (!isEglReady()) {
-                    Log.w(TAG, "EGL not ready for service switch, attempting initialization");
-                    if (!initializeEglIfNeeded()) {
-                        Log.e(TAG, "Failed to initialize EGL for service switch");
-                        return;
-                    }
-                }
-                
-                // Get the new service instance
-                BaseBackgroundService newService = getServiceInstance(newServiceType);
-                if (newService == null) {
-                    Log.e(TAG, "New service instance not found: " + newServiceType);
-                    return;
-                }
-                
-                // Queue pending operations to prevent buffer overflow
-                synchronized (mPendingOperations) {
-                    if (mPendingOperations.size() > MAX_PENDING_OPERATIONS) {
-                        Log.w(TAG, "Clearing pending operations due to overflow");
-                        mPendingOperations.clear();
-                        mBufferOverflow = true;
-                    }
-                }
-                
-                // Update active service type
-                mCurrentActiveService = newServiceType;
-                
-                // Update surface only if changed
-                if (newSurface != null) {
-                    
-                    mCameraHandler.post(() -> {
-                        try {
-                            // Preserve existing EGL context
-                            synchronized (mEglSurfaceLock) {
-                                // Release old display surface carefully
-                                if (displaySurface != null) {
-                                    displaySurface.releaseEglSurface();
-                                }
-                                
-                                // Create new display surface with existing EGL core
-                                if (eglCore != null && newSurface != null) {
-                                    displaySurface = new WindowSurfaceNew(eglCore, newSurface);
-                                    mEglSurfaceValid = true;
-                                    
-                                    // Update dimensions
-                                    setSourceSize(width, height);
-                                    
-                                    Log.d(TAG, "EGL surface updated for service: " + newServiceType);
-                                }
-                            }
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error updating EGL surface", e);
-                            mEglSurfaceValid = false;
-                        }
-                    });
-                } else {
-                    // Just update dimensions if surface hasn't changed
-                    setSourceSize(width, height);
-                }
-                
-                // Apply service-specific configurations
-                applyServiceConfiguration(newService);
-                
-                // Process any pending operations
-                processPendingOperations();
-                
-            } finally {
-                mIsServiceSwitching = false;
-            }
-        }
-    }
-    
-    /**
-     * Check if two SurfaceTextures are the same
-     */
-    private boolean isSameSurface(SurfaceTexture surface1, SurfaceTexture surface2) {
-        if (surface1 == null || surface2 == null) return false;
-        return surface1 == surface2;
-    }
-    
-    /**
-     * Initialize EGL if needed
-     */
-    private boolean initializeEglIfNeeded() {
-        if (eglCore == null || !eglIsReady) {
-            try {
-                initializeEGL();
-                return true;
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to initialize EGL", e);
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    /**
-     * Apply service-specific configuration
-     */
-    private void applyServiceConfiguration(BaseBackgroundService service) {
-        if (service != null) {
-            // Apply orientation settings
-            setRotation(service.getRotation());
-            setMirror(service.getMirrorState());
-            setFlip(service.getFlipState());
-            
-            // Apply service-specific parameters
-            ServiceType serviceType = MainActivity.getServiceType();
-            if (serviceType == ServiceType.BgUSBCamera) {
-                // USB camera specific settings
-                Log.d(TAG, "Applying USB camera configuration");
-            } else if (serviceType == ServiceType.BgScreenCast) {
-                // Screen cast specific settings
-                Log.d(TAG, "Applying screen cast configuration");
-            }
-        }
-    }
-
-    /**
-     * Process pending operations
-     */
-    private void processPendingOperations() {
-        synchronized (mPendingOperations) {
-            while (!mPendingOperations.isEmpty()) {
-                Runnable operation = mPendingOperations.poll();
-                if (operation != null) {
-                    mCameraHandler.post(operation);
-                }
-            }
-        }
-    }
-    
-    /**
-     * Clear pending frames to prevent buffer overflow
-     */
-    private void clearPendingFrames() {
-        if (cameraTexture != null) {
-            try {
-                // Clear the handler queue of pending frame updates
-                mCameraHandler.removeCallbacks(null);
-                
-                // Update texture to latest frame
-                cameraTexture.updateTexImage();
-                
-                // Clear the transform matrix
-                cameraTexture.getTransformMatrix(mTmpMatrix);
-            } catch (Exception e) {
-                Log.e(TAG, "Error clearing pending frames", e);
-            }
-        }
-    }
 
     public BaseBackgroundService getServiceInstance(ServiceType type) {
         synchronized (mServiceLock) {
@@ -3583,192 +3225,6 @@ public class SharedEglManager {
         synchronized (mServiceLock) {
             cleanupDeadReferences();
             return mRegisteredServices.keySet().toArray(new ServiceType[0]);
-        }
-    }
-    
-    /**
-     * Reinitialize EGL instance when leaving settings screen
-     * This ensures that shared EGL instances and streaming/recording restart correctly
-     */
-    public void reinitializeEglOnSettingsExit() {
-        Log.d(TAG, "Reinitializing EGL on settings exit");
-        
-        mCameraHandler.post(() -> {
-            try {
-                // Save current streaming/recording states
-                final boolean wasStreaming = mStreaming;
-                final boolean wasRecording = mRecording;
-                
-                // Stop current operations temporarily
-                if (wasStreaming) {
-                    pauseStreaming();
-                }
-                if (wasRecording) {
-                    pauseRecording();
-                }
-                
-                // Release and reinitialize EGL
-                releaseEgl();
-                initializeEGL();
-                
-                // Restore streaming/recording if they were active
-                if (wasStreaming) {
-                    resumeStreaming();
-                }
-                if (wasRecording) {
-                    resumeRecording();
-                }
-                
-                Log.d(TAG, "EGL reinitialized successfully on settings exit");
-                
-            } catch (Exception e) {
-                Log.e(TAG, "Error reinitializing EGL on settings exit", e);
-                handleError("Failed to reinitialize EGL: " + e.getMessage());
-            }
-        });
-    }
-    
-    /**
-     * Pause streaming temporarily (without fully stopping)
-     */
-    private void pauseStreaming() {
-        Log.d(TAG, "Pausing streaming temporarily");
-        // Implementation depends on your streaming logic
-        // This should preserve connection but pause data flow
-    }
-    
-    /**
-     * Resume streaming after pause
-     */
-    private void resumeStreaming() {
-        Log.d(TAG, "Resuming streaming");
-        // Implementation depends on your streaming logic
-        // This should resume data flow on existing connections
-    }
-    
-    /**
-     * Pause recording temporarily (without fully stopping)
-     */
-    private void pauseRecording() {
-        Log.d(TAG, "Pausing recording temporarily");
-        // Implementation depends on your recording logic
-        // This should preserve file handles but pause writing
-    }
-    
-    /**
-     * Resume recording after pause
-     */
-    private void resumeRecording() {
-        Log.d(TAG, "Resuming recording");
-        // Implementation depends on your recording logic
-        // This should resume writing to existing files
-    }
-    
-    /**
-     * Reset EGL instance for configuration changes
-     * @param config The new configuration type (e.g., USB, front camera, etc.)
-     */
-    public void resetEglForConfiguration(ServiceType config) {
-        Log.d(TAG, "Resetting EGL for configuration: " + config);
-        
-        synchronized (mServiceSwitchingLock) {
-            mIsServiceSwitching = true;
-            
-            try {
-                // Only reinitialize if necessary
-                if (requiresEglReset(config)) {
-                    mCameraHandler.post(() -> {
-                        try {
-                            // Save states
-                            final boolean wasStreaming = mStreaming;
-                            final boolean wasRecording = mRecording;
-                            
-                            // Reinitialize with minimal disruption
-                            if (displaySurface != null) {
-                                displaySurface.releaseEglSurface();
-                            }
-                            
-                            // Reconfigure for new service type
-                            configureEglForService(config);
-                            
-                            // Restore states
-                            if (wasStreaming || wasRecording) {
-                                Log.d(TAG, "Restoring streaming/recording states");
-                            }
-                            
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error resetting EGL for configuration", e);
-                        }
-                    });
-                }
-            } finally {
-                mIsServiceSwitching = false;
-            }
-        }
-    }
-    
-    /**
-     * Check if service type requires EGL reset
-     */
-    private boolean requiresEglReset(ServiceType serviceType) {
-        // USB and Screen Cast typically require different EGL configurations
-        return serviceType == ServiceType.BgUSBCamera || 
-               serviceType == ServiceType.BgScreenCast;
-    }
-    
-    /**
-     * Configure EGL for specific service type
-     */
-    private void configureEglForService(ServiceType serviceType) {
-        Log.d(TAG, "Configuring EGL for service: " + serviceType);
-        
-        // Service-specific EGL configurations
-        switch (serviceType) {
-            case BgUSBCamera:
-                // USB camera specific EGL settings
-                if (cameraTexture != null) {
-                    cameraTexture.setDefaultBufferSize(1920, 1080); // Example USB resolution
-                }
-                break;
-                
-            case BgScreenCast:
-                // Screen cast specific EGL settings
-                if (cameraTexture != null) {
-                    cameraTexture.setDefaultBufferSize(mScreenWidth, mScreenHeight);
-                }
-                break;
-                
-            case BgCamera:
-            case BgAudio:
-                // Standard camera/audio EGL settings
-                if (cameraTexture != null) {
-                    cameraTexture.setDefaultBufferSize(srcW, srcH);
-                }
-                break;
-        }
-    }
-    
-    /**
-     * Check memory usage and log warnings if necessary
-     */
-    private void checkMemoryUsage() {
-        Runtime runtime = Runtime.getRuntime();
-        long maxMemory = runtime.maxMemory();
-        long totalMemory = runtime.totalMemory();
-        long freeMemory = runtime.freeMemory();
-        long usedMemory = totalMemory - freeMemory;
-        
-        float memoryUsagePercent = (usedMemory * 100f) / maxMemory;
-        
-        if (memoryUsagePercent > 80) {
-            Log.w(TAG, String.format("High memory usage: %.1f%% (Used: %dMB, Max: %dMB)",
-                    memoryUsagePercent, usedMemory / (1024 * 1024), maxMemory / (1024 * 1024)));
-            
-            // Suggest garbage collection if memory is critically low
-            if (memoryUsagePercent > 90) {
-                System.gc();
-                Log.w(TAG, "Requested garbage collection due to high memory usage");
-            }
         }
     }
 }

@@ -17,11 +17,6 @@
     <color name="red">#de5249</color>
     <color name="textInputLayout">#96ffffff</color>
     <color name="uvv_titlebar_bg">#7f000000</color>
-    
-    <!-- Navigation Colors -->
-    <color name="nav_item_unselected">#757575</color>
-    <color name="nav_background">#FFFFFF</color>
-    
     <!-- Text -->
     <color name="text_normal">#313131</color>
     <color name="text_light">#989898</color>

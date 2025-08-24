@@ -773,7 +773,7 @@ public class BgUSBService extends BaseBackgroundService {
                         AppPreference.setStr(AppPreference.KEY.USB_CAMERA_NAME, device.getDeviceName());
 
                         if (SettingsFragment.instance != null && SettingsFragment.instance.get() != null) {
-                            SettingsFragment.instance.get().setCameraname();
+                            SettingsFragment.instance.get().setCameraname(device.getDeviceName());
                         }
                         isNavFromStream = false;
                         mServiceHandler.postDelayed(new Runnable() {

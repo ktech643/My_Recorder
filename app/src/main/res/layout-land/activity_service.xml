@@ -80,7 +80,7 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:orientation="horizontal"
-            android:visibility="gone"
+            android:visibility="visible"
             app:active_color="@color/teal"
             app:animation_duration="100"
             app:item_padding="4dp"

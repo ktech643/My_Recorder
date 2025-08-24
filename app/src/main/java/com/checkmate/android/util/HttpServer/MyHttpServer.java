@@ -400,7 +400,7 @@ public final class MyHttpServer extends NanoHTTPD {
                             LiveFragment liveFragmentInstance = LiveFragment.getInstance();
                             if (liveFragmentInstance != null && liveFragmentInstance.isAdded()) {
                                 Log.d(TAG, "Updating LiveFragment spinner to position: " + pos);
-                                liveFragmentInstance.spinner_camera.setSelection(pos);
+                                liveFragmentInstance.spinner_camera.setSelectionNew(pos);
                             }
 
                         } catch (Exception e) {
