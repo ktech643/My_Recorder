@@ -41,6 +41,9 @@ import com.checkmate.android.networking.RestApiService;
 import com.checkmate.android.service.LocationManagerService;
 import com.checkmate.android.service.MyAccessibilityService;
 import com.checkmate.android.ui.view.MySpinner;
+import com.checkmate.android.ui.dialog.CameraSelectionBottomSheet;
+import com.checkmate.android.ui.dialog.RotationSelectionBottomSheet;
+import com.checkmate.android.model.CameraSelectionModel;
 import com.checkmate.android.util.AudioLevelMeter;
 import com.checkmate.android.util.CommonUtil;
 import com.checkmate.android.util.DeviceUtils;
@@ -695,22 +698,14 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     public void OnClick(View view) {
         switch (view.getId()) {
             case R.id.ly_camera_type:
-                if (cam_adapter == null) {
-                    initCameraSpinner();
-                }
-                mListener.isDialog(true);
-                spinner_camera.performClick();
+                showCameraSelectionBottomSheet();
                 break;
             case R.id.ly_rotate:
-                if (adapter == null) {
-                    initialize();
-                }
                 if (mActivityRef != null && mActivityRef.get() != null && (is_rec || mActivityRef.get().isWifiRecording())) {
                     return;
                 }
-                mListener.isDialog(true);
                 if (is_camera_opened) {
-                    spinner_rotate.performClick();
+                    showRotationSelectionBottomSheet();
                 } else {
                     rotateStream();
                 }
@@ -2070,6 +2065,321 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 parent.removeView(textureView);
             }
             textureView = null;
+        }
+    }
+
+    /**
+     * Show camera selection bottom sheet
+     */
+    private void showCameraSelectionBottomSheet() {
+        if (!isAdded() || getActivity() == null) return;
+        
+        CameraSelectionBottomSheet bottomSheet = CameraSelectionBottomSheet.newInstance();
+        bottomSheet.setOnCameraSelectionListener(new CameraSelectionBottomSheet.OnCameraSelectionListener() {
+            @Override
+            public void onCameraSelected(CameraSelectionModel camera, int position) {
+                handleCameraSelectionFromBottomSheet(camera, position);
+            }
+
+            @Override
+            public void onBottomSheetDismissed() {
+                mListener.isDialog(false);
+            }
+        });
+        
+        mListener.isDialog(true);
+        bottomSheet.show(getChildFragmentManager(), "CameraSelectionBottomSheet");
+    }
+
+    /**
+     * Show rotation selection bottom sheet
+     */
+    private void showRotationSelectionBottomSheet() {
+        if (!isAdded() || getActivity() == null) return;
+        
+        RotationSelectionBottomSheet bottomSheet = RotationSelectionBottomSheet.newInstance(
+            is_rotated, is_flipped, is_mirrored);
+        bottomSheet.setOnRotationSelectionListener(new RotationSelectionBottomSheet.OnRotationSelectionListener() {
+            @Override
+            public void onRotationApplied(int rotation, boolean flip, boolean mirror) {
+                handleRotationSelectionFromBottomSheet(rotation, flip, mirror);
+            }
+
+            @Override
+            public void onBottomSheetDismissed() {
+                mListener.isDialog(false);
+            }
+        });
+        
+        mListener.isDialog(true);
+        bottomSheet.show(getChildFragmentManager(), "RotationSelectionBottomSheet");
+    }
+
+    /**
+     * Handle camera selection from bottom sheet
+     */
+    private void handleCameraSelectionFromBottomSheet(CameraSelectionModel camera, int position) {
+        if (!isValidFragmentState()) {
+            return;
+        }
+
+        try {
+            // Store current streaming state
+            boolean wasStreaming = AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false);
+
+            // Reset all states first
+            resetAllStates();
+
+            // Stop any existing streaming
+            stopExistingStreaming();
+
+            // Determine camera type and handle accordingly
+            if (camera.getWifiCamera() != null) {
+                // WiFi camera
+                handleWifiCameraSelectionFromBottomSheet(camera.getWifiCamera());
+            } else {
+                // Built-in camera
+                handleBuiltInCameraSelectionFromBottomSheet(camera.getType());
+            }
+
+            // Enable recording settings
+            enableRecordingSettings(true);
+
+            // Force UI update on main thread
+            updateUIOnMainThread(position);
+
+            // Restart streaming if it was active
+            restartStreamingIfNeeded(wasStreaming);
+
+        } catch (Exception e) {
+            handleError("Error in handleCameraSelectionFromBottomSheet", e);
+        }
+    }
+
+    /**
+     * Handle built-in camera selection from bottom sheet
+     */
+    private void handleBuiltInCameraSelectionFromBottomSheet(String cameraType) {
+        switch (cameraType) {
+            case AppConstant.REAR_CAMERA:
+                handleRearCameraSelection();
+                break;
+            case AppConstant.FRONT_CAMERA:
+                handleFrontCameraSelection();
+                break;
+            case AppConstant.USB_CAMERA:
+                handleUSBCameraSelection();
+                break;
+            case AppConstant.SCREEN_CAST:
+                handleScreenCastSelection();
+                break;
+            case AppConstant.AUDIO_ONLY:
+                handleAudioOnlySelection();
+                break;
+        }
+    }
+
+    /**
+     * Handle WiFi camera selection from bottom sheet
+     */
+    private void handleWifiCameraSelectionFromBottomSheet(Camera wifiCamera) {
+        ly_cast.setVisibility(View.GONE);
+        is_cast_opened = false;
+        is_usb_opened = false;
+        mListener.stopFragBgCamera();
+        mListener.fragInitBGWifiService();
+        mListener.stopFragUSBService();
+        mListener.stopFragAudio();
+        
+        is_camera_opened = false;
+        streaming_camera = wifiCamera;
+        mListener.setFragStreamingCamera(wifiCamera);
+        AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, wifiCamera.camera_name);
+        
+        if (isAdded() && getActivity() != null) {
+            sharedViewModel.setCameraOpened(is_camera_opened);
+        }
+        
+        handleWifiCameraConnection(wifiCamera);
+    }
+
+    /**
+     * Handle WiFi camera connection logic
+     */
+    private void handleWifiCameraConnection(Camera wifiCamera) {
+        if (!TextUtils.isEmpty(wifiCamera.wifi_ssid)) {
+            String wifi_ssid = wifiCamera.wifi_ssid;
+            String ssid = CommonUtil.getWifiSSID(mActivityRef.get());
+            if (!TextUtils.equals(wifi_ssid, ssid)) {
+                // Show WiFi connection dialog
+                showWifiConnectionDialog(wifiCamera, wifi_ssid);
+            } else {
+                mListener.isDialog(true);
+                mListener.showDialog();
+                openWifiCamera(wifiCamera);
+            }
+        } else {
+            playStream(wifiCamera);
+        }
+    }
+
+    /**
+     * Show WiFi connection dialog
+     */
+    private void showWifiConnectionDialog(Camera wifiCamera, String wifi_ssid) {
+        mListener.isDialog(true);
+        if (TextUtils.isEmpty(wifiCamera.wifi_password)) {
+            wifiCamera.wifi_password = "12345678";
+        }
+        
+        new AlertDialog.Builder(mActivityRef.get())
+                .setTitle(R.string.app_name)
+                .setMessage(String.format(getString(R.string.wifi_warning), wifiCamera.camera_name, wifi_ssid))
+                .setIcon(R.mipmap.ic_launcher)
+                .setPositiveButton(R.string.OK, (dialog, whichButton) -> {
+                    dialog.dismiss();
+                    mListener.isDialog(true);
+                    mListener.showDialog();
+                    connectToWifi(wifiCamera, wifi_ssid);
+                })
+                .setNegativeButton(R.string.CANCEL, (dialog, whichButton) -> {
+                    dialog.dismiss();
+                    mListener.isDialog(false);
+                    openWifiCamera(wifiCamera);
+                    setNetworkText(wifi_ssid, wifiCamera.wifi_out);
+                })
+                .show();
+    }
+
+    /**
+     * Connect to WiFi network
+     */
+    private void connectToWifi(Camera wifiCamera, String wifi_ssid) {
+        WifiUtils.withContext(mActivityRef.get())
+                .connectWith(wifi_ssid, wifiCamera.wifi_password)
+                .setTimeout(15000)
+                .onConnectionResult(new com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener() {
+                    @Override
+                    public void success() {
+                        mListener.isDialog(false);
+                        openWifiCamera(wifiCamera);
+                        setNetworkText(wifiCamera.wifi_in, wifiCamera.wifi_out);
+                        mListener.dismissDialog();
+                    }
+                    @Override
+                    public void failed(@NonNull com.thanosfisherman.wifiutils.wifiConnect.ConnectionErrorCode errorCode) {
+                        MessageUtil.showToast(mActivityRef.get(), R.string.connection_fail);
+                        mListener.isDialog(false);
+                        mListener.dismissDialog();
+                    }
+                })
+                .start();
+    }
+
+    /**
+     * Restart streaming if it was previously active
+     */
+    private void restartStreamingIfNeeded(boolean wasStreaming) {
+        if (wasStreaming && mActivityRef != null && mActivityRef.get() != null) {
+            MainActivity activity = mActivityRef.get();
+            // First ensure preview is properly initialized
+            if (is_camera_opened || is_usb_opened) {
+                forceTextureViewRefresh();
+                handler.postDelayed(() -> {
+                    if (activity != null && !activity.isFinishing()) {
+                        activity.startStream();
+                        ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                    }
+                }, 1500);
+            } else if (is_cast_opened) {
+                handler.postDelayed(() -> {
+                    if (activity != null && !activity.isFinishing()) {
+                        activity.onCastStream();
+                        ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                    }
+                }, 1500);
+            } else if (is_audio_only) {
+                boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
+                forceTextureViewRefresh();
+                if (isAudioEnabled) {
+                    handler.postDelayed(() -> {
+                        if (activity != null && !activity.isFinishing()) {
+                            activity.startStream();
+                            ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                        }
+                    }, 1500);
+                }
+            } else if (AppConstant.is_library_use && activity.mWifiService != null) {
+                handler.postDelayed(() -> {
+                    forceTextureViewRefresh();
+                    if (activity != null && !activity.isFinishing()) {
+                        activity.startWifiStreaming();
+                        ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                    }
+                }, 1500);
+            }
+        }
+    }
+
+    /**
+     * Handle rotation selection from bottom sheet
+     */
+    private void handleRotationSelectionFromBottomSheet(int rotation, boolean flip, boolean mirror) {
+        if (mActivityRef != null && mActivityRef.get() != null && !(is_rec || mActivityRef.get().isWifiRecording())) {
+            // Update current states
+            is_rotated = rotation;
+            is_flipped = flip;
+            is_mirrored = mirror;
+            
+            // If normal is selected (no rotation, flip, or mirror), reset everything
+            if (rotation == AppConstant.is_rotated_0 && !flip && !mirror) {
+                onNormal();
+            } else {
+                // Apply transformations
+                applyRotationAndTransforms(rotation, flip, mirror);
+            }
+        }
+    }
+
+    /**
+     * Apply rotation and transforms to camera service
+     */
+    private void applyRotationAndTransforms(int rotation, boolean flip, boolean mirror) {
+        if (mActivityRef != null && mActivityRef.get() != null) {
+            MainActivity activity = mActivityRef.get();
+            
+            if (is_camera_opened && activity.mCamService != null) {
+                // Apply rotation
+                if (rotation == AppConstant.is_rotated_90) {
+                    activity.mCamService.setRotation(90);
+                } else if (rotation == AppConstant.is_rotated_180) {
+                    activity.mCamService.setRotation(180);
+                } else if (rotation == AppConstant.is_rotated_270) {
+                    activity.mCamService.setRotation(270);
+                } else {
+                    activity.mCamService.setRotation(0);
+                }
+                
+                // Apply flip and mirror
+                activity.mCamService.setFlip(flip);
+                activity.mCamService.setMirror(mirror);
+                
+            } else if (is_usb_opened && activity.mUSBService != null) {
+                // Apply rotation
+                if (rotation == AppConstant.is_rotated_90) {
+                    activity.mUSBService.setRotation(90);
+                } else if (rotation == AppConstant.is_rotated_180) {
+                    activity.mUSBService.setRotation(180);
+                } else if (rotation == AppConstant.is_rotated_270) {
+                    activity.mUSBService.setRotation(270);
+                } else {
+                    activity.mUSBService.setRotation(0);
+                }
+                
+                // Apply flip and mirror
+                activity.mUSBService.setFlip(flip);
+                activity.mUSBService.setMirror(mirror);
+            }
         }
     }
 

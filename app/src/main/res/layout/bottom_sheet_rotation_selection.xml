@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_background"
+    android:padding="16dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Rotation & Transform"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:gravity="center" />
+
+        <ImageView
+            android:id="@+id/btn_close_rotation"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="4dp" />
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_light"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Rotation Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rotation (Select one)"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:paddingBottom="8dp" />
+
+    <RadioGroup
+        android:id="@+id/rg_rotation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rb_normal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Normal (0°)"
+            android:padding="8dp"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/rb_rotate_90"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rotate 90°"
+            android:padding="8dp" />
+
+        <RadioButton
+            android:id="@+id/rb_rotate_180"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rotate 180°"
+            android:padding="8dp" />
+
+        <RadioButton
+            android:id="@+id/rb_rotate_270"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rotate 270°"
+            android:padding="8dp" />
+    </RadioGroup>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_light"
+        android:layout_marginVertical="16dp" />
+
+    <!-- Transform Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Transform (Select multiple)"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:paddingBottom="8dp" />
+
+    <CheckBox
+        android:id="@+id/cb_flip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Flip"
+        android:padding="8dp" />
+
+    <CheckBox
+        android:id="@+id/cb_mirror"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mirror"
+        android:padding="8dp" />
+
+    <!-- Apply Button -->
+    <Button
+        android:id="@+id/btn_apply_rotation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Apply"
+        android:layout_marginTop="16dp"
+        android:background="@color/blue"
+        android:textColor="@color/white"
+        android:textStyle="bold" />
+
+</LinearLayout>

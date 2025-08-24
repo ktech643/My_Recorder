@@ -23,4 +23,5 @@
 
     <color name="border">#D8D8D8</color>
     <color name="teal">#4689F2</color>
+    <color name="gray_light">#E0E0E0</color>
 </resources>
