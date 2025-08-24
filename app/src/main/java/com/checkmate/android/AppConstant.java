@@ -16,10 +16,10 @@ public class AppConstant {
     public static final String AUDIO_ONLY = "4";
     public static final String CertPassword = "1Q87$%#kj762Op(*C4sWad3ZmF";
     public static String expire_date = "2020-09-30";
-    public static int is_rotated_0 = 0;
-    public static int is_rotated_90 = 1;
-    public static int is_rotated_180 = 2;
-    public static int is_rotated_270 = 3;
+    public static final int is_rotated_0 = 0;
+    public static final int is_rotated_90 = 1;
+    public static final int is_rotated_180 = 2;
+    public static final int is_rotated_270 = 3;
 
     //    public static String STREAM_USERNAME = "bNh0PJ7j";
 //    public static String STREAM_PASSWORD = "2rcLDsiv";
