@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/Users/jahan/Desktop/Projects/My_Recorder/app/.cxx/Debug/1v5s2bb2/arm64-v8a",
-  "command": "/Users/jahan/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=aarch64-none-linux-android29 --sysroot=/Users/jahan/Library/Android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DANDROID_STL=c++_shared -D_ANDROID -D_LIB_MODE -D_LIN -D_M64 -D_NO_NV -D_STREAM_MANAGER -Dnative_lib_EXPORTS -I/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/cpp/../jniLibs/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -std=c++14 -std=c++17 -fno-limit-debug-info  -fPIC   -o CMakeFiles/native-lib.dir/native-lib.cpp.o -c /Users/jahan/Desktop/Projects/My_Recorder/app/src/main/cpp/native-lib.cpp",
-  "file": "/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/cpp/native-lib.cpp"
-}
-]
