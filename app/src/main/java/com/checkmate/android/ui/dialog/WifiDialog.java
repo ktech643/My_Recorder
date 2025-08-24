@@ -42,6 +42,7 @@ public class WifiDialog extends Dialog {
         setCancelable(true);
                 btn_ok = findViewById(R.id.btn_ok);
         btn_close = findViewById(R.id.btn_close);
+        edt_ssid = findViewById(R.id.edt_ssid);
 
     }
 

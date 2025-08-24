@@ -17,12 +17,11 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.serenegiant.utils.BuildCheck;
-import com.serenegiant.uvccamera.BuildConfig;
 
 import javax.microedition.khronos.opengles.GL10;
 
 public final class GLHelper {
-	private static final boolean DEBUG = BuildConfig.DEBUG;
+	private static final boolean DEBUG = false; // Fixed: replaced BuildConfig.DEBUG with constant
 	private static final String TAG = "GLHelper";
 
 	private static final ThreadLocal<float[]> SCRATCH_ARRAY = ThreadLocal.withInitial(() -> new float[32]);

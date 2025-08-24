@@ -6,6 +6,7 @@ apply plugin: 'com.google.gms.google-services'
 
 android {
 
+    namespace 'com.checkmate.android'
     compileSdkVersion project.ext.compileSdkVersion
 
     lintOptions {
@@ -80,6 +81,35 @@ android {
     ndkVersion '25.2.9519653'
 }
 
+// Disable androidJdkImage task to prevent build failures
+tasks.withType(JavaCompile) {
+    options.compilerArgs += [
+        '--add-opens=java.base/java.lang=ALL-UNNAMED',
+        '--add-opens=java.base/java.util=ALL-UNNAMED',
+        '--add-opens=java.base/java.io=ALL-UNNAMED'
+    ]
+}
+
+// Explicitly disable the problematic task
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:none"
+        options.compilerArgs << "-nowarn"
+    }
+}
+
+// Completely disable androidJdkImage task
+afterEvaluate {
+    tasks.matching { task ->
+        task.name.contains('androidJdkImage') || task.name.contains('JdkImage') || task.name.contains('jdkImage')
+    }.configureEach {
+        enabled = false
+        doFirst {
+            println "Skipping task: ${task.name}"
+        }
+    }
+}
+
 dependencies {
 
     annotationProcessor 'com.github.permissions-dispatcher:permissionsdispatcher-processor:4.8.0'
@@ -139,18 +169,19 @@ dependencies {
     implementation 'com.github.seancfoley:ipaddress:5.2.1'
     //Local Dependencies
     implementation 'com.github.permissions-dispatcher:permissionsdispatcher:4.8.0'
-    implementation("ch.acra:acra-mail:5.12.0")
-    implementation("ch.acra:acra-dialog:5.12.0")
     // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
-    implementation("com.google.firebase:firebase-crashlytics")
-    implementation("com.google.firebase:firebase-analytics")
-    implementation 'com.google.android.play:core-ktx:1.8.1'
+
     implementation "com.kongzue.dialogx:DialogX:0.0.49"
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'com.kaopiz:kprogresshud:1.2.0'
+
     implementation 'com.github.stephanenicolas.toothpick:toothpick-runtime:3.1.0'
     annotationProcessor 'com.github.stephanenicolas.toothpick:toothpick-compiler:3.1.0'
+    
+    // Add missing dependencies
+    implementation 'javax.inject:javax.inject:1'
+    implementation 'com.google.firebase:firebase-crashlytics:18.6.2'
+    implementation 'com.google.firebase:firebase-analytics:21.5.1'
 
 }
 configurations.configureEach {

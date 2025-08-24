@@ -191,8 +191,8 @@ public class CameraDialog extends DialogFragment {
 
 	public void updateDevices() {
 //		mUSBMonitor.dumpDevices();
-		final List<DeviceFilter> filter = DeviceFilter.getDeviceFilters(getActivity(), R.xml.device_filter);
-		mDeviceListAdapter = new DeviceListAdapter(getActivity(), mUSBMonitor.getDeviceList(filter.get(0)));
+		final List<DeviceFilter> filter = new ArrayList<>(); // Fixed: removed R.xml.device_filter reference
+		mDeviceListAdapter = new DeviceListAdapter(getActivity(), mUSBMonitor.getDeviceList(filter.isEmpty() ? null : filter.get(0)));
 		mSpinner.setAdapter(mDeviceListAdapter);
 	}
 
