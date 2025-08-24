@@ -38,8 +38,6 @@ public class RePasswordDialog extends Dialog {
         setCancelable(false);
                 btn_ok = findViewById(R.id.btn_ok);
         btn_close = findViewById(R.id.btn_close);
-        edt_password = findViewById(R.id.edt_password);
-        edt_repassword = findViewById(R.id.edt_repassword);
 
     }
 

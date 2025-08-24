@@ -50,23 +50,6 @@ subprojects {
             '--add-opens=java.base/java.io=ALL-UNNAMED'
         ]
     }
-    
-    // Ensure consistent Java toolchain across all subprojects
-    afterEvaluate {
-        if (project.hasProperty('android')) {
-            project.android.compileOptions {
-                sourceCompatibility JavaVersion.VERSION_11
-                targetCompatibility JavaVersion.VERSION_11
-            }
-        }
-        
-        // Disable androidJdkImage task if it exists
-        project.tasks.matching { task ->
-            task.name.contains('androidJdkImage') || task.name.contains('JdkImage')
-        }.configureEach {
-            enabled = false
-        }
-    }
 }
 
 task clean(type: Delete) {
