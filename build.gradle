@@ -59,6 +59,13 @@ subprojects {
                 targetCompatibility JavaVersion.VERSION_11
             }
         }
+        
+        // Disable androidJdkImage task if it exists
+        project.tasks.matching { task ->
+            task.name.contains('androidJdkImage') || task.name.contains('JdkImage')
+        }.configureEach {
+            enabled = false
+        }
     }
 }
 

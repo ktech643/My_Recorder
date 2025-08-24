@@ -74,7 +74,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     // UI Components
     public ConstraintLayout frame_camera;
     public FrameLayout ly_cast;
-    public TextView ly_audio;
+    public FrameLayout ly_audio;
     public LinearLayout ly_menu;
     public LinearLayout ly_stream;
     public LinearLayout ly_rotate;
