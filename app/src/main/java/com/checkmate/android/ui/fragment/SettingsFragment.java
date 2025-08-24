@@ -420,6 +420,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         edt_bitrate = mView.findViewById(R.id.edt_bitrate);
         edt_keyFrame = mView.findViewById(R.id.edt_keyFrame);
         swt_secure_multi = mView.findViewById(R.id.swt_secure_multi);
+        swt_encryption = mView.findViewById(R.id.swt_encryption);
         txt_storage = mView.findViewById(R.id.txt_storage);
         tv_storage_location = mView.findViewById(R.id.tv_storage_location);
         ly_video_custom = mView.findViewById(R.id.ly_video_custom);
@@ -758,8 +759,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         String storageType = AppPreference.getStr(AppPreference.KEY.Storage_Type, "Storage Location: Default Storage");
         tv_storage_location.setText(storageType);
 
-        swt_encryption.setChecked(AppPreference.getBool(AppPreference.KEY.FILE_ENCRYPTION, false));
-        swt_encryption.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        if (swt_encryption != null) {
+            swt_encryption.setChecked(AppPreference.getBool(AppPreference.KEY.FILE_ENCRYPTION, false));
+            swt_encryption.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 enterEncryptionKey();
             } else {
@@ -767,6 +769,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 AppPreference.setBool(AppPreference.KEY.FILE_ENCRYPTION, false);
             }
         });
+        }
 
         if (!AppPreference.getBool(AppPreference.KEY.USE_AUDIO, false)) {
             AppPreference.setBool(AppPreference.KEY.RECORD_AUDIO, false);
@@ -3407,7 +3410,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             codeDialog.dismiss();
             mListener.isDialog(false);
             AppPreference.setBool(AppPreference.KEY.FILE_ENCRYPTION, false);
-            swt_encryption.setChecked(false);
+            if (swt_encryption != null) {
+                swt_encryption.setChecked(false);
+            }
             MessageUtil.showToast(requireContext(), "File encryption is not enabled.");
         });
         codeDialog.setOkListener(view -> {
@@ -3417,10 +3422,14 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             if (!TextUtils.isEmpty(encryption_code)) {
                 AppPreference.setStr(AppPreference.KEY.ENCRYPTION_KEY, encryption_code);
                 AppPreference.setBool(AppPreference.KEY.FILE_ENCRYPTION, true);
-                swt_encryption.setChecked(true);
+                if (swt_encryption != null) {
+                    swt_encryption.setChecked(true);
+                }
             } else {
                 AppPreference.setBool(AppPreference.KEY.FILE_ENCRYPTION, false);
-                swt_encryption.setChecked(false);
+                if (swt_encryption != null) {
+                    swt_encryption.setChecked(false);
+                }
                 MessageUtil.showToast(requireContext(), "Encryption will be not working without key.");
             }
         });
