@@ -513,7 +513,6 @@ public class MainActivity extends BaseActivity
         bottom_tab = findViewById(R.id.bottom_tab);
         txt_record = findViewById(R.id.txt_record);
         flImages = findViewById(R.id.flImages);
-
         
         flImages.setVisibility(View.GONE);
 
@@ -1873,19 +1872,6 @@ public class MainActivity extends BaseActivity
             }
         }
 
-    }
-
-    public static ServiceType getServiceType() {
-        String pos = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION,"0");
-        if (pos.equals("0")||pos.equals("1")){
-            return  ServiceType.BgCamera;
-        }else if (pos.equals("2")) {
-            return ServiceType.BgUSBCamera;
-        }else if (pos.equals("3")) {
-            return ServiceType.BgScreenCast;
-        }else {
-            return ServiceType.BgAudio;
-        }
     }
 
     /* ------------------------------------------------------------------------

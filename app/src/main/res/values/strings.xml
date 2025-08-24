@@ -41,7 +41,7 @@
     <string name="confirm_convert">This mode hides the recording application behind a fully playable Chess game. To unlock the app, you press the numbers of your Pin code on the left side of the Chessboard. Would you like to use Covert Mode?</string>
     <string name="confirm_update">There is a new version available. Do you want to update now?</string>
     <string name="confirm_wifi">Are you sure want to continue on current wifi connection?</string>
-    <string name="wifi_warning">%s has a wifi profile for %s it appears you are not connected. Would you like to switch network?</string>
+    <string name="wifi_warning">%1$s has a wifi profile for %2$s it appears you are not connected. Would you like to switch network?</string>
     <string name="confirm_audio">Does your intended use of this application legally allow AUDIO RECORDING?</string>
 
     <string name="live">Live</string>
@@ -476,8 +476,8 @@
     <string name="volume_keys_action_do_nothing" translatable="false">0</string>
     <string name="settings_parse_failed">Unable to parse parameters</string>
     <string name="need_login_pass">"Please fill both login and password fields."</string>
-    <string name="settings_wrong_value">Wrong value for parameter \"%1s\"</string>
-    <string name="settings_error_video">Video: %1s\n</string>
+    <string name="settings_wrong_value">Wrong value for parameter \"%1$s\"</string>
+    <string name="settings_error_video">Video: %1$s\n</string>
     <string-array name="video_codec_values">
         <item>"video/avc"</item>
         <item>"video/hevc"</item>
@@ -499,20 +499,20 @@
         <item>"320000"</item>
     </string-array>
     <string name="settings_import_body">Do you want to import following settings from the link?</string>
-    <string name="settings_import_connections"><![CDATA[<br>Connections (<b>%d</b> new, <b>%d</b> updated)]]></string>
-    <string name="settings_import_connections_new"><![CDATA[<br>Connections (<b>%d</b> new)]]></string>
-    <string name="settings_import_connections_updated"><![CDATA[<br>Connections (<b>%d</b> updated)]]></string>
+    <string name="settings_import_connections"><![CDATA[<br>Connections (<b>%1$d</b> new, <b>%2$d</b> updated)]]></string>
+    <string name="settings_import_connections_new"><![CDATA[<br>Connections (<b>%1$d</b> new)]]></string>
+    <string name="settings_import_connections_updated"><![CDATA[<br>Connections (<b>%1$d</b> updated)]]></string>
     <string name="settings_imported_connections">\nImported %s.</string>
-    <string name="settings_imported_connections_and_settings">\nImported %s and %s settings.</string>
-    <string name="settings_imported_new">%d new connections</string>
-    <string name="settings_imported_updated">%d updated connections.</string>
-    <string name="settings_imported_new_updated">%d connections (%d new, %d updated)</string>
-    <string name="settings_imported_settings">\nImported %s settings</string>
+    <string name="settings_imported_connections_and_settings">\nImported %1$s and %2$s settings.</string>
+    <string name="settings_imported_new">%1$d new connections</string>
+    <string name="settings_imported_updated">%1$d updated connections.</string>
+    <string name="settings_imported_new_updated">%1$d connections (%2$d new, %3$d updated)</string>
+    <string name="settings_imported_settings">\nImported %1$s settings</string>
     <string name="settings_imported_audio">audio</string>
     <string name="settings_imported_video">video</string>
     <string name="settings_imported_record">record</string>
-    <string name="settings_imported_2">%s,%s</string>
-    <string name="settings_imported_3">%s,%s,%s</string>
+    <string name="settings_imported_2">%1$s,%2$s</string>
+    <string name="settings_imported_3">%1$s,%2$s,%3$s</string>
     <string name="settings_import_remove_existing"><![CDATA[<br><span style=\'color: red\'>Remove %d existing connections</span>]]></string>
     <string name="pref_fragment_header_video">"Video"</string>
     <string name="pref_fragment_header_audio">"Audio"</string>
@@ -520,16 +520,16 @@
     <string name="pref_fragment_header_mp4rec">"Recording"</string>
     <string name="pref_fragment_header_advanced_options">"Advanced options"</string>
     <string name="pref_fragment_header_help_and_support">"Help &amp; support"</string>
-    <string name="settings_error_audio">Audio: %1s\n</string>
-    <string name="settings_error_record">Record: %1s\n</string>
-    <string name="settings_error_connection">Connection %1d: %2s\n</string>
+    <string name="settings_error_audio">Audio: %1$s\n</string>
+    <string name="settings_error_record">Record: %1$s\n</string>
+    <string name="settings_error_connection">Connection %1$d: %2$s\n</string>
     <string name="grove_export_audio">Audio</string>
     <string name="grove_export_video">Video</string>
     <string name="grove_export_record">Record</string>
     <string name="grove_copy_url">Copy</string>
     <string name="grove_share_url">Share</string>
     <string name="grove_link_label">Larix Grove link</string>
-    <string name="settings_has_errors">\nThere were following errors:\n%1s</string>
+    <string name="settings_has_errors">\nThere were following errors:\n%1$s</string>
     <string name="service_restart_info">"Restart is necessary to apply changes.\n Start app again for the new updates. Thanks!"</string>
     <string name="service_restart_first">"The app has completed its initial setup and configuration. A restart is necessary to finalize and apply all changes. Please restart the app to ensure optimal performance and functionality. Thanks!"</string>
 

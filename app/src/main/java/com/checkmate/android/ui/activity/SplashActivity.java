@@ -6,7 +6,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.multidex.BuildConfig;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -42,6 +41,7 @@ import android.widget.Toast;
 import com.blikoon.qrcodescanner.QrCodeActivity;
 import com.checkmate.android.AppConstant;
 import com.checkmate.android.AppPreference;
+import com.checkmate.android.BuildConfig;
 import com.checkmate.android.R;
 import com.checkmate.android.networking.HttpApiService;
 import com.checkmate.android.util.CommonUtil;
@@ -473,13 +473,6 @@ public class SplashActivity extends BaseActivity {
             finish();
         });
         activationDialog.show();
-    }
-
-    /**
-     * Request notification permission after activation is complete
-     */
-    private void requestNotificationPermissionAfterActivation() {
-        maybeAskNotificationThenMain();
     }
 
 
@@ -1010,9 +1003,13 @@ public class SplashActivity extends BaseActivity {
         // Make buttons more visible
         try {
             Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
 
             if (positiveButton != null) {
                 positiveButton.setTextColor(Color.BLACK);
+            }
+            if (negativeButton != null) {
+                negativeButton.setTextColor(Color.BLACK);
             }
         } catch (Exception e) {
             Log.w(TAG, "Could not set button colors", e);
@@ -1057,5 +1054,3 @@ public class SplashActivity extends BaseActivity {
         }
     }
 }
-
-//

@@ -22,7 +22,6 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -41,13 +40,12 @@ import com.checkmate.android.networking.Responses;
 import com.checkmate.android.networking.RestApiService;
 import com.checkmate.android.service.LocationManagerService;
 import com.checkmate.android.service.MyAccessibilityService;
-
+import com.checkmate.android.ui.view.MySpinner;
 import com.checkmate.android.util.AudioLevelMeter;
 import com.checkmate.android.util.CommonUtil;
 import com.checkmate.android.util.DeviceUtils;
 import com.checkmate.android.util.MainActivity;
 import com.checkmate.android.util.MessageUtil;
-import com.checkmate.android.util.CameraIconUtils;
 import com.checkmate.android.viewmodels.EventType;
 import com.checkmate.android.viewmodels.SharedViewModel;
 import com.kongzue.dialogx.dialogs.MessageDialog;
@@ -71,7 +69,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     private SharedViewModel sharedViewModel;
     private ActivityFragmentCallbacks mListener;
 
-    // UI Components
+    // UI Components  
     public ConstraintLayout frame_camera;
     public FrameLayout ly_cast;
     public FrameLayout ly_audio;
@@ -94,8 +92,8 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     public TextView txt_sel;
     public TextView txt_rec;
     public TextView txt_snapshot;
-    public Spinner spinner_camera;
-    public Spinner spinner_rotate;
+    public MySpinner spinner_camera;
+    public MySpinner spinner_rotate;
     public TextureView textureView;
     public AudioLevelMeter mVuMeter;
 
@@ -190,7 +188,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.fragment_live, container, false);
-
+        
         // Initialize UI components
         frame_camera = mView.findViewById(R.id.frame_camera);
         ly_cast = mView.findViewById(R.id.ly_cast);
@@ -201,13 +199,13 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         ly_camera_type = mView.findViewById(R.id.ly_camera_type);
         ly_rec = mView.findViewById(R.id.ly_rec);
         ly_snap = mView.findViewById(R.id.ly_snap);
-
+        
         ic_stream = mView.findViewById(R.id.ic_stream);
         ic_rotate = mView.findViewById(R.id.ic_rotate);
         ic_sel = mView.findViewById(R.id.ic_sel);
         ic_rec = mView.findViewById(R.id.ic_rec);
         ic_snapshot = mView.findViewById(R.id.ic_snapshot);
-
+        
         txt_speed = mView.findViewById(R.id.txt_speed);
         txt_network = mView.findViewById(R.id.txt_network);
         txt_gps = mView.findViewById(R.id.txt_gps);
@@ -216,13 +214,13 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         txt_sel = mView.findViewById(R.id.txt_sel);
         txt_rec = mView.findViewById(R.id.txt_rec);
         txt_snapshot = mView.findViewById(R.id.txt_snapshot);
-
+        
         spinner_camera = mView.findViewById(R.id.spinner_camera);
         spinner_rotate = mView.findViewById(R.id.spinner_rotate);
-
+        
         // TextureView is in the included layout
         textureView = mView.findViewById(R.id.preview_afl);
-
+        
         // Initialize AudioLevelMeter (may not be in this layout, check if exists)
         mVuMeter = mView.findViewById(R.id.audio_level_meter);
 
@@ -359,14 +357,11 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         } else {
             initialize();
         }
-
-        // Set initial camera icon based on current camera type
-        setInitialCameraIcon();
     }
 
     private void checkAndAutoStart() {
         if (mActivityRef == null || mActivityRef.get() == null) return;
-
+        
         MainActivity activity = mActivityRef.get();
         boolean shouldStream = AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false);
         boolean shouldRecord = AppPreference.getBool(AppPreference.KEY.AUTO_RECORD, false);
@@ -399,8 +394,12 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (is_camera_opened || is_usb_opened || is_audio_only) {
                     boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
                     if (is_audio_only) {
-                        activity.startStream();
-                        streamStarted = activity.isStreaming();
+                        if (isAudioEnabled) {
+                            activity.startStream();
+                            streamStarted = activity.isStreaming();
+                        } else {
+                            showAudioEnablePopup();
+                        }
                     } else {
                         activity.startStream();
                         streamStarted = activity.isStreaming();
@@ -435,10 +434,14 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                     recordStarted = activity.isCastRecording();
                 } else if (is_audio_only && !activity.isAudioRecording()) {
                     boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
-                    activity.startRecord();
-                    recordStarted = activity.isAudioRecording();
-                    if (recordStarted) {
-                        ic_rec.setImageResource(R.mipmap.ic_radio_active);
+                    if (isAudioEnabled) {
+                        activity.startRecord();
+                        recordStarted = activity.isAudioRecording();
+                        if (recordStarted) {
+                            ic_rec.setImageResource(R.mipmap.ic_radio_active);
+                        }
+                    } else {
+                        showAudioEnablePopup();
                     }
                 } else if (!activity.isWifiRecording()) {
                     activity.startRecordStream();
@@ -579,7 +582,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     private void updateUI(boolean isRecording, boolean isLandscape) {
         ic_rec.setImageResource(R.mipmap.ic_radio);
         ic_snapshot.setImageResource(R.mipmap.ic_camera);
-        // ic_sel icon will be set dynamically based on camera type
+        ic_sel.setImageResource(R.mipmap.ic_refresh);
         ic_rotate.setImageResource(R.mipmap.ic_rotate);
         ly_snap.setEnabled(true);
         ly_rotate.setEnabled(true);
@@ -602,12 +605,12 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
 
                 if (mActivityRef != null && mActivityRef.get() != null) {
                     if (mActivityRef.get().isStreaming()) {
-                        // ic_sel icon will be set dynamically based on camera type
+                        ic_sel.setImageResource(R.mipmap.ic_refresh);
                         ic_rotate.setImageResource(R.mipmap.ic_rotate);
                         ly_camera_type.setEnabled(true);
                         ly_rotate.setEnabled(true);
                     } else {
-                        // ic_sel icon will be set dynamically based on camera type
+                        ic_sel.setImageResource(R.mipmap.ic_refresh);
                         ic_rotate.setImageResource(R.mipmap.ic_rotate);
                         ly_camera_type.setEnabled(true);
                         ly_rotate.setEnabled(true);
@@ -695,21 +698,8 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (cam_adapter == null) {
                     initCameraSpinner();
                 }
-                // Toggle camera spinner visibility
-                if (spinner_camera != null) {
-                    if (spinner_camera.getVisibility() == View.VISIBLE) {
-                        spinner_camera.setVisibility(View.GONE);
-                    } else {
-                        spinner_camera.setVisibility(View.VISIBLE);
-                        // Ensure spinner doesn't expand beyond its container
-                        spinner_camera.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        ));
-                    }
-                } else {
-                    Log.e(TAG, "spinner_camera is null in OnClick ly_camera_type");
-                }
+                mListener.isDialog(true);
+                spinner_camera.performClick();
                 break;
             case R.id.ly_rotate:
                 if (adapter == null) {
@@ -718,20 +708,11 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (mActivityRef != null && mActivityRef.get() != null && (is_rec || mActivityRef.get().isWifiRecording())) {
                     return;
                 }
-                // Toggle rotate spinner visibility
-                if (spinner_rotate != null) {
-                    if (spinner_rotate.getVisibility() == View.VISIBLE) {
-                        spinner_rotate.setVisibility(View.GONE);
-                    } else {
-                        spinner_rotate.setVisibility(View.VISIBLE);
-                        // Ensure spinner doesn't expand beyond its container
-                        spinner_rotate.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        ));
-                    }
+                mListener.isDialog(true);
+                if (is_camera_opened) {
+                    spinner_rotate.performClick();
                 } else {
-                    Log.e(TAG, "spinner_rotate is null in OnClick ly_rotate");
+                    rotateStream();
                 }
                 break;
             case R.id.btn_refresh:
@@ -892,9 +873,6 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     }
 
     private void handleCameraSelection(String item, int position) {
-        // Update camera icon based on selection
-        updateCameraIcon(item);
-
         if (TextUtils.equals(getString(R.string.rear_camera), item)) {
             handleRearCameraSelection();
         } else if (TextUtils.equals(getString(R.string.front_camera), item)) {
@@ -907,53 +885,6 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             handleAudioOnlySelection();
         } else {
             handleWifiCameraSelection(position);
-        }
-    }
-
-    /**
-     * Update the camera type icon based on the selected camera
-     * @param cameraType The selected camera type string
-     */
-    private void updateCameraIcon(String cameraType) {
-        if (ic_sel != null && cameraType != null) {
-            CameraIconUtils.setCameraIconByString(ic_sel, cameraType);
-        }
-    }
-
-    /**
-     * Get the current camera selection from the spinner
-     * @return The current camera selection string or null if not available
-     */
-    private String getCurrentCameraSelection() {
-        if (spinner_camera != null && cam_spinnerArray != null && !cam_spinnerArray.isEmpty()) {
-            int position = spinner_camera.getSelectedItemPosition();
-            if (position >= 0 && position < cam_spinnerArray.size()) {
-                return cam_spinnerArray.get(position);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Set the initial camera icon based on the current camera type
-     */
-    private void setInitialCameraIcon() {
-        String cameraID = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
-        if (ic_sel != null) {
-            if (TextUtils.equals(cameraID, AppConstant.REAR_CAMERA)) {
-                CameraIconUtils.setCameraIconByString(ic_sel, getString(R.string.rear_camera));
-            } else if (TextUtils.equals(cameraID, AppConstant.FRONT_CAMERA)) {
-                CameraIconUtils.setCameraIconByString(ic_sel, getString(R.string.front_camera));
-            } else if (TextUtils.equals(cameraID, AppConstant.USB_CAMERA)) {
-                CameraIconUtils.setCameraIconByString(ic_sel, getString(R.string.usb_camera));
-            } else if (TextUtils.equals(cameraID, AppConstant.SCREEN_CAST)) {
-                CameraIconUtils.setCameraIconByString(ic_sel, getString(R.string.screen_cast));
-            } else if (TextUtils.equals(cameraID, AppConstant.AUDIO_ONLY)) {
-                CameraIconUtils.setCameraIconByString(ic_sel, getString(R.string.audio_only_text));
-            } else {
-                // Default to camera icon
-                ic_sel.setImageResource(R.mipmap.ic_camera);
-            }
         }
     }
 
@@ -1084,12 +1015,18 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (mActivityRef != null && mActivityRef.get() != null) {
             MainActivity activity = mActivityRef.get();
             // Stop camera service first
+            if (activity.mCamService != null) {
+                activity.mCamService.stopSafe();
+                activity.mCamService = null;
+            }
+            mListener.stopFragBgCamera();
+            
             // Stop other services
             if (is_usb_opened) {
                 mListener.stopFragUSBService();
             }
-            if (is_camera_opened) {
-                mListener.stopFragBgCamera();
+            if (is_wifi_opened) {
+                mListener.stopFragWifiService();
             }
             if (is_cast_opened) {
                 mListener.stopFragBgCast();
@@ -1172,30 +1109,30 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (textureView != null) {
             // First remove the surface texture listener
             textureView.setSurfaceTextureListener(null);
-
+            
             // Clear the surface texture
             if (textureView.getSurfaceTexture() != null) {
                 textureView.getSurfaceTexture().release();
             }
-
+            
             // Remove the view from its parent
             ViewGroup parent = (ViewGroup) textureView.getParent();
             if (parent != null) {
                 parent.removeView(textureView);
             }
-
+            
             // Create a new TextureView
             TextureView newTextureView = new TextureView(getContext());
             newTextureView.setLayoutParams(textureView.getLayoutParams());
-
+            
             // Add the new view to the parent
             if (parent != null) {
                 parent.addView(newTextureView);
             }
-
+            
             // Replace the old view with the new one
             textureView = newTextureView;
-
+            
             // Set up the new surface texture listener
             if (mActivityRef != null && mActivityRef.get() != null) {
                 TextureView.SurfaceTextureListener listener = mActivityRef.get().mSurfaceTextureListener;
@@ -1275,7 +1212,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         try {
             // First stop all existing services
             stopServices();
-
+            
             // Reset all states
             prepareCameraSelection();
             currentState = CameraState.AUDIO_ONLY;
@@ -1291,7 +1228,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
 
             // Update UI
             updateAudioOnlyUI();
-
+            
             // Initialize audio service with a delay to ensure previous services are stopped
             handler.postDelayed(() -> {
                 if (isAdded() && getActivity() != null) {
@@ -1305,6 +1242,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                     }
                     mListener.initFragAudioService();
                     updateSharedViewModel();
+                    scheduleAudioCheck();
                 }
             }, UI_UPDATE_DELAY);
 
@@ -1318,6 +1256,14 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         ic_stream.setImageResource(R.mipmap.ic_stream);
     }
 
+    private void scheduleAudioCheck() {
+        handler.postDelayed(() -> {
+            boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
+            if (!isAudioEnabled) {
+                showAudioEnablePopup();
+            }
+        }, AUDIO_CHECK_DELAY);
+    }
 
     private void updateSharedViewModel() {
         if (!isValidFragmentState()) {
@@ -1352,7 +1298,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             List<RotateModel> models = RotateModel.initialize(mActivityRef.get(), is_rotated, is_flipped, is_mirrored);
             adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, models);
             spinner_rotate.setAdapter(adapter);
-            spinner_rotate.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            spinner_rotate.setOnItemSelectedEvenIfUnchangedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                     mListener.isDialog(false);
@@ -1477,25 +1423,19 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (mActivityRef != null && mActivityRef.get() != null) {
             cam_adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, cam_models);
         }
-
-        // Check if spinner_camera is available before using it
-        if (spinner_camera != null) {
-            spinner_camera.setAdapter(cam_adapter);
-            spinner_camera.setOnItemSelectedListener(this);
-            spinner_camera.setOnTouchListener((view, motionEvent) -> {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    mListener.isDialog(true);
-                }
-                return false;
-            });
-            if (!is_camera_opened && !is_wifi_opened && !is_audio_only && !is_usb_opened) {
-                int finalSelected_index = selected_index;
-                handler.postDelayed(() -> spinner_camera.setSelection(finalSelected_index), 1000);
+        spinner_camera.setAdapter(cam_adapter);
+        spinner_camera.setOnItemSelectedEvenIfUnchangedListener(this);
+        spinner_camera.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                mListener.isDialog(true);
             }
-            spinner_camera.requestFocus();
-        } else {
-            Log.e(TAG, "spinner_camera is null in initCameraSpinner");
+            return false;
+        });
+        if (!is_camera_opened && !is_wifi_opened && !is_audio_only && !is_usb_opened) {
+            int finalSelected_index = selected_index;
+            handler.postDelayed(() -> spinner_camera.setSelectionNew(finalSelected_index), 1000);
         }
+        spinner_camera.requestFocus();
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -1559,20 +1499,14 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (mActivityRef != null && mActivityRef.get() != null) {
             cam_adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, cam_models);
         }
-
-        // Check if spinner_camera is available before using it
-        if (spinner_camera != null) {
-            spinner_camera.setAdapter(cam_adapter);
-            spinner_camera.setOnItemSelectedListener(this);
-            spinner_camera.setOnTouchListener((view, motionEvent) -> {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    mListener.isDialog(true);
-                }
-                return false;
-            });
-        } else {
-            Log.e(TAG, "spinner_camera is null in notifyCameraSpinner");
-        }
+        spinner_camera.setAdapter(cam_adapter);
+        spinner_camera.setOnItemSelectedEvenIfUnchangedListener(this);
+        spinner_camera.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                mListener.isDialog(true);
+            }
+            return false;
+        });
     }
 
     void playStream(Camera camera) {
@@ -1769,7 +1703,12 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             } else if (is_cast_opened) {
                 activity.onCastStream();
             } else if (is_audio_only) {
-                mActivityRef.get().startStream();
+                boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
+                if (isAudioEnabled) {
+                    mActivityRef.get().startStream();
+                } else {
+                    showAudioEnablePopup();
+                }
             } else {
                 if (!AppConstant.is_library_use || mActivityRef.get().mWifiService == null) {
                     return;
@@ -1903,11 +1842,26 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                         messageDialog.setCancelTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
                     }
                 }
+            } else {
+                showAudioEnablePopup();
             }
         } else {
             recordStream();
         }
     }
+
+    void showAudioEnablePopup() {
+        MessageDialog messageDialog = MessageDialog
+                .show(getString(R.string.confirmation_title), getString(R.string.audio_disbaled), getString(R.string.Okay))
+                .setCancelButton((dialog, v) -> {
+                    if (instance != null && instance.get() != null && instance.get().isAdded()) {
+                        dialog.dismiss();
+                    }
+                    return false;
+                });
+        messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
+    }
+
     void recordStream() {
         if (mActivityRef != null && mActivityRef.get() != null && !mActivityRef.get().isWifiRecording()) {
             mActivityRef.get().startRecordStream();
@@ -2004,7 +1958,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 isStreaming = true;
             }
 
-            boolean shouldUpdate = isStreaming != lastStreamingState ||
+            boolean shouldUpdate = isStreaming != lastStreamingState || 
                                  (isStreaming && (currentTime - lastApiUpdateTime >= frequencyMillis));
 
             if (shouldUpdate) {
@@ -2053,25 +2007,13 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
 
     public void wifiCameraStarted(String url) {
         txt_speed.setText(url);
-        // Set disabled icon for WiFi camera
-        if (ic_sel != null) {
-            ic_sel.setImageResource(R.mipmap.ic_refresh_disabled);
-        }
+        ic_sel.setImageResource(R.mipmap.ic_refresh_disabled);
         ly_camera_type.setEnabled(true);
     }
 
     public void stopWifiStream() {
         txt_speed.setText("");
-        // Set appropriate icon based on current camera type
-        if (ic_sel != null) {
-            // Get current camera selection and update icon accordingly
-            String currentCamera = getCurrentCameraSelection();
-            if (currentCamera != null) {
-                CameraIconUtils.setCameraIconByString(ic_sel, currentCamera);
-            } else {
-                ic_sel.setImageResource(R.mipmap.ic_refresh);
-            }
-        }
+        ic_sel.setImageResource(R.mipmap.ic_refresh);
         ly_camera_type.setEnabled(true);
         clearPreview();
         forceTextureViewRefresh();
@@ -2081,30 +2023,30 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (textureView != null) {
             // First remove the surface texture listener
             textureView.setSurfaceTextureListener(null);
-
+            
             // Clear the surface texture
             if (textureView.getSurfaceTexture() != null) {
                 textureView.getSurfaceTexture().release();
             }
-
+            
             // Remove the view from its parent
             ViewGroup parent = (ViewGroup) textureView.getParent();
             if (parent != null) {
                 parent.removeView(textureView);
             }
-
+            
             // Create a new TextureView
             TextureView newTextureView = new TextureView(getContext());
             newTextureView.setLayoutParams(textureView.getLayoutParams());
-
+            
             // Add the new view to the parent
             if (parent != null) {
                 parent.addView(newTextureView);
             }
-
+            
             // Replace the old view with the new one
             textureView = newTextureView;
-
+            
             // Set up the new surface texture listener
             if (mActivityRef != null && mActivityRef.get() != null) {
                 TextureView.SurfaceTextureListener listener = mActivityRef.get().mSurfaceTextureListener;

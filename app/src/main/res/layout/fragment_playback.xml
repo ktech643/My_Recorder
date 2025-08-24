@@ -79,13 +79,11 @@
 
                 />
         </LinearLayout>
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <com.checkmate.android.ui.view.DragListView
+            android:id="@+id/list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="16dp"
-            android:scrollbars="vertical" />
+            android:divider="@null" />
     </LinearLayout>
 
     <TextView
