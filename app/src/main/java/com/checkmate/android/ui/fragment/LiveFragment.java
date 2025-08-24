@@ -60,6 +60,10 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import com.checkmate.android.adapter.CameraSelectionAdapter;
 
 @SuppressLint("NonConstantResourceId")
 public class LiveFragment extends BaseFragment implements AdapterView.OnItemSelectedListener {
@@ -698,8 +702,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (cam_adapter == null) {
                     initCameraSpinner();
                 }
-                mListener.isDialog(true);
-                spinner_camera.performClick();
+                showCameraBottomSheet();
                 break;
             case R.id.ly_rotate:
                 if (adapter == null) {
@@ -708,12 +711,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (mActivityRef != null && mActivityRef.get() != null && (is_rec || mActivityRef.get().isWifiRecording())) {
                     return;
                 }
-                mListener.isDialog(true);
-                if (is_camera_opened) {
-                    spinner_rotate.performClick();
-                } else {
-                    rotateStream();
-                }
+                showRotationBottomSheet();
                 break;
             case R.id.btn_refresh:
                 if (streaming_camera != null) playStream(streaming_camera);
@@ -1298,37 +1296,11 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             List<RotateModel> models = RotateModel.initialize(mActivityRef.get(), is_rotated, is_flipped, is_mirrored);
             adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, models);
             spinner_rotate.setAdapter(adapter);
+            // Keep spinner for compatibility but use bottom sheet instead
             spinner_rotate.setOnItemSelectedEvenIfUnchangedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                    mListener.isDialog(false);
-                    switch (position) {
-                        case 0:
-                            onRotate(AppConstant.is_rotated_90);
-                            break;
-                        case 1:
-                            onRotate(AppConstant.is_rotated_180);
-                            break;
-                        case 2:
-                            onRotate(AppConstant.is_rotated_270);
-                            break;
-                        case 3:
-                            onFlip();
-                            break;
-                        case 4:
-                            onMirror();
-                            break;
-                        case 5:
-                            onNormal();
-                            break;
-                    }
-                    models.get(0).is_selected = is_rotated == AppConstant.is_rotated_90;
-                    models.get(1).is_selected = is_rotated == AppConstant.is_rotated_180;
-                    models.get(2).is_selected = is_rotated == AppConstant.is_rotated_270;
-                    models.get(3).is_selected = is_flipped;
-                    models.get(4).is_selected = is_mirrored;
-                    models.get(5).is_selected = (is_rotated == AppConstant.is_rotated_0) && !is_flipped && !is_mirrored;
-                    adapter.notifyDataSetChanged();
+                    // Handle through bottom sheet now
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> adapterView) {
@@ -2076,6 +2048,176 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     @Override
     public void onRefresh() {
         // no-op
+    }
+    
+    /**
+     * Show bottom sheet dialog for camera selection
+     */
+    private void showCameraBottomSheet() {
+        if (!isAdded() || getContext() == null) return;
+        
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+        View bottomSheetView = LayoutInflater.from(getContext()).inflate(R.layout.bottom_sheet_camera_selection, null);
+        bottomSheetDialog.setContentView(bottomSheetView);
+        
+        RecyclerView recyclerView = bottomSheetView.findViewById(R.id.rv_camera_options);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        
+        // Create adapter for camera options
+        CameraSelectionAdapter adapter = new CameraSelectionAdapter(cam_spinnerArray, new CameraSelectionAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                bottomSheetDialog.dismiss();
+                handleCameraSelectionFromBottomSheet(position);
+            }
+        });
+        
+        // Set current selection
+        String currentSelection = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
+        adapter.setCurrentSelection(currentSelection);
+        
+        recyclerView.setAdapter(adapter);
+        bottomSheetDialog.show();
+    }
+    
+    /**
+     * Handle camera selection from bottom sheet
+     */
+    private void handleCameraSelectionFromBottomSheet(int position) {
+        // Store selection in preferences and database
+        String selectedCamera = cam_spinnerArray.get(position);
+        String cameraId = getCameraIdFromSelection(selectedCamera, position);
+        
+        // Store in preferences
+        AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, cameraId);
+        
+        // Trigger the selection handling
+        onItemSelected(spinner_camera, null, position, 0);
+    }
+    
+    /**
+     * Get camera ID from selection
+     */
+    private String getCameraIdFromSelection(String selection, int position) {
+        if (TextUtils.equals(getString(R.string.rear_camera), selection)) {
+            return AppConstant.REAR_CAMERA;
+        } else if (TextUtils.equals(getString(R.string.front_camera), selection)) {
+            return AppConstant.FRONT_CAMERA;
+        } else if (TextUtils.equals(getString(R.string.usb_camera), selection)) {
+            return AppConstant.USB_CAMERA;
+        } else if (TextUtils.equals(getString(R.string.screen_cast), selection)) {
+            return AppConstant.SCREEN_CAST;
+        } else if (TextUtils.equals(getString(R.string.audio_only_text), selection)) {
+            return AppConstant.AUDIO_ONLY;
+        } else {
+            // It's a WiFi camera
+            Camera wifi_cam = db_cams.get(position - origin_count);
+            return wifi_cam.camera_name;
+        }
+    }
+    
+    /**
+     * Show bottom sheet dialog for rotation options
+     */
+    private void showRotationBottomSheet() {
+        if (!isAdded() || getContext() == null) return;
+        
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+        View bottomSheetView = LayoutInflater.from(getContext()).inflate(R.layout.bottom_sheet_rotation, null);
+        bottomSheetDialog.setContentView(bottomSheetView);
+        
+        // Initialize rotation degree options
+        View rotate90 = bottomSheetView.findViewById(R.id.ly_rotate_90);
+        View rotate180 = bottomSheetView.findViewById(R.id.ly_rotate_180);
+        View rotate270 = bottomSheetView.findViewById(R.id.ly_rotate_270);
+        View flipOption = bottomSheetView.findViewById(R.id.ly_flip);
+        View mirrorOption = bottomSheetView.findViewById(R.id.ly_mirror);
+        View normalOption = bottomSheetView.findViewById(R.id.ly_normal);
+        
+        ImageView iv90 = bottomSheetView.findViewById(R.id.iv_rotate_90_check);
+        ImageView iv180 = bottomSheetView.findViewById(R.id.iv_rotate_180_check);
+        ImageView iv270 = bottomSheetView.findViewById(R.id.iv_rotate_270_check);
+        ImageView ivFlip = bottomSheetView.findViewById(R.id.iv_flip_check);
+        ImageView ivMirror = bottomSheetView.findViewById(R.id.iv_mirror_check);
+        ImageView ivNormal = bottomSheetView.findViewById(R.id.iv_normal_check);
+        
+        // Update UI based on current state
+        updateRotationUI(iv90, iv180, iv270, ivFlip, ivMirror, ivNormal);
+        
+        // Handle rotation degree selections (single select)
+        rotate90.setOnClickListener(v -> {
+            handleRotationSelection(AppConstant.is_rotated_90);
+            updateRotationUI(iv90, iv180, iv270, ivFlip, ivMirror, ivNormal);
+        });
+        
+        rotate180.setOnClickListener(v -> {
+            handleRotationSelection(AppConstant.is_rotated_180);
+            updateRotationUI(iv90, iv180, iv270, ivFlip, ivMirror, ivNormal);
+        });
+        
+        rotate270.setOnClickListener(v -> {
+            handleRotationSelection(AppConstant.is_rotated_270);
+            updateRotationUI(iv90, iv180, iv270, ivFlip, ivMirror, ivNormal);
+        });
+        
+        // Handle flip and mirror (multi-select)
+        flipOption.setOnClickListener(v -> {
+            onFlip();
+            updateRotationUI(iv90, iv180, iv270, ivFlip, ivMirror, ivNormal);
+        });
+        
+        mirrorOption.setOnClickListener(v -> {
+            onMirror();
+            updateRotationUI(iv90, iv180, iv270, ivFlip, ivMirror, ivNormal);
+        });
+        
+        // Handle normal (reset all)
+        normalOption.setOnClickListener(v -> {
+            onNormal();
+            updateRotationUI(iv90, iv180, iv270, ivFlip, ivMirror, ivNormal);
+            bottomSheetDialog.dismiss();
+        });
+        
+        bottomSheetDialog.show();
+    }
+    
+    /**
+     * Handle rotation degree selection (single select)
+     */
+    private void handleRotationSelection(int rotationAngle) {
+        if (is_rotated == rotationAngle) {
+            // If already selected, deselect (set to 0)
+            is_rotated = AppConstant.is_rotated_0;
+            if (mActivityRef != null && mActivityRef.get() != null) {
+                if (is_camera_opened && mActivityRef.get().mCamService != null) {
+                    mActivityRef.get().mCamService.setRotation(0);
+                } else if (is_usb_opened && mActivityRef.get().mUSBService != null) {
+                    mActivityRef.get().mUSBService.setRotation(0);
+                }
+            }
+        } else {
+            // Select new rotation
+            onRotate(rotationAngle);
+        }
+    }
+    
+    /**
+     * Update rotation UI based on current state
+     */
+    private void updateRotationUI(ImageView iv90, ImageView iv180, ImageView iv270, 
+                                 ImageView ivFlip, ImageView ivMirror, ImageView ivNormal) {
+        // Update rotation degree selections (single select)
+        iv90.setVisibility(is_rotated == AppConstant.is_rotated_90 ? View.VISIBLE : View.GONE);
+        iv180.setVisibility(is_rotated == AppConstant.is_rotated_180 ? View.VISIBLE : View.GONE);
+        iv270.setVisibility(is_rotated == AppConstant.is_rotated_270 ? View.VISIBLE : View.GONE);
+        
+        // Update flip and mirror (multi-select)
+        ivFlip.setVisibility(is_flipped ? View.VISIBLE : View.GONE);
+        ivMirror.setVisibility(is_mirrored ? View.VISIBLE : View.GONE);
+        
+        // Update normal indicator
+        boolean isNormal = (is_rotated == AppConstant.is_rotated_0) && !is_flipped && !is_mirrored;
+        ivNormal.setVisibility(isNormal ? View.VISIBLE : View.GONE);
     }
 }
 
