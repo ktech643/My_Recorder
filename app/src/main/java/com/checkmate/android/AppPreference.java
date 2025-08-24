@@ -169,6 +169,11 @@ public class AppPreference {
         final public static String AUDIO_OPTION_CHANNEL_COUNT = "AUDIO_OPTION_CHANNEL_COUNT";
         final public static String AUDIO_OPTION_SAMPLE_RATE = "AUDIO_OPTION_SAMPLE_RATE";
         final public static String AUDIO_OPTION_BITRATE = "AUDIO_OPTION_BITRATE";
+        
+        // Rotation settings
+        final public static String IS_ROTATED = "IS_ROTATED";
+        final public static String IS_FLIPPED = "IS_FLIPPED";
+        final public static String IS_MIRRORED = "IS_MIRRORED";
     }
 
     public static void initialize(SharedPreferences pref) {

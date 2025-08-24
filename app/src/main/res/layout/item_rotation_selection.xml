@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:gravity="center_vertical"
+    android:background="@drawable/rotation_item_background"
+    android:clickable="true"
+    android:focusable="true"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="8dp">
+    
+    <ImageView 
+        android:id="@+id/iv_rotation_icon" 
+        android:layout_width="28dp" 
+        android:layout_height="28dp" 
+        android:src="@mipmap/ic_rotate" 
+        android:layout_marginEnd="16dp"
+        android:tint="@color/teal" />
+        
+    <TextView 
+        android:id="@+id/tv_rotation_title" 
+        android:layout_width="0dp" 
+        android:layout_height="wrap_content" 
+        android:layout_weight="1" 
+        android:text="Rotation Option" 
+        android:textSize="16sp" 
+        android:textColor="@color/text_normal"
+        android:textStyle="normal" />
+        
+    <ImageView 
+        android:id="@+id/iv_rotation_selected" 
+        android:layout_width="24dp" 
+        android:layout_height="24dp" 
+        android:src="@mipmap/ic_radio_active" 
+        android:visibility="gone" 
+        android:layout_marginStart="8dp"
+        android:tint="@color/teal" />
+        
+</LinearLayout>
