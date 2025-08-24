@@ -57,6 +57,7 @@ import com.checkmate.android.ui.dialog.InviteDialog;
 import com.checkmate.android.ui.dialog.NameDialog;
 import com.checkmate.android.ui.dialog.PasswordDialog;
 import com.checkmate.android.ui.dialog.RePasswordDialog;
+import com.checkmate.android.ui.dialog.StreamingModeBottomSheet;
 import com.checkmate.android.util.CommonUtil;
 import com.checkmate.android.util.DateTimeUtils;
 import com.checkmate.android.util.DeviceUtils;
@@ -533,60 +534,47 @@ public class StreamingFragment extends BaseFragment {
            }
        },1000);
     }
-    // Spinner logic for Cloud vs Local
+    // Bottom sheet logic for Cloud vs Local streaming mode selection
     private void setupStreamingModeSpinner() {
         spinner_mode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MessageDialog messageDialog = MessageDialog.show("Streaming Mode", "Please choose the streaming Mode","Local Streaming" , "Cloud Streaming").setCancelButton(new OnDialogButtonClickListener<MessageDialog>() {
+                int currentMode = AppPreference.getInt(AppPreference.KEY.STREAMING_MODE, 0);
+                StreamingModeBottomSheet bottomSheet = StreamingModeBottomSheet.newInstance(currentMode);
+                bottomSheet.setListener(new StreamingModeBottomSheet.StreamingModeListener() {
                     @Override
-                    public boolean onClick(MessageDialog dialog, View v) {
-                        dialog.dismiss();
-                        // Show Cloud stuff
-                        spinner_mode.setText("Cloud Streaming");
-                        local_fields_container.setVisibility(View.GONE);
-                        row_gps.setVisibility(View.VISIBLE);
-                        row_frequency.setVisibility(View.VISIBLE);
-                        view_share.setVisibility(View.VISIBLE);
-                        ly_share.setVisibility(View.VISIBLE);
-                        View txtSpeedTest = (rootView != null) ? rootView.findViewById(R.id.txt_speed_test) : null;
-                        if (txtSpeedTest != null) {
-                            txtSpeedTest.setVisibility(View.GONE);
+                    public void onStreamingModeSelected(StreamingModeBottomSheet.StreamingModeOption option) {
+                        // Handle the selected streaming mode
+                        if (option.modeValue == 0) {
+                            // Cloud Streaming
+                            spinner_mode.setText("Cloud Streaming");
+                            local_fields_container.setVisibility(View.GONE);
+                            row_gps.setVisibility(View.VISIBLE);
+                            row_frequency.setVisibility(View.VISIBLE);
+                            view_share.setVisibility(View.VISIBLE);
+                            ly_share.setVisibility(View.VISIBLE);
+                            View txtSpeedTest = (rootView != null) ? rootView.findViewById(R.id.txt_speed_test) : null;
+                            if (txtSpeedTest != null) {
+                                txtSpeedTest.setVisibility(View.VISIBLE);
+                            }
+                            AppPreference.setInt(AppPreference.KEY.STREAMING_MODE, 0);
                         } else {
-                            Log.e("StreamingFragment", "View not available");
+                            // Local Streaming
+                            spinner_mode.setText("Local Streaming");
+                            local_fields_container.setVisibility(View.VISIBLE);
+                            row_gps.setVisibility(View.GONE);
+                            row_frequency.setVisibility(View.GONE);
+                            view_share.setVisibility(View.GONE);
+                            ly_share.setVisibility(View.GONE);
+                            View txtSpeedTest = (rootView != null) ? rootView.findViewById(R.id.txt_speed_test) : null;
+                            if (txtSpeedTest != null) {
+                                txtSpeedTest.setVisibility(View.GONE);
+                            }
+                            AppPreference.setInt(AppPreference.KEY.STREAMING_MODE, 1);
                         }
-                        if (txtSpeedTest != null) {
-                            txtSpeedTest.setVisibility(View.VISIBLE);
-                        }
-                        AppPreference.setInt(AppPreference.KEY.STREAMING_MODE, 0);
-                        return false;
-                    }
-                }).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
-                    @Override
-                    public boolean onClick(MessageDialog baseDialog, View v) {
-                        baseDialog.dismiss();
-                        spinner_mode.setText("Local Streaming");
-                        local_fields_container.setVisibility(View.VISIBLE);
-                        row_gps.setVisibility(View.GONE);
-                        row_frequency.setVisibility(View.GONE);
-                        view_share.setVisibility(View.GONE);
-                        ly_share.setVisibility(View.GONE);
-                        View txtSpeedTest = (rootView != null) ? rootView.findViewById(R.id.txt_speed_test) : null;
-                        if (txtSpeedTest != null) {
-                            txtSpeedTest.setVisibility(View.GONE);
-                        } else {
-                            Log.e("StreamingFragment", "View not available");
-                        }
-                        if (txtSpeedTest != null) {
-                            txtSpeedTest.setVisibility(View.GONE);
-                        }
-                        AppPreference.setInt(AppPreference.KEY.STREAMING_MODE, 1);
-                        return false;
                     }
                 });
-                messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-                messageDialog.setCancelTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-                messageDialog.show();
+                bottomSheet.show(getChildFragmentManager(), "streaming_mode_bottom_sheet");
             }
         });
     }
