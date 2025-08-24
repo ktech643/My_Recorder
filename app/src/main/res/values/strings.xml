@@ -13,6 +13,9 @@
     <string name="cancel">Cancel</string>
     <string name="CLOSE">CLOSE</string>
     <string name="close">Close</string>
+    <string name="back">Back</string>
+    <string name="register">Register</string>
+    <string name="validate">Validate</string>
     <string name="Error">Error</string>
     <string name="Busy">Busy</string>
     <string name="CONFIRM">CONFIRM</string>

@@ -289,6 +289,12 @@ public class StreamingFragment extends BaseFragment {
         btn_share = mView.findViewById(R.id.btn_share);
         view_login = mView.findViewById(R.id.view_login);
         btn_back = mView.findViewById(R.id.btn_back);
+        // Ensure back button is properly visible
+        if (btn_back != null) {
+            btn_back.setVisibility(View.VISIBLE);
+            btn_back.setClickable(true);
+            btn_back.setFocusable(true);
+        }
         txt_login = mView.findViewById(R.id.txt_login);
         ly_username = mView.findViewById(R.id.ly_username);
         edt_username = mView.findViewById(R.id.edt_username);
@@ -352,11 +358,11 @@ public class StreamingFragment extends BaseFragment {
         btn_share.setOnClickListener(v -> onShare());
         btn_back.setOnClickListener(v -> onBackPressed());
         btn_login.setOnClickListener(v -> onLogin());
-        btn_code.setOnClickListener(v -> onPassword());
-        btn_send.setOnClickListener(v -> onPassword());
-        btn_password.setOnClickListener(v -> onPassword());
-        btn_new_user.setOnClickListener(v -> onPassword());
-        btn_reset_password.setOnClickListener(v -> onPassword());
+        btn_code.setOnClickListener(v -> onCode());
+        btn_send.setOnClickListener(v -> onSend());
+        btn_password.setOnClickListener(v -> onNewUser());
+        btn_new_user.setOnClickListener(v -> onExistingUser());
+        btn_reset_password.setOnClickListener(v -> onResetPassword());
 
         int freq_min = AppPreference.getInt(AppPreference.KEY.FREQUENCY_MIN, 1);
         switch (freq_min) {
@@ -585,24 +591,257 @@ public class StreamingFragment extends BaseFragment {
         });
     }
 
-    // Show initial login UI
+    // Show initial login UI - only action buttons, no input fields
     void showInitialLogin() {
-        ly_username.setVisibility(View.GONE);
-        ly_password.setVisibility(View.GONE);
-        btn_login.setVisibility(View.GONE);
-        btn_password.setVisibility(View.VISIBLE);
-        btn_new_user.setVisibility(View.VISIBLE);
-        btn_reset_password.setVisibility(View.VISIBLE);
-        btn_code.setVisibility(View.GONE);
+        Log.d("StreamingFragment", "showInitialLogin() called");
+        currentFormState = FormState.INITIAL;
+        ly_username.setVisibility(View.GONE);  // Hide username field initially
+        ly_password.setVisibility(View.GONE);  // Hide password field initially
+        btn_login.setVisibility(View.GONE);   // Hide login button initially
+        btn_password.setVisibility(View.VISIBLE);      // "I am a new user" button
+        btn_new_user.setVisibility(View.VISIBLE);     // "Existing user" button  
+        btn_reset_password.setVisibility(View.VISIBLE); // "Reset password" button
+        btn_code.setVisibility(View.GONE);    // Hide validate code button
+        btn_send.setVisibility(View.GONE);    // Hide send code button
+        btn_back.setVisibility(View.GONE);    // Hide back button initially
+        
+        // Reset title and button text to default
+        txt_login.setText(R.string.login);
+        btn_login.setText(R.string.login);
+        btn_send.setText(R.string.send_code);
+        btn_code.setText(R.string.validate);
+        
         view_login.setVisibility(View.VISIBLE);
-        btn_back.setVisibility(View.GONE);
-        btn_send.setVisibility(View.GONE);
         view_stream.setVisibility(View.GONE);
+        Log.d("StreamingFragment", "Initial login UI shown - action buttons visible, input fields hidden. State: " + currentFormState);
+    }
+
+    // Show the login form - username, password, and login button
+    void showLoginForm() {
+        Log.d("StreamingFragment", "showLoginForm() called");
+        currentFormState = FormState.LOGIN;
+        ly_username.setVisibility(View.VISIBLE);
+        ly_password.setVisibility(View.VISIBLE);
+        btn_login.setVisibility(View.VISIBLE);
+        btn_password.setVisibility(View.GONE);      // Hide "I am a new user" button
+        btn_new_user.setVisibility(View.GONE);     // Hide "Existing user" button
+        btn_reset_password.setVisibility(View.GONE); // Hide "Reset password" button
+        btn_code.setVisibility(View.GONE);    // Hide validate code button
+        btn_send.setVisibility(View.GONE);    // Hide send code button
+        btn_back.setVisibility(View.VISIBLE); // Show back button
+        
+        // Update the title to show "Login" and button text
+        txt_login.setText(R.string.login);
+        btn_login.setText(R.string.login);
+        
+        // Debug: Check back button state and ensure it's visible
+        if (btn_back != null) {
+            Log.d("StreamingFragment", "Back button found, setting visibility to VISIBLE");
+            btn_back.setVisibility(View.VISIBLE);
+            btn_back.setClickable(true);
+            btn_back.setFocusable(true);
+            // Force refresh the view
+            btn_back.invalidate();
+            // Also ensure parent container is visible
+            if (btn_back.getParent() instanceof View) {
+                ((View) btn_back.getParent()).setVisibility(View.VISIBLE);
+            }
+        } else {
+            Log.e("StreamingFragment", "Back button is null!");
+        }
+        
+        view_login.setVisibility(View.VISIBLE);
+        view_stream.setVisibility(View.GONE);
+        Log.d("StreamingFragment", "Login form shown - username/password visible, login button visible. State: " + currentFormState);
+    }
+
+    // Show registration form for new users - username, password, and send code button
+    void showRegisterForm() {
+        Log.d("StreamingFragment", "showRegisterForm() called");
+        currentFormState = FormState.REGISTER;
+        ly_username.setVisibility(View.VISIBLE);
+        ly_password.setVisibility(View.VISIBLE);
+        btn_login.setVisibility(View.GONE);    // Hide login button
+        btn_password.setVisibility(View.GONE);      // Hide "I am a new user" button
+        btn_new_user.setVisibility(View.GONE);     // Hide "Existing user" button
+        btn_reset_password.setVisibility(View.GONE); // Hide "Reset password" button
+        btn_code.setVisibility(View.GONE);    // Hide validate code button
+        btn_send.setVisibility(View.VISIBLE); // Show send code button
+        btn_back.setVisibility(View.VISIBLE); // Show back button
+        
+        // Update the title to show "Register" and button text
+        txt_login.setText(R.string.register);
+        btn_send.setText(R.string.send_code);
+        
+        view_login.setVisibility(View.VISIBLE);
+        view_stream.setVisibility(View.GONE);
+        Log.d("StreamingFragment", "Registration form shown - username/password visible, send button visible. State: " + currentFormState);
+    }
+
+    // Show password form for code validation - username, password, and validate code button
+    void showPasswordForm() {
+        Log.d("StreamingFragment", "showPasswordForm() called");
+        currentFormState = FormState.PASSWORD;
+        ly_username.setVisibility(View.VISIBLE);
+        ly_password.setVisibility(View.VISIBLE);
+        btn_login.setVisibility(View.GONE);    // Hide login button
+        btn_password.setVisibility(View.GONE);      // Hide "I am a new user" button
+        btn_new_user.setVisibility(View.GONE);     // Hide "Existing user" button
+        btn_reset_password.setVisibility(View.GONE); // Hide "Reset password" button
+        btn_code.setVisibility(View.VISIBLE); // Show validate code button
+        btn_send.setVisibility(View.GONE);    // Hide send code button
+        btn_back.setVisibility(View.VISIBLE); // Show back button
+        
+        // Update the title to show "Validate Code" and button text
+        txt_login.setText(R.string.validate_code);
+        btn_code.setText(R.string.validate);
+        
+        view_login.setVisibility(View.VISIBLE);
+        view_stream.setVisibility(View.GONE);
+        Log.d("StreamingFragment", "Password form shown - username/password visible, validate code button visible. State: " + currentFormState);
+    }
+
+    // Show reset password form - username, password, and reset password functionality
+    void showResetPasswordForm() {
+        Log.d("StreamingFragment", "showResetPasswordForm() called");
+        currentFormState = FormState.RESET_PASSWORD;
+        ly_username.setVisibility(View.VISIBLE);
+        ly_password.setVisibility(View.VISIBLE);
+        btn_login.setVisibility(View.GONE);    // Hide login button
+        btn_password.setVisibility(View.GONE);      // Hide "I am a new user" button
+        btn_new_user.setVisibility(View.GONE);     // Hide "Existing user" button
+        btn_reset_password.setVisibility(View.VISIBLE); // Show "Reset password" button
+        btn_code.setVisibility(View.GONE);    // Hide validate code button
+        btn_send.setVisibility(View.GONE);    // Hide send code button
+        btn_back.setVisibility(View.VISIBLE); // Show back button
+        view_login.setVisibility(View.VISIBLE);
+        view_stream.setVisibility(View.GONE);
+        
+        // Update the title to show "Reset Password" instead of "Login"
+        txt_login.setText(R.string.reset_password);
+        
+        Log.d("StreamingFragment", "Reset password form shown - username/password visible, reset button visible. State: " + currentFormState);
+        
+        // Set the reset password button to actually call the reset password functionality
+        btn_reset_password.setOnClickListener(v -> {
+            String email = edt_username.getText().toString().trim();
+            if (TextUtils.isEmpty(email)) {
+                MessageUtil.showToast(mActivity, R.string.no_email);
+                return;
+            }
+            if (!CommonUtil.isValidEmail(email)) {
+                MessageUtil.showToast(mActivity, R.string.invalid_email);
+                return;
+            }
+            // Call the actual reset password functionality
+            callResetPassword();
+        });
+    }
+
+    // Form state tracking
+    private enum FormState {
+        INITIAL,        // Initial state with action buttons
+        LOGIN,          // Login form
+        REGISTER,       // Registration form  
+        PASSWORD,       // Password validation form
+        RESET_PASSWORD  // Reset password form
+    }
+    
+    private FormState currentFormState = FormState.INITIAL;
+    
+    // Back button functionality - navigate back one step in form flow
+    void onBackPressed() {
+        Log.d("StreamingFragment", "onBackPressed() called from state: " + currentFormState);
+        
+        switch (currentFormState) {
+            case LOGIN:
+            case REGISTER:
+            case PASSWORD:
+            case RESET_PASSWORD:
+                // Go back to initial state
+                Log.d("StreamingFragment", "Going back to initial state");
+                currentFormState = FormState.INITIAL;
+                ly_username.setVisibility(View.GONE);
+                ly_password.setVisibility(View.GONE);
+                edt_username.setText(""); // Clear username
+                edt_password.setText(""); // Clear password
+                showInitialLogin();
+                break;
+                
+            case INITIAL:
+            default:
+                // Already at initial state, do nothing
+                Log.d("StreamingFragment", "Already at initial state, doing nothing");
+                break;
+        }
+    }
+
+    // For "I am a new user" button click
+    void onNewUser() {
+        Log.d("StreamingFragment", "onNewUser() called");
+        if (mActivity == null) return;
+        // Show username field and registration form
+        ly_username.setVisibility(View.VISIBLE);
+        edt_password.setText(""); // Clear password field
+        Log.d("StreamingFragment", "Calling showRegisterForm()");
+        showRegisterForm();
+    }
+
+    // For "Existing user" button click
+    void onExistingUser() {
+        if (mActivity == null) return;
+        // Show username field and login form
+        ly_username.setVisibility(View.VISIBLE);
+        edt_password.setText(""); // Clear password field
+        showLoginForm();
+    }
+
+    // For "Reset password" button click
+    void onResetPassword() {
+        if (mActivity == null) return;
+        // Show username field and reset password form
+        ly_username.setVisibility(View.VISIBLE);
+        edt_password.setText(""); // Clear password field
+        showResetPasswordForm();
+    }
+
+    // For "Send code" button click
+    void onSend() {
+        if (mActivity == null) return;
+        String email = edt_username.getText().toString().trim();
+        if (TextUtils.isEmpty(email)) {
+            MessageUtil.showToast(mActivity, R.string.no_email);
+            return;
+        }
+        if (!CommonUtil.isValidEmail(email)) {
+            MessageUtil.showToast(mActivity, R.string.invalid_email);
+            return;
+        }
+        // Send OTC code
+        onPassword(); // This method handles sending the code
+    }
+
+    // For "Validate code" button click
+    void onCode() {
+        if (mActivity == null) return;
+        String email = edt_username.getText().toString().trim();
+        if (TextUtils.isEmpty(email)) {
+            MessageUtil.showToast(mActivity, R.string.no_email);
+            return;
+        }
+        if (!CommonUtil.isValidEmail(email)) {
+            MessageUtil.showToast(mActivity, R.string.invalid_email);
+            return;
+        }
+        // Show password input for code validation
+        showPasswordForm();
     }
 
     // Basic initialization for streaming UI
     void initialize() {
+        Log.d("StreamingFragment", "initialize() called");
         if (user_info == null) {
+            Log.d("StreamingFragment", "user_info is null, showing initial login");
             view_share.setVisibility(View.GONE);
             view_stream.setVisibility(View.GONE);
             showInitialLogin();
@@ -892,13 +1131,6 @@ public class StreamingFragment extends BaseFragment {
             });
         }
     }
-
-    // Show the login form
-    void showLoginForm() {
-        view_login.setVisibility(View.VISIBLE);
-        view_stream.setVisibility(View.GONE);
-    }
-
     // Called on user logout
     public void onLogout() {
         if (mListener != null) {
@@ -1001,9 +1233,6 @@ public class StreamingFragment extends BaseFragment {
         }
     }
 
-    void onBackPressed(){
-
-    }
     // Called when user tries to log in
     void onLogin() {
         if (mActivity == null) return;
@@ -1277,44 +1506,9 @@ public class StreamingFragment extends BaseFragment {
         });
     }
 
-    // For "New User" click
-    void doLogin() {
-        view_login.setVisibility(View.VISIBLE);
-        ly_username.setVisibility(View.VISIBLE);
-        ly_password.setVisibility(View.VISIBLE);
-        btn_login.setVisibility(View.VISIBLE);
-        btn_password.setVisibility(View.GONE);
-        btn_reset_password.setVisibility(View.GONE);
-        btn_new_user.setVisibility(View.GONE);
-        btn_back.setVisibility(View.VISIBLE);
-        btn_send.setVisibility(View.GONE);
-        view_stream.setVisibility(View.GONE);
-    }
+    // Old doLogin method removed - now using new form management system
 
-    // For "Reset Password" click
-    void resetPassword() {
-        ly_username.setVisibility(View.VISIBLE);
-        btn_new_user.setVisibility(View.GONE);
-        btn_password.setVisibility(View.GONE);
-        btn_reset_password.setVisibility(View.GONE);
-        btn_back.setVisibility(View.VISIBLE);
-        btn_send.setVisibility(View.VISIBLE);
-        view_stream.setVisibility(View.GONE);
-        view_login.setVisibility(View.VISIBLE);
-    }
-
-    // For "Need Password" click
-    void needPassword() {
-        ly_username.setVisibility(View.VISIBLE);
-        btn_new_user.setVisibility(View.GONE);
-        btn_reset_password.setVisibility(View.GONE);
-        btn_password.setVisibility(View.GONE);
-        btn_code.setVisibility(View.VISIBLE);
-        btn_back.setVisibility(View.VISIBLE);
-        btn_send.setVisibility(View.GONE);
-        view_stream.setVisibility(View.GONE);
-        view_login.setVisibility(View.VISIBLE);
-    }
+    // Old methods removed - now using new form management system
 
     // Clicking "Share new" invites user by email
     void onShare() {
@@ -1923,74 +2117,7 @@ public class StreamingFragment extends BaseFragment {
     }
 
 
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_share:
-                if (mListener != null) {
-                    mListener.isDialog(true);
-                }
-                if (mActivity != null) {
-                    mActivity.startActivity(new Intent(mActivity, ShareActivity.class));
-                }
-                break;
-            case R.id.btn_logout:
-                if (mListener != null) {
-                    mListener.isDialog(true);
-                }
-                MessageDialog logoutConfirm = MessageDialog.show(
-                                getString(R.string.unregister),
-                                getString(R.string.label_logout),
-                                getString(R.string.Okay),
-                                getString(R.string.cancel))
-                        .setCancelButton((dialog, v1) -> {
-                            dialog.dismiss();
-                            return false;
-                        })
-                        .setOkButton((baseDialog, v12) -> {
-                            onLogout();
-                            baseDialog.dismiss();
-                            return false;
-                        });
-                logoutConfirm.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-                logoutConfirm.setCancelTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-                break;
-            case R.id.ly_share:
-                onShare();
-                break;
-            case R.id.btn_refresh:
-                edt_username.setText(AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, ""));
-                edt_password.setText(AppPreference.getStr(AppPreference.KEY.LOGIN_PASSWORD, ""));
-                onLogin();
-                break;
-            case R.id.btn_back:
-                showInitialLogin();
-                break;
-            case R.id.btn_login:
-                onLogin();
-                break;
-            case R.id.btn_password:
-                needPassword();
-                break;
-            case R.id.btn_reset_password:
-                resetPassword();
-                break;
-            case R.id.btn_new_user:
-                doLogin();
-                break;
-            case R.id.btn_code:
-                onPassword();
-                break;
-            case R.id.txt_qr:
-                if (mListener != null) {
-                    mListener.isDialog(true);
-                }
-                if (mActivity != null) {
-                    Intent i = new Intent(mActivity, QrCodeActivity.class);
-                    startActivityForResult(i, REQUEST_CODE_QR_SCAN);
-                }
-                break;
-        }
-    }
+    // Old onClick method removed - now using individual button click listeners
 
     // Handle results, e.g. scanning a channel QR
     @Override
