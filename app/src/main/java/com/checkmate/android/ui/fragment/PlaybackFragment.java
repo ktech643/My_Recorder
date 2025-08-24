@@ -435,12 +435,15 @@ public class PlaybackFragment extends BaseFragment
                         media.type = Media.TYPE.PHOTO;
                         media.is_encrypted = true;
                     } else if (lowerName.endsWith(".mp4") || lowerName.endsWith(".mov") ||
-                            lowerName.endsWith(".mkv") || lowerName.endsWith(".avi")) {
+                            lowerName.endsWith(".mkv") || lowerName.endsWith(".avi") ||
+                            lowerName.endsWith(".3gp") || lowerName.endsWith(".webm")) {
                         media.type = Media.TYPE.VIDEO;
                     } else if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") ||
-                            lowerName.endsWith(".png") || lowerName.endsWith(".gif")) {
-                        media.type = Media.TYPE.PHOTO;
+                            lowerName.endsWith(".png") || lowerName.endsWith(".gif") ||
+                            lowerName.endsWith(".bmp") || lowerName.endsWith(".webp")) {
+                        media.type = Media.TYPE.IMAGE;
                     } else {
+                        // Skip non-media files - only include VIDEO, PHOTO, and IMAGE types
                         continue;
                     }
 
@@ -454,7 +457,8 @@ public class PlaybackFragment extends BaseFragment
                             media.name,
                             uriString,
                             media.date.getTime(),
-                            media.type == Media.TYPE.VIDEO ? "video" : "photo",
+                            media.type == Media.TYPE.VIDEO ? "video" : 
+                            media.type == Media.TYPE.IMAGE ? "image" : "photo",
                             media.is_encrypted,
                             media.duration,
                             media.resolutionWidth,
@@ -544,40 +548,31 @@ public class PlaybackFragment extends BaseFragment
     }
 
     private class LoadAllMediaTask extends AsyncTask<Void, Void, List<Media>> {
+        
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+        
         @Override
         protected List<Media> doInBackground(Void... voids) {
             List<Media> result = new ArrayList<>();
             
             try {
-                // First, try to load from SAF if available
-                if (treeUri != null) {
-                    result.addAll(loadFromSAF());
-                }
-                
-                // Also load from traditional file paths and MediaStore
+                // Only load from database (SAF and file paths) - ignore MediaStore
+                result.addAll(loadFromSAF());
                 result.addAll(loadFromFilePaths());
-                result.addAll(loadFromMediaStore());
-                
-                // Remove duplicates based on content URI
-                Set<String> seenUris = new HashSet<>();
-                List<Media> uniqueResult = new ArrayList<>();
-                for (Media media : result) {
-                    String uriString = media.contentUri.toString();
-                    if (!seenUris.contains(uriString)) {
-                        seenUris.add(uriString);
-                        uniqueResult.add(media);
-                    }
-                }
                 
                 // Sort by date (newest first)
-                Collections.sort(uniqueResult, (m1, m2) -> Long.compare(m2.date, m1.date));
-                
-                return uniqueResult;
+                if (!result.isEmpty()) {
+                    Collections.sort(result, (m1, m2) -> Long.compare(m2.date.getTime(), m1.date.getTime()));
+                }
                 
             } catch (Exception e) {
                 Log.e("LoadAllMedia", "Error loading media", e);
-                return result;
             }
+            
+            return result;
         }
         
         private List<Media> loadFromSAF() {
@@ -615,15 +610,18 @@ public class PlaybackFragment extends BaseFragment
                         media.name = name;
                         media.contentUri = contentUri;
                         media.path = treeUri.toString();
-                        media.date = doc.lastModified();
+                        media.date = new Date(doc.lastModified());
                         media.file = doc;
 
-                        // Determine media type
+                        // Determine media type - only include VIDEO and IMAGE types
                         if (isVideoFile(name)) {
                             media.type = Media.TYPE.VIDEO;
                             extractVideoMetadata(media);
                         } else if (isImageFile(name)) {
                             media.type = Media.TYPE.IMAGE;
+                        } else {
+                            // Skip non-media files
+                            continue;
                         }
 
                         // Check if encrypted
@@ -663,15 +661,18 @@ public class PlaybackFragment extends BaseFragment
                                         media.name = name;
                                         media.contentUri = Uri.fromFile(file);
                                         media.path = storagePath;
-                                        media.date = file.lastModified();
+                                        media.date = new Date(file.lastModified());
                                         media.fileSize = file.length();
                                         
-                                        // Determine media type
+                                        // Determine media type - only include VIDEO and IMAGE types
                                         if (isVideoFile(name)) {
                                             media.type = Media.TYPE.VIDEO;
                                             extractVideoMetadata(media);
                                         } else if (isImageFile(name)) {
                                             media.type = Media.TYPE.IMAGE;
+                                        } else {
+                                            // Skip non-media files
+                                            continue;
                                         }
                                         
                                         // Check if encrypted
@@ -687,112 +688,6 @@ public class PlaybackFragment extends BaseFragment
                 
             } catch (Exception e) {
                 Log.e("LoadFilePaths", "Error loading from file paths", e);
-            }
-            
-            return result;
-        }
-        
-        private List<Media> loadFromMediaStore() {
-            List<Media> result = new ArrayList<>();
-            
-            try {
-                Context context = requireContext();
-                
-                // Load images from MediaStore
-                String[] imageProjection = {
-                    MediaStore.Images.Media._ID,
-                    MediaStore.Images.Media.DISPLAY_NAME,
-                    MediaStore.Images.Media.DATE_ADDED,
-                    MediaStore.Images.Media.SIZE,
-                    MediaStore.Images.Media.DATA
-                };
-                
-                Cursor imageCursor = context.getContentResolver().query(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    imageProjection,
-                    null,
-                    null,
-                    MediaStore.Images.Media.DATE_ADDED + " DESC LIMIT 100"
-                );
-                
-                if (imageCursor != null) {
-                    while (imageCursor.moveToNext()) {
-                        try {
-                            long id = imageCursor.getLong(imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID));
-                            String name = imageCursor.getString(imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME));
-                            long dateAdded = imageCursor.getLong(imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED));
-                            long size = imageCursor.getLong(imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE));
-                            String path = imageCursor.getString(imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
-                            
-                            Uri contentUri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, String.valueOf(id));
-                            
-                            Media media = new Media();
-                            media.name = name;
-                            media.contentUri = contentUri;
-                            media.path = "MediaStore";
-                            media.date = dateAdded * 1000; // Convert to milliseconds
-                            media.fileSize = size;
-                            media.type = Media.TYPE.IMAGE;
-                            media.is_encrypted = false;
-                            
-                            result.add(media);
-                        } catch (Exception e) {
-                            Log.e("MediaStore", "Error processing image", e);
-                        }
-                    }
-                    imageCursor.close();
-                }
-                
-                // Load videos from MediaStore
-                String[] videoProjection = {
-                    MediaStore.Video.Media._ID,
-                    MediaStore.Video.Media.DISPLAY_NAME,
-                    MediaStore.Video.Media.DATE_ADDED,
-                    MediaStore.Video.Media.SIZE,
-                    MediaStore.Video.Media.DURATION,
-                    MediaStore.Video.Media.DATA
-                };
-                
-                Cursor videoCursor = context.getContentResolver().query(
-                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                    videoProjection,
-                    null,
-                    null,
-                    MediaStore.Video.Media.DATE_ADDED + " DESC LIMIT 100"
-                );
-                
-                if (videoCursor != null) {
-                    while (videoCursor.moveToNext()) {
-                        try {
-                            long id = videoCursor.getLong(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID));
-                            String name = videoCursor.getString(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME));
-                            long dateAdded = videoCursor.getLong(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED));
-                            long size = videoCursor.getLong(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE));
-                            long duration = videoCursor.getLong(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION));
-                            String path = videoCursor.getString(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
-                            
-                            Uri contentUri = Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, String.valueOf(id));
-                            
-                            Media media = new Media();
-                            media.name = name;
-                            media.contentUri = contentUri;
-                            media.path = "MediaStore";
-                            media.date = dateAdded * 1000; // Convert to milliseconds
-                            media.fileSize = size;
-                            media.duration = duration;
-                            media.type = Media.TYPE.VIDEO;
-                            media.is_encrypted = false;
-                            
-                            result.add(media);
-                        } catch (Exception e) {
-                            Log.e("MediaStore", "Error processing video", e);
-                        }
-                    }
-                    videoCursor.close();
-                }
-                
-            } catch (Exception e) {
-                Log.e("LoadMediaStore", "Error loading from MediaStore", e);
             }
             
             return result;
@@ -831,12 +726,14 @@ public class PlaybackFragment extends BaseFragment
             mDataList.addAll(result);
             adapter.notifyDataSetChanged();
             
-            // Update UI with source information
-            updateStorageLocationDisplay(result);
-            
-            txt_no_data.setVisibility(mDataList.isEmpty() ? View.VISIBLE : View.GONE);
+            // Center the no data message and make it more prominent
             if (mDataList.isEmpty()) {
-                txt_no_data.setText("No media files found in any storage location");
+                txt_no_data.setVisibility(View.VISIBLE);
+                txt_no_data.setText("No media files found\nPull down to refresh");
+                list_view.setVisibility(View.GONE);
+            } else {
+                txt_no_data.setVisibility(View.GONE);
+                list_view.setVisibility(View.VISIBLE);
             }
             
             list_view.onRefreshComplete();
@@ -952,7 +849,7 @@ public class PlaybackFragment extends BaseFragment
 
         class ViewHolder {
             ImageView img_thumbnail;
-            TextView txt_name, txt_type, txt_date, txt_time, txt_duration, txt_source;
+            TextView txt_name, txt_type, txt_date, txt_time, txt_duration;
             ImageView ic_share, ic_trash;
             CheckBox checkbox;
 
@@ -963,7 +860,6 @@ public class PlaybackFragment extends BaseFragment
                 txt_date = convertView.findViewById(R.id.txt_date);
                 txt_time = convertView.findViewById(R.id.txt_time);
                 txt_duration = convertView.findViewById(R.id.txt_duration);
-                txt_source = convertView.findViewById(R.id.txt_source);
                 ic_share = convertView.findViewById(R.id.ic_share);
                 ic_trash = convertView.findViewById(R.id.ic_trash);
                 checkbox = convertView.findViewById(R.id.checkbox);
@@ -983,8 +879,8 @@ public class PlaybackFragment extends BaseFragment
             holder = (ViewHolder) convertView.getTag();
             final Media media = mDataList.get(position);
             holder.txt_name.setText(media.name);
-            holder.txt_date.setText(ResourceUtil.date(media.date));
-            holder.txt_time.setText(ResourceUtil.time(media.date));
+            holder.txt_date.setText(ResourceUtil.date(media.date.getTime()));
+            holder.txt_time.setText(ResourceUtil.time(media.date.getTime()));
 
             if (media.type == Media.TYPE.VIDEO) {
                 holder.txt_type.setText(R.string.video);
@@ -1007,7 +903,19 @@ public class PlaybackFragment extends BaseFragment
                     }
                 }
                 holder.txt_duration.setVisibility(View.VISIBLE);
+            } else if (media.type == Media.TYPE.IMAGE) {
+                holder.txt_type.setText("Image");
+                holder.txt_duration.setVisibility(View.GONE);
+                if (media.is_encrypted) {
+                    holder.img_thumbnail.setImageResource(R.mipmap.ic_lock);
+                } else {
+                    Glide.with(getActivity())
+                            .load(media.contentUri)
+                            .thumbnail(0.1f)
+                            .into(holder.img_thumbnail);
+                }
             } else {
+                // Handle PHOTO type (legacy)
                 holder.txt_type.setText(R.string.photo);
                 holder.txt_duration.setVisibility(View.GONE);
                 if (media.is_encrypted) {
@@ -1020,35 +928,43 @@ public class PlaybackFragment extends BaseFragment
                 }
             }
 
-            // Set source indicator
-            if (media.path != null) {
-                if (media.path.startsWith("content://")) {
-                    holder.txt_source.setText("SAF");
-                    holder.txt_source.setBackgroundColor(getResources().getColor(R.color.blue));
-                } else if (media.path.equals("MediaStore")) {
-                    holder.txt_source.setText("Gallery");
-                    holder.txt_source.setBackgroundColor(getResources().getColor(R.color.teal));
-                } else {
-                    holder.txt_source.setText("File");
-                    holder.txt_source.setBackgroundColor(getResources().getColor(R.color.red));
-                }
-            } else {
-                holder.txt_source.setText("Unknown");
-                holder.txt_source.setBackgroundColor(getResources().getColor(R.color.gray_dark));
-            }
-
             holder.checkbox.setVisibility(is_selectable ? View.VISIBLE : View.GONE);
             holder.checkbox.setChecked(media.is_selected);
             holder.checkbox.setOnCheckedChangeListener((btn, isChecked) ->
                     media.is_selected = isChecked);
 
             holder.ic_share.setOnClickListener(v -> {
-                String mimeType = media.type == Media.TYPE.VIDEO ? "video/mp4" : "image/*";
-                ShareCompat.IntentBuilder.from(requireActivity())
-                        .setType(mimeType)
-                        .setStream(media.contentUri)
-                        .setChooserTitle("Share media...")
-                        .startChooser();
+                try {
+                    String mimeType = media.type == Media.TYPE.VIDEO ? "video/mp4" : "image/*";
+                    
+                    // Use FileProvider for safe sharing
+                    Uri shareUri;
+                    if (media.contentUri.getScheme().equals("file")) {
+                        // Convert file URI to content URI using FileProvider
+                        shareUri = FileProvider.getUriForFile(
+                            requireActivity(),
+                            requireActivity().getPackageName() + ".provider",
+                            new File(media.contentUri.getPath())
+                        );
+                    } else {
+                        // Already a content URI, use as is
+                        shareUri = media.contentUri;
+                    }
+                    
+                    ShareCompat.IntentBuilder.from(requireActivity())
+                            .setType(mimeType)
+                            .setStream(shareUri)
+                            .setChooserTitle("Share media...")
+                            .startChooser();
+                } catch (Exception e) {
+                    Log.e("Share", "Error sharing media", e);
+                    // Fallback to simple text sharing
+                    ShareCompat.IntentBuilder.from(requireActivity())
+                            .setType("text/plain")
+                            .setText("Media: " + media.name)
+                            .setChooserTitle("Share media...")
+                            .startChooser();
+                }
             });
 
             holder.ic_trash.setOnClickListener(v ->

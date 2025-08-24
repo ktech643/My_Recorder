@@ -72,6 +72,47 @@ public class FileStoreDb extends SQLiteOpenHelper {
         cv.put(COL_FILE_SIZE, fileSize);
         return getWritableDatabase().insert(TABLE, null, cv);
     }
+    
+    // Insert Media object into database
+    public long insert(Media media) {
+        ContentValues cv = new ContentValues();
+        cv.put(COL_FILENAME, media.name);
+        cv.put(COL_PATH, media.path);
+        cv.put(COL_TIMESTAMP, media.date != null ? media.date.getTime() : System.currentTimeMillis());
+        cv.put(COL_TYPE, getTypeString(media.type));
+        cv.put(COL_ENCRYPTED, media.is_encrypted ? 1 : 0);
+        cv.put(COL_DURATION, media.duration);
+        cv.put(COL_RES_W, media.resolutionWidth);
+        cv.put(COL_RES_H, media.resolutionHeight);
+        cv.put(COL_FILE_SIZE, media.fileSize);
+        return getWritableDatabase().insert(TABLE, null, cv);
+    }
+    
+    // Update Media object in database
+    public int update(Media media) {
+        ContentValues cv = new ContentValues();
+        cv.put(COL_FILENAME, media.name);
+        cv.put(COL_PATH, media.path);
+        cv.put(COL_TIMESTAMP, media.date != null ? media.date.getTime() : System.currentTimeMillis());
+        cv.put(COL_TYPE, getTypeString(media.type));
+        cv.put(COL_ENCRYPTED, media.is_encrypted ? 1 : 0);
+        cv.put(COL_DURATION, media.duration);
+        cv.put(COL_RES_W, media.resolutionWidth);
+        cv.put(COL_RES_H, media.resolutionHeight);
+        cv.put(COL_FILE_SIZE, media.fileSize);
+        return getWritableDatabase().update(TABLE, cv, COL_ID + " = ?", new String[]{String.valueOf(media.id)});
+    }
+    
+    // Helper method to convert Media.TYPE to string for database storage
+    private String getTypeString(Media.TYPE type) {
+        if (type == null) return "unknown";
+        switch (type) {
+            case VIDEO: return "video";
+            case PHOTO: return "photo";
+            case IMAGE: return "image";
+            default: return "unknown";
+        }
+    }
 
     // FileStoreDb.java
     @SuppressLint("Range")

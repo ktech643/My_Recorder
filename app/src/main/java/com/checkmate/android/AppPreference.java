@@ -169,6 +169,11 @@ public class AppPreference {
         final public static String AUDIO_OPTION_CHANNEL_COUNT = "AUDIO_OPTION_CHANNEL_COUNT";
         final public static String AUDIO_OPTION_SAMPLE_RATE = "AUDIO_OPTION_SAMPLE_RATE";
         final public static String AUDIO_OPTION_BITRATE = "AUDIO_OPTION_BITRATE";
+        
+        // Rotation settings
+        final public static String IS_ROTATED = "IS_ROTATED";
+        final public static String IS_FLIPPED = "IS_FLIPPED";
+        final public static String IS_MIRRORED = "IS_MIRRORED";
     }
 
     public static void initialize(SharedPreferences pref) {
@@ -229,6 +234,29 @@ public class AppPreference {
         SharedPreferences.Editor editor = instance.edit();
         editor.remove(key);
         editor.apply();
+    }
+    
+    // Rotation settings methods
+    public static void saveRotationSettings(int rotation, boolean isFlipped, boolean isMirrored) {
+        setInt(KEY.IS_ROTATED, rotation);
+        setBool(KEY.IS_FLIPPED, isFlipped);
+        setBool(KEY.IS_MIRRORED, isMirrored);
+    }
+    
+    public static int getRotation() {
+        return getInt(KEY.IS_ROTATED, 0);
+    }
+    
+    public static boolean isFlipped() {
+        return getBool(KEY.IS_FLIPPED, false);
+    }
+    
+    public static boolean isMirrored() {
+        return getBool(KEY.IS_MIRRORED, false);
+    }
+    
+    public static void resetRotationSettings() {
+        saveRotationSettings(0, false, false);
     }
 
 }
