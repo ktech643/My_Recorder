@@ -15,6 +15,8 @@ import androidx.annotation.NonNull;
 import com.checkmate.android.database.DBManager;
 import com.checkmate.android.service.SharedEGL.GraphicsModule;
 import com.checkmate.android.util.HttpServer.ServiceModule;
+import com.checkmate.android.util.CrashLogger;
+import com.checkmate.android.util.ANRHandler;
 
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -48,8 +50,17 @@ public class MyApp extends Application {
         appScope.installModules(new ServiceModule());
 
 
-        // initialize
+        // Initialize crash logger first
+        CrashLogger.initialize(mContext);
+        
+        // Initialize ANR handler
+        ANRHandler.getInstance();
+        
+        // Initialize thread-safe preferences
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+        ThreadSafeAppPreference.initialize(pref);
+        
+        // Keep old AppPreference for backward compatibility
         AppPreference.initialize(pref);
 
         new DBManager(mContext);
@@ -72,8 +83,8 @@ public class MyApp extends Application {
             public void onActivityStarted(@NonNull Activity activity) {
                 if (++activityReferences == 1 && !isActivityChangingConfigurations) {
                     // App enters foreground
-                    AppPreference.setBool(AppPreference.KEY.IS_APP_BACKGROUND, false);
-                    Log.d("AppState", "App in FOREGROUND");
+                    ThreadSafeAppPreference.getInstance().setBoolean(AppPreference.KEY.IS_APP_BACKGROUND, false);
+                    CrashLogger.getInstance().i("AppState", "App in FOREGROUND");
                 }
             }
 
@@ -88,8 +99,8 @@ public class MyApp extends Application {
                 isActivityChangingConfigurations = activity.isChangingConfigurations();
                 if (--activityReferences == 0 && !isActivityChangingConfigurations) {
                     // App enters background
-                    AppPreference.setBool(AppPreference.KEY.IS_APP_BACKGROUND, true);
-                    Log.d("AppState", "App in BACKGROUND");
+                    ThreadSafeAppPreference.getInstance().setBoolean(AppPreference.KEY.IS_APP_BACKGROUND, true);
+                    CrashLogger.getInstance().i("AppState", "App in BACKGROUND");
                 }
             }
 
@@ -105,5 +116,25 @@ public class MyApp extends Application {
     }
     public Activity getCurrentActivity() {
         return currentActivity;
+    }
+    
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        // Cleanup resources
+        CrashLogger.getInstance().shutdown();
+        ANRHandler.getInstance().shutdown();
+        ThreadSafeAppPreference.getInstance().shutdown();
+    }
+    
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        CrashLogger.getInstance().i("MyApp", "onTrimMemory called with level: " + level);
+        
+        // Clear caches on critical memory situations
+        if (level >= TRIM_MEMORY_RUNNING_CRITICAL) {
+            ThreadSafeAppPreference.getInstance().clearCache();
+        }
     }
 }
