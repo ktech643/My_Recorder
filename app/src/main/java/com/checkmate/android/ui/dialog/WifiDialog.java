@@ -40,9 +40,9 @@ public class WifiDialog extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_wifi);
         setCancelable(true);
-        btn_ok = findViewById(R.id.btn_ok);
+                btn_ok = findViewById(R.id.btn_ok);
         btn_close = findViewById(R.id.btn_close);
-        edt_ssid = findViewById(R.id.edt_ssid);
+
     }
 
     @Override

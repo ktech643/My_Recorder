@@ -34,9 +34,9 @@ public class EncryptionDialog extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_encryption);
         setCancelable(false);
-        btn_ok = findViewById(R.id.btn_ok);
+                btn_ok = findViewById(R.id.btn_ok);
         btn_close = findViewById(R.id.btn_close);
-        edt_code = findViewById(R.id.edt_code);
+
     }
 
     @Override

@@ -71,7 +71,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     private SharedViewModel sharedViewModel;
     private ActivityFragmentCallbacks mListener;
 
-    // UI Components  
+    // UI Components
     public ConstraintLayout frame_camera;
     public FrameLayout ly_cast;
     public TextView ly_audio;
@@ -96,7 +96,6 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     public TextView txt_snapshot;
     public Spinner spinner_camera;
     public Spinner spinner_rotate;
-    public LinearLayout top_spinners_container;
     public TextureView textureView;
     public AudioLevelMeter mVuMeter;
 
@@ -191,7 +190,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.fragment_live, container, false);
-        
+
         // Initialize UI components
         frame_camera = mView.findViewById(R.id.frame_camera);
         ly_cast = mView.findViewById(R.id.ly_cast);
@@ -202,13 +201,13 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         ly_camera_type = mView.findViewById(R.id.ly_camera_type);
         ly_rec = mView.findViewById(R.id.ly_rec);
         ly_snap = mView.findViewById(R.id.ly_snap);
-        
+
         ic_stream = mView.findViewById(R.id.ic_stream);
         ic_rotate = mView.findViewById(R.id.ic_rotate);
         ic_sel = mView.findViewById(R.id.ic_sel);
         ic_rec = mView.findViewById(R.id.ic_rec);
         ic_snapshot = mView.findViewById(R.id.ic_snapshot);
-        
+
         txt_speed = mView.findViewById(R.id.txt_speed);
         txt_network = mView.findViewById(R.id.txt_network);
         txt_gps = mView.findViewById(R.id.txt_gps);
@@ -217,14 +216,13 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         txt_sel = mView.findViewById(R.id.txt_sel);
         txt_rec = mView.findViewById(R.id.txt_rec);
         txt_snapshot = mView.findViewById(R.id.txt_snapshot);
-        
+
         spinner_camera = mView.findViewById(R.id.spinner_camera);
         spinner_rotate = mView.findViewById(R.id.spinner_rotate);
-        top_spinners_container = mView.findViewById(R.id.top_spinners_container);
-        
+
         // TextureView is in the included layout
         textureView = mView.findViewById(R.id.preview_afl);
-        
+
         // Initialize AudioLevelMeter (may not be in this layout, check if exists)
         mVuMeter = mView.findViewById(R.id.audio_level_meter);
 
@@ -361,14 +359,14 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         } else {
             initialize();
         }
-        
+
         // Set initial camera icon based on current camera type
         setInitialCameraIcon();
     }
 
     private void checkAndAutoStart() {
         if (mActivityRef == null || mActivityRef.get() == null) return;
-        
+
         MainActivity activity = mActivityRef.get();
         boolean shouldStream = AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false);
         boolean shouldRecord = AppPreference.getBool(AppPreference.KEY.AUTO_RECORD, false);
@@ -697,15 +695,20 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (cam_adapter == null) {
                     initCameraSpinner();
                 }
-                // Toggle top spinners container visibility
-                if (top_spinners_container != null) {
-                    if (top_spinners_container.getVisibility() == View.VISIBLE) {
-                        top_spinners_container.setVisibility(View.GONE);
+                // Toggle camera spinner visibility
+                if (spinner_camera != null) {
+                    if (spinner_camera.getVisibility() == View.VISIBLE) {
+                        spinner_camera.setVisibility(View.GONE);
                     } else {
-                        top_spinners_container.setVisibility(View.VISIBLE);
+                        spinner_camera.setVisibility(View.VISIBLE);
+                        // Ensure spinner doesn't expand beyond its container
+                        spinner_camera.setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ));
                     }
                 } else {
-                    Log.e(TAG, "top_spinners_container is null in OnClick ly_camera_type");
+                    Log.e(TAG, "spinner_camera is null in OnClick ly_camera_type");
                 }
                 break;
             case R.id.ly_rotate:
@@ -715,15 +718,20 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (mActivityRef != null && mActivityRef.get() != null && (is_rec || mActivityRef.get().isWifiRecording())) {
                     return;
                 }
-                // Toggle top spinners container visibility
-                if (top_spinners_container != null) {
-                    if (top_spinners_container.getVisibility() == View.VISIBLE) {
-                        top_spinners_container.setVisibility(View.GONE);
+                // Toggle rotate spinner visibility
+                if (spinner_rotate != null) {
+                    if (spinner_rotate.getVisibility() == View.VISIBLE) {
+                        spinner_rotate.setVisibility(View.GONE);
                     } else {
-                        top_spinners_container.setVisibility(View.VISIBLE);
+                        spinner_rotate.setVisibility(View.VISIBLE);
+                        // Ensure spinner doesn't expand beyond its container
+                        spinner_rotate.setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ));
                     }
                 } else {
-                    Log.e(TAG, "top_spinners_container is null in OnClick ly_rotate");
+                    Log.e(TAG, "spinner_rotate is null in OnClick ly_rotate");
                 }
                 break;
             case R.id.btn_refresh:
@@ -886,7 +894,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     private void handleCameraSelection(String item, int position) {
         // Update camera icon based on selection
         updateCameraIcon(item);
-        
+
         if (TextUtils.equals(getString(R.string.rear_camera), item)) {
             handleRearCameraSelection();
         } else if (TextUtils.equals(getString(R.string.front_camera), item)) {
@@ -901,7 +909,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             handleWifiCameraSelection(position);
         }
     }
-    
+
     /**
      * Update the camera type icon based on the selected camera
      * @param cameraType The selected camera type string
@@ -911,7 +919,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             CameraIconUtils.setCameraIconByString(ic_sel, cameraType);
         }
     }
-    
+
     /**
      * Get the current camera selection from the spinner
      * @return The current camera selection string or null if not available
@@ -925,7 +933,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         }
         return null;
     }
-    
+
     /**
      * Set the initial camera icon based on the current camera type
      */
@@ -1164,30 +1172,30 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (textureView != null) {
             // First remove the surface texture listener
             textureView.setSurfaceTextureListener(null);
-            
+
             // Clear the surface texture
             if (textureView.getSurfaceTexture() != null) {
                 textureView.getSurfaceTexture().release();
             }
-            
+
             // Remove the view from its parent
             ViewGroup parent = (ViewGroup) textureView.getParent();
             if (parent != null) {
                 parent.removeView(textureView);
             }
-            
+
             // Create a new TextureView
             TextureView newTextureView = new TextureView(getContext());
             newTextureView.setLayoutParams(textureView.getLayoutParams());
-            
+
             // Add the new view to the parent
             if (parent != null) {
                 parent.addView(newTextureView);
             }
-            
+
             // Replace the old view with the new one
             textureView = newTextureView;
-            
+
             // Set up the new surface texture listener
             if (mActivityRef != null && mActivityRef.get() != null) {
                 TextureView.SurfaceTextureListener listener = mActivityRef.get().mSurfaceTextureListener;
@@ -1267,7 +1275,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         try {
             // First stop all existing services
             stopServices();
-            
+
             // Reset all states
             prepareCameraSelection();
             currentState = CameraState.AUDIO_ONLY;
@@ -1283,7 +1291,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
 
             // Update UI
             updateAudioOnlyUI();
-            
+
             // Initialize audio service with a delay to ensure previous services are stopped
             handler.postDelayed(() -> {
                 if (isAdded() && getActivity() != null) {
@@ -1469,7 +1477,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (mActivityRef != null && mActivityRef.get() != null) {
             cam_adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, cam_models);
         }
-        
+
         // Check if spinner_camera is available before using it
         if (spinner_camera != null) {
             spinner_camera.setAdapter(cam_adapter);
@@ -1551,7 +1559,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (mActivityRef != null && mActivityRef.get() != null) {
             cam_adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, cam_models);
         }
-        
+
         // Check if spinner_camera is available before using it
         if (spinner_camera != null) {
             spinner_camera.setAdapter(cam_adapter);
@@ -1996,7 +2004,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 isStreaming = true;
             }
 
-            boolean shouldUpdate = isStreaming != lastStreamingState || 
+            boolean shouldUpdate = isStreaming != lastStreamingState ||
                                  (isStreaming && (currentTime - lastApiUpdateTime >= frequencyMillis));
 
             if (shouldUpdate) {
@@ -2073,30 +2081,30 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (textureView != null) {
             // First remove the surface texture listener
             textureView.setSurfaceTextureListener(null);
-            
+
             // Clear the surface texture
             if (textureView.getSurfaceTexture() != null) {
                 textureView.getSurfaceTexture().release();
             }
-            
+
             // Remove the view from its parent
             ViewGroup parent = (ViewGroup) textureView.getParent();
             if (parent != null) {
                 parent.removeView(textureView);
             }
-            
+
             // Create a new TextureView
             TextureView newTextureView = new TextureView(getContext());
             newTextureView.setLayoutParams(textureView.getLayoutParams());
-            
+
             // Add the new view to the parent
             if (parent != null) {
                 parent.addView(newTextureView);
             }
-            
+
             // Replace the old view with the new one
             textureView = newTextureView;
-            
+
             // Set up the new surface texture listener
             if (mActivityRef != null && mActivityRef.get() != null) {
                 TextureView.SurfaceTextureListener listener = mActivityRef.get().mSurfaceTextureListener;
