@@ -258,6 +258,18 @@
             android:configChanges="screenSize|keyboardHidden|orientation"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".ui.activity.ImageViewerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activity.VideoPlayerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false" />
+
         <service android:name=".service.PlayService" />
         <service android:name=".service.LocationManagerService" />
         <service
