@@ -104,6 +104,9 @@ import com.checkmate.android.util.rtsp.EncOpt;
 import com.checkmate.android.util.rtsp.TextOverlayOption;
 import com.checkmate.android.viewmodels.EventType;
 import com.checkmate.android.viewmodels.SharedViewModel;
+import com.checkmate.android.util.CrashLogger;
+import com.checkmate.android.util.AnrDetector;
+import com.checkmate.android.util.SafeExecutor;
 import com.kongzue.dialogx.dialogs.MessageDialog;
 import com.kongzue.dialogx.util.TextInfo;
 import com.tonyodev.fetch2.Download;
@@ -317,30 +320,58 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,WindowManager.LayoutParams.FLAG_SECURE);
+        CrashLogger.d(TAG, "MainActivity onCreate starting");
+        
+        try {
+            // Null safety check for window
+            if (getWindow() != null) {
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+            } else {
+                CrashLogger.e(TAG, "Window is null in onCreate");
+            }
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // kept once
-        setContentView(R.layout.activity_service);
-        instance = this;
-        fragmentManager = getSupportFragmentManager();
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            setContentView(R.layout.activity_service);
+            instance = this;
+            
+            // Null safety check for fragment manager
+            fragmentManager = getSupportFragmentManager();
+            if (!SafeExecutor.checkNotNull(fragmentManager, "fragmentManager", "onCreate")) {
+                CrashLogger.e(TAG, "FragmentManager is null, cannot continue");
+                finish();
+                return;
+            }
 
-        dlg_progress = KProgressHUD.create(this)
-                .setStyle(KProgressHUD.Style.PIE_DETERMINATE)
-                .setLabel("Processing")
-                .setDetailsLabel("Please Wait...")
-                .setCancellable(false)
-                .setAnimationSpeed(3)
-                .setDimAmount(0.6f)
-                .setBackgroundColor(Color.parseColor("#000000"))
-                .setWindowColor(Color.parseColor("#0D0D0D"))
-                .setCornerRadius(18f)
-                .setMaxProgress(100)
-                .setCancellable(true);
-                //.show();
+            // Initialize progress dialog with null safety
+            SafeExecutor.executeVoid("initProgressDialog", () -> {
+                dlg_progress = KProgressHUD.create(this)
+                        .setStyle(KProgressHUD.Style.PIE_DETERMINATE)
+                        .setLabel("Processing")
+                        .setDetailsLabel("Please Wait...")
+                        .setCancellable(false)
+                        .setAnimationSpeed(3)
+                        .setDimAmount(0.6f)
+                        .setBackgroundColor(Color.parseColor("#000000"))
+                        .setWindowColor(Color.parseColor("#0D0D0D"))
+                        .setCornerRadius(18f)
+                        .setMaxProgress(100)
+                        .setCancellable(true);
+            });
 
-
-        init();
-        showChessIfNeeded();
+            // Initialize components with error handling
+            SafeExecutor.executeVoid("mainActivityInit", this::init);
+            SafeExecutor.executeVoid("showChessIfNeeded", this::showChessIfNeeded);
+            
+            CrashLogger.d(TAG, "MainActivity onCreate completed successfully");
+            
+        } catch (Exception e) {
+            CrashLogger.e(TAG, "Failed to initialize MainActivity", e);
+            // Try to continue with basic functionality
+            instance = this;
+            if (fragmentManager == null) {
+                fragmentManager = getSupportFragmentManager();
+            }
+        }
     }
 
     private void showChessIfNeeded() {
@@ -386,56 +417,86 @@ public class MainActivity extends BaseActivity
     }
 
     /** Exposes the active camera's static info to SettingsFragment. */
+    @Nullable
     public CameraInfo findCameraInfo() {
-        CameraInfo cameraInfo = null;
-        List<CameraInfo> mCameraList = CameraManager.getCameraList(this, true);
+        return SafeExecutor.execute("findCameraInfo", () -> {
+            List<CameraInfo> mCameraList = CameraManager.getCameraList(this, true);
 
-        if (mCameraList == null || mCameraList.isEmpty()) {
-            Log.e(TAG, "No cameras found");
-            return null;
-        }
-
-        String cameraId = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
-        if (TextUtils.isEmpty(cameraId)) {
-            cameraId = AppConstant.REAR_CAMERA;
-        }
-
-        for (CameraInfo info : mCameraList) {
-            if (cameraId.equals(info.cameraId)) {
-                cameraInfo = info;
-                break;
+            if (mCameraList == null || mCameraList.isEmpty()) {
+                CrashLogger.w(TAG, "No cameras found");
+                return null;
             }
-        }
 
-        return cameraInfo != null ? cameraInfo : mCameraList.get(0);
+            String cameraId = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
+            if (TextUtils.isEmpty(cameraId)) {
+                cameraId = AppConstant.REAR_CAMERA;
+                CrashLogger.d(TAG, "Empty camera ID, using default rear camera");
+            }
+
+            CameraInfo foundCamera = null;
+            for (CameraInfo info : mCameraList) {
+                if (info != null && cameraId.equals(info.cameraId)) {
+                    foundCamera = info;
+                    break;
+                }
+            }
+
+            if (foundCamera != null) {
+                CrashLogger.d(TAG, "Found camera: " + foundCamera.cameraId);
+                return foundCamera;
+            } else if (!mCameraList.isEmpty()) {
+                CameraInfo defaultCamera = mCameraList.get(0);
+                CrashLogger.d(TAG, "Using first available camera: " + (defaultCamera != null ? defaultCamera.cameraId : "null"));
+                return defaultCamera;
+            }
+
+            return null;
+        }, null);
     }
 
 
     /* ─────────────────────────────────────────────────────────────────────────
      *  Camera-selection pop-up for USB list
      * ──────────────────────────────────────────────────────────────────────── */
-    public void showCamerasList(String[] names) {
-        Log.e(TAG, "showCamerasList triggered");
-        boolean isChessPin = AppPreference.getBool(AppPreference.KEY.CHESS_MODE_PIN, false);
+    public void showCamerasList(@Nullable String[] names) {
+        SafeExecutor.executeVoid("showCamerasList", () -> {
+            CrashLogger.d(TAG, "showCamerasList triggered");
+            
+            if (names == null || names.length == 0) {
+                CrashLogger.w(TAG, "No camera names provided to showCamerasList");
+                return;
+            }
+            
+            boolean isChessPin = AppPreference.getBool(AppPreference.KEY.CHESS_MODE_PIN, false);
 
-        if (!isChessPin) {
-            // show popup activity after a short delay to let UI settle
-            handler.postDelayed(() -> {
-                Intent i = new Intent(MainActivity.this, UsbPopupActivity.class);
-                i.putExtra("list", names);
-                startActivityForResult(i, REQUEST_CODE_INTENT);
-            }, 500);
-        } else {
-            // default to first index when PIN-locked chess mode is active
-            int selectedIndex = 0;
-            if (liveFragment != null && liveFragment.is_usb_opened) {
-                if (mUSBService != null) {
-                    mUSBService.selectedPositionForCameraList(selectedIndex);
+            if (!isChessPin) {
+                // show popup activity after a short delay to let UI settle
+                if (handler != null) {
+                    handler.postDelayed(() -> SafeExecutor.executeVoid("startUsbPopup", () -> {
+                        if (!isFinishing() && !isDestroyed()) {
+                            Intent i = new Intent(MainActivity.this, UsbPopupActivity.class);
+                            i.putExtra("list", names);
+                            startActivityForResult(i, REQUEST_CODE_INTENT);
+                        }
+                    }), 500);
                 } else {
-                    startBgUSB();     // kick service if not yet running
+                    CrashLogger.w(TAG, "Handler is null, cannot delay USB popup");
+                }
+            } else {
+                // default to first index when PIN-locked chess mode is active
+                int selectedIndex = 0;
+                if (SafeExecutor.checkNotNull(liveFragment, "liveFragment", "showCamerasList") && 
+                    liveFragment.is_usb_opened) {
+                    if (SafeExecutor.checkNotNull(mUSBService, "mUSBService", "showCamerasList")) {
+                        mUSBService.selectedPositionForCameraList(selectedIndex);
+                    } else {
+                        SafeExecutor.executeVoid("startBgUSB", this::startBgUSB);
+                    }
+                } else {
+                    CrashLogger.w(TAG, "LiveFragment is null or USB not opened");
                 }
             }
-        }
+        });
     }
 
     /* ─────────────────────────────────────────────────────────────────────────

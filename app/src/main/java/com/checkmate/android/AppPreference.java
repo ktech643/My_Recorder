@@ -1,9 +1,20 @@
 package com.checkmate.android;
 
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class AppPreference {
-    private static SharedPreferences instance = null;
+    private static final String TAG = "AppPreference";
+    private static final long ANR_TIMEOUT_MS = 3000; // 3 seconds timeout to prevent ANR
+    private static volatile SharedPreferences instance = null;
+    private static final Object lock = new Object();
 
     public static class KEY {
         // settings
@@ -176,87 +187,359 @@ public class AppPreference {
         final public static String IS_MIRRORED = "IS_MIRRORED";
     }
 
-    public static void initialize(SharedPreferences pref) {
-        instance = pref;
+    /**
+     * Thread-safe initialization of SharedPreferences
+     */
+    public static void initialize(@NonNull SharedPreferences pref) {
+        synchronized (lock) {
+            if (instance == null) {
+                instance = pref;
+                Log.d(TAG, "AppPreference initialized successfully");
+            }
+        }
+    }
+
+    /**
+     * Check if AppPreference is properly initialized
+     */
+    private static boolean isInitialized() {
+        return instance != null;
+    }
+
+    /**
+     * ANR-safe operation wrapper for SharedPreferences operations
+     */
+    private static <T> T executeWithAnrProtection(@NonNull String operation, @NonNull AnrSafeOperation<T> op, @Nullable T defaultValue) {
+        if (!isInitialized()) {
+            Log.e(TAG, "AppPreference not initialized for operation: " + operation);
+            return defaultValue;
+        }
+
+        try {
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                // On main thread - use timeout protection
+                AtomicReference<T> result = new AtomicReference<>(defaultValue);
+                AtomicReference<Exception> error = new AtomicReference<>();
+                CountDownLatch latch = new CountDownLatch(1);
+
+                new Thread(() -> {
+                    try {
+                        result.set(op.execute());
+                    } catch (Exception e) {
+                        error.set(e);
+                        Log.e(TAG, "Error in ANR-protected operation: " + operation, e);
+                    } finally {
+                        latch.countDown();
+                    }
+                }).start();
+
+                try {
+                    if (latch.await(ANR_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+                        Exception e = error.get();
+                        if (e != null) {
+                            Log.e(TAG, "Operation failed: " + operation + ", using default value", e);
+                            return defaultValue;
+                        }
+                        return result.get();
+                    } else {
+                        Log.w(TAG, "Operation timed out: " + operation + ", using default value");
+                        return defaultValue;
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    Log.e(TAG, "Operation interrupted: " + operation + ", using default value", e);
+                    return defaultValue;
+                }
+            } else {
+                // Not on main thread - execute directly
+                return op.execute();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Unexpected error in operation: " + operation + ", using default value", e);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Interface for ANR-safe operations
+     */
+    private interface AnrSafeOperation<T> {
+        T execute() throws Exception;
     }
 
     // check contain
-    public static boolean contains(String key) {
-        return instance.contains(key);
+    public static boolean contains(@Nullable String key) {
+        if (key == null) {
+            Log.w(TAG, "Null key provided to contains()");
+            return false;
+        }
+        return executeWithAnrProtection("contains(" + key + ")", 
+            () -> instance.contains(key), false);
     }
 
-    // boolean
-    public static boolean getBool(String key, boolean def) {
-        return instance.getBoolean(key, def);
+    // boolean operations with thread safety and null protection
+    public static boolean getBool(@Nullable String key, boolean defaultValue) {
+        if (key == null) {
+            Log.w(TAG, "Null key provided to getBool(), returning default: " + defaultValue);
+            return defaultValue;
+        }
+        return executeWithAnrProtection("getBool(" + key + ")", 
+            () -> instance.getBoolean(key, defaultValue), defaultValue);
     }
 
-    public static void setBool(String key, boolean value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putBoolean(key, value);
-        editor.commit();
+    public static void setBool(@Nullable String key, boolean value) {
+        if (key == null) {
+            Log.w(TAG, "Null key provided to setBool(), operation ignored");
+            return;
+        }
+        executeWithAnrProtection("setBool(" + key + ", " + value + ")", () -> {
+            synchronized (lock) {
+                SharedPreferences.Editor editor = instance.edit();
+                editor.putBoolean(key, value);
+                boolean success = editor.commit();
+                if (!success) {
+                    Log.w(TAG, "Failed to commit boolean value for key: " + key);
+                }
+                return success;
+            }
+        }, false);
     }
 
-    // int
-    public static int getInt(String key, int def) {
-        return instance.getInt(key, def);
+    // int operations with thread safety and null protection
+    public static int getInt(@Nullable String key, int defaultValue) {
+        if (key == null) {
+            Log.w(TAG, "Null key provided to getInt(), returning default: " + defaultValue);
+            return defaultValue;
+        }
+        return executeWithAnrProtection("getInt(" + key + ")", 
+            () -> instance.getInt(key, defaultValue), defaultValue);
     }
 
-    public static void setInt(String key, int value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putInt(key, value);
-        editor.commit();
+    public static void setInt(@Nullable String key, int value) {
+        if (key == null) {
+            Log.w(TAG, "Null key provided to setInt(), operation ignored");
+            return;
+        }
+        executeWithAnrProtection("setInt(" + key + ", " + value + ")", () -> {
+            synchronized (lock) {
+                SharedPreferences.Editor editor = instance.edit();
+                editor.putInt(key, value);
+                boolean success = editor.commit();
+                if (!success) {
+                    Log.w(TAG, "Failed to commit int value for key: " + key);
+                }
+                return success;
+            }
+        }, false);
     }
 
-    // long
-    public static long getLong(String key, long def) {
-        return instance.getLong(key, def);
+    // long operations with thread safety and null protection
+    public static long getLong(@Nullable String key, long defaultValue) {
+        if (key == null) {
+            Log.w(TAG, "Null key provided to getLong(), returning default: " + defaultValue);
+            return defaultValue;
+        }
+        return executeWithAnrProtection("getLong(" + key + ")", 
+            () -> instance.getLong(key, defaultValue), defaultValue);
     }
 
-    public static void setLong(String key, long value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putLong(key, value);
-        editor.apply();
+    public static void setLong(@Nullable String key, long value) {
+        if (key == null) {
+            Log.w(TAG, "Null key provided to setLong(), operation ignored");
+            return;
+        }
+        executeWithAnrProtection("setLong(" + key + ", " + value + ")", () -> {
+            synchronized (lock) {
+                SharedPreferences.Editor editor = instance.edit();
+                editor.putLong(key, value);
+                boolean success = editor.commit();
+                if (!success) {
+                    Log.w(TAG, "Failed to commit long value for key: " + key);
+                }
+                return success;
+            }
+        }, false);
     }
 
-    // string
-    public static String getStr(String key, String def) {
-        return instance.getString(key, def);
+    // string operations with thread safety and null protection
+    @Nullable
+    public static String getStr(@Nullable String key, @Nullable String defaultValue) {
+        if (key == null) {
+            Log.w(TAG, "Null key provided to getStr(), returning default: " + defaultValue);
+            return defaultValue;
+        }
+        return executeWithAnrProtection("getStr(" + key + ")", 
+            () -> instance.getString(key, defaultValue), defaultValue);
     }
 
-    public static void setStr(String key, String value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putString(key, value);
-        editor.apply();
+    public static void setStr(@Nullable String key, @Nullable String value) {
+        if (key == null) {
+            Log.w(TAG, "Null key provided to setStr(), operation ignored");
+            return;
+        }
+        executeWithAnrProtection("setStr(" + key + ", " + value + ")", () -> {
+            synchronized (lock) {
+                SharedPreferences.Editor editor = instance.edit();
+                editor.putString(key, value);
+                boolean success = editor.commit();
+                if (!success) {
+                    Log.w(TAG, "Failed to commit string value for key: " + key);
+                }
+                return success;
+            }
+        }, false);
     }
 
-    // remove
-    public static void removeKey(String key) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.remove(key);
-        editor.apply();
+    // remove operation with thread safety and null protection
+    public static void removeKey(@Nullable String key) {
+        if (key == null) {
+            Log.w(TAG, "Null key provided to removeKey(), operation ignored");
+            return;
+        }
+        executeWithAnrProtection("removeKey(" + key + ")", () -> {
+            synchronized (lock) {
+                SharedPreferences.Editor editor = instance.edit();
+                editor.remove(key);
+                boolean success = editor.commit();
+                if (!success) {
+                    Log.w(TAG, "Failed to remove key: " + key);
+                }
+                return success;
+            }
+        }, false);
     }
     
-    // Rotation settings methods
+    // Rotation settings methods with enhanced safety
     public static void saveRotationSettings(int rotation, boolean isFlipped, boolean isMirrored) {
-        setInt(KEY.IS_ROTATED, rotation);
-        setBool(KEY.IS_FLIPPED, isFlipped);
-        setBool(KEY.IS_MIRRORED, isMirrored);
+        try {
+            setInt(KEY.IS_ROTATED, rotation);
+            setBool(KEY.IS_FLIPPED, isFlipped);
+            setBool(KEY.IS_MIRRORED, isMirrored);
+            Log.d(TAG, "Rotation settings saved: rotation=" + rotation + ", flipped=" + isFlipped + ", mirrored=" + isMirrored);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to save rotation settings", e);
+        }
     }
     
     public static int getRotation() {
-        return getInt(KEY.IS_ROTATED, 0);
+        try {
+            return getInt(KEY.IS_ROTATED, 0);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to get rotation, returning default", e);
+            return 0;
+        }
     }
     
     public static boolean isFlipped() {
-        return getBool(KEY.IS_FLIPPED, false);
+        try {
+            return getBool(KEY.IS_FLIPPED, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to get flip status, returning default", e);
+            return false;
+        }
     }
     
     public static boolean isMirrored() {
-        return getBool(KEY.IS_MIRRORED, false);
+        try {
+            return getBool(KEY.IS_MIRRORED, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to get mirror status, returning default", e);
+            return false;
+        }
     }
     
     public static void resetRotationSettings() {
-        saveRotationSettings(0, false, false);
+        try {
+            saveRotationSettings(0, false, false);
+            Log.d(TAG, "Rotation settings reset to defaults");
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to reset rotation settings", e);
+        }
+    }
+
+    /**
+     * Batch operation to set multiple preferences atomically
+     */
+    public static void setBatch(@NonNull BatchOperation... operations) {
+        if (operations == null || operations.length == 0) {
+            Log.w(TAG, "No operations provided to setBatch()");
+            return;
+        }
+        
+        executeWithAnrProtection("setBatch(" + operations.length + " operations)", () -> {
+            synchronized (lock) {
+                SharedPreferences.Editor editor = instance.edit();
+                for (BatchOperation op : operations) {
+                    if (op != null && op.key != null) {
+                        op.apply(editor);
+                    }
+                }
+                boolean success = editor.commit();
+                if (!success) {
+                    Log.w(TAG, "Failed to commit batch operation");
+                }
+                return success;
+            }
+        }, false);
+    }
+
+    /**
+     * Batch operation class for atomic updates
+     */
+    public static class BatchOperation {
+        private final String key;
+        private final Object value;
+        private final OperationType type;
+
+        public static BatchOperation putBoolean(@NonNull String key, boolean value) {
+            return new BatchOperation(key, value, OperationType.BOOLEAN);
+        }
+
+        public static BatchOperation putInt(@NonNull String key, int value) {
+            return new BatchOperation(key, value, OperationType.INT);
+        }
+
+        public static BatchOperation putLong(@NonNull String key, long value) {
+            return new BatchOperation(key, value, OperationType.LONG);
+        }
+
+        public static BatchOperation putString(@NonNull String key, @Nullable String value) {
+            return new BatchOperation(key, value, OperationType.STRING);
+        }
+
+        public static BatchOperation remove(@NonNull String key) {
+            return new BatchOperation(key, null, OperationType.REMOVE);
+        }
+
+        private BatchOperation(@NonNull String key, @Nullable Object value, @NonNull OperationType type) {
+            this.key = key;
+            this.value = value;
+            this.type = type;
+        }
+
+        private void apply(@NonNull SharedPreferences.Editor editor) {
+            switch (type) {
+                case BOOLEAN:
+                    editor.putBoolean(key, (Boolean) value);
+                    break;
+                case INT:
+                    editor.putInt(key, (Integer) value);
+                    break;
+                case LONG:
+                    editor.putLong(key, (Long) value);
+                    break;
+                case STRING:
+                    editor.putString(key, (String) value);
+                    break;
+                case REMOVE:
+                    editor.remove(key);
+                    break;
+            }
+        }
+
+        private enum OperationType {
+            BOOLEAN, INT, LONG, STRING, REMOVE
+        }
     }
 
 }

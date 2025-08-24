@@ -46,6 +46,8 @@ import com.checkmate.android.util.CommonUtil;
 import com.checkmate.android.util.DeviceUtils;
 import com.checkmate.android.util.MainActivity;
 import com.checkmate.android.util.MessageUtil;
+import com.checkmate.android.util.CrashLogger;
+import com.checkmate.android.util.SafeExecutor;
 import com.checkmate.android.ui.dialog.CameraSelectionBottomSheet;
 import com.checkmate.android.ui.dialog.RotationBottomSheet;
 import com.checkmate.android.viewmodels.EventType;
@@ -149,14 +151,22 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
     private CameraState currentState = CameraState.NONE;
 
     // Static Methods
+    @Nullable
     public static LiveFragment getInstance() {
-        if (instance != null) {
-            LiveFragment fragment = instance.get();
-            if (fragment != null && fragment.isAdded()) {
-                return fragment;
+        try {
+            if (instance != null) {
+                LiveFragment fragment = instance.get();
+                if (fragment != null && fragment.isAdded() && !fragment.isDetached() && !fragment.isRemoving()) {
+                    return fragment;
+                } else {
+                    CrashLogger.d(TAG, "LiveFragment instance exists but is not in valid state");
+                }
             }
+            return null;
+        } catch (Exception e) {
+            CrashLogger.e(TAG, "Error getting LiveFragment instance", e);
+            return null;
         }
-        return null;
     }
 
     public static LiveFragment newInstance() {
@@ -171,73 +181,118 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        instance = new WeakReference<>(this);
-        if (context instanceof MainActivity) {
-            mActivityRef = new WeakReference<>((MainActivity) context);
-        }
-        if (context instanceof ActivityFragmentCallbacks) {
-            mListener = (ActivityFragmentCallbacks) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
-        }
-        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        CrashLogger.d(TAG, "LiveFragment onAttach");
+        
+        SafeExecutor.executeVoid("liveFragmentOnAttach", () -> {
+            instance = new WeakReference<>(this);
+            
+            if (context instanceof MainActivity) {
+                mActivityRef = new WeakReference<>((MainActivity) context);
+                CrashLogger.d(TAG, "MainActivity reference set");
+            } else {
+                CrashLogger.w(TAG, "Context is not MainActivity: " + context.getClass().getSimpleName());
+            }
+            
+            if (context instanceof ActivityFragmentCallbacks) {
+                mListener = (ActivityFragmentCallbacks) context;
+                CrashLogger.d(TAG, "ActivityFragmentCallbacks set");
+            } else {
+                CrashLogger.e(TAG, "Context does not implement ActivityFragmentCallbacks: " + context.toString());
+                throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+            }
+            
+            try {
+                sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+                CrashLogger.d(TAG, "SharedViewModel initialized");
+            } catch (Exception e) {
+                CrashLogger.e(TAG, "Failed to initialize SharedViewModel", e);
+                throw e;
+            }
+        });
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View mView = inflater.inflate(R.layout.fragment_live, container, false);
+    @Nullable
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        CrashLogger.d(TAG, "LiveFragment onCreateView");
         
-        // Initialize UI components
-        frame_camera = mView.findViewById(R.id.frame_camera);
-        ly_cast = mView.findViewById(R.id.ly_cast);
-        ly_audio = mView.findViewById(R.id.ly_audio);
-        ly_menu = mView.findViewById(R.id.ly_menu);
-        ly_stream = mView.findViewById(R.id.ly_stream);
-        ly_rotate = mView.findViewById(R.id.ly_rotate);
-        ly_camera_type = mView.findViewById(R.id.ly_camera_type);
-        ly_rec = mView.findViewById(R.id.ly_rec);
-        ly_snap = mView.findViewById(R.id.ly_snap);
-        
-        ic_stream = mView.findViewById(R.id.ic_stream);
-        ic_rotate = mView.findViewById(R.id.ic_rotate);
-        ic_sel = mView.findViewById(R.id.ic_sel);
-        ic_rec = mView.findViewById(R.id.ic_rec);
-        ic_snapshot = mView.findViewById(R.id.ic_snapshot);
-        
-        txt_speed = mView.findViewById(R.id.txt_speed);
-        txt_network = mView.findViewById(R.id.txt_network);
-        txt_gps = mView.findViewById(R.id.txt_gps);
-        txt_stream = mView.findViewById(R.id.txt_stream);
-        txt_rotate = mView.findViewById(R.id.txt_rotate);
-        txt_sel = mView.findViewById(R.id.txt_sel);
-        txt_rec = mView.findViewById(R.id.txt_rec);
-        txt_snapshot = mView.findViewById(R.id.txt_snapshot);
-        
-        // spinner_camera = mView.findViewById(R.id.spinner_camera); // Removed - was for old spinner implementation
-        // spinner_rotate = mView.findViewById(R.id.spinner_rotate); // Removed - was for old spinner implementation
-        
-        // TextureView is in the included layout
-        textureView = mView.findViewById(R.id.preview_afl);
-        
-        // Initialize AudioLevelMeter (may not be in this layout, check if exists)
-        mVuMeter = mView.findViewById(R.id.audio_level_meter);
+        return SafeExecutor.execute("liveFragmentOnCreateView", () -> {
+            View mView = inflater.inflate(R.layout.fragment_live, container, false);
+            
+            if (mView == null) {
+                CrashLogger.e(TAG, "Failed to inflate LiveFragment layout");
+                return null;
+            }
+            
+            // Initialize UI components with null safety
+            SafeExecutor.executeVoid("initializeUIComponents", () -> {
+                frame_camera = mView.findViewById(R.id.frame_camera);
+                ly_cast = mView.findViewById(R.id.ly_cast);
+                ly_audio = mView.findViewById(R.id.ly_audio);
+                ly_menu = mView.findViewById(R.id.ly_menu);
+                ly_stream = mView.findViewById(R.id.ly_stream);
+                ly_rotate = mView.findViewById(R.id.ly_rotate);
+                ly_camera_type = mView.findViewById(R.id.ly_camera_type);
+                ly_rec = mView.findViewById(R.id.ly_rec);
+                ly_snap = mView.findViewById(R.id.ly_snap);
+                
+                ic_stream = mView.findViewById(R.id.ic_stream);
+                ic_rotate = mView.findViewById(R.id.ic_rotate);
+                ic_sel = mView.findViewById(R.id.ic_sel);
+                ic_rec = mView.findViewById(R.id.ic_rec);
+                ic_snapshot = mView.findViewById(R.id.ic_snapshot);
+                
+                txt_speed = mView.findViewById(R.id.txt_speed);
+                txt_network = mView.findViewById(R.id.txt_network);
+                txt_gps = mView.findViewById(R.id.txt_gps);
+                txt_stream = mView.findViewById(R.id.txt_stream);
+                txt_rotate = mView.findViewById(R.id.txt_rotate);
+                txt_sel = mView.findViewById(R.id.txt_sel);
+                txt_rec = mView.findViewById(R.id.txt_rec);
+                txt_snapshot = mView.findViewById(R.id.txt_snapshot);
+                
+                // TextureView is in the included layout
+                textureView = mView.findViewById(R.id.preview_afl);
+                
+                // Initialize AudioLevelMeter (may not be in this layout, check if exists)
+                mVuMeter = mView.findViewById(R.id.audio_level_meter);
+                
+                // Log null checks for critical components
+                if (!SafeExecutor.checkNotNull(textureView, "textureView", "onCreateView")) {
+                    CrashLogger.w(TAG, "TextureView is null, camera preview may not work");
+                }
+                
+                if (!SafeExecutor.checkNotNull(ly_stream, "ly_stream", "onCreateView")) {
+                    CrashLogger.w(TAG, "Stream button is null");
+                }
+            });
 
-        // Set up click listeners for buttons
-        ly_stream.setOnClickListener(this::OnClick);
-        ly_rotate.setOnClickListener(this::OnClick);
-        ly_camera_type.setOnClickListener(this::OnClick);
-        ly_rec.setOnClickListener(this::OnClick);
-        ly_snap.setOnClickListener(this::OnClick);
+            // Set up click listeners for buttons with null safety
+            SafeExecutor.executeVoid("setupClickListeners", () -> {
+                if (ly_stream != null) ly_stream.setOnClickListener(this::OnClick);
+                if (ly_rotate != null) ly_rotate.setOnClickListener(this::OnClick);
+                if (ly_camera_type != null) ly_camera_type.setOnClickListener(this::OnClick);
+                if (ly_rec != null) ly_rec.setOnClickListener(this::OnClick);
+                if (ly_snap != null) ly_snap.setOnClickListener(this::OnClick);
+            });
 
-        instance = new WeakReference<>(this);
+            instance = new WeakReference<>(this);
 
-        if (AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false)) {
-            ic_stream.setImageResource(R.mipmap.ic_stream_active);
-        }
-        initializeServices();
-        return mView;
+            // Update stream icon if streaming is active
+            SafeExecutor.executeVoid("updateStreamIcon", () -> {
+                if (AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false) && ic_stream != null) {
+                    ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                }
+            });
+            
+            SafeExecutor.executeVoid("initializeServices", this::initializeServices);
+            
+            CrashLogger.d(TAG, "LiveFragment onCreateView completed successfully");
+            return mView;
+            
+        }, null);
     }
 
     @Override

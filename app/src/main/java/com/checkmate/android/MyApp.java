@@ -15,6 +15,8 @@ import androidx.annotation.NonNull;
 import com.checkmate.android.database.DBManager;
 import com.checkmate.android.service.SharedEGL.GraphicsModule;
 import com.checkmate.android.util.HttpServer.ServiceModule;
+import com.checkmate.android.util.CrashLogger;
+import com.checkmate.android.util.AnrDetector;
 
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -48,12 +50,22 @@ public class MyApp extends Application {
         appScope.installModules(new ServiceModule());
 
 
-        // initialize
+        // Initialize crash logging system first
+        CrashLogger.initialize(mContext);
+        CrashLogger.i("MyApp", "Application starting - initializing core systems");
+        
+        // Initialize ANR detector
+        AnrDetector.getInstance().start();
+        
+        // initialize preferences
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
         AppPreference.initialize(pref);
+        CrashLogger.d("MyApp", "AppPreference initialized");
 
         new DBManager(mContext);
-        mContext =this;
+        CrashLogger.d("MyApp", "DBManager initialized");
+        
+        mContext = this;
 
         // window size
         WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
@@ -73,6 +85,7 @@ public class MyApp extends Application {
                 if (++activityReferences == 1 && !isActivityChangingConfigurations) {
                     // App enters foreground
                     AppPreference.setBool(AppPreference.KEY.IS_APP_BACKGROUND, false);
+                    CrashLogger.d("AppState", "App in FOREGROUND");
                     Log.d("AppState", "App in FOREGROUND");
                 }
             }
@@ -89,6 +102,7 @@ public class MyApp extends Application {
                 if (--activityReferences == 0 && !isActivityChangingConfigurations) {
                     // App enters background
                     AppPreference.setBool(AppPreference.KEY.IS_APP_BACKGROUND, true);
+                    CrashLogger.d("AppState", "App in BACKGROUND");
                     Log.d("AppState", "App in BACKGROUND");
                 }
             }
@@ -97,12 +111,33 @@ public class MyApp extends Application {
             public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {}
 
             @Override
-            public void onActivityDestroyed(@NonNull Activity activity) {}
+            public void onActivityDestroyed(@NonNull Activity activity) {
+                if (activity == currentActivity) {
+                    currentActivity = null;
+                }
+            }
         });
+        
+        CrashLogger.i("MyApp", "Application initialization completed successfully");
     }
+    
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        
+        // Cleanup logging system
+        CrashLogger.i("MyApp", "Application terminating - cleaning up resources");
+        AnrDetector.getInstance().stop();
+        
+        if (CrashLogger.getInstance() != null) {
+            CrashLogger.getInstance().shutdown();
+        }
+    }
+    
     public static Context getContext() {
-        return mContext.getApplicationContext();
+        return mContext != null ? mContext.getApplicationContext() : null;
     }
+    
     public Activity getCurrentActivity() {
         return currentActivity;
     }

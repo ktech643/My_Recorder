@@ -29,6 +29,8 @@ import com.checkmate.android.model.SurfaceModel;
 import com.checkmate.android.service.SharedEGL.ServiceType;
 import com.checkmate.android.service.SharedEGL.SharedEglManager;
 import com.checkmate.android.util.SettingsUtils;
+import com.checkmate.android.util.CrashLogger;
+import com.checkmate.android.util.SafeExecutor;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -84,73 +86,150 @@ public class BgCameraService extends BaseBackgroundService {
     @Override
     public void onCreate() {
         super.onCreate();
-        mCurrentStatus = BackgroundNotification.NOTIFICATION_STATUS.CREATED;
+        CrashLogger.d(TAG, "BgCameraService onCreate");
+        
+        SafeExecutor.executeVoid("bgCameraServiceOnCreate", () -> {
+            mCurrentStatus = BackgroundNotification.NOTIFICATION_STATUS.CREATED;
 
-        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        String wakeLockTag = "CheckMate:CameraLock";
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockTag);
-        wakeLock.acquire(60 * 60 * 2000);
-
-        mCameraThread.start();
-
-        // Get the singleton instance
-        SharedEglManager.cleanAndResetAsync(() -> {
-            mEglManager = SharedEglManager.getInstance();
-            mEglManager.initialize(getApplicationContext(), ServiceType.BgCamera);
-        });
-
-        mEglManager.setListener(new SharedEglManager.Listener() {
-            @Override
-            public void onEglReady() {
-                if (mEglManager != null) {
-                    if (mPreviewTexture != null) return;
-
-                    mPreviewTexture = mEglManager.getCameraTexture();
-                    if (mPreviewTexture == null) {
-                        Log.e(TAG, "Failed to get camera texture from EglManager");
-                        return;
-                    }
-
-                    mPreviewSurface = new Surface(mPreviewTexture);
-                    mPreviewTexture.setDefaultBufferSize(1280, 720);
-                    Log.d(TAG, "Preview surface created and buffer size set");
-
-                    if (sharedViewModel != null) {
-                        SurfaceModel surfaceModel = sharedViewModel.getSurfaceModel();
-                        SurfaceTexture dsurfaceTexture = surfaceModel.getSurfaceTexture();
-                        if (dsurfaceTexture == null) {
-                            Log.w(TAG, "onEglReady: SurfaceTexture not created yet, skipping for now");
-                            return;
-                        }
-                        int dwidth = surfaceModel.getWidth();
-                        int dheight = surfaceModel.getHeight();
-                        mEglManager.setPreviewSurface(dsurfaceTexture, dwidth, dheight);
-                    }
-
-                    mFrameAvailableListener = surfaceTexture -> {
-                        if (mEglManager != null && mEglManager.getHandler() != null) {
-                            mEglManager.getHandler().post(this::drawFrame);
-                        }
-                    };
-                    mPreviewTexture.setOnFrameAvailableListener(mFrameAvailableListener);
-                    initCamera();
+            // Initialize wake lock with null safety
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            if (SafeExecutor.checkNotNull(pm, "PowerManager", "BgCameraService onCreate")) {
+                String wakeLockTag = "CheckMate:CameraLock";
+                wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockTag);
+                if (SafeExecutor.checkNotNull(wakeLock, "wakeLock", "BgCameraService onCreate")) {
+                    wakeLock.acquire(60 * 60 * 2000); // 2 hours
+                    CrashLogger.d(TAG, "Wake lock acquired");
+                } else {
+                    CrashLogger.e(TAG, "Failed to create wake lock");
                 }
+            } else {
+                CrashLogger.e(TAG, "PowerManager is null");
             }
 
-            private void drawFrame() {
-                if (mPreviewTexture != null) {
+            // Start camera thread with error handling
+            try {
+                if (!mCameraThread.isAlive()) {
+                    mCameraThread.start();
+                    CrashLogger.d(TAG, "Camera thread started");
+                } else {
+                    CrashLogger.w(TAG, "Camera thread already running");
+                }
+            } catch (Exception e) {
+                CrashLogger.e(TAG, "Failed to start camera thread", e);
+            }
+
+            // Get the singleton instance with error handling
+            SafeExecutor.executeVoid("initializeEglManager", () -> {
+                SharedEglManager.cleanAndResetAsync(() -> SafeExecutor.executeVoid("eglManagerSetup", () -> {
                     try {
-                        mPreviewTexture.updateTexImage();
+                        mEglManager = SharedEglManager.getInstance();
+                        if (SafeExecutor.checkNotNull(mEglManager, "mEglManager", "BgCameraService onCreate")) {
+                            mEglManager.initialize(getApplicationContext(), ServiceType.BgCamera);
+                            CrashLogger.d(TAG, "EGL Manager initialized");
+                        } else {
+                            CrashLogger.e(TAG, "Failed to get EGL Manager instance");
+                        }
                     } catch (Exception e) {
-                        Log.e(TAG, "Failed to updateTexImage()", e);
-                        return;
+                        CrashLogger.e(TAG, "EGL Manager initialization failed", e);
                     }
-                    float[] tx = new float[16];
-                    mPreviewTexture.getTransformMatrix(tx);
-                }
-                if (mEglManager != null) {
-                    mEglManager.drawFrame();
-                }
+                }));
+            });
+        });
+
+        // Initialize EGL listener with null safety and error handling
+        SafeExecutor.executeVoid("setEglListener", () -> {
+            if (SafeExecutor.checkNotNull(mEglManager, "mEglManager", "setListener")) {
+                mEglManager.setListener(new SharedEglManager.Listener() {
+                    @Override
+                    public void onEglReady() {
+                        SafeExecutor.executeVoid("onEglReady", () -> {
+                            if (!SafeExecutor.checkNotNull(mEglManager, "mEglManager", "onEglReady")) {
+                                return;
+                            }
+                            
+                            if (mPreviewTexture != null) {
+                                CrashLogger.d(TAG, "Preview texture already exists, skipping creation");
+                                return;
+                            }
+
+                            mPreviewTexture = mEglManager.getCameraTexture();
+                            if (!SafeExecutor.checkNotNull(mPreviewTexture, "mPreviewTexture", "onEglReady")) {
+                                CrashLogger.e(TAG, "Failed to get camera texture from EglManager");
+                                return;
+                            }
+
+                            try {
+                                mPreviewSurface = new Surface(mPreviewTexture);
+                                mPreviewTexture.setDefaultBufferSize(1280, 720);
+                                CrashLogger.d(TAG, "Preview surface created and buffer size set");
+                            } catch (Exception e) {
+                                CrashLogger.e(TAG, "Failed to create preview surface", e);
+                                return;
+                            }
+
+                            if (SafeExecutor.checkNotNull(sharedViewModel, "sharedViewModel", "onEglReady")) {
+                                try {
+                                    SurfaceModel surfaceModel = sharedViewModel.getSurfaceModel();
+                                    if (SafeExecutor.checkNotNull(surfaceModel, "surfaceModel", "onEglReady")) {
+                                        SurfaceTexture dsurfaceTexture = surfaceModel.getSurfaceTexture();
+                                        if (!SafeExecutor.checkNotNull(dsurfaceTexture, "dsurfaceTexture", "onEglReady")) {
+                                            CrashLogger.w(TAG, "onEglReady: SurfaceTexture not created yet, skipping for now");
+                                            return;
+                                        }
+                                        int dwidth = surfaceModel.getWidth();
+                                        int dheight = surfaceModel.getHeight();
+                                        mEglManager.setPreviewSurface(dsurfaceTexture, dwidth, dheight);
+                                        CrashLogger.d(TAG, "Preview surface set with dimensions: " + dwidth + "x" + dheight);
+                                    }
+                                } catch (Exception e) {
+                                    CrashLogger.e(TAG, "Error setting preview surface", e);
+                                }
+                            } else {
+                                CrashLogger.w(TAG, "SharedViewModel is null in onEglReady");
+                            }
+
+                            try {
+                                mFrameAvailableListener = surfaceTexture -> SafeExecutor.executeVoid("frameAvailable", () -> {
+                                    if (SafeExecutor.checkNotNull(mEglManager, "mEglManager", "frameAvailable") && 
+                                        SafeExecutor.checkNotNull(mEglManager.getHandler(), "eglHandler", "frameAvailable")) {
+                                        mEglManager.getHandler().post(this::drawFrame);
+                                    }
+                                });
+                                mPreviewTexture.setOnFrameAvailableListener(mFrameAvailableListener);
+                                CrashLogger.d(TAG, "Frame available listener set");
+                            } catch (Exception e) {
+                                CrashLogger.e(TAG, "Failed to set frame available listener", e);
+                            }
+                            
+                            SafeExecutor.executeVoid("initCamera", this::initCamera);
+                        });
+                    }
+
+                    private void drawFrame() {
+                        SafeExecutor.executeVoid("drawFrame", () -> {
+                            if (SafeExecutor.checkNotNull(mPreviewTexture, "mPreviewTexture", "drawFrame")) {
+                                try {
+                                    mPreviewTexture.updateTexImage();
+                                    float[] tx = new float[16];
+                                    mPreviewTexture.getTransformMatrix(tx);
+                                } catch (Exception e) {
+                                    CrashLogger.e(TAG, "Failed to updateTexImage()", e);
+                                    return;
+                                }
+                            }
+                            
+                            if (SafeExecutor.checkNotNull(mEglManager, "mEglManager", "drawFrame")) {
+                                try {
+                                    mEglManager.drawFrame();
+                                } catch (Exception e) {
+                                    CrashLogger.e(TAG, "Failed to draw frame", e);
+                                }
+                            }
+                        });
+                    }
+                });
+            } else {
+                CrashLogger.e(TAG, "Cannot set EGL listener - mEglManager is null");
             }
         });
     }
