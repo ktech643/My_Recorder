@@ -24,6 +24,7 @@ import toothpick.Toothpick;
 import toothpick.config.Module;
 import javax.inject.Inject;
 import android.annotation.SuppressLint;
+import com.checkmate.android.util.CrashLogger;
 public abstract class BaseBackgroundService extends Service {
     // Common fields
     @Inject
@@ -177,32 +178,77 @@ public abstract class BaseBackgroundService extends Service {
 
     // Common methods for streaming/recording
     public void startStreaming() {
-        if (mEglManager != null) {
-            mEglManager.startStreaming();
+        try {
+            if (mEglManager != null) {
+                mEglManager.startStreaming();
+            } else {
+                Log.w(getClass().getSimpleName(), "startStreaming: EglManager is null");
+            }
+        } catch (Exception e) {
+            Log.e(getClass().getSimpleName(), "Error starting streaming", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(getClass().getSimpleName(), "startStreaming", e);
+            }
         }
     }
 
     public void stopStreaming() {
-        if (mEglManager != null) {
-            mEglManager.stopStreaming();
+        try {
+            if (mEglManager != null) {
+                mEglManager.stopStreaming();
+            } else {
+                Log.w(getClass().getSimpleName(), "stopStreaming: EglManager is null");
+            }
+        } catch (Exception e) {
+            Log.e(getClass().getSimpleName(), "Error stopping streaming", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(getClass().getSimpleName(), "stopStreaming", e);
+            }
         }
     }
 
     public void startRecording() {
-        if (mEglManager != null) {
-            mEglManager.startRecording();
+        try {
+            if (mEglManager != null) {
+                mEglManager.startRecording();
+            } else {
+                Log.w(getClass().getSimpleName(), "startRecording: EglManager is null");
+            }
+        } catch (Exception e) {
+            Log.e(getClass().getSimpleName(), "Error starting recording", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(getClass().getSimpleName(), "startRecording", e);
+            }
         }
     }
 
     public void stopRecording() {
-        if (mEglManager != null) {
-            mEglManager.stopRecording(false);
+        try {
+            if (mEglManager != null) {
+                mEglManager.stopRecording(false);
+            } else {
+                Log.w(getClass().getSimpleName(), "stopRecording: EglManager is null");
+            }
+        } catch (Exception e) {
+            Log.e(getClass().getSimpleName(), "Error stopping recording", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(getClass().getSimpleName(), "stopRecording", e);
+            }
         }
     }
 
     public void takeSnapshot() {
-        if (mEglManager != null) {
-            mEglManager.takeSnapshot();
+        try {
+            if (mEglManager != null) {
+                mEglManager.takeSnapshot();
+            } else {
+                Log.w(getClass().getSimpleName(), "takeSnapshot: EglManager is null");
+            }
+        } catch (Exception e) {
+            Log.e(getClass().getSimpleName(), "Error taking snapshot", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(getClass().getSimpleName(), "takeSnapshot", e);
+            }
         }
     }
 

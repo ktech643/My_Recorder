@@ -43,6 +43,7 @@ import com.checkmate.android.service.MyAccessibilityService;
 // import com.checkmate.android.ui.view.MySpinner; // Removed - was for old spinner implementation
 import com.checkmate.android.util.AudioLevelMeter;
 import com.checkmate.android.util.CommonUtil;
+import com.checkmate.android.util.CrashLogger;
 import com.checkmate.android.util.DeviceUtils;
 import com.checkmate.android.util.MainActivity;
 import com.checkmate.android.util.MessageUtil;
@@ -182,7 +183,14 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
         } else {
             throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
         }
-        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        try {
+            sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing SharedViewModel", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "onAttach SharedViewModel", e);
+            }
+        }
     }
 
     @Override
@@ -360,9 +368,18 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
     }
 
     private void checkAndAutoStart() {
-        if (mActivityRef == null || mActivityRef.get() == null) return;
+        if (mActivityRef == null || mActivityRef.get() == null) {
+            Log.w(TAG, "checkAndAutoStart: Activity reference is null");
+            resetAutoStartFlags();
+            return;
+        }
         
         MainActivity activity = mActivityRef.get();
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            Log.w(TAG, "checkAndAutoStart: Activity is not available");
+            resetAutoStartFlags();
+            return;
+        }
         boolean shouldStream = AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false);
         boolean shouldRecord = AppPreference.getBool(AppPreference.KEY.AUTO_RECORD, false);
 
@@ -381,10 +398,12 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
 
         // Wait for service to be ready
         handler.postDelayed(() -> {
-            if (activity == null || !isAdded()) {
-                resetAutoStartFlags();
-                return;
-            }
+            try {
+                if (activity == null || !isAdded() || activity.isFinishing() || activity.isDestroyed()) {
+                    Log.w(TAG, "checkAndAutoStart: Activity no longer valid in delayed execution");
+                    resetAutoStartFlags();
+                    return;
+                }
 
             boolean streamStarted = false;
             boolean recordStarted = false;
@@ -474,9 +493,20 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
     }
 
     private void handleEvent(SharedViewModel.EventPayload payload) {
+        if (payload == null) {
+            Log.w(TAG, "handleEvent: Received null payload");
+            return;
+        }
+        
         EventType eventType = payload.getEventType();
+        if (eventType == null) {
+            Log.w(TAG, "handleEvent: Event type is null");
+            return;
+        }
+        
         Object data = payload.getData();
-        switch (eventType) {
+        try {
+            switch (eventType) {
             case SET_WIFI_INFORMATION_LIVE:
                 HashMap<String, String> map = (HashMap<String, String>) data;
                 String wifiIn = map.get("wifi_in");
@@ -529,9 +559,19 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
     }
 
     public void handleCameraView() {
-        if (mActivityRef == null || mActivityRef.get() == null) return;
+        if (mActivityRef == null || mActivityRef.get() == null) {
+            Log.w(TAG, "handleCameraView: Activity reference is null");
+            return;
+        }
+        
         MainActivity activity = mActivityRef.get();
+        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            Log.w(TAG, "handleCameraView: Activity is not available");
+            return;
+        }
+        
         activity.runOnUiThread(() -> {
+            try {
             if (is_camera_opened) {
                 updateCameraUI(activity);
             } else if (is_usb_opened) {
@@ -547,28 +587,83 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
     }
 
     private void updateCameraUI(MainActivity activity) {
-        is_rec = activity.isRecordingCamera();
-        updateUI(is_rec, activity.is_landscape);
+        if (activity == null) {
+            Log.w(TAG, "updateCameraUI: Activity is null");
+            return;
+        }
+        try {
+            is_rec = activity.isRecordingCamera();
+            updateUI(is_rec, activity.is_landscape);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating camera UI", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "updateCameraUI", e);
+            }
+        }
     }
 
     private void updateUSBCameraUI(MainActivity activity) {
-        is_rec = activity.isRecordingUSB();
-        updateUI(is_rec, activity.is_landscape);
+        if (activity == null) {
+            Log.w(TAG, "updateUSBCameraUI: Activity is null");
+            return;
+        }
+        try {
+            is_rec = activity.isRecordingUSB();
+            updateUI(is_rec, activity.is_landscape);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating USB camera UI", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "updateUSBCameraUI", e);
+            }
+        }
     }
 
     private void updateCastUI(MainActivity activity) {
-        is_rec = activity.isCastRecording();
-        updateUI(is_rec, activity.is_landscape);
+        if (activity == null) {
+            Log.w(TAG, "updateCastUI: Activity is null");
+            return;
+        }
+        try {
+            is_rec = activity.isCastRecording();
+            updateUI(is_rec, activity.is_landscape);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating cast UI", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "updateCastUI", e);
+            }
+        }
     }
 
     private void updateAudioOnlyUI(MainActivity activity) {
-        is_rec = activity.isAudioRecording();
-        updateUI(is_rec, activity.is_landscape);
+        if (activity == null) {
+            Log.w(TAG, "updateAudioOnlyUI: Activity is null");
+            return;
+        }
+        try {
+            is_rec = activity.isAudioRecording();
+            updateUI(is_rec, activity.is_landscape);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating audio only UI", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "updateAudioOnlyUI", e);
+            }
+        }
     }
 
     private void updateWifiUI(MainActivity activity) {
-        is_rec = activity.isWifiRecording();
-        updateUI(is_rec, activity.is_landscape);
+        if (activity == null) {
+            Log.w(TAG, "updateWifiUI: Activity is null");
+            return;
+        }
+        try {
+            is_rec = activity.isWifiRecording();
+            updateUI(is_rec, activity.is_landscape);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating WiFi UI", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "updateWifiUI", e);
+            }
+        }
     }
 
     private void updateUI(boolean isRecording, boolean isLandscape) {
@@ -583,7 +678,10 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
     }
 
     public void handleStreamView() {
-        if (!isAdded() || getActivity() == null) return;
+        if (!isAdded() || getActivity() == null) {
+            Log.w(TAG, "handleStreamView: Fragment not properly attached");
+            return;
+        }
 
         getActivity().runOnUiThread(() -> {
             try {

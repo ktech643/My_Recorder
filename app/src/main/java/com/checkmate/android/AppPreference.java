@@ -1,9 +1,25 @@
 package com.checkmate.android;
 
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
 public class AppPreference {
-    private static SharedPreferences instance = null;
+    private static final String TAG = "AppPreference";
+    private static volatile SharedPreferences instance = null;
+    private static final Object lock = new Object();
+    private static final ConcurrentHashMap<String, Object> cache = new ConcurrentHashMap<>();
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private static final long ANR_TIMEOUT = 3000; // 3 seconds timeout
+    private static CrashLogger crashLogger;
 
     public static class KEY {
         // settings
@@ -177,70 +193,401 @@ public class AppPreference {
     }
 
     public static void initialize(SharedPreferences pref) {
-        instance = pref;
+        synchronized (lock) {
+            if (instance == null) {
+                instance = pref;
+                crashLogger = CrashLogger.getInstance();
+                // Preload critical preferences into cache
+                preloadCriticalPreferences();
+            }
+        }
+    }
+    
+    private static void preloadCriticalPreferences() {
+        if (instance == null) return;
+        try {
+            // Preload critical keys to avoid ANR
+            String[] criticalKeys = {
+                KEY.DEVICE_ID, KEY.USER_TOKEN, KEY.IS_APP_BACKGROUND,
+                KEY.CAM_FRONT_FACING, KEY.CAM_REAR_FACING, KEY.CAM_USB
+            };
+            for (String key : criticalKeys) {
+                if (instance.contains(key)) {
+                    cache.put(key, instance.getAll().get(key));
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error preloading preferences", e);
+            if (crashLogger != null) {
+                crashLogger.logError("AppPreference.preloadCriticalPreferences", e);
+            }
+        }
     }
 
-    // check contain
+    // check contain with thread safety and ANR protection
     public static boolean contains(String key) {
-        return instance.contains(key);
+        if (instance == null) {
+            Log.w(TAG, "AppPreference not initialized");
+            return false;
+        }
+        
+        // Check cache first
+        if (cache.containsKey(key)) {
+            return true;
+        }
+        
+        try {
+            return executeWithTimeout(() -> {
+                synchronized (lock) {
+                    return instance.contains(key);
+                }
+            }, false);
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking key: " + key, e);
+            if (crashLogger != null) {
+                crashLogger.logError("AppPreference.contains", e);
+            }
+            return false;
+        }
     }
 
-    // boolean
+    // boolean with thread safety, type safety, and ANR protection
     public static boolean getBool(String key, boolean def) {
-        return instance.getBoolean(key, def);
+        if (instance == null) {
+            Log.w(TAG, "AppPreference not initialized, returning default");
+            return def;
+        }
+        
+        // Check cache first
+        Object cachedValue = cache.get(key);
+        if (cachedValue instanceof Boolean) {
+            return (Boolean) cachedValue;
+        }
+        
+        try {
+            return executeWithTimeout(() -> {
+                synchronized (lock) {
+                    try {
+                        boolean value = instance.getBoolean(key, def);
+                        cache.put(key, value);
+                        return value;
+                    } catch (ClassCastException e) {
+                        Log.e(TAG, "Type mismatch for key: " + key + ", expected boolean", e);
+                        if (crashLogger != null) {
+                            crashLogger.logError("AppPreference.getBool.ClassCastException", e);
+                        }
+                        return def;
+                    }
+                }
+            }, def);
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting boolean: " + key, e);
+            if (crashLogger != null) {
+                crashLogger.logError("AppPreference.getBool", e);
+            }
+            return def;
+        }
     }
 
     public static void setBool(String key, boolean value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putBoolean(key, value);
-        editor.commit();
+        if (instance == null) {
+            Log.e(TAG, "AppPreference not initialized");
+            return;
+        }
+        
+        // Update cache immediately for fast reads
+        cache.put(key, value);
+        
+        // Async write to avoid ANR
+        executor.execute(() -> {
+            try {
+                synchronized (lock) {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putBoolean(key, value);
+                    boolean success = editor.commit();
+                    if (!success) {
+                        Log.e(TAG, "Failed to commit boolean preference: " + key);
+                        cache.remove(key); // Remove from cache if commit failed
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting boolean: " + key, e);
+                cache.remove(key); // Remove from cache on error
+                if (crashLogger != null) {
+                    crashLogger.logError("AppPreference.setBool", e);
+                }
+            }
+        });
     }
 
-    // int
+    // int with thread safety, type safety, and ANR protection
     public static int getInt(String key, int def) {
-        return instance.getInt(key, def);
+        if (instance == null) {
+            Log.w(TAG, "AppPreference not initialized, returning default");
+            return def;
+        }
+        
+        // Check cache first
+        Object cachedValue = cache.get(key);
+        if (cachedValue instanceof Integer) {
+            return (Integer) cachedValue;
+        }
+        
+        try {
+            return executeWithTimeout(() -> {
+                synchronized (lock) {
+                    try {
+                        int value = instance.getInt(key, def);
+                        cache.put(key, value);
+                        return value;
+                    } catch (ClassCastException e) {
+                        Log.e(TAG, "Type mismatch for key: " + key + ", expected int", e);
+                        if (crashLogger != null) {
+                            crashLogger.logError("AppPreference.getInt.ClassCastException", e);
+                        }
+                        return def;
+                    }
+                }
+            }, def);
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting int: " + key, e);
+            if (crashLogger != null) {
+                crashLogger.logError("AppPreference.getInt", e);
+            }
+            return def;
+        }
     }
 
     public static void setInt(String key, int value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putInt(key, value);
-        editor.commit();
+        if (instance == null) {
+            Log.e(TAG, "AppPreference not initialized");
+            return;
+        }
+        
+        // Update cache immediately for fast reads
+        cache.put(key, value);
+        
+        // Async write to avoid ANR
+        executor.execute(() -> {
+            try {
+                synchronized (lock) {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putInt(key, value);
+                    boolean success = editor.commit();
+                    if (!success) {
+                        Log.e(TAG, "Failed to commit int preference: " + key);
+                        cache.remove(key);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting int: " + key, e);
+                cache.remove(key);
+                if (crashLogger != null) {
+                    crashLogger.logError("AppPreference.setInt", e);
+                }
+            }
+        });
     }
 
-    // long
+    // long with thread safety, type safety, and ANR protection
     public static long getLong(String key, long def) {
-        return instance.getLong(key, def);
+        if (instance == null) {
+            Log.w(TAG, "AppPreference not initialized, returning default");
+            return def;
+        }
+        
+        // Check cache first
+        Object cachedValue = cache.get(key);
+        if (cachedValue instanceof Long) {
+            return (Long) cachedValue;
+        }
+        
+        try {
+            return executeWithTimeout(() -> {
+                synchronized (lock) {
+                    try {
+                        long value = instance.getLong(key, def);
+                        cache.put(key, value);
+                        return value;
+                    } catch (ClassCastException e) {
+                        Log.e(TAG, "Type mismatch for key: " + key + ", expected long", e);
+                        if (crashLogger != null) {
+                            crashLogger.logError("AppPreference.getLong.ClassCastException", e);
+                        }
+                        return def;
+                    }
+                }
+            }, def);
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting long: " + key, e);
+            if (crashLogger != null) {
+                crashLogger.logError("AppPreference.getLong", e);
+            }
+            return def;
+        }
     }
 
     public static void setLong(String key, long value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putLong(key, value);
-        editor.apply();
+        if (instance == null) {
+            Log.e(TAG, "AppPreference not initialized");
+            return;
+        }
+        
+        // Update cache immediately for fast reads
+        cache.put(key, value);
+        
+        // Async write to avoid ANR
+        executor.execute(() -> {
+            try {
+                synchronized (lock) {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putLong(key, value);
+                    editor.apply(); // Using apply for better performance
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting long: " + key, e);
+                cache.remove(key);
+                if (crashLogger != null) {
+                    crashLogger.logError("AppPreference.setLong", e);
+                }
+            }
+        });
     }
 
-    // string
+    // string with thread safety, type safety, and ANR protection
     public static String getStr(String key, String def) {
-        return instance.getString(key, def);
+        if (instance == null) {
+            Log.w(TAG, "AppPreference not initialized, returning default");
+            return def;
+        }
+        
+        // Check cache first
+        Object cachedValue = cache.get(key);
+        if (cachedValue instanceof String) {
+            return (String) cachedValue;
+        }
+        
+        try {
+            return executeWithTimeout(() -> {
+                synchronized (lock) {
+                    try {
+                        String value = instance.getString(key, def);
+                        if (value != null) {
+                            cache.put(key, value);
+                        }
+                        return value;
+                    } catch (ClassCastException e) {
+                        Log.e(TAG, "Type mismatch for key: " + key + ", expected string", e);
+                        if (crashLogger != null) {
+                            crashLogger.logError("AppPreference.getStr.ClassCastException", e);
+                        }
+                        return def;
+                    }
+                }
+            }, def);
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting string: " + key, e);
+            if (crashLogger != null) {
+                crashLogger.logError("AppPreference.getStr", e);
+            }
+            return def;
+        }
     }
 
     public static void setStr(String key, String value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putString(key, value);
-        editor.apply();
+        if (instance == null) {
+            Log.e(TAG, "AppPreference not initialized");
+            return;
+        }
+        
+        if (key == null) {
+            Log.e(TAG, "Null key provided to setStr");
+            return;
+        }
+        
+        // Update cache immediately for fast reads
+        if (value != null) {
+            cache.put(key, value);
+        } else {
+            cache.remove(key);
+        }
+        
+        // Async write to avoid ANR
+        executor.execute(() -> {
+            try {
+                synchronized (lock) {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putString(key, value);
+                    editor.apply();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting string: " + key, e);
+                cache.remove(key);
+                if (crashLogger != null) {
+                    crashLogger.logError("AppPreference.setStr", e);
+                }
+            }
+        });
     }
 
-    // remove
+    // remove with thread safety
     public static void removeKey(String key) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.remove(key);
-        editor.apply();
+        if (instance == null) {
+            Log.e(TAG, "AppPreference not initialized");
+            return;
+        }
+        
+        if (key == null) {
+            Log.e(TAG, "Null key provided to removeKey");
+            return;
+        }
+        
+        // Remove from cache immediately
+        cache.remove(key);
+        
+        // Async remove to avoid ANR
+        executor.execute(() -> {
+            try {
+                synchronized (lock) {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.remove(key);
+                    editor.apply();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error removing key: " + key, e);
+                if (crashLogger != null) {
+                    crashLogger.logError("AppPreference.removeKey", e);
+                }
+            }
+        });
     }
     
-    // Rotation settings methods
+    // Rotation settings methods with thread safety
     public static void saveRotationSettings(int rotation, boolean isFlipped, boolean isMirrored) {
-        setInt(KEY.IS_ROTATED, rotation);
-        setBool(KEY.IS_FLIPPED, isFlipped);
-        setBool(KEY.IS_MIRRORED, isMirrored);
+        // Batch update for better performance
+        executor.execute(() -> {
+            try {
+                synchronized (lock) {
+                    if (instance == null) return;
+                    
+                    // Update cache first
+                    cache.put(KEY.IS_ROTATED, rotation);
+                    cache.put(KEY.IS_FLIPPED, isFlipped);
+                    cache.put(KEY.IS_MIRRORED, isMirrored);
+                    
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putInt(KEY.IS_ROTATED, rotation);
+                    editor.putBoolean(KEY.IS_FLIPPED, isFlipped);
+                    editor.putBoolean(KEY.IS_MIRRORED, isMirrored);
+                    editor.apply();
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error saving rotation settings", e);
+                if (crashLogger != null) {
+                    crashLogger.logError("AppPreference.saveRotationSettings", e);
+                }
+            }
+        });
     }
     
     public static int getRotation() {
@@ -257,6 +604,59 @@ public class AppPreference {
     
     public static void resetRotationSettings() {
         saveRotationSettings(0, false, false);
+    }
+    
+    // Helper method for ANR protection with timeout
+    private static <T> T executeWithTimeout(java.util.concurrent.Callable<T> task, T defaultValue) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            // If on main thread, execute async and return cached/default value
+            Future<T> future = executor.submit(task);
+            try {
+                return future.get(50, TimeUnit.MILLISECONDS); // Very short timeout on main thread
+            } catch (TimeoutException e) {
+                Log.w(TAG, "Operation timed out on main thread, returning cached/default value");
+                return defaultValue;
+            } catch (Exception e) {
+                Log.e(TAG, "Error in executeWithTimeout", e);
+                return defaultValue;
+            }
+        } else {
+            // If on background thread, execute normally with longer timeout
+            try {
+                Future<T> future = executor.submit(task);
+                return future.get(ANR_TIMEOUT, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                Log.e(TAG, "Operation timed out after " + ANR_TIMEOUT + "ms");
+                if (crashLogger != null) {
+                    crashLogger.logError("AppPreference.executeWithTimeout.Timeout", e);
+                }
+                return defaultValue;
+            } catch (Exception e) {
+                Log.e(TAG, "Error in executeWithTimeout", e);
+                if (crashLogger != null) {
+                    crashLogger.logError("AppPreference.executeWithTimeout", e);
+                }
+                return defaultValue;
+            }
+        }
+    }
+    
+    // Clear cache (useful for memory management)
+    public static void clearCache() {
+        cache.clear();
+    }
+    
+    // Shutdown executor (call this when app is terminating)
+    public static void shutdown() {
+        try {
+            executor.shutdown();
+            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
 }

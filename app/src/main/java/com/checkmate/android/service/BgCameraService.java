@@ -38,6 +38,8 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 import androidx.annotation.NonNull;
+import java.util.concurrent.locks.ReentrantLock;
+import com.checkmate.android.util.CrashLogger;
 
 public class BgCameraService extends BaseBackgroundService {
     private static final String TAG = "BgCameraService";
@@ -45,17 +47,23 @@ public class BgCameraService extends BaseBackgroundService {
     private static final int MAX_RETRIES = 5;
 
     // Camera-specific fields
-    private CameraDevice mCamera2;
-    private CameraCaptureSession mCaptureSession;
+    private volatile CameraDevice mCamera2;
+    private volatile CameraCaptureSession mCaptureSession;
     private CameraCaptureSession.StateCallback mSessionStateCallback;
     private CameraDevice.StateCallback mCameraStateCallback;
     private final HandlerThread mCameraThread = new HandlerThread("BgCamera");
     private final Handler mCameraHandler = new Handler(Looper.getMainLooper());
-    private boolean mClosing;
-    private int reopenAttempts = 0;
+    private volatile boolean mClosing;
+    private volatile int reopenAttempts = 0;
     private final Runnable reopenRunnable = this::initCamera;
     private BroadcastReceiver configChangeReceiver;
-    private boolean isConfigChangeReceiverRegistered = false;
+    private volatile boolean isConfigChangeReceiverRegistered = false;
+    
+    // Thread safety locks
+    private final ReentrantLock cameraLock = new ReentrantLock();
+    private final ReentrantLock sessionLock = new ReentrantLock();
+    private final ReentrantLock surfaceLock = new ReentrantLock();
+    private static final CrashLogger crashLogger = CrashLogger.getInstance();
     // Status tracking
     public static final MutableLiveData<String> liveData = new MutableLiveData<>();
     // Binder
@@ -68,7 +76,13 @@ public class BgCameraService extends BaseBackgroundService {
     private WeakReference<CameraBinder> mBinderRef = new WeakReference<>(new CameraBinder(this));
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinderRef.get();
+        CameraBinder binder = mBinderRef.get();
+        if (binder == null) {
+            Log.w(TAG, "Binder reference is null, creating new one");
+            binder = new CameraBinder(this);
+            mBinderRef = new WeakReference<>(binder);
+        }
+        return binder;
     }
 
     @Inject
@@ -84,14 +98,25 @@ public class BgCameraService extends BaseBackgroundService {
     @Override
     public void onCreate() {
         super.onCreate();
-        mCurrentStatus = BackgroundNotification.NOTIFICATION_STATUS.CREATED;
+        try {
+            mCurrentStatus = BackgroundNotification.NOTIFICATION_STATUS.CREATED;
 
-        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        String wakeLockTag = "CheckMate:CameraLock";
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockTag);
-        wakeLock.acquire(60 * 60 * 2000);
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            if (pm != null) {
+                String wakeLockTag = "CheckMate:CameraLock";
+                wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockTag);
+                if (wakeLock != null) {
+                    wakeLock.acquire(60 * 60 * 2000);
+                }
+            }
 
-        mCameraThread.start();
+            mCameraThread.start();
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onCreate", e);
+            if (crashLogger != null) {
+                crashLogger.logError(TAG, "onCreate", e);
+            }
+        }
 
         // Get the singleton instance
         SharedEglManager.cleanAndResetAsync(() -> {
@@ -128,25 +153,41 @@ public class BgCameraService extends BaseBackgroundService {
                     }
 
                     mFrameAvailableListener = surfaceTexture -> {
-                        if (mEglManager != null && mEglManager.getHandler() != null) {
-                            mEglManager.getHandler().post(this::drawFrame);
+                        try {
+                            if (mEglManager != null && mEglManager.getHandler() != null) {
+                                mEglManager.getHandler().post(this::drawFrame);
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error in frame available listener", e);
+                            if (crashLogger != null) {
+                                crashLogger.logError(TAG, "mFrameAvailableListener", e);
+                            }
                         }
                     };
-                    mPreviewTexture.setOnFrameAvailableListener(mFrameAvailableListener);
+                    if (mPreviewTexture != null) {
+                        mPreviewTexture.setOnFrameAvailableListener(mFrameAvailableListener);
+                    }
                     initCamera();
                 }
             }
 
             private void drawFrame() {
-                if (mPreviewTexture != null) {
-                    try {
-                        mPreviewTexture.updateTexImage();
-                    } catch (Exception e) {
-                        Log.e(TAG, "Failed to updateTexImage()", e);
-                        return;
+                surfaceLock.lock();
+                try {
+                    if (mPreviewTexture != null) {
+                        try {
+                            mPreviewTexture.updateTexImage();
+                            float[] tx = new float[16];
+                            mPreviewTexture.getTransformMatrix(tx);
+                        } catch (Exception e) {
+                            Log.e(TAG, "Failed to updateTexImage()", e);
+                            if (crashLogger != null) {
+                                crashLogger.logError(TAG, "drawFrame.updateTexImage", e);
+                            }
+                        }
                     }
-                    float[] tx = new float[16];
-                    mPreviewTexture.getTransformMatrix(tx);
+                } finally {
+                    surfaceLock.unlock();
                 }
                 if (mEglManager != null) {
                     mEglManager.drawFrame();
@@ -165,28 +206,49 @@ public class BgCameraService extends BaseBackgroundService {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+        try {
+            mClosing = true;
+            
+            // Remove any pending callbacks
+            if (mCameraHandler != null) {
+                mCameraHandler.removeCallbacksAndMessages(null);
+            }
+            
+            super.onDestroy();
 
-        // Camera-specific cleanup
-        safeCloseSessionAndDevice(mCamera2);
-
-        if (mPreviewSurface != null) {
-            mPreviewSurface.release();
-            mPreviewSurface = null;
-        }
-
-        if (mPreviewTexture != null) {
-            mPreviewTexture.release();
-            mPreviewTexture = null;
-        }
-
-        if (isConfigChangeReceiverRegistered && configChangeReceiver != null) {
+            // Camera-specific cleanup with proper locking
+            cameraLock.lock();
             try {
-                unregisterReceiver(configChangeReceiver);
-            } catch (IllegalArgumentException e) {
-                Log.e(TAG, "ConfigChangeReceiver not registered", e);
+                safeCloseSessionAndDevice(mCamera2);
+                mCamera2 = null;
             } finally {
-                isConfigChangeReceiverRegistered = false;
+                cameraLock.unlock();
+            }
+
+            // Surface cleanup with proper locking
+            surfaceLock.lock();
+            try {
+                if (mPreviewSurface != null) {
+                    mPreviewSurface.release();
+                    mPreviewSurface = null;
+                }
+
+                if (mPreviewTexture != null) {
+                    mPreviewTexture.release();
+                    mPreviewTexture = null;
+                }
+            } finally {
+                surfaceLock.unlock();
+            }
+
+            // Unregister receiver safely
+            if (isConfigChangeReceiverRegistered && configChangeReceiver != null) {
+                try {
+                    unregisterReceiver(configChangeReceiver);
+                } catch (IllegalArgumentException e) {
+                    Log.e(TAG, "ConfigChangeReceiver not registered", e);
+                } finally {
+                    isConfigChangeReceiverRegistered = false;
                 configChangeReceiver = null;
             }
         }
@@ -240,63 +302,90 @@ public class BgCameraService extends BaseBackgroundService {
 
     // Camera-specific methods
     private void initCamera() {
-        mSessionStateCallback = new CameraCaptureSession.StateCallback() {
-            @Override
-            public void onReady(@NonNull CameraCaptureSession session) {
-                Log.v(TAG, "onReady");
-            }
-
-            @Override
-            public void onConfigured(@NonNull CameraCaptureSession session) {
-                Log.v(TAG, "onConfigured");
-                mCaptureSession = session;
-                if (!mClosing) startPreview();
-            }
-
-            @Override
-            public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-                Log.v(TAG, "onConfigureFailed");
-            }
-        };
-
-        mCameraStateCallback = new CameraDevice.StateCallback() {
-            @Override
-            public void onOpened(@NonNull CameraDevice camera) {
-                Log.v(TAG, "onOpened");
-                if (mClosing) {
-                    Log.w(TAG, "Camera opened after service is closing, closing camera");
-                    camera.close();
-                    return;
+        try {
+            mSessionStateCallback = new CameraCaptureSession.StateCallback() {
+                @Override
+                public void onReady(@NonNull CameraCaptureSession session) {
+                    Log.v(TAG, "onReady");
                 }
-                mCamera2 = camera;
-                setStatus(BackgroundNotification.NOTIFICATION_STATUS.OPENED);
-                initCapture();
-                createCaptureSession();
-            }
+
+                @Override
+                public void onConfigured(@NonNull CameraCaptureSession session) {
+                    Log.v(TAG, "onConfigured");
+                    sessionLock.lock();
+                    try {
+                        mCaptureSession = session;
+                        if (!mClosing) {
+                            startPreview();
+                        }
+                    } finally {
+                        sessionLock.unlock();
+                    }
+                }
+
+                @Override
+                public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+                    Log.e(TAG, "onConfigureFailed");
+                    if (crashLogger != null) {
+                        crashLogger.logError(TAG, "Camera session configuration failed");
+                    }
+                }
+            };
+
+            mCameraStateCallback = new CameraDevice.StateCallback() {
+                @Override
+                public void onOpened(@NonNull CameraDevice camera) {
+                    Log.v(TAG, "onOpened");
+                    cameraLock.lock();
+                    try {
+                        if (mClosing) {
+                            Log.w(TAG, "Camera opened after service is closing, closing camera");
+                            camera.close();
+                            return;
+                        }
+                        mCamera2 = camera;
+                        setStatus(BackgroundNotification.NOTIFICATION_STATUS.OPENED);
+                        initCapture();
+                        createCaptureSession();
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error in onOpened", e);
+                        if (crashLogger != null) {
+                            crashLogger.logError(TAG, "onOpened", e);
+                        }
+                    } finally {
+                        cameraLock.unlock();
+                    }
+                }
 
             @Override
             public void onClosed(@NonNull CameraDevice camera) {
                 Log.v(TAG, "onClosed");
             }
 
-            @Override
-            public void onDisconnected(@NonNull CameraDevice camera) {
-                Log.w(TAG, "Camera disconnected – will try to reopen");
-                safeCloseSessionAndDevice(camera);
-                scheduleReopen();
-            }
+                @Override
+                public void onDisconnected(@NonNull CameraDevice camera) {
+                    Log.w(TAG, "Camera disconnected – will try to reopen");
+                    if (crashLogger != null) {
+                        crashLogger.logWarning(TAG, "Camera disconnected");
+                    }
+                    safeCloseSessionAndDevice(camera);
+                    scheduleReopen();
+                }
 
-            @Override
-            public void onError(@NonNull CameraDevice camera, int error) {
-                Log.e(TAG, "Camera error: " + error);
-                switch (error) {
-                    case ERROR_CAMERA_IN_USE:
-                    case ERROR_MAX_CAMERAS_IN_USE:
-                    case ERROR_CAMERA_DEVICE:
-                        safeCloseSessionAndDevice(camera);
-                        scheduleReopen();
-                        break;
-                    case ERROR_CAMERA_DISABLED:
+                @Override
+                public void onError(@NonNull CameraDevice camera, int error) {
+                    Log.e(TAG, "Camera error: " + error);
+                    if (crashLogger != null) {
+                        crashLogger.logError(TAG, "Camera error: " + error);
+                    }
+                    switch (error) {
+                        case ERROR_CAMERA_IN_USE:
+                        case ERROR_MAX_CAMERAS_IN_USE:
+                        case ERROR_CAMERA_DEVICE:
+                            safeCloseSessionAndDevice(camera);
+                            scheduleReopen();
+                            break;
+                        case ERROR_CAMERA_DISABLED:
                         stopSafe();
                         break;
                     case CameraDevice.StateCallback.ERROR_CAMERA_SERVICE:
@@ -374,27 +463,51 @@ public class BgCameraService extends BaseBackgroundService {
     }
 
     private void createCaptureSession() {
-        if (mClosing) {
-            Log.w(TAG, "Service is closing – skipping createCaptureSession()");
-            return;
-        }
-        if (mPreviewSurface == null || !mPreviewSurface.isValid()) {
-            Log.w(TAG, "Preview surface invalid or null – skipping createCaptureSession()");
-            return;
-        }
+        cameraLock.lock();
         try {
+            if (mClosing) {
+                Log.w(TAG, "Service is closing – skipping createCaptureSession()");
+                return;
+            }
+            if (mCamera2 == null) {
+                Log.w(TAG, "Camera device is null – skipping createCaptureSession()");
+                return;
+            }
+            if (mPreviewSurface == null || !mPreviewSurface.isValid()) {
+                Log.w(TAG, "Preview surface invalid or null – skipping createCaptureSession()");
+                return;
+            }
+            
             List<Surface> outputSurfaces = Collections.singletonList(mPreviewSurface);
             mCamera2.createCaptureSession(outputSurfaces, mSessionStateCallback, mCameraHandler);
         } catch (CameraAccessException e) {
             Log.e(TAG, "Failed to create capture session", e);
+            if (crashLogger != null) {
+                crashLogger.logError(TAG, "createCaptureSession.CameraAccessException", e);
+            }
         } catch (IllegalArgumentException e) {
             Log.w(TAG, "Surface abandoned – cannot create capture session", e);
+            if (crashLogger != null) {
+                crashLogger.logError(TAG, "createCaptureSession.IllegalArgumentException", e);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Unexpected error creating capture session", e);
+            if (crashLogger != null) {
+                crashLogger.logError(TAG, "createCaptureSession", e);
+            }
+        } finally {
+            cameraLock.unlock();
         }
     }
 
     private void startPreview() {
-        if (mCamera2 == null || mCaptureSession == null) return;
+        sessionLock.lock();
         try {
+            if (mCamera2 == null || mCaptureSession == null) {
+                Log.w(TAG, "Camera or session is null in startPreview");
+                return;
+            }
+            
             CaptureRequest.Builder builder =
                     mCamera2.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             float fpsValue = SettingsUtils.findStreamFps(getApplicationContext(), Objects.requireNonNull(mEglManager.findCameraInfo().fpsRanges));
