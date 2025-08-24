@@ -1,1 +1,0 @@
-/Users/jahan/Desktop/Projects/My_Recorder/app/src/main/cpp/CMakeLists.txt
