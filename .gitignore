@@ -1,116 +1,75 @@
-# Built application files
-*.apk
-*.aar
-*.ap_
-*.aab
-
-# Files for the ART/Dalvik VM
-*.dex
-
-# Java class files
-*.class
-
-# Generated files
-bin/
-gen/
-out/
-
 # Gradle files
 .gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
 
-# Local configuration file (e.g., SDK paths)
+# Local configuration file (SDK configuration)
 local.properties
 
-# Log/OS Files
+# Android Studio specific
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# User-specific files
 *.log
-*.log.*
 *.swp
+
+# OS-specific files
 .DS_Store
 Thumbs.db
 
-# Android Studio/IntelliJ
+# Android build output
+*.apk
+*.ap_
+*.dex
+*.class
+
+# IntelliJ IDEA specific
 .idea/
 *.iml
+
+# Node.js
+node_modules/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# JetBrains specific
+.idea/
 *.iws
-*.ipr
-.navigation/
-captures/
-.idea_modules/
-
-# Android Profiling
-*.hprof
-
-# Keystore files
-*.jks
-*.keystore
-
-# Firebase/Google Services (if used)
-google-services.json
-google-services.json.license
-google-services.xml
-
-# Fastlane (if used)
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots
-fastlane/test_output
-
-# Build artifacts
-app/build/
-**/build/
-
-# NDK
-.externalNativeBuild/
-.cxx/
-obj/
-
-# CMake
-cmake-build-*/
-
-# Generated code (e.g., Room, Dagger, etc)
-**/build/generated/
+*.iml
 
 # Logs
-logs/
+*.log
 
-# Environment files
-.env
-.env.local
+# Crashlytics specific
+crashlytics-build.properties
 
-# BUCK build (if not used)
-buck-out/
-.buckconfig.local
+# Test and coverage results
+/coverage/
+/test-logs/
+/test-results/
 
-# VSCode (optional)
-.vscode/
-
-# macOS
-._*
-
-# Windows
-[Tt]humbs.db
-
-# Backup files
+# Temporary files
 *.bak
-*.orig
+*.swp
+*.swo
+*.tmp
 
-# Kotlin
-*.kotlin_module
+# Flutter specific (if applicable)
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.dart_tool/
 
-# Kapt
-**/kapt/
-
-# Annotation Processors
-**/annotation_processed/
-
-# Exclude version control
-*.vscode/
-*.svn/
-
-
-
-# Exclude test coverage
-coverage/
-.nyc_output/
+# Android specific generated files
+/app/build/
+/app/libs/
+*.apk
+*.ap_ 
+*.dex
+*.class
