@@ -81,7 +81,7 @@
                             android:textStyle="bold" />
 
                     </LinearLayout>
-          <LinearLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
@@ -1191,24 +1191,7 @@
                                 android:inputType="number" />
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
 
-                            <TextView
-                                style="@style/normalText"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/adaptive_mode" />
-
-                            <com.checkmate.android.ui.view.MySpinner
-                                android:id="@+id/spinner_cast_adaptive"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                        </LinearLayout>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -1481,108 +1464,108 @@
                     android:orientation="vertical"
                     android:padding="@dimen/margin_normal">
 
-                <TextView
-                    style="@style/normalText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Audio Options"
-                    android:textSize="@dimen/textsize_large"
-                    android:textStyle="bold" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
                     <TextView
                         style="@style/normalText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Sound Settings" />
-
-                    <com.checkmate.android.ui.view.MySpinner
-                        android:id="@+id/audio_src"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        style="@style/normalText"
-                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Preferred Microphone" />
+                        android:text="Audio Options"
+                        android:textSize="@dimen/textsize_large"
+                        android:textStyle="bold" />
 
-                    <com.checkmate.android.ui.view.MySpinner
-                        android:id="@+id/audio_pref_mic"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        style="@style/normalText"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/channel_count" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                    <com.checkmate.android.ui.view.MySpinner
-                        android:id="@+id/audio_option_channel_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
+                        <TextView
+                            style="@style/normalText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Sound Settings" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                        <com.checkmate.android.ui.view.MySpinner
+                            android:id="@+id/audio_src"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
 
-                    <TextView
-                        style="@style/normalText"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Bitrate" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                    <com.checkmate.android.ui.view.MySpinner
-                        android:id="@+id/audio_option_bitrate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
+                        <TextView
+                            style="@style/normalText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Preferred Microphone" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                        <com.checkmate.android.ui.view.MySpinner
+                            android:id="@+id/audio_pref_mic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
 
-                    <TextView
-                        style="@style/normalText"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/sample_rate" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                    <com.checkmate.android.ui.view.MySpinner
-                        android:id="@+id/audio_option_sample_rate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
+                        <TextView
+                            style="@style/normalText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/channel_count" />
+
+                        <com.checkmate.android.ui.view.MySpinner
+                            android:id="@+id/audio_option_channel_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/normalText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Bitrate" />
+
+                        <com.checkmate.android.ui.view.MySpinner
+                            android:id="@+id/audio_option_bitrate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            style="@style/normalText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/sample_rate" />
+
+                        <com.checkmate.android.ui.view.MySpinner
+                            android:id="@+id/audio_option_sample_rate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -1799,29 +1782,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
 
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
-
-                        <TextView
-                            android:id="@+id/txt_update"
-                            style="@style/normalText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="right"
-                            android:text="@string/update_now"
-                            android:textColor="@color/teal"
-                            android:textSize="@dimen/textsize_large"
-                            android:textStyle="bold" />
                     </LinearLayout>
 
                     <LinearLayout

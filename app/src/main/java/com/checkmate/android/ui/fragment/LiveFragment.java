@@ -22,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -40,7 +41,7 @@ import com.checkmate.android.networking.Responses;
 import com.checkmate.android.networking.RestApiService;
 import com.checkmate.android.service.LocationManagerService;
 import com.checkmate.android.service.MyAccessibilityService;
-import com.checkmate.android.ui.view.MySpinner;
+
 import com.checkmate.android.util.AudioLevelMeter;
 import com.checkmate.android.util.CommonUtil;
 import com.checkmate.android.util.DeviceUtils;
@@ -73,7 +74,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     // UI Components  
     public ConstraintLayout frame_camera;
     public FrameLayout ly_cast;
-    public FrameLayout ly_audio;
+    public TextView ly_audio;
     public LinearLayout ly_menu;
     public LinearLayout ly_stream;
     public LinearLayout ly_rotate;
@@ -93,8 +94,9 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     public TextView txt_sel;
     public TextView txt_rec;
     public TextView txt_snapshot;
-    public MySpinner spinner_camera;
-    public MySpinner spinner_rotate;
+    public Spinner spinner_camera;
+    public Spinner spinner_rotate;
+    public LinearLayout top_spinners_container;
     public TextureView textureView;
     public AudioLevelMeter mVuMeter;
 
@@ -218,6 +220,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         
         spinner_camera = mView.findViewById(R.id.spinner_camera);
         spinner_rotate = mView.findViewById(R.id.spinner_rotate);
+        top_spinners_container = mView.findViewById(R.id.top_spinners_container);
         
         // TextureView is in the included layout
         textureView = mView.findViewById(R.id.preview_afl);
@@ -694,8 +697,16 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (cam_adapter == null) {
                     initCameraSpinner();
                 }
-                mListener.isDialog(true);
-                spinner_camera.performClick();
+                // Toggle top spinners container visibility
+                if (top_spinners_container != null) {
+                    if (top_spinners_container.getVisibility() == View.VISIBLE) {
+                        top_spinners_container.setVisibility(View.GONE);
+                    } else {
+                        top_spinners_container.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    Log.e(TAG, "top_spinners_container is null in OnClick ly_camera_type");
+                }
                 break;
             case R.id.ly_rotate:
                 if (adapter == null) {
@@ -704,11 +715,15 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (mActivityRef != null && mActivityRef.get() != null && (is_rec || mActivityRef.get().isWifiRecording())) {
                     return;
                 }
-                mListener.isDialog(true);
-                if (is_camera_opened) {
-                    spinner_rotate.performClick();
+                // Toggle top spinners container visibility
+                if (top_spinners_container != null) {
+                    if (top_spinners_container.getVisibility() == View.VISIBLE) {
+                        top_spinners_container.setVisibility(View.GONE);
+                    } else {
+                        top_spinners_container.setVisibility(View.VISIBLE);
+                    }
                 } else {
-                    rotateStream();
+                    Log.e(TAG, "top_spinners_container is null in OnClick ly_rotate");
                 }
                 break;
             case R.id.btn_refresh:
@@ -1329,7 +1344,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             List<RotateModel> models = RotateModel.initialize(mActivityRef.get(), is_rotated, is_flipped, is_mirrored);
             adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, models);
             spinner_rotate.setAdapter(adapter);
-            spinner_rotate.setOnItemSelectedEvenIfUnchangedListener(new AdapterView.OnItemSelectedListener() {
+            spinner_rotate.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                     mListener.isDialog(false);
@@ -1454,19 +1469,25 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (mActivityRef != null && mActivityRef.get() != null) {
             cam_adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, cam_models);
         }
-        spinner_camera.setAdapter(cam_adapter);
-        spinner_camera.setOnItemSelectedEvenIfUnchangedListener(this);
-        spinner_camera.setOnTouchListener((view, motionEvent) -> {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                mListener.isDialog(true);
+        
+        // Check if spinner_camera is available before using it
+        if (spinner_camera != null) {
+            spinner_camera.setAdapter(cam_adapter);
+            spinner_camera.setOnItemSelectedListener(this);
+            spinner_camera.setOnTouchListener((view, motionEvent) -> {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    mListener.isDialog(true);
+                }
+                return false;
+            });
+            if (!is_camera_opened && !is_wifi_opened && !is_audio_only && !is_usb_opened) {
+                int finalSelected_index = selected_index;
+                handler.postDelayed(() -> spinner_camera.setSelection(finalSelected_index), 1000);
             }
-            return false;
-        });
-        if (!is_camera_opened && !is_wifi_opened && !is_audio_only && !is_usb_opened) {
-            int finalSelected_index = selected_index;
-            handler.postDelayed(() -> spinner_camera.setSelectionNew(finalSelected_index), 1000);
+            spinner_camera.requestFocus();
+        } else {
+            Log.e(TAG, "spinner_camera is null in initCameraSpinner");
         }
-        spinner_camera.requestFocus();
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -1530,14 +1551,20 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         if (mActivityRef != null && mActivityRef.get() != null) {
             cam_adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, cam_models);
         }
-        spinner_camera.setAdapter(cam_adapter);
-        spinner_camera.setOnItemSelectedEvenIfUnchangedListener(this);
-        spinner_camera.setOnTouchListener((view, motionEvent) -> {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                mListener.isDialog(true);
-            }
-            return false;
-        });
+        
+        // Check if spinner_camera is available before using it
+        if (spinner_camera != null) {
+            spinner_camera.setAdapter(cam_adapter);
+            spinner_camera.setOnItemSelectedListener(this);
+            spinner_camera.setOnTouchListener((view, motionEvent) -> {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    mListener.isDialog(true);
+                }
+                return false;
+            });
+        } else {
+            Log.e(TAG, "spinner_camera is null in notifyCameraSpinner");
+        }
     }
 
     void playStream(Camera camera) {
