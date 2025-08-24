@@ -1,75 +1,50 @@
-# Gradle files
+# -------- Android / Gradle --------
 .gradle/
-build/
-
-# Local configuration file (SDK configuration)
 local.properties
+**/build/
+**/intermediates/
+**/generated/
+**/outputs/
+captures/
 
-# Android Studio specific
+# Keep the Gradle wrapper (do NOT ignore these)
+!gradle/wrapper/gradle-wrapper.jar
+!gradlew
+!gradlew.bat
+!gradle/wrapper/gradle-wrapper.properties
+
+# -------- NDK / CMake --------
+**/.cxx/
+**/.externalNativeBuild/
+**/obj/
+**/cmake-build-*/
+**/*.ninja
+**/*.ninja_deps
+**/*.ninja_log
+**/CMakeCache.txt
+**/CMakeFiles/
+**/cmake_install.cmake
+**/compile_commands.json
+**/Makefile
+**/Testing/
+
+# -------- IDE --------
 .idea/
 *.iml
 *.ipr
 *.iws
 
-# User-specific files
-*.log
-*.swp
-
-# OS-specific files
-.DS_Store
-Thumbs.db
-
-# Android build output
-*.apk
-*.ap_
-*.dex
-*.class
-
-# IntelliJ IDEA specific
-.idea/
-*.iml
-
-# Node.js
-node_modules/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# JetBrains specific
-.idea/
-*.iws
-*.iml
-
-# Logs
-*.log
-
-# Crashlytics specific
-crashlytics-build.properties
-
-# Test and coverage results
-/coverage/
-/test-logs/
-/test-results/
-
-# Temporary files
-*.bak
-*.swp
-*.swo
-*.tmp
-
-# Flutter specific (if applicable)
+# -------- Flutter (if used) --------
+.dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 .packages
-.dart_tool/
 
-# Android specific generated files
-/app/build/
-/app/libs/
-*.apk
-*.ap_ 
-*.dex
-*.class
+# -------- OS / misc --------
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak

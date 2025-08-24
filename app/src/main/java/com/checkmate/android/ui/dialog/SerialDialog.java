@@ -45,12 +45,12 @@ public class SerialDialog extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_serial);
         setCancelable(false);
-                btn_ok = findViewById(R.id.btn_ok);
+        btn_ok = findViewById(R.id.btn_ok);
         btn_close = findViewById(R.id.btn_close);
         img_help = findViewById(R.id.img_help);
         btn_qr = findViewById(R.id.btn_qr);
         txt_content = findViewById(R.id.txt_content);
-
+        edt_serial = findViewById(R.id.edt_serial);
     }
 
     @Override
