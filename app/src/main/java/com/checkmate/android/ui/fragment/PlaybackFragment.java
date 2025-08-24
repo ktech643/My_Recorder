@@ -241,31 +241,36 @@ public class PlaybackFragment extends BaseFragment
 
     private void openVideo(Media media) {
         if (media.is_encrypted) {
-            decryptAndOpen(media, "video/mp4");
+            decryptAndOpenVideo(media);
         } else {
-            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-            Uri contentUri = media.contentUri;
-            viewIntent.setType("video/mp4");
-            viewIntent.setDataAndType(contentUri, "video/*");
-            viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(viewIntent, null));
+            Intent intent = new Intent(getActivity(), com.checkmate.android.ui.activity.VideoPlayerActivity.class);
+            intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_URI, media.contentUri);
+            intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_NAME, media.name);
+            intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_IS_ENCRYPTED, media.is_encrypted);
+            intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_DATE, media.date.getTime());
+            intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_SIZE, media.fileSize);
+            intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_DURATION, media.duration);
+            intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_WIDTH, media.resolutionWidth);
+            intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_HEIGHT, media.resolutionHeight);
+            startActivity(intent);
         }
     }
 
     private void openImage(Media media) {
         if (media.is_encrypted) {
-            decryptAndOpen(media, "image/*");
+            decryptAndOpenImage(media);
         } else {
-            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-            Uri contentUri = media.contentUri;
-            viewIntent.setType("image/*");
-            viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            viewIntent.setDataAndType(contentUri, "image/*");
-            startActivity(Intent.createChooser(viewIntent, null));
+            Intent intent = new Intent(getActivity(), com.checkmate.android.ui.activity.ImageViewerActivity.class);
+            intent.putExtra(com.checkmate.android.ui.activity.ImageViewerActivity.EXTRA_IMAGE_URI, media.contentUri);
+            intent.putExtra(com.checkmate.android.ui.activity.ImageViewerActivity.EXTRA_IMAGE_NAME, media.name);
+            intent.putExtra(com.checkmate.android.ui.activity.ImageViewerActivity.EXTRA_IS_ENCRYPTED, media.is_encrypted);
+            intent.putExtra(com.checkmate.android.ui.activity.ImageViewerActivity.EXTRA_IMAGE_DATE, media.date.getTime());
+            intent.putExtra(com.checkmate.android.ui.activity.ImageViewerActivity.EXTRA_IMAGE_SIZE, media.fileSize);
+            startActivity(intent);
         }
     }
 
-    private void decryptAndOpen(Media media, String mimeType) {
+    private void decryptAndOpenVideo(Media media) {
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(getActivity());
         builder.setTitle("Enter Password");
         final android.widget.EditText input = new android.widget.EditText(getActivity());
@@ -278,10 +283,49 @@ public class PlaybackFragment extends BaseFragment
                 boolean result = decryptFile(media.contentUri, tempDecryptedFile, password);
                 if (result) {
                     Uri fileUri = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName() + ".provider", tempDecryptedFile);
-                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    viewIntent.setDataAndType(fileUri, mimeType);
-                    viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(Intent.createChooser(viewIntent, null));
+                    Intent intent = new Intent(getActivity(), com.checkmate.android.ui.activity.VideoPlayerActivity.class);
+                    intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_URI, fileUri);
+                    intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_NAME, media.name);
+                    intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_IS_ENCRYPTED, true);
+                    intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_DATE, media.date.getTime());
+                    intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_SIZE, media.fileSize);
+                    intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_DURATION, media.duration);
+                    intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_WIDTH, media.resolutionWidth);
+                    intent.putExtra(com.checkmate.android.ui.activity.VideoPlayerActivity.EXTRA_VIDEO_HEIGHT, media.resolutionHeight);
+                    startActivity(intent);
+                } else {
+                    MessageUtil.showToast(getActivity(), "Failed to decrypt");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                MessageUtil.showToast(getActivity(), e.getLocalizedMessage());
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private void decryptAndOpenImage(Media media) {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(getActivity());
+        builder.setTitle("Enter Password");
+        final android.widget.EditText input = new android.widget.EditText(getActivity());
+        input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            String password = input.getText().toString();
+            try {
+                String extension = media.name.toLowerCase().endsWith(".t3j") ? ".jpg" : ".jpg";
+                File tempDecryptedFile = File.createTempFile("temp_decrypted", extension, getActivity().getCacheDir());
+                boolean result = decryptFile(media.contentUri, tempDecryptedFile, password);
+                if (result) {
+                    Uri fileUri = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName() + ".provider", tempDecryptedFile);
+                    Intent intent = new Intent(getActivity(), com.checkmate.android.ui.activity.ImageViewerActivity.class);
+                    intent.putExtra(com.checkmate.android.ui.activity.ImageViewerActivity.EXTRA_IMAGE_URI, fileUri);
+                    intent.putExtra(com.checkmate.android.ui.activity.ImageViewerActivity.EXTRA_IMAGE_NAME, media.name);
+                    intent.putExtra(com.checkmate.android.ui.activity.ImageViewerActivity.EXTRA_IS_ENCRYPTED, true);
+                    intent.putExtra(com.checkmate.android.ui.activity.ImageViewerActivity.EXTRA_IMAGE_DATE, media.date.getTime());
+                    intent.putExtra(com.checkmate.android.ui.activity.ImageViewerActivity.EXTRA_IMAGE_SIZE, media.fileSize);
+                    startActivity(intent);
                 } else {
                     MessageUtil.showToast(getActivity(), "Failed to decrypt");
                 }
