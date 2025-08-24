@@ -34,9 +34,9 @@ public class InviteDialog extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_email);
         setCancelable(false);
-        btn_ok = findViewById(R.id.btn_ok);
+                btn_ok = findViewById(R.id.btn_ok);
         btn_close = findViewById(R.id.btn_close);
-        edt_email = findViewById(R.id.edt_email);
+
     }
 
     @Override
