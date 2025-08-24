@@ -1012,24 +1012,32 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     void stopServices() {
         if (mActivityRef != null && mActivityRef.get() != null) {
             MainActivity activity = mActivityRef.get();
-            // Stop camera service first
-            if (activity.mCamService != null) {
-                activity.mCamService.stopSafe();
-                activity.mCamService = null;
-            }
-            mListener.stopFragBgCamera();
             
-            // Stop other services
-            if (is_usb_opened) {
+            // Stop all services and ensure they are properly unbound
+            // This prevents ServiceConnection leaks
+            
+            // Stop camera service
+            if (activity.isCamServiceBond || activity.mCamService != null) {
+                mListener.stopFragBgCamera();
+            }
+            
+            // Stop USB service
+            if (activity.isUsbServiceBound || activity.mUSBService != null) {
                 mListener.stopFragUSBService();
             }
-            if (is_wifi_opened) {
+            
+            // Stop WiFi service
+            if (activity.mWifiService != null) {
                 mListener.stopFragWifiService();
             }
-            if (is_cast_opened) {
+            
+            // Stop cast service
+            if (activity.isCastServiceBound || activity.mCastService != null) {
                 mListener.stopFragBgCast();
             }
-            if (is_audio_only) {
+            
+            // Stop audio service
+            if (activity.isAudioServiceBound || activity.mAudioService != null) {
                 mListener.stopFragAudio();
             }
         }
@@ -1044,12 +1052,18 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, false);
             AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
 
+            // Stop all services first and wait for them to properly unbind
             stopServices();
-            scheduleServiceInit(() -> mListener.initFragService());
-
-            updateDeviceInfo();
-            checkCamService(true);
-            updateSharedViewModel();
+            
+            // Add a longer delay to ensure services are fully stopped
+            handler.postDelayed(() -> {
+                if (isAdded() && getActivity() != null) {
+                    mListener.initFragService();
+                    updateDeviceInfo();
+                    checkCamService(true);
+                    updateSharedViewModel();
+                }
+            }, 500);
         } catch (Exception e) {
             handleError("Error in handleRearCameraSelection", e);
         }
@@ -1064,12 +1078,18 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, false);
             AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.FRONT_CAMERA);
 
+            // Stop all services first and wait for them to properly unbind
             stopServices();
-            scheduleServiceInit(() -> mListener.initFragService());
-
-            updateDeviceInfo();
-            checkCamService(false);
-            updateSharedViewModel();
+            
+            // Add a longer delay to ensure services are fully stopped
+            handler.postDelayed(() -> {
+                if (isAdded() && getActivity() != null) {
+                    mListener.initFragService();
+                    updateDeviceInfo();
+                    checkCamService(false);
+                    updateSharedViewModel();
+                }
+            }, 500);
         } catch (Exception e) {
             handleError("Error in handleFrontCameraSelection", e);
         }
@@ -1141,7 +1161,8 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         }
     }
     private void scheduleServiceInit(Runnable initAction) {
-        handler.postDelayed(initAction, UI_UPDATE_DELAY);
+        // Increased delay to ensure proper service cleanup
+        handler.postDelayed(initAction, 800);
     }
 
     private void handleUSBCameraSelection() {
@@ -1151,11 +1172,19 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             is_usb_opened = true;
 
             AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, true);
-            USBCameraAction();
-
-            updateUSBCameraUI();
-            updateDeviceInfo();
-            updateSharedViewModel();
+            
+            // Stop all services first
+            stopServices();
+            
+            // Wait for services to stop before starting USB camera
+            handler.postDelayed(() -> {
+                if (isAdded() && getActivity() != null) {
+                    USBCameraAction();
+                    updateUSBCameraUI();
+                    updateDeviceInfo();
+                    updateSharedViewModel();
+                }
+            }, 500);
         } catch (Exception e) {
             handleError("Error in handleUSBCameraSelection", e);
         }
@@ -1191,9 +1220,17 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             }
 
             updateScreenCastUI();
+            
+            // Stop all services first
             stopServices();
-            scheduleServiceInit(() -> mListener.initFragCastService());
-            updateSharedViewModel();
+            
+            // Wait before starting cast service
+            handler.postDelayed(() -> {
+                if (isAdded() && getActivity() != null) {
+                    mListener.initFragCastService();
+                    updateSharedViewModel();
+                }
+            }, 500);
         } catch (Exception e) {
             handleError("Error in handleScreenCastSelection", e);
         }
@@ -1208,9 +1245,6 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
 
     private void handleAudioOnlySelection() {
         try {
-            // First stop all existing services
-            stopServices();
-            
             // Reset all states
             prepareCameraSelection();
             currentState = CameraState.AUDIO_ONLY;
@@ -1227,22 +1261,17 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             // Update UI
             updateAudioOnlyUI();
             
+            // Stop all existing services
+            stopServices();
+            
             // Initialize audio service with a delay to ensure previous services are stopped
             handler.postDelayed(() -> {
                 if (isAdded() && getActivity() != null) {
-                    // Double check that camera service is stopped
-                    if (mActivityRef != null && mActivityRef.get() != null) {
-                        MainActivity activity = mActivityRef.get();
-                        if (activity.mCamService != null) {
-                            activity.mCamService.stopSafe();
-                            activity.mCamService = null;
-                        }
-                    }
                     mListener.initFragAudioService();
                     updateSharedViewModel();
                     scheduleAudioCheck();
                 }
-            }, UI_UPDATE_DELAY);
+            }, 500);
 
         } catch (Exception e) {
             handleError("Error in handleAudioOnlySelection", e);
@@ -1532,15 +1561,15 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     }
 
     public void USBCameraAction() {
-
         is_audio_only = false;
         is_cast_opened = false;
         is_usb_opened = true;
         is_camera_opened = false;
         streaming_camera = null;
         AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.USB_CAMERA);
-        stopServices();
-        handler.postDelayed(() -> mListener.fragInitBGUSBService(), 500);
+        
+        // Don't call stopServices here as it's already called in handleUSBCameraSelection
+        mListener.fragInitBGUSBService();
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (mActivityRef != null && mActivityRef.get() != null) {
                 if (mActivityRef.get().mUSBService != null) {
