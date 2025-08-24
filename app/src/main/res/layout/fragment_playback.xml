@@ -64,20 +64,37 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_margin="5dp">
+            android:layout_margin="5dp"
+            android:background="@drawable/round_border_background"
+            android:padding="8dp">
+            
             <TextView
                 android:id="@+id/tv_storage_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Storage Location"
+                android:text="Storage Sources"
                 android:textStyle="bold"
-                />
+                android:textColor="@color/blue"
+                android:textSize="14sp" />
+                
             <TextView
                 android:id="@+id/tv_storage_path"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-                />
+                android:layout_marginTop="4dp"
+                android:textSize="12sp"
+                android:textColor="@color/text_light" />
+                
+            <TextView
+                android:id="@+id/tv_refresh_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Pull down to refresh from all sources"
+                android:textSize="10sp"
+                android:textColor="@color/gray_dark"
+                android:textStyle="italic" />
+                
         </LinearLayout>
         <com.checkmate.android.ui.view.DragListView
             android:id="@+id/list_view"
