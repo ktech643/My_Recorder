@@ -827,4 +827,6 @@ Stream resolution is 1280x720."</string>
     <string name="audio_only_txt">Audio Only</string>
     <string name="error_camera_selection">Problem in camera selection.</string>
     <string name="enable_location_message">GPS:ON - Enable location from settings</string>
+    <string name="select_camera">Select Camera</string>
+    <string name="rotation_settings">Rotation Settings</string>
 </resources>

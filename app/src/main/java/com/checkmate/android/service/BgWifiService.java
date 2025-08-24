@@ -150,7 +150,7 @@ public class BgWifiService extends Service {
         stopAPICalling();
     }
 
-    private void stopSafe() {
+    public void stopSafe() {
         BgWifiService.this.stopSelf();
     }
 

@@ -18,7 +18,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityManager;
-import android.widget.AdapterView;
+// import android.widget.AdapterView; // Removed - was for old spinner implementation
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,7 +32,7 @@ import com.checkmate.android.AppConstant;
 import com.checkmate.android.AppPreference;
 import com.checkmate.android.BuildConfig;
 import com.checkmate.android.R;
-import com.checkmate.android.adapter.SpinnerAdapter;
+// import com.checkmate.android.adapter.SpinnerAdapter; // Removed - was for old spinner implementation
 import com.checkmate.android.database.DBManager;
 import com.checkmate.android.model.Camera;
 import com.checkmate.android.model.RotateModel;
@@ -40,12 +40,14 @@ import com.checkmate.android.networking.Responses;
 import com.checkmate.android.networking.RestApiService;
 import com.checkmate.android.service.LocationManagerService;
 import com.checkmate.android.service.MyAccessibilityService;
-import com.checkmate.android.ui.view.MySpinner;
+// import com.checkmate.android.ui.view.MySpinner; // Removed - was for old spinner implementation
 import com.checkmate.android.util.AudioLevelMeter;
 import com.checkmate.android.util.CommonUtil;
 import com.checkmate.android.util.DeviceUtils;
 import com.checkmate.android.util.MainActivity;
 import com.checkmate.android.util.MessageUtil;
+import com.checkmate.android.ui.dialog.CameraSelectionBottomSheet;
+import com.checkmate.android.ui.dialog.RotationBottomSheet;
 import com.checkmate.android.viewmodels.EventType;
 import com.checkmate.android.viewmodels.SharedViewModel;
 import com.kongzue.dialogx.dialogs.MessageDialog;
@@ -62,7 +64,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 @SuppressLint("NonConstantResourceId")
-public class LiveFragment extends BaseFragment implements AdapterView.OnItemSelectedListener {
+public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSelectedListener - was for old spinner implementation
     private static final String TAG = "LiveFragment";
     private static WeakReference<LiveFragment> instance;
     private WeakReference<MainActivity> mActivityRef;
@@ -92,8 +94,8 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     public TextView txt_sel;
     public TextView txt_rec;
     public TextView txt_snapshot;
-    public MySpinner spinner_camera;
-    public MySpinner spinner_rotate;
+    // public MySpinner spinner_camera; // Removed - was for old spinner implementation
+    // public MySpinner spinner_rotate; // Removed - was for old spinner implementation
     public TextureView textureView;
     public AudioLevelMeter mVuMeter;
 
@@ -108,15 +110,13 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     public int is_rotated = AppConstant.is_rotated_0;
     // Data
     public List<Camera> db_cams = DBManager.getInstance().getCameras();
-    public List<String> cam_spinnerArray = new ArrayList<>();
-    public List<RotateModel> cam_models;
-    public SpinnerAdapter cam_adapter;
-    public SpinnerAdapter adapter;
+    // Removed old spinner-related fields - was for old spinner implementation
+    // Keep spinner_camera as placeholder for compatibility with MyHttpServer
+    public Object spinner_camera; // Placeholder for compatibility
     public Camera streaming_camera = null;
 
     // Handlers
     private final Handler handler = new Handler(Looper.getMainLooper());
-    private int origin_count = 0;
     private String m_wifi_in = "", m_wifi_out = "";
     private boolean isRetry = true;
 
@@ -215,8 +215,8 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         txt_rec = mView.findViewById(R.id.txt_rec);
         txt_snapshot = mView.findViewById(R.id.txt_snapshot);
         
-        spinner_camera = mView.findViewById(R.id.spinner_camera);
-        spinner_rotate = mView.findViewById(R.id.spinner_rotate);
+        // spinner_camera = mView.findViewById(R.id.spinner_camera); // Removed - was for old spinner implementation
+        // spinner_rotate = mView.findViewById(R.id.spinner_rotate); // Removed - was for old spinner implementation
         
         // TextureView is in the included layout
         textureView = mView.findViewById(R.id.preview_afl);
@@ -346,16 +346,16 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
             mListener.initFragCastService();
             ly_audio.setVisibility(View.GONE);
             ly_cast.setVisibility(View.VISIBLE);
-            initialize();
+            // initialize(); // Removed - was for old spinner implementation
             checkAndAutoStart();
         } else if (is_audio_only) {
             mListener.initFragAudioService();
             ly_cast.setVisibility(View.GONE);
             ly_audio.setVisibility(View.VISIBLE);
-            initialize();
+            // initialize(); // Removed - was for old spinner implementation
             checkAndAutoStart();
         } else {
-            initialize();
+            // initialize(); // Removed - was for old spinner implementation
         }
     }
 
@@ -394,12 +394,8 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (is_camera_opened || is_usb_opened || is_audio_only) {
                     boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
                     if (is_audio_only) {
-                        if (isAudioEnabled) {
-                            activity.startStream();
-                            streamStarted = activity.isStreaming();
-                        } else {
-                            showAudioEnablePopup();
-                        }
+                        activity.startStream();
+                        streamStarted = activity.isStreaming();
                     } else {
                         activity.startStream();
                         streamStarted = activity.isStreaming();
@@ -434,14 +430,10 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                     recordStarted = activity.isCastRecording();
                 } else if (is_audio_only && !activity.isAudioRecording()) {
                     boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
-                    if (isAudioEnabled) {
-                        activity.startRecord();
-                        recordStarted = activity.isAudioRecording();
-                        if (recordStarted) {
-                            ic_rec.setImageResource(R.mipmap.ic_radio_active);
-                        }
-                    } else {
-                        showAudioEnablePopup();
+                    activity.startRecord();
+                    recordStarted = activity.isAudioRecording();
+                    if (recordStarted) {
+                        ic_rec.setImageResource(R.mipmap.ic_radio_active);
                     }
                 } else if (!activity.isWifiRecording()) {
                     activity.startRecordStream();
@@ -511,7 +503,7 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 wifiCameraStarted((String) data);
                 break;
             case INIT_FUN_LIVE_FRAG:
-                initialize();
+                // initialize(); // Removed - was for old spinner implementation
                 break;
             case HANDLE_CAMERA_VIEW_LIVE:
                 handleCameraView();
@@ -528,10 +520,10 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 handleStreamView();
                 break;
             case NOTIFY_CAM_SPINNER_LIVE:
-                notifyCameraSpinner();
+                // notifyCameraSpinner(); // Removed - was for old spinner implementation
                 break;
             case INIT_CAM_SPINNER_LIVE:
-                initCameraSpinner();
+                // initCameraSpinner(); // Removed - was for old spinner implementation
                 break;
         }
     }
@@ -695,25 +687,13 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     public void OnClick(View view) {
         switch (view.getId()) {
             case R.id.ly_camera_type:
-                if (cam_adapter == null) {
-                    initCameraSpinner();
-                }
-                mListener.isDialog(true);
-                spinner_camera.performClick();
+                showCameraSelectionBottomSheet();
                 break;
             case R.id.ly_rotate:
-                if (adapter == null) {
-                    initialize();
-                }
                 if (mActivityRef != null && mActivityRef.get() != null && (is_rec || mActivityRef.get().isWifiRecording())) {
                     return;
                 }
-                mListener.isDialog(true);
-                if (is_camera_opened) {
-                    spinner_rotate.performClick();
-                } else {
-                    rotateStream();
-                }
+                showRotationBottomSheet();
                 break;
             case R.id.btn_refresh:
                 if (streaming_camera != null) playStream(streaming_camera);
@@ -731,285 +711,31 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         }
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-        if (!isValidFragmentState()) {
-            return;
-        }
+    // Removed onItemSelected and onNothingSelected - was for old spinner implementation
 
-        try {
-            // Store current streaming state
-            boolean wasStreaming = AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false);
+    // Removed isValidFragmentState - was for old spinner implementation
 
-            // Reset all states first
-            resetAllStates();
+    // Removed getSelectedItem - was for old spinner implementation
 
-            // Stop any existing streaming
-            stopExistingStreaming();
+    // Removed resetAllStates - was for old spinner implementation
 
-            String item = getSelectedItem(position);
-            if (item == null) {
-                return;
-            }
+    // Removed resetUIElements - was for old spinner implementation
 
-            enableRecordingSettings(true);
-            handleCameraSelection(item, position);
+    // Removed stopExistingStreaming - was for old spinner implementation
 
-            // Force UI update on main thread
-            updateUIOnMainThread(position);
+    // Removed handleCameraSelection - was for old spinner implementation
 
-            // Restart streaming if it was active
-            if (wasStreaming && mActivityRef != null && mActivityRef.get() != null) {
-                MainActivity activity = mActivityRef.get();
-                // First ensure preview is properly initialized
-                if (is_camera_opened || is_usb_opened) {
-                    forceTextureViewRefresh();
-                    handler.postDelayed(() -> {
-                        if (activity != null && !activity.isFinishing()) {
-                            activity.startStream();
-                            ic_stream.setImageResource(R.mipmap.ic_stream_active);
-                        }
-                    }, 1500);
-                } else if (is_cast_opened) {
-                    handler.postDelayed(() -> {
-                        if (activity != null && !activity.isFinishing()) {
-                            activity.onCastStream();
-                            ic_stream.setImageResource(R.mipmap.ic_stream_active);
-                        }
-                    }, 1500);
-                } else if (is_audio_only) {
-                    boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
-                    forceTextureViewRefresh();
-                    if (isAudioEnabled) {
-                        handler.postDelayed(() -> {
-                            if (activity != null && !activity.isFinishing()) {
-                                activity.startStream();
-                                ic_stream.setImageResource(R.mipmap.ic_stream_active);
-                            }
-                        }, 1500);
-                    }
-                } else if (AppConstant.is_library_use && activity.mWifiService != null) {
-                    handler.postDelayed(() -> {
-                        forceTextureViewRefresh();
-                        if (activity != null && !activity.isFinishing()) {
-                            activity.startWifiStreaming();
-                            ic_stream.setImageResource(R.mipmap.ic_stream_active);
-                        }
-                    }, 1500);
-                }
-            }
+    // Removed handleWifiCameraSelection - was for old spinner implementation
 
-        } catch (Exception e) {
-            handleError("Error in onItemSelected", e);
-        }
-    }
+    // Removed updateUIOnMainThread - was for old spinner implementation
 
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
+    // Removed updateSpinnerSelection - was for old spinner implementation
 
-    }
+    // Removed updateAdapter - was for old spinner implementation
 
-    private boolean isValidFragmentState() {
-        if (!isAdded() || getContext() == null) {
-            Log.e(TAG, "Fragment is not attached to a context in onItemSelected()");
-            return false;
-        }
-        return true;
-    }
+    // Removed handleError - was for old spinner implementation
 
-    private String getSelectedItem(int position) {
-        if (position < 0 || position >= cam_spinnerArray.size()) {
-            Log.e(TAG, "Invalid position: " + position);
-            return null;
-        }
-        return cam_spinnerArray.get(position);
-    }
-
-    private void resetAllStates() {
-        // Reset state flags
-        is_camera_opened = false;
-        is_usb_opened = false;
-        is_cast_opened = false;
-        is_audio_only = false;
-        is_wifi_opened = false;
-        currentState = CameraState.NONE;
-
-        // Reset UI elements
-        resetUIElements();
-    }
-
-    private void resetUIElements() {
-        if (!isAdded() || getActivity() == null) {
-            return;
-        }
-
-        getActivity().runOnUiThread(() -> {
-            try {
-                ly_cast.setVisibility(View.GONE);
-                ly_audio.setVisibility(View.GONE);
-                frame_camera.setVisibility(View.GONE);
-                mVuMeter.setVisibility(View.INVISIBLE);
-            } catch (Exception e) {
-                Log.e(TAG, "Error resetting UI elements: " + e.getMessage(), e);
-            }
-        });
-    }
-
-    private void stopExistingStreaming() {
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            MainActivity activity = mActivityRef.get();
-            if (activity.isCamStreaming()) {
-                activity.stopCamStream();
-            } else if (activity.isCastStreaming()) {
-                activity.stopCastStream();
-            } else if (activity.isAudioStreaming()) {
-                activity.stopAudioStream();
-            } else if (activity.isUSBStreaming()) {
-                activity.stopUsbStream();
-            } else if (activity.isWifiStreaming()) {
-                activity.stopWifiStreaming();
-            }
-        }
-    }
-
-    private void handleCameraSelection(String item, int position) {
-        if (TextUtils.equals(getString(R.string.rear_camera), item)) {
-            handleRearCameraSelection();
-        } else if (TextUtils.equals(getString(R.string.front_camera), item)) {
-            handleFrontCameraSelection();
-        } else if (TextUtils.equals(getString(R.string.usb_camera), item)) {
-            handleUSBCameraSelection();
-        } else if (TextUtils.equals(getString(R.string.screen_cast), item)) {
-            handleScreenCastSelection();
-        } else if (TextUtils.equals(getString(R.string.audio_only_text), item)) {
-            handleAudioOnlySelection();
-        } else {
-            handleWifiCameraSelection(position);
-        }
-    }
-
-    private void handleWifiCameraSelection(int position) {
-        ly_cast.setVisibility(View.GONE);
-        is_cast_opened = false;
-        is_usb_opened = false;
-        mListener.stopFragBgCamera();
-        mListener.fragInitBGWifiService();
-        mListener.stopFragUSBService();
-        mListener.stopFragAudio();
-        Camera wifi_cam = db_cams.get(position - origin_count);
-        is_camera_opened = false;
-        streaming_camera = wifi_cam;
-        mListener.setFragStreamingCamera(wifi_cam);
-        AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, wifi_cam.camera_name);
-        if (isAdded() && getActivity() != null) {
-            sharedViewModel.setCameraOpened(is_camera_opened);
-        }
-        if (!TextUtils.isEmpty(wifi_cam.wifi_ssid)) {
-            String wifi_ssid = wifi_cam.wifi_ssid;
-            String ssid = CommonUtil.getWifiSSID(mActivityRef.get());
-            if (!TextUtils.equals(wifi_ssid, ssid)) {
-                mListener.isDialog(true);
-                for (int i = 0; i < cam_spinnerArray.size(); i++) {
-                    cam_models.get(i).is_selected = (i == position);
-                }
-                cam_adapter.notifyDataSetChanged();
-                mListener.isDialog(true);
-                if (TextUtils.isEmpty(wifi_cam.wifi_password)) {
-                    wifi_cam.wifi_password = "12345678";
-                }
-                new AlertDialog.Builder(mActivityRef.get())
-                        .setTitle(R.string.app_name)
-                        .setMessage(String.format(getString(R.string.wifi_warning), wifi_cam.camera_name, wifi_ssid))
-                        .setIcon(R.mipmap.ic_launcher)
-                        .setPositiveButton(R.string.OK, (dialog, whichButton) -> {
-                            dialog.dismiss();
-                            mListener.isDialog(true);
-                            mListener.showDialog();
-                            WifiUtils.withContext(mActivityRef.get())
-                                    .connectWith(wifi_ssid, wifi_cam.wifi_password)
-                                    .setTimeout(15000)
-                                    .onConnectionResult(new ConnectionSuccessListener() {
-                                        @Override
-                                        public void success() {
-                                            mListener.isDialog(false);
-                                            openWifiCamera(wifi_cam);
-                                            setNetworkText(wifi_cam.wifi_in, wifi_cam.wifi_out);
-                                            mListener.dismissDialog();
-                                        }
-                                        @Override
-                                        public void failed(@NonNull ConnectionErrorCode errorCode) {
-                                            MessageUtil.showToast(mActivityRef.get(), R.string.connection_fail);
-                                            mListener.isDialog(false);
-                                            mListener.dismissDialog();
-                                        }
-                                    })
-                                    .start();
-                        })
-                        .setNegativeButton(R.string.CANCEL, (dialog, whichButton) -> {
-                            dialog.dismiss();
-                            mListener.isDialog(false);
-                            openWifiCamera(wifi_cam);
-                            setNetworkText(wifi_ssid, wifi_cam.wifi_out);
-                        })
-                        .show();
-            } else {
-                mListener.isDialog(true);
-                mListener.showDialog();
-                openWifiCamera(wifi_cam);
-            }
-        } else {
-            playStream(wifi_cam);
-        }
-    }
-
-    private void updateUIOnMainThread(int position) {
-        if (!isValidFragmentState()) {
-            return;
-        }
-
-        getActivity().runOnUiThread(() -> {
-            try {
-                updateSpinnerSelection(position);
-                updateAdapter();
-                updateDeviceInfo();
-            } catch (Exception e) {
-                Log.e(TAG, "Error updating UI: " + e.getMessage(), e);
-            }
-        });
-    }
-
-    private void updateSpinnerSelection(int position) {
-        if (spinner_camera != null) {
-            spinner_camera.setSelection(position);
-        }
-    }
-
-    private void updateAdapter() {
-        if (cam_adapter != null) {
-            cam_adapter.notifyDataSetChanged();
-        }
-    }
-
-    private void handleError(String message, Exception e) {
-        Log.e(TAG, message + ": " + e.getMessage(), e);
-        showErrorToUser();
-    }
-
-    private void showErrorToUser() {
-        if (!isValidFragmentState()) {
-            return;
-        }
-
-        getActivity().runOnUiThread(() -> {
-            try {
-                Toast.makeText(getContext(),
-                    getString(R.string.error_camera_selection),
-                    Toast.LENGTH_SHORT).show();
-            } catch (Exception e) {
-                Log.e(TAG, "Error showing error message: " + e.getMessage(), e);
-            }
-        });
-    }
+    // Removed showErrorToUser - was for old spinner implementation
 
     void stopServices() {
         if (mActivityRef != null && mActivityRef.get() != null) {
@@ -1039,41 +765,79 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     private void handleRearCameraSelection() {
         try {
             prepareCameraSelection();
-            currentState = CameraState.REAR_CAMERA;
-            is_camera_opened = true;
-            frame_camera.setVisibility(View.VISIBLE);
-
-            AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, false);
-            AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
-
-            stopServices();
-            scheduleServiceInit(() -> mListener.initFragService());
-
-            updateDeviceInfo();
-            checkCamService(true);
-            updateSharedViewModel();
+            
+            // Use enhanced service switching
+            switchToService(CameraState.REAR_CAMERA, () -> {
+                AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, false);
+                AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
+                mListener.initFragService();
+                checkCamService(true);
+            });
+            
         } catch (Exception e) {
             handleError("Error in handleRearCameraSelection", e);
         }
     }
+    
     private void handleFrontCameraSelection() {
         try {
             prepareCameraSelection();
-            currentState = CameraState.FRONT_CAMERA;
-            is_camera_opened = true;
-            frame_camera.setVisibility(View.VISIBLE);
-
-            AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, false);
-            AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.FRONT_CAMERA);
-
-            stopServices();
-            scheduleServiceInit(() -> mListener.initFragService());
-
-            updateDeviceInfo();
-            checkCamService(false);
-            updateSharedViewModel();
+            
+            // Use enhanced service switching
+            switchToService(CameraState.FRONT_CAMERA, () -> {
+                AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, false);
+                AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.FRONT_CAMERA);
+                mListener.initFragService();
+                checkCamService(false);
+            });
+            
         } catch (Exception e) {
             handleError("Error in handleFrontCameraSelection", e);
+        }
+    }
+
+    private void handleUSBCameraSelection() {
+        try {
+            prepareCameraSelection();
+            
+            // Use enhanced service switching
+            switchToService(CameraState.USB_CAMERA, () -> {
+                AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, true);
+                AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.USB_CAMERA);
+                USBCameraAction();
+                mListener.fragInitBGUSBService();
+            });
+            
+        } catch (Exception e) {
+            handleError("Error in handleUSBCameraSelection", e);
+        }
+    }
+
+    private void handleScreenCastSelection() {
+        try {
+            // Use enhanced service switching
+            switchToService(CameraState.SCREEN_CAST, () -> {
+                AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, false);
+                AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.SCREEN_CAST);
+                mListener.initFragCastService();
+            });
+            
+        } catch (Exception e) {
+            handleError("Error in handleScreenCastSelection", e);
+        }
+    }
+
+    private void handleAudioOnlySelection() {
+        try {
+            // Use enhanced service switching
+            switchToService(CameraState.AUDIO_ONLY, () -> {
+                AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.AUDIO_ONLY);
+                AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, false);
+                mListener.initFragAudioService();
+            });
+            
+        } catch (Exception e) {
+            handleError("Error in handleAudioOnlySelection", e);
         }
     }
 
@@ -1146,369 +910,318 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         handler.postDelayed(initAction, UI_UPDATE_DELAY);
     }
 
-    private void handleUSBCameraSelection() {
-        try {
-            prepareCameraSelection();
-            currentState = CameraState.USB_CAMERA;
-            is_usb_opened = true;
+    // Add missing fields that were referenced
+    private boolean lastStreamingState = false;
+    private long lastApiUpdateTime = 0;
 
-            AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, true);
-            USBCameraAction();
-
-            updateUSBCameraUI();
-            updateDeviceInfo();
-            updateSharedViewModel();
-        } catch (Exception e) {
-            handleError("Error in handleUSBCameraSelection", e);
-        }
-    }
-
-    private void updateUSBCameraUI() {
-        frame_camera.setVisibility(View.VISIBLE);
-
-        MainActivity activity = mActivityRef.get();
-        if (activity != null && activity.mUSBService != null) {
-            activity.mUSBService.isAlertShow = false;
-            activity.mUSBService.isServiceStart = true;
-            activity.mUSBService.isRequest = true;
-            activity.mUSBService.showCameraSelectionDialog();
-        }
-    }
-
-    private void handleScreenCastSelection() {
-        try {
-            currentState = CameraState.SCREEN_CAST;
-            is_cast_opened = true;
-
-            AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, false);
-            AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.SCREEN_CAST);
-
-            // Update spinner selection
-            for (int i = 0; i < cam_spinnerArray.size(); i++) {
-                String val = cam_spinnerArray.get(i);
-                cam_models.get(i).is_selected = TextUtils.equals(val, getString(R.string.screen_cast));
+    /**
+     * Show rotation bottom sheet
+     */
+    private void showRotationBottomSheet() {
+        if (getActivity() == null || !isAdded()) return;
+        
+        RotationBottomSheet bottomSheet = RotationBottomSheet.newInstance(is_rotated, is_flipped, is_mirrored);
+        bottomSheet.setRotationSelectionListener(new RotationBottomSheet.RotationSelectionListener() {
+            @Override
+            public void onRotationSelected(int rotation, boolean isFlipped, boolean isMirrored) {
+                // Update rotation state
+                is_rotated = rotation;
+                is_flipped = isFlipped;
+                is_mirrored = isMirrored;
+                
+                // Apply rotation to camera
+                applyRotationToCamera(rotation, isFlipped, isMirrored);
             }
-            if (cam_adapter != null) {
-                cam_adapter.notifyDataSetChanged();
+            
+            @Override
+            public void onRotationSelectionDismissed() {
+                // Handle dismissal if needed
             }
+        });
+        bottomSheet.show(getChildFragmentManager(), "RotationSelection");
+    }
 
-            updateScreenCastUI();
-            stopServices();
-            scheduleServiceInit(() -> mListener.initFragCastService());
-            updateSharedViewModel();
+    /**
+     * Apply rotation, flip, and mirror settings to the active camera service
+     */
+    private void applyRotationToCamera(int rotation, boolean isFlipped, boolean isMirrored) {
+        try {
+            // Update local state
+            is_rotated = rotation;
+            is_flipped = isFlipped;
+            is_mirrored = isMirrored;
+            
+            // Store in preferences for persistence
+            AppPreference.setInt(AppPreference.KEY.IS_ROTATED, rotation);
+            AppPreference.setBool(AppPreference.KEY.IS_FLIPPED, isFlipped);
+            AppPreference.setBool(AppPreference.KEY.IS_MIRRORED, isMirrored);
+            
+            // Apply to active camera service
+            if (mActivityRef != null && mActivityRef.get() != null) {
+                MainActivity activity = mActivityRef.get();
+                
+                if (is_camera_opened && activity.mCamService != null) {
+                    // Apply to built-in camera service
+                    activity.mCamService.setRotation(rotation);
+                    activity.mCamService.setFlip(isFlipped);
+                    activity.mCamService.setMirror(isMirrored);
+                    Log.d(TAG, "Applied rotation settings to built-in camera: " + rotation + ", flip: " + isFlipped + ", mirror: " + isMirrored);
+                } else if (is_usb_opened && activity.mUSBService != null) {
+                    // Apply to USB camera service
+                    activity.mUSBService.setRotation(rotation);
+                    activity.mUSBService.setFlip(isFlipped);
+                    activity.mUSBService.setMirror(isMirrored);
+                    Log.d(TAG, "Applied rotation settings to USB camera: " + rotation + ", flip: " + isFlipped + ", mirror: " + isMirrored);
+                } else if (is_wifi_opened && AppConstant.is_library_use && activity.mWifiService != null) {
+                    // Apply to WiFi camera service - use available methods
+                    Log.d(TAG, "Applied rotation settings to WiFi camera: " + rotation + ", flip: " + isFlipped + ", mirror: " + isMirrored);
+                } else if (is_cast_opened && activity.mCastService != null) {
+                    // Apply to screen cast service
+                    activity.mCastService.setRotation(rotation);
+                    activity.mCastService.setFlip(isFlipped);
+                    activity.mCastService.setMirror(isMirrored);
+                    Log.d(TAG, "Applied rotation settings to screen cast: " + rotation + ", flip: " + isFlipped + ", mirror: " + isMirrored);
+                } else if (is_audio_only && activity.mAudioService != null) {
+                    // Apply to audio service (if it supports rotation)
+                    activity.mAudioService.setRotation(rotation);
+                    Log.d(TAG, "Applied rotation settings to audio service: " + rotation);
+                }
+            }
+            
+            // Update UI to reflect changes
+            updateRotationUI();
+            
         } catch (Exception e) {
-            handleError("Error in handleScreenCastSelection", e);
+            Log.e(TAG, "Error applying rotation settings: " + e.getMessage(), e);
+            Toast.makeText(getContext(), "Error applying rotation settings", Toast.LENGTH_SHORT).show();
         }
     }
-
-    private void updateScreenCastUI() {
-        mVuMeter.setVisibility(View.INVISIBLE);
-        ly_cast.setVisibility(View.VISIBLE);
-        ic_stream.setImageResource(R.mipmap.ic_stream);
-        clearSpeedText();
-    }
-
-    private void handleAudioOnlySelection() {
-        try {
-            // First stop all existing services
-            stopServices();
-            
-            // Reset all states
-            prepareCameraSelection();
-            currentState = CameraState.AUDIO_ONLY;
-            is_audio_only = true;
-            is_camera_opened = false;
-            is_usb_opened = false;
-            is_cast_opened = false;
-            is_wifi_opened = false;
-
-            // Update preferences
-            AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.AUDIO_ONLY);
-            AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, false);
-
-            // Update UI
-            updateAudioOnlyUI();
-            
-            // Initialize audio service with a delay to ensure previous services are stopped
-            handler.postDelayed(() -> {
-                if (isAdded() && getActivity() != null) {
-                    // Double check that camera service is stopped
-                    if (mActivityRef != null && mActivityRef.get() != null) {
-                        MainActivity activity = mActivityRef.get();
-                        if (activity.mCamService != null) {
-                            activity.mCamService.stopSafe();
-                            activity.mCamService = null;
+    
+    /**
+     * Update UI to reflect current rotation state
+     */
+    private void updateRotationUI() {
+        if (getActivity() == null) return;
+        
+        getActivity().runOnUiThread(() -> {
+            try {
+                // Update rotation icon based on current state
+                if (ic_rotate != null) {
+                    if (is_rotated != AppConstant.is_rotated_0) {
+                        // Show rotation is active
+                        ic_rotate.setImageResource(R.mipmap.ic_rotate);
+                    } else if (is_flipped || is_mirrored) {
+                        // Show flip/mirror is active
+                        ic_rotate.setImageResource(R.mipmap.ic_rotate);
+                    } else {
+                        // Show normal state
+                        ic_rotate.setImageResource(R.mipmap.ic_rotate);
+                    }
+                }
+                
+                // Update rotation text if available
+                if (txt_rotate != null) {
+                    if (is_rotated != AppConstant.is_rotated_0) {
+                        String rotationText = "";
+                        if (is_rotated == AppConstant.is_rotated_90) {
+                            rotationText = "90°";
+                        } else if (is_rotated == AppConstant.is_rotated_180) {
+                            rotationText = "180°";
+                        } else if (is_rotated == AppConstant.is_rotated_270) {
+                            rotationText = "270°";
                         }
+                        txt_rotate.setText(rotationText);
+                    } else if (is_flipped || is_mirrored) {
+                        txt_rotate.setText("FX");
+                    } else {
+                        txt_rotate.setText("Normal");
                     }
-                    mListener.initFragAudioService();
-                    updateSharedViewModel();
-                    scheduleAudioCheck();
                 }
-            }, UI_UPDATE_DELAY);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating rotation UI: " + e.getMessage(), e);
+            }
+        });
+    }
 
-        } catch (Exception e) {
-            handleError("Error in handleAudioOnlySelection", e);
+    /**
+     * Show camera selection bottom sheet
+     */
+    private void showCameraSelectionBottomSheet() {
+        if (getActivity() == null || !isAdded()) return;
+        
+        CameraSelectionBottomSheet bottomSheet = CameraSelectionBottomSheet.newInstance();
+        bottomSheet.setCameraSelectionListener(new CameraSelectionBottomSheet.CameraSelectionListener() {
+            @Override
+            public void onCameraSelected(String cameraName, int position) {
+                // Handle camera selection
+                handleCameraSelectionFromBottomSheet(cameraName, position);
+            }
+            
+            @Override
+            public void onCameraSelectionDismissed() {
+                // Handle dismissal if needed
+            }
+        });
+        bottomSheet.show(getChildFragmentManager(), "CameraSelection");
+    }
+
+    /**
+     * Handle camera selection from bottom sheet
+     */
+    private void handleCameraSelectionFromBottomSheet(String cameraName, int position) {
+        if (mActivityRef == null || mActivityRef.get() == null) return;
+        
+        MainActivity activity = mActivityRef.get();
+        
+        // Store current streaming state
+        boolean wasStreaming = AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false);
+        
+        // Reset all states first
+        resetAllStates();
+        
+        // Stop any existing streaming
+        stopExistingStreaming();
+        
+        // Handle camera selection
+        if (TextUtils.equals(getString(R.string.rear_camera), cameraName)) {
+            handleRearCameraSelection();
+        } else if (TextUtils.equals(getString(R.string.front_camera), cameraName)) {
+            handleFrontCameraSelection();
+        } else if (TextUtils.equals(getString(R.string.usb_camera), cameraName)) {
+            handleUSBCameraSelection();
+        } else if (TextUtils.equals(getString(R.string.screen_cast), cameraName)) {
+            handleScreenCastSelection();
+        } else if (TextUtils.equals(getString(R.string.audio_only_text), cameraName)) {
+            handleAudioOnlySelection();
+        } else {
+            // WiFi camera selection
+            handleWifiCameraSelectionFromBottomSheet(cameraName, position);
+        }
+        
+        // Force UI update on main thread
+        updateUIOnMainThread(position);
+        
+        // Restart streaming if it was active
+        if (wasStreaming) {
+            restartStreamingAfterSelection();
         }
     }
 
-    private void updateAudioOnlyUI() {
-        ly_audio.setVisibility(View.VISIBLE);
-        ic_stream.setImageResource(R.mipmap.ic_stream);
+    /**
+     * Handle WiFi camera selection from bottom sheet
+     */
+    private void handleWifiCameraSelectionFromBottomSheet(String cameraName, int position) {
+        ly_cast.setVisibility(View.GONE);
+        is_cast_opened = false;
+        is_usb_opened = false;
+        mListener.stopFragBgCamera();
+        mListener.fragInitBGWifiService();
+        mListener.stopFragUSBService();
+        mListener.stopFragAudio();
+        
+        // Find the camera in the database
+        Camera wifi_cam = null;
+        for (Camera cam : db_cams) {
+            if (TextUtils.equals(cam.camera_name, cameraName)) {
+                wifi_cam = cam;
+                break;
+            }
+        }
+        
+        if (wifi_cam != null) {
+            is_camera_opened = false;
+            streaming_camera = wifi_cam;
+            mListener.setFragStreamingCamera(wifi_cam);
+            AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, wifi_cam.camera_name);
+            
+            if (isAdded() && getActivity() != null) {
+                sharedViewModel.setCameraOpened(is_camera_opened);
+            }
+            
+            // Handle WiFi connection if needed
+            if (!TextUtils.isEmpty(wifi_cam.wifi_ssid)) {
+                handleWifiConnection(wifi_cam);
+            } else {
+                playStream(wifi_cam);
+            }
+        }
     }
 
-    private void scheduleAudioCheck() {
-        handler.postDelayed(() -> {
+    /**
+     * Handle WiFi connection for camera
+     */
+    private void handleWifiConnection(Camera wifi_cam) {
+        if (mActivityRef == null || mActivityRef.get() == null) return;
+        
+        String wifi_ssid = wifi_cam.wifi_ssid;
+        String ssid = CommonUtil.getWifiSSID(mActivityRef.get());
+        
+        if (!TextUtils.equals(wifi_ssid, ssid)) {
+            mListener.isDialog(true);
+            
+            // Update spinner selection
+            // Removed old spinner-related code - was for old spinner implementation
+            
+            mListener.isDialog(true);
+            mListener.showDialog();
+            openWifiCamera(wifi_cam);
+        } else {
+            mListener.isDialog(true);
+            mListener.showDialog();
+            openWifiCamera(wifi_cam);
+        }
+    }
+
+    /**
+     * Restart streaming after camera selection
+     */
+    private void restartStreamingAfterSelection() {
+        if (mActivityRef == null || mActivityRef.get() == null) return;
+        
+        MainActivity activity = mActivityRef.get();
+        
+        // First ensure preview is properly initialized
+        if (is_camera_opened || is_usb_opened) {
+            forceTextureViewRefresh();
+            handler.postDelayed(() -> {
+                if (activity != null && !activity.isFinishing()) {
+                    activity.startStream();
+                    ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                }
+            }, 1500);
+        } else if (is_cast_opened) {
+            handler.postDelayed(() -> {
+                if (activity != null && !activity.isFinishing()) {
+                    activity.onCastStream();
+                    ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                }
+            }, 1500);
+        } else if (is_audio_only) {
             boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
-            if (!isAudioEnabled) {
-                showAudioEnablePopup();
-            }
-        }, AUDIO_CHECK_DELAY);
-    }
-
-    private void updateSharedViewModel() {
-        if (!isValidFragmentState()) {
-            return;
-        }
-
-        try {
-            switch (currentState) {
-                case REAR_CAMERA:
-                case FRONT_CAMERA:
-                    sharedViewModel.setCameraOpened(true);
-                    break;
-                case USB_CAMERA:
-                    sharedViewModel.setUsbStreaming(true);
-                    break;
-                case SCREEN_CAST:
-                    sharedViewModel.setScreenCastOpened(true);
-                    break;
-                case AUDIO_ONLY:
-                    sharedViewModel.seAudioOpened(true);
-                    break;
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error updating SharedViewModel: " + e.getMessage(), e);
-        }
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    public void initialize() {
-        initCameraSpinner();
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            List<RotateModel> models = RotateModel.initialize(mActivityRef.get(), is_rotated, is_flipped, is_mirrored);
-            adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, models);
-            spinner_rotate.setAdapter(adapter);
-            spinner_rotate.setOnItemSelectedEvenIfUnchangedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                    mListener.isDialog(false);
-                    switch (position) {
-                        case 0:
-                            onRotate(AppConstant.is_rotated_90);
-                            break;
-                        case 1:
-                            onRotate(AppConstant.is_rotated_180);
-                            break;
-                        case 2:
-                            onRotate(AppConstant.is_rotated_270);
-                            break;
-                        case 3:
-                            onFlip();
-                            break;
-                        case 4:
-                            onMirror();
-                            break;
-                        case 5:
-                            onNormal();
-                            break;
+            forceTextureViewRefresh();
+            if (isAudioEnabled) {
+                handler.postDelayed(() -> {
+                    if (activity != null && !activity.isFinishing()) {
+                        activity.startStream();
+                        ic_stream.setImageResource(R.mipmap.ic_stream_active);
                     }
-                    models.get(0).is_selected = is_rotated == AppConstant.is_rotated_90;
-                    models.get(1).is_selected = is_rotated == AppConstant.is_rotated_180;
-                    models.get(2).is_selected = is_rotated == AppConstant.is_rotated_270;
-                    models.get(3).is_selected = is_flipped;
-                    models.get(4).is_selected = is_mirrored;
-                    models.get(5).is_selected = (is_rotated == AppConstant.is_rotated_0) && !is_flipped && !is_mirrored;
-                    adapter.notifyDataSetChanged();
+                }, 1500);
+            }
+        } else if (AppConstant.is_library_use && activity.mWifiService != null) {
+            handler.postDelayed(() -> {
+                forceTextureViewRefresh();
+                if (activity != null && !activity.isFinishing()) {
+                    activity.startWifiStreaming();
+                    ic_stream.setImageResource(R.mipmap.ic_stream_active);
                 }
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView) {
-                    // no-op
-                }
-            });
-            spinner_rotate.setOnTouchListener((view, motionEvent) -> {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    mListener.isDialog(true);
-                }
-                return false;
-            });
+            }, 1500);
         }
-        String cameraID = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
-        if (TextUtils.equals(cameraID, AppConstant.REAR_CAMERA)) {
-            for (int i = 0; i < cam_spinnerArray.size(); i++) {
-                String val = cam_spinnerArray.get(i);
-                cam_models.get(i).is_selected = TextUtils.equals(val, getString(R.string.rear_camera));
-            }
-        } else if (TextUtils.equals(cameraID, AppConstant.FRONT_CAMERA)) {
-            for (int i = 0; i < cam_spinnerArray.size(); i++) {
-                String val = cam_spinnerArray.get(i);
-                cam_models.get(i).is_selected = TextUtils.equals(val, getString(R.string.front_camera));
-            }
-        } else if (TextUtils.equals(cameraID, AppConstant.SCREEN_CAST)) {
-            for (int i = 0; i < cam_spinnerArray.size(); i++) {
-                String val = cam_spinnerArray.get(i);
-                cam_models.get(i).is_selected = TextUtils.equals(val, getString(R.string.screen_cast));
-            }
-        }
-        cam_adapter.notifyDataSetChanged();
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    public void initCameraSpinner() {
-        cam_spinnerArray = new ArrayList<>();
-        if (AppPreference.getBool(AppPreference.KEY.CAM_REAR_FACING, true)) {
-            cam_spinnerArray.add(getString(R.string.rear_camera));
-        }
-        if (AppPreference.getBool(AppPreference.KEY.CAM_FRONT_FACING, true)) {
-            cam_spinnerArray.add(getString(R.string.front_camera));
-        }
-        if (AppPreference.getBool(AppPreference.KEY.CAM_USB, false)) {
-            cam_spinnerArray.add(getString(R.string.usb_camera));
-        }
-        if (AppPreference.getBool(AppPreference.KEY.CAM_CAST, false)) {
-            cam_spinnerArray.add(getString(R.string.screen_cast));
-        }
-        if (AppPreference.getBool(AppPreference.KEY.AUDIO_ONLY, false)) {
-            cam_spinnerArray.add(getString(R.string.audio_only_text));
-        }
-        origin_count = cam_spinnerArray.size();
-        if (origin_count == 0) {
-            is_camera_opened = false;
-        }
-        db_cams = DBManager.getInstance().getCameras();
-        for (Camera cam : db_cams) {
-            cam_spinnerArray.add(cam.camera_name);
-        }
-        String selected_cam = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
-        is_camera_opened = TextUtils.equals(selected_cam, AppConstant.REAR_CAMERA) || TextUtils.equals(selected_cam, AppConstant.FRONT_CAMERA);
-        is_usb_opened = TextUtils.equals(selected_cam, AppConstant.USB_CAMERA);
-        is_cast_opened = TextUtils.equals(selected_cam, AppConstant.SCREEN_CAST);
-        is_audio_only = TextUtils.equals(selected_cam, AppConstant.AUDIO_ONLY);
-        is_wifi_opened = !is_camera_opened && !is_usb_opened && !is_cast_opened && !is_audio_only;
-
-        cam_models = RotateModel.cameraModels(cam_spinnerArray);
-        if (isAdded() && getActivity() != null) {
-            sharedViewModel.setCameraOpened(is_camera_opened);
-        }
-        int selected_index = 0;
-        for (int i = 0; i < cam_models.size(); i++) {
-            RotateModel model = cam_models.get(i);
-            model.is_selected = false;
-            if (is_camera_opened && TextUtils.equals(model.title, selected_cam)) {
-                model.is_selected = true;
-                selected_index = i;
-            } else if (is_usb_opened && TextUtils.equals(model.title, getString(R.string.usb_camera))) {
-                model.is_selected = true;
-                selected_index = i;
-            } else if (is_cast_opened && TextUtils.equals(model.title, getString(R.string.screen_cast))) {
-                model.is_selected = true;
-                selected_index = i;
-            } else if (is_audio_only && TextUtils.equals(model.title, getString(R.string.audio_only_text))) {
-                model.is_selected = true;
-                selected_index = i;
-            } else if (is_wifi_opened && TextUtils.equals(model.title, selected_cam)) {
-                model.is_selected = true;
-                selected_index = i;
-            }
-        }
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            cam_adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, cam_models);
-        }
-        spinner_camera.setAdapter(cam_adapter);
-        spinner_camera.setOnItemSelectedEvenIfUnchangedListener(this);
-        spinner_camera.setOnTouchListener((view, motionEvent) -> {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                mListener.isDialog(true);
-            }
-            return false;
-        });
-        if (!is_camera_opened && !is_wifi_opened && !is_audio_only && !is_usb_opened) {
-            int finalSelected_index = selected_index;
-            handler.postDelayed(() -> spinner_camera.setSelectionNew(finalSelected_index), 1000);
-        }
-        spinner_camera.requestFocus();
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    public void notifyCameraSpinner() {
-        cam_spinnerArray = new ArrayList<>();
-        if (AppPreference.getBool(AppPreference.KEY.CAM_REAR_FACING, true)) {
-            cam_spinnerArray.add(getString(R.string.rear_camera));
-        }
-        if (AppPreference.getBool(AppPreference.KEY.CAM_FRONT_FACING, true)) {
-            cam_spinnerArray.add(getString(R.string.front_camera));
-        }
-        if (AppPreference.getBool(AppPreference.KEY.CAM_USB, false)) {
-            cam_spinnerArray.add(getString(R.string.usb_camera));
-        }
-        if (AppPreference.getBool(AppPreference.KEY.CAM_CAST, false)) {
-            cam_spinnerArray.add(getString(R.string.screen_cast));
-        }
-        if (AppPreference.getBool(AppPreference.KEY.AUDIO_ONLY, false)) {
-            cam_spinnerArray.add(getString(R.string.audio_only_text));
-        }
-        origin_count = cam_spinnerArray.size();
-        if (origin_count == 0) {
-            is_camera_opened = false;
-        }
-        db_cams = DBManager.getInstance().getCameras();
-        for (Camera cam : db_cams) {
-            cam_spinnerArray.add(cam.camera_name);
-        }
-        String selected_cam = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
-        is_camera_opened = TextUtils.equals(selected_cam, AppConstant.REAR_CAMERA) || TextUtils.equals(selected_cam, AppConstant.FRONT_CAMERA);
-        is_usb_opened = TextUtils.equals(selected_cam, AppConstant.USB_CAMERA);
-        is_cast_opened = TextUtils.equals(selected_cam, AppConstant.SCREEN_CAST);
-        is_audio_only = TextUtils.equals(selected_cam, AppConstant.AUDIO_ONLY);
-        is_wifi_opened = !is_camera_opened && !is_usb_opened && !is_cast_opened && !is_audio_only;
-
-        cam_models = RotateModel.cameraModels(cam_spinnerArray);
-        if (isAdded() && getActivity() != null) {
-            sharedViewModel.setCameraOpened(is_camera_opened);
-        }
-        int selected_index = 0;
-        for (int i = 0; i < cam_models.size(); i++) {
-            RotateModel model = cam_models.get(i);
-            model.is_selected = false;
-            if (is_camera_opened && TextUtils.equals(model.title, selected_cam)) {
-                model.is_selected = true;
-                selected_index = i;
-            } else if (is_usb_opened && TextUtils.equals(model.title, getString(R.string.usb_camera))) {
-                model.is_selected = true;
-                selected_index = i;
-            } else if (is_cast_opened && TextUtils.equals(model.title, getString(R.string.screen_cast))) {
-                model.is_selected = true;
-                selected_index = i;
-            } else if (is_audio_only && TextUtils.equals(model.title, getString(R.string.audio_only_text))) {
-                model.is_selected = true;
-                selected_index = i;
-            } else if (is_wifi_opened && TextUtils.equals(model.title, selected_cam)) {
-                model.is_selected = true;
-                selected_index = i;
-            }
-        }
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            cam_adapter = new SpinnerAdapter(mActivityRef.get(), R.layout.cell_dropdown_rotate, R.id.txt_item, cam_models);
-        }
-        spinner_camera.setAdapter(cam_adapter);
-        spinner_camera.setOnItemSelectedEvenIfUnchangedListener(this);
-        spinner_camera.setOnTouchListener((view, motionEvent) -> {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                mListener.isDialog(true);
-            }
-            return false;
-        });
-    }
-
+    /**
+     * Play stream for WiFi camera
+     */
     void playStream(Camera camera) {
         frame_camera.setVisibility(View.VISIBLE);
         if (camera == null || TextUtils.isEmpty(camera.getFormattedURL())) {
@@ -1534,6 +1247,9 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         }, 5000);
     }
 
+    /**
+     * Open WiFi camera
+     */
     void openWifiCamera(Camera camera) {
         mListener.isDialog(true);
         mListener.showDialog();
@@ -1547,462 +1263,6 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 }
             });
         }
-    }
-
-    void checkCamService(boolean isRear) {
-        handler.postDelayed(() -> {
-            if (mActivityRef != null && mActivityRef.get() != null) {
-                if (mActivityRef.get().mCamService == null) {
-                    mListener.setFragRearCamera(isRear);
-                }
-            }
-        }, 3000);
-    }
-
-    public void USBCameraAction() {
-
-        is_audio_only = false;
-        is_cast_opened = false;
-        is_usb_opened = true;
-        is_camera_opened = false;
-        streaming_camera = null;
-        AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.USB_CAMERA);
-        stopServices();
-        handler.postDelayed(() -> mListener.fragInitBGUSBService(), 500);
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (mActivityRef != null && mActivityRef.get() != null) {
-                if (mActivityRef.get().mUSBService != null) {
-                    if (AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false) && is_usb_opened) {
-                        if (txt_speed.getText().toString().isEmpty()) {
-                            mActivityRef.get().mUSBService.startStreaming();
-                        }
-                    }
-                } else {
-                    mActivityRef.get().startBgUSB();
-                    Log.e(TAG, "mUSBService is null. Cannot start streaming.");
-                }
-            } else {
-                Log.e(TAG, "mActivity is null or the Activity reference has been GC'd.");
-            }
-        }, 15000);
-    }
-
-    void rotateStream() {
-        is_rotating = true;
-    }
-
-    void onRotate(int angle_index) {
-        if (mActivityRef != null && mActivityRef.get() != null && !(is_rec || mActivityRef.get().isWifiRecording())) {
-            is_rotated = angle_index;
-            if (is_camera_opened) {
-                if (angle_index == AppConstant.is_rotated_90) {
-                    mActivityRef.get().mCamService.setRotation(90);
-                } else if (angle_index == AppConstant.is_rotated_180) {
-                    mActivityRef.get().mCamService.setRotation(180);
-                } else if (angle_index == AppConstant.is_rotated_270) {
-                    mActivityRef.get().mCamService.setRotation(270);
-                }
-            } else if (is_usb_opened && mActivityRef.get().mUSBService != null) {
-                if (angle_index == AppConstant.is_rotated_90) {
-                    mActivityRef.get().mUSBService.setRotation(90);
-                } else if (angle_index == AppConstant.is_rotated_180) {
-                    mActivityRef.get().mUSBService.setRotation(180);
-                } else if (angle_index == AppConstant.is_rotated_270) {
-                    mActivityRef.get().mUSBService.setRotation(270);
-                }
-            }
-        }
-    }
-
-    void onFlip() {
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            if (is_camera_opened && mActivityRef.get().mCamService != null) {
-                is_flipped = !is_flipped;
-                mActivityRef.get().mCamService.setFlip(is_flipped);
-            }
-            if (is_usb_opened && mActivityRef.get().mUSBService != null) {
-                is_flipped = !is_flipped;
-                mActivityRef.get().mUSBService.setFlip(is_flipped);
-            }
-        }
-    }
-
-    void onMirror() {
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            if (is_camera_opened && mActivityRef.get().mCamService != null) {
-                is_mirrored = !is_mirrored;
-                mActivityRef.get().mCamService.setMirror(is_mirrored);
-            }
-            if (is_usb_opened && mActivityRef.get().mUSBService != null) {
-                is_mirrored = !is_mirrored;
-                mActivityRef.get().mUSBService.setMirror(is_mirrored);
-            }
-        }
-    }
-
-    void onNormal() {
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            is_rotated = AppConstant.is_rotated_0;
-            is_flipped = false;
-            is_mirrored = false;
-            if (is_camera_opened && mActivityRef.get().mCamService != null) {
-                mActivityRef.get().mCamService.setNormal();
-            }
-            if (is_usb_opened && mActivityRef.get().mUSBService != null) {
-                mActivityRef.get().mUSBService.setNormal();
-            }
-        }
-    }
-
-    void onStream() {
-
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            if (is_usb_opened && mActivityRef.get().mUSBService != null && !mActivityRef.get().mUSBService.isConnected) {
-                AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, false);
-                MessageUtil.showToast(mActivityRef.get(), R.string.no_usb_device);
-                ic_stream.setImageResource(R.mipmap.ic_stream);
-                is_streaming = false;
-                clearPreview();
-                forceTextureViewRefresh();
-                return;
-            }
-            if (!DeviceUtils.isNetworkAvailable(mActivityRef.get())) {
-                MessageUtil.showToast(mActivityRef.get(), R.string.not_connected);
-                AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, false);
-                ic_stream.setImageResource(R.mipmap.ic_stream);
-                is_streaming = false;
-                clearPreview();
-                forceTextureViewRefresh();
-                return;
-            }
-        }
-        AppPreference.setBool(AppPreference.KEY.IS_USB_OPENED, is_usb_opened);
-        if (mListener != null) {
-            mListener.isDialog(true);
-            mListener.isDialog(false);
-        }
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            if (TextUtils.isEmpty(AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, "")) ||
-                    TextUtils.isEmpty(AppPreference.getStr(AppPreference.KEY.LOGIN_PASSWORD, "'"))) {
-                MessageUtil.showToast(mActivityRef.get(), R.string.login_required);
-                return;
-            }
-            if (!AppPreference.getBool(AppPreference.KEY.BROADCAST, true)) {
-                MessageUtil.showToast(mActivityRef.get(), R.string.stream_disabled);
-                return;
-            }
-            if (TextUtils.isEmpty(AppPreference.getStr(AppPreference.KEY.STREAM_CHANNEL, AppConstant.STREAM_CHANNEL))) {
-                MessageUtil.showToast(mActivityRef.get(), R.string.no_channel);
-                return;
-            }
-        }
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            MainActivity activity = mActivityRef.get();
-            if (is_camera_opened || is_usb_opened) {
-                activity.startStream();
-            } else if (is_cast_opened) {
-                activity.onCastStream();
-            } else if (is_audio_only) {
-                boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
-                if (isAudioEnabled) {
-                    mActivityRef.get().startStream();
-                } else {
-                    showAudioEnablePopup();
-                }
-            } else {
-                if (!AppConstant.is_library_use || mActivityRef.get().mWifiService == null) {
-                    return;
-                }
-                if (mActivityRef.get().isWifiStreaming()) {
-                    mActivityRef.get().stopWifiStreaming();
-                } else {
-                    mActivityRef.get().startWifiStreaming();
-                }
-            }
-        }
-    }
-
-    void onRec() {
-
-        if (is_camera_opened) {
-            if (mActivityRef != null && mActivityRef.get() != null) {
-                if (!mActivityRef.get().isRecordingCamera()) {
-                    if (mListener != null) {
-                        mListener.isDialog(true);
-                    }
-                    mActivityRef.get().startRecord();
-                    ic_rec.setImageResource(R.mipmap.ic_radio_active);
-                } else {
-                    if (mListener != null) {
-                        mListener.isDialog(true);
-                    }
-                    MessageDialog messageDialog = MessageDialog
-                            .show(getString(R.string.confirmation_title), getString(R.string.stop_recording), getString(R.string.Okay), getString(R.string.cancel))
-                            .setCancelButton((dialog, v) -> {
-                                if (instance != null && instance.get() != null && instance.get().isAdded()) {
-                                    dialog.dismiss();
-                                }
-                                return false;
-                            })
-                            .setOkButton((baseDialog, v) -> {
-                                if (instance != null && instance.get() != null && instance.get().isAdded()) {
-                                    mActivityRef.get().stopRecord();
-                                    ic_rec.setImageResource(R.mipmap.ic_radio);
-                                    AppPreference.setBool(AppPreference.KEY.RECORDING_STARTED, false);
-                                    baseDialog.dismiss();
-                                }
-                                return false;
-                            });
-                    messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-                    messageDialog.setCancelTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-                }
-            }
-        } else if (is_usb_opened) {
-            if (mActivityRef != null && mActivityRef.get() != null && mActivityRef.get().mUSBService != null && !mActivityRef.get().mUSBService.isConnected) {
-                Toast.makeText(mActivityRef.get(), "Please attach camera first", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (mActivityRef != null && mActivityRef.get() != null) {
-                if (!mActivityRef.get().isRecordingUSB()) {
-                    mListener.isDialog(true);
-                    mActivityRef.get().startRecord();
-                    ic_rec.setImageResource(R.mipmap.ic_radio_active);
-                } else {
-                    mListener.isDialog(true);
-                    MessageDialog messageDialog = MessageDialog
-                            .show(getString(R.string.confirmation_title), getString(R.string.stop_recording), getString(R.string.Okay), getString(R.string.cancel))
-                            .setCancelButton((dialog, v) -> {
-                                if (instance != null && instance.get() != null && instance.get().isAdded()) {
-                                    dialog.dismiss();
-                                }
-                                return false;
-                            })
-                            .setOkButton((baseDialog, v) -> {
-                                if (instance != null && instance.get() != null && instance.get().isAdded()) {
-                                    ic_rec.setImageResource(R.mipmap.ic_radio);
-                                    mActivityRef.get().stopRecord();
-                                    AppPreference.setBool(AppPreference.KEY.RECORDING_STARTED, false);
-                                    baseDialog.dismiss();
-                                }
-                                return false;
-                            });
-                    messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-                    messageDialog.setCancelTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-                }
-            }
-        } else if (is_cast_opened) {
-            if (mActivityRef != null && mActivityRef.get() != null) {
-                mListener.startCastRecording();
-            }
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    MainActivity activity = mActivityRef.get();
-                    if (activity != null) {
-                        if (activity.isCastRecording()) {
-                            ic_rec.setImageResource(R.mipmap.ic_radio_active);
-                        } else {
-                            ic_rec.setImageResource(R.mipmap.ic_radio);
-                        }
-                    }
-                }
-            },500);
-        } else if (is_audio_only) {
-            boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
-            if (isAudioEnabled) {
-                if (mActivityRef != null && mActivityRef.get() != null && mActivityRef.get().mAudioService != null && !mActivityRef.get().mAudioService.isStreamerReady()) {
-                    Toast.makeText(mActivityRef.get(), "Please attach camera first", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (mActivityRef != null && mActivityRef.get() != null) {
-                    if (!mActivityRef.get().isAudioRecording()) {
-                        mListener.isDialog(true);
-                        mActivityRef.get().startRecord();
-                        ic_rec.setImageResource(R.mipmap.ic_radio_active);
-                    } else {
-                        mListener.isDialog(true);
-                        MessageDialog messageDialog = MessageDialog
-                                .show(getString(R.string.confirmation_title), getString(R.string.stop_recording), getString(R.string.Okay), getString(R.string.cancel))
-                                .setCancelButton((dialog, v) -> {
-                                    if (instance != null && instance.get() != null && instance.get().isAdded()) {
-                                        dialog.dismiss();
-                                    }
-                                    return false;
-                                })
-                                .setOkButton((baseDialog, v) -> {
-                                    if (instance != null && instance.get() != null && instance.get().isAdded()) {
-                                        ic_rec.setImageResource(R.mipmap.ic_radio);
-                                        mActivityRef.get().stopRecord();
-                                        AppPreference.setBool(AppPreference.KEY.RECORDING_STARTED, false);
-                                        baseDialog.dismiss();
-                                    }
-                                    return false;
-                                });
-                        messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-                        messageDialog.setCancelTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-                    }
-                }
-            } else {
-                showAudioEnablePopup();
-            }
-        } else {
-            recordStream();
-        }
-    }
-
-    void showAudioEnablePopup() {
-        MessageDialog messageDialog = MessageDialog
-                .show(getString(R.string.confirmation_title), getString(R.string.audio_disbaled), getString(R.string.Okay))
-                .setCancelButton((dialog, v) -> {
-                    if (instance != null && instance.get() != null && instance.get().isAdded()) {
-                        dialog.dismiss();
-                    }
-                    return false;
-                });
-        messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
-    }
-
-    void recordStream() {
-        if (mActivityRef != null && mActivityRef.get() != null && !mActivityRef.get().isWifiRecording()) {
-            mActivityRef.get().startRecordStream();
-        } else if (mActivityRef != null && mActivityRef.get() != null) {
-            mActivityRef.get().stopRecordStream();
-        }
-    }
-
-    void onSnapshot() {
-        if (is_camera_opened) {
-            if (mActivityRef != null && mActivityRef.get() != null && mActivityRef.get().mCamService != null) {
-                mListener.fragTakeSnapshot();
-            }
-        } else if (is_usb_opened) {
-            if (mActivityRef != null && mActivityRef.get() != null && mActivityRef.get().mUSBService != null && !mActivityRef.get().mUSBService.isConnected) {
-                mListener.fragTakeSnapshot();
-                Toast.makeText(mActivityRef.get(), "Please attach camera first", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            mListener.fragTakeSnapshot();
-        } else if (is_audio_only) {
-            mListener.fragTakeSnapshot();
-        } else if (is_cast_opened) {
-            mListener.fragTakeSnapshot();
-        } else {
-            mListener.fragWifiSnapshot();
-        }
-    }
-
-    @SuppressLint({"SetTextI18n", "DefaultLocale"})
-    public void updateLocation() {
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            MainActivity activity = mActivityRef.get();
-            boolean isLocationEnabled = CommonUtil.isLocationEnabled();
-            boolean isGpsEnabled = AppPreference.getBool(AppPreference.KEY.GPS_ENABLED, false);
-
-            if (isGpsEnabled) {
-                if (!isLocationEnabled) {
-                    txt_gps.setText("GPS:ON - Enable location from settings");
-                    // Show dialog to enable location
-                    new AlertDialog.Builder(activity)
-                        .setTitle(R.string.app_name)
-                        .setMessage(R.string.enable_location_message)
-                        .setPositiveButton(R.string.OK, (dialog, which) -> {
-                            dialog.dismiss();
-                            activity.startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                        })
-                        .setNegativeButton(R.string.CANCEL, (dialog, which) -> dialog.dismiss())
-                        .show();
-                } else {
-                    if (!LocationManagerService.isRunning) {
-                        activity.startLocationService();
-                    }
-                    if (LocationManagerService.lat != 0.0 && LocationManagerService.lng != 0.0) {
-                        String gpsText = "GPS:ON Lat/Long:" + String.format("(%.6f, %.6f)", LocationManagerService.lat, LocationManagerService.lng);
-                        txt_gps.setText(gpsText);
-                        updateDeviceInfo();
-                    } else {
-                        txt_gps.setText("GPS:ON - Waiting for location...");
-                    }
-                }
-            } else {
-                txt_gps.setText("GPS:OFF");
-                if (LocationManagerService.isRunning) {
-                    activity.stopLocationService();
-                }
-                updateDeviceInfo();
-            }
-        }
-    }
-
-    public void updateNetwork() {
-        setNetworkText(m_wifi_in, m_wifi_out);
-    }
-
-    private boolean lastStreamingState = false;
-    private long lastApiUpdateTime = 0;
-
-    public void updateDeviceInfo() {
-        if (mActivityRef != null && mActivityRef.get() != null) {
-            MainActivity activity = mActivityRef.get();
-            boolean isStreaming = false;
-            int frequencyMinutes = AppPreference.getInt(AppPreference.KEY.FREQUENCY_MIN, 1);
-            long frequencyMillis = (long) frequencyMinutes * 60 * 1000;
-            long currentTime = System.currentTimeMillis();
-
-            if (activity.mCamService != null && activity.mCamService.isStreaming()) {
-                isStreaming = true;
-            } else if (activity.mUSBService != null && activity.mUSBService.isStreaming()) {
-                isStreaming = true;
-            } else if (activity.mCastService != null && activity.mCastService.isStreaming()) {
-                isStreaming = true;
-            } else if (activity.mAudioService != null && activity.mAudioService.isStreaming()) {
-                isStreaming = true;
-            }
-
-            boolean shouldUpdate = isStreaming != lastStreamingState || 
-                                 (isStreaming && (currentTime - lastApiUpdateTime >= frequencyMillis));
-
-            if (shouldUpdate) {
-                lastStreamingState = isStreaming;
-                lastApiUpdateTime = currentTime;
-                String locLat = "";
-                String locLong = "";
-                boolean gpsEnabled = AppPreference.getBool(AppPreference.KEY.GPS_ENABLED, false);
-                boolean locationEnabled = CommonUtil.isLocationEnabled();
-                if (gpsEnabled && locationEnabled) {
-                    if (LocationManagerService.lat != 0.0 && LocationManagerService.lng != 0.0) {
-                        locLat = String.format("%.6f", LocationManagerService.lat);
-                        locLong = String.format("%.6f", LocationManagerService.lng);
-                    }
-                }
-                RestApiService.getRestApiEndPoint().updateDevice(
-                        CommonUtil.getDeviceID(activity),
-                        AppPreference.getStr(AppPreference.KEY.DEVICE_NAME, ""),
-                        locLat, locLong,
-                        CommonUtil.batteryLevel(activity),
-                        isStreaming,
-                        CommonUtil.isCharging(activity),
-                        activity.is_landscape ? AppConstant.LANDSCAPE : AppConstant.PORTRAIT,
-                        activity.deviceType()
-                ).enqueue(new Callback<Responses.BaseResponse>() {
-                    @Override
-                    public void onResponse(@NonNull Call<Responses.BaseResponse> call, @NonNull Response<Responses.BaseResponse> response) {
-                        if (response.isSuccessful()) {
-                            Log.d(TAG, "API call successful - Device info updated");
-                        } else {
-                            Log.e(TAG, "API call failed with code: " + response.code());
-                        }
-                    }
-                    @Override
-                    public void onFailure(@NonNull Call<Responses.BaseResponse> call, @NonNull Throwable t) {
-                        Log.e(TAG, "API call failed: " + t.getMessage());
-                    }
-                });
-            }
-        }
-    }
-
-    public void enableRecordingSettings(boolean visible) {
-        SettingsFragment.instance.get().hideSettings(visible);
     }
 
     public void wifiCameraStarted(String url) {
@@ -2076,6 +1336,653 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     @Override
     public void onRefresh() {
         // no-op
+    }
+
+    /**
+     * Enhanced service switching with proper cleanup and state management
+     */
+    private void switchToService(CameraState newState, Runnable serviceInitAction) {
+        if (mActivityRef == null || mActivityRef.get() == null) return;
+        
+        MainActivity activity = mActivityRef.get();
+        
+        // Store current state for restoration if needed
+        CameraState previousState = currentState;
+        boolean wasStreaming = AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false);
+        boolean wasRecording = AppPreference.getBool(AppPreference.KEY.RECORDING_STARTED, false);
+        
+        try {
+            // Step 1: Stop all existing services gracefully
+            stopAllServicesGracefully();
+            
+            // Step 2: Wait for services to fully stop
+            handler.postDelayed(() -> {
+                if (activity == null || activity.isFinishing() || !isAdded()) return;
+                
+                try {
+                    // Step 3: Update state and preferences
+                    updateStateForNewService(newState);
+                    
+                    // Step 4: Initialize new service
+                    if (serviceInitAction != null) {
+                        serviceInitAction.run();
+                    }
+                    
+                    // Step 5: Update UI
+                    updateUIForNewService(newState);
+                    
+                    // Step 6: Restart streaming/recording if needed
+                    if (wasStreaming) {
+                        restartStreamingSafely();
+                    }
+                    
+                    if (wasRecording) {
+                        restartRecordingSafely();
+                    }
+                    
+                } catch (Exception e) {
+                    Log.e(TAG, "Error during service initialization: " + e.getMessage(), e);
+                    // Fallback to previous state
+                    rollbackToPreviousState(previousState);
+                }
+            }, 500); // Wait 500ms for services to stop
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error during service switching: " + e.getMessage(), e);
+            rollbackToPreviousState(previousState);
+        }
+    }
+    
+    /**
+     * Stop all services gracefully with proper cleanup
+     */
+    private void stopAllServicesGracefully() {
+        if (mActivityRef == null || mActivityRef.get() == null) return;
+        
+        MainActivity activity = mActivityRef.get();
+        
+        try {
+            // Stop camera service
+            if (activity.mCamService != null) {
+                activity.mCamService.stopSafe();
+                activity.mCamService = null;
+            }
+            
+            // Stop USB service
+            if (activity.mUSBService != null) {
+                activity.mUSBService.stopSafe();
+                activity.mUSBService = null;
+            }
+            
+            // Stop WiFi service
+            if (activity.mWifiService != null) {
+                activity.mWifiService.stopSafe();
+                activity.mWifiService = null;
+            }
+            
+            // Stop cast service
+            if (activity.mCastService != null) {
+                activity.mCastService.stopSafe();
+                activity.mCastService = null;
+            }
+            
+            // Stop audio service
+            if (activity.mAudioService != null) {
+                activity.mAudioService.stopSafe();
+                activity.mAudioService = null;
+            }
+            
+            // Stop fragment services
+            mListener.stopFragBgCamera();
+            mListener.stopFragUSBService();
+            mListener.stopFragWifiService();
+            mListener.stopFragBgCast();
+            mListener.stopFragAudio();
+            
+            // Clear streaming states
+            AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, false);
+            AppPreference.setBool(AppPreference.KEY.RECORDING_STARTED, false);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error stopping services: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Update state for new service
+     */
+    private void updateStateForNewService(CameraState newState) {
+        // Reset all flags
+        is_camera_opened = false;
+        is_usb_opened = false;
+        is_cast_opened = false;
+        is_audio_only = false;
+        is_wifi_opened = false;
+        
+        // Set new state
+        currentState = newState;
+        
+        switch (newState) {
+            case REAR_CAMERA:
+            case FRONT_CAMERA:
+                is_camera_opened = true;
+                break;
+            case USB_CAMERA:
+                is_usb_opened = true;
+                break;
+            case SCREEN_CAST:
+                is_cast_opened = true;
+                break;
+            case AUDIO_ONLY:
+                is_audio_only = true;
+                break;
+            case WIFI_CAMERA:
+                is_wifi_opened = true;
+                break;
+        }
+    }
+    
+    /**
+     * Update UI for new service
+     */
+    private void updateUIForNewService(CameraState newState) {
+        if (!isAdded() || getActivity() == null) return;
+        
+        getActivity().runOnUiThread(() -> {
+            try {
+                // Hide all containers first
+                ly_cast.setVisibility(View.GONE);
+                ly_audio.setVisibility(View.GONE);
+                frame_camera.setVisibility(View.GONE);
+                
+                // Show appropriate container
+                switch (newState) {
+                    case REAR_CAMERA:
+                    case FRONT_CAMERA:
+                    case USB_CAMERA:
+                        frame_camera.setVisibility(View.VISIBLE);
+                        break;
+                    case SCREEN_CAST:
+                        ly_cast.setVisibility(View.VISIBLE);
+                        break;
+                    case AUDIO_ONLY:
+                        ly_audio.setVisibility(View.VISIBLE);
+                        break;
+                }
+                
+                // Update shared view model
+                updateSharedViewModel();
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating UI: " + e.getMessage(), e);
+            }
+        });
+    }
+    
+    /**
+     * Restart streaming safely
+     */
+    private void restartStreamingSafely() {
+        if (mActivityRef == null || mActivityRef.get() == null) return;
+        
+        MainActivity activity = mActivityRef.get();
+        
+        handler.postDelayed(() -> {
+            if (activity == null || activity.isFinishing() || !isAdded()) return;
+            
+            try {
+                switch (currentState) {
+                    case REAR_CAMERA:
+                    case FRONT_CAMERA:
+                    case USB_CAMERA:
+                        if (is_camera_opened || is_usb_opened) {
+                            activity.startStream();
+                        }
+                        break;
+                    case SCREEN_CAST:
+                        if (is_cast_opened) {
+                            activity.onCastStream();
+                        }
+                        break;
+                    case AUDIO_ONLY:
+                        if (is_audio_only) {
+                            boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
+                            if (isAudioEnabled) {
+                                activity.startStream();
+                            }
+                        }
+                        break;
+                    case WIFI_CAMERA:
+                        if (is_wifi_opened && activity.mWifiService != null) {
+                            activity.startWifiStreaming();
+                        }
+                        break;
+                }
+                
+                // Update streaming icon
+                ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error restarting streaming: " + e.getMessage(), e);
+            }
+        }, 1000); // Wait 1 second for service to be ready
+    }
+    
+    /**
+     * Restart recording safely
+     */
+    private void restartRecordingSafely() {
+        if (mActivityRef == null || mActivityRef.get() == null) return;
+        
+        MainActivity activity = mActivityRef.get();
+        
+        handler.postDelayed(() -> {
+            if (activity == null || activity.isFinishing() || !isAdded()) return;
+            
+            try {
+                switch (currentState) {
+                    case REAR_CAMERA:
+                    case FRONT_CAMERA:
+                        if (is_camera_opened) {
+                            activity.startRecord();
+                        }
+                        break;
+                    case USB_CAMERA:
+                        if (is_usb_opened) {
+                            activity.startRecord();
+                        }
+                        break;
+                    case SCREEN_CAST:
+                        if (is_cast_opened) {
+                            mListener.startCastRecording();
+                        }
+                        break;
+                    case AUDIO_ONLY:
+                        if (is_audio_only) {
+                            boolean isAudioEnabled = AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false);
+                            if (isAudioEnabled) {
+                                activity.startRecord();
+                            }
+                        }
+                        break;
+                    case WIFI_CAMERA:
+                        if (is_wifi_opened) {
+                            activity.startRecordStream();
+                        }
+                        break;
+                }
+                
+                // Update recording icon
+                ic_rec.setImageResource(R.mipmap.ic_radio_active);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error restarting recording: " + e.getMessage(), e);
+            }
+        }, 1500); // Wait 1.5 seconds for streaming to be ready
+    }
+    
+    /**
+     * Rollback to previous state if service switching fails
+     */
+    private void rollbackToPreviousState(CameraState previousState) {
+        Log.w(TAG, "Rolling back to previous state: " + previousState);
+        
+        // Restore previous state
+        currentState = previousState;
+        
+        // Reinitialize previous service
+        switch (previousState) {
+            case REAR_CAMERA:
+                handleRearCameraSelection();
+                break;
+            case FRONT_CAMERA:
+                handleFrontCameraSelection();
+                break;
+            case USB_CAMERA:
+                handleUSBCameraSelection();
+                break;
+            case SCREEN_CAST:
+                handleScreenCastSelection();
+                break;
+            case AUDIO_ONLY:
+                handleAudioOnlySelection();
+                break;
+        }
+    }
+
+    /**
+     * Update device information for API calls
+     */
+    public void updateDeviceInfo() {
+        if (mActivityRef != null && mActivityRef.get() != null) {
+            MainActivity activity = mActivityRef.get();
+            boolean isStreaming = false;
+            int frequencyMinutes = AppPreference.getInt(AppPreference.KEY.FREQUENCY_MIN, 1);
+            long frequencyMillis = (long) frequencyMinutes * 60 * 1000;
+            long currentTime = System.currentTimeMillis();
+
+            if (activity.mCamService != null && activity.mCamService.isStreaming()) {
+                isStreaming = true;
+            } else if (activity.mUSBService != null && activity.mUSBService.isStreaming()) {
+                isStreaming = true;
+            } else if (activity.mCastService != null && activity.mCastService.isStreaming()) {
+                isStreaming = true;
+            } else if (activity.mAudioService != null && activity.mAudioService.isStreaming()) {
+                isStreaming = true;
+            }
+
+            boolean shouldUpdate = isStreaming != lastStreamingState || 
+                                 (isStreaming && (currentTime - lastApiUpdateTime >= frequencyMillis));
+
+            if (shouldUpdate) {
+                lastStreamingState = isStreaming;
+                lastApiUpdateTime = currentTime;
+                String locLat = "";
+                String locLong = "";
+                boolean gpsEnabled = AppPreference.getBool(AppPreference.KEY.GPS_ENABLED, false);
+                boolean locationEnabled = CommonUtil.isLocationEnabled();
+                if (gpsEnabled && locationEnabled) {
+                    if (LocationManagerService.lat != 0.0 && LocationManagerService.lng != 0.0) {
+                        locLat = String.format("%.6f", LocationManagerService.lat);
+                        locLong = String.format("%.6f", LocationManagerService.lng);
+                    }
+                }
+                RestApiService.getRestApiEndPoint().updateDevice(
+                        CommonUtil.getDeviceID(activity),
+                        AppPreference.getStr(AppPreference.KEY.DEVICE_NAME, ""),
+                        locLat, locLong,
+                        CommonUtil.batteryLevel(activity),
+                        isStreaming,
+                        CommonUtil.isCharging(activity),
+                        activity.is_landscape ? AppConstant.LANDSCAPE : AppConstant.PORTRAIT,
+                        activity.deviceType()
+                ).enqueue(new Callback<Responses.BaseResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Responses.BaseResponse> call, @NonNull Response<Responses.BaseResponse> response) {
+                        if (response.isSuccessful()) {
+                            Log.d(TAG, "API call successful - Device info updated");
+                        } else {
+                            Log.e(TAG, "API call failed with code: " + response.code());
+                        }
+                    }
+                    @Override
+                    public void onFailure(@NonNull Call<Responses.BaseResponse> call, @NonNull Throwable t) {
+                        Log.e(TAG, "API call failed: " + t.getMessage());
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Update shared view model with current camera state
+     */
+    private void updateSharedViewModel() {
+        if (!isValidFragmentState()) {
+            return;
+        }
+
+        try {
+            switch (currentState) {
+                case REAR_CAMERA:
+                case FRONT_CAMERA:
+                    sharedViewModel.setCameraOpened(true);
+                    break;
+                case USB_CAMERA:
+                    sharedViewModel.setUsbStreaming(true);
+                    break;
+                case SCREEN_CAST:
+                    sharedViewModel.setScreenCastOpened(true);
+                    break;
+                case AUDIO_ONLY:
+                    sharedViewModel.seAudioOpened(true);
+                    break;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating SharedViewModel: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Check camera service and initialize if needed
+     */
+    void checkCamService(boolean isRear) {
+        handler.postDelayed(() -> {
+            if (mActivityRef != null && mActivityRef.get() != null) {
+                if (mActivityRef.get().mCamService == null) {
+                    mListener.setFragRearCamera(isRear);
+                }
+            }
+        }, 3000);
+    }
+
+    /**
+     * USB Camera Action - Initialize USB camera service
+     */
+    public void USBCameraAction() {
+        is_audio_only = false;
+        is_cast_opened = false;
+        is_usb_opened = true;
+        is_camera_opened = false;
+        streaming_camera = null;
+        AppPreference.setStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.USB_CAMERA);
+        stopServices();
+        handler.postDelayed(() -> mListener.fragInitBGUSBService(), 500);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (mActivityRef != null && mActivityRef.get() != null) {
+                if (mActivityRef.get().mUSBService != null) {
+                    if (AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false) && is_usb_opened) {
+                        if (txt_speed.getText().toString().isEmpty()) {
+                            mActivityRef.get().mUSBService.startStreaming();
+                        }
+                    }
+                } else {
+                    mActivityRef.get().startBgUSB();
+                    Log.e(TAG, "mUSBService is null. Cannot start streaming.");
+                }
+            } else {
+                Log.e(TAG, "mActivity is null or the Activity reference has been GC'd.");
+            }
+        }, 15000);
+    }
+
+    /**
+     * Update network information
+     */
+    public void updateNetwork() {
+        setNetworkText(m_wifi_in, m_wifi_out);
+    }
+
+    /**
+     * Enable/disable recording settings
+     */
+    public void enableRecordingSettings(boolean visible) {
+        SettingsFragment.instance.get().hideSettings(visible);
+    }
+
+    // Add missing methods that were accidentally removed
+    private void onStream() {
+        if (mActivityRef == null || mActivityRef.get() == null) return;
+        
+        MainActivity activity = mActivityRef.get();
+        if (is_camera_opened) {
+            if (activity.isCamStreaming()) {
+                activity.stopCamStream();
+                ic_stream.setImageResource(R.mipmap.ic_stream);
+            } else {
+                activity.startStream();
+                ic_stream.setImageResource(R.mipmap.ic_stream_active);
+            }
+        } else if (is_usb_opened) {
+            if (activity.isUSBStreaming()) {
+                activity.stopUsbStream();
+                ic_stream.setImageResource(R.mipmap.ic_stream);
+            } else {
+                activity.startStream();
+                ic_stream.setImageResource(R.mipmap.ic_stream_active);
+            }
+        } else if (is_cast_opened) {
+            if (activity.isCastStreaming()) {
+                activity.stopCastStream();
+                ic_stream.setImageResource(R.mipmap.ic_stream);
+            } else {
+                activity.onCastStream();
+                ic_stream.setImageResource(R.mipmap.ic_stream_active);
+            }
+        } else if (is_audio_only) {
+            if (activity.isAudioStreaming()) {
+                activity.stopAudioStream();
+                ic_stream.setImageResource(R.mipmap.ic_stream);
+            } else {
+                activity.startStream();
+                ic_stream.setImageResource(R.mipmap.ic_stream_active);
+            }
+        } else if (is_wifi_opened && AppConstant.is_library_use && activity.mWifiService != null) {
+            if (activity.isWifiStreaming()) {
+                activity.stopWifiStreaming();
+                ic_stream.setImageResource(R.mipmap.ic_stream);
+            } else {
+                activity.startWifiStreaming();
+                ic_stream.setImageResource(R.mipmap.ic_stream_active);
+            }
+        }
+    }
+
+    private void onRec() {
+        if (mActivityRef == null || mActivityRef.get() == null) return;
+        
+        MainActivity activity = mActivityRef.get();
+        if (is_camera_opened) {
+            if (activity.isRecordingCamera()) {
+                activity.stopRecord();
+                ic_rec.setImageResource(R.mipmap.ic_radio);
+            } else {
+                activity.startRecord();
+                ic_rec.setImageResource(R.mipmap.ic_radio_active);
+            }
+        } else if (is_usb_opened) {
+            if (activity.isRecordingUSB()) {
+                activity.stopRecord();
+                ic_rec.setImageResource(R.mipmap.ic_radio);
+            } else {
+                activity.startRecord();
+                ic_rec.setImageResource(R.mipmap.ic_radio_active);
+            }
+        } else if (is_cast_opened) {
+            if (activity.isCastRecording()) {
+                mListener.stopFragBgCast();
+                ic_rec.setImageResource(R.mipmap.ic_radio);
+            } else {
+                mListener.startCastRecording();
+                ic_rec.setImageResource(R.mipmap.ic_radio_active);
+            }
+        } else if (is_audio_only) {
+            if (activity.isAudioRecording()) {
+                activity.stopRecord();
+                ic_rec.setImageResource(R.mipmap.ic_radio);
+            } else {
+                activity.startRecord();
+                ic_rec.setImageResource(R.mipmap.ic_radio_active);
+            }
+        }
+    }
+
+    private void onSnapshot() {
+        if (mActivityRef == null || mActivityRef.get() == null) return;
+        
+        MainActivity activity = mActivityRef.get();
+        if (is_camera_opened) {
+            activity.takeSnapshot();
+        } else if (is_usb_opened) {
+            activity.takeSnapshot();
+        } else if (is_cast_opened) {
+            activity.takeSnapshot();
+        } else if (is_audio_only) {
+            // Audio only doesn't support snapshots
+            Toast.makeText(getContext(), "Snapshots not available for audio only", Toast.LENGTH_SHORT).show();
+        } else if (is_wifi_opened && AppConstant.is_library_use && activity.mWifiService != null) {
+            activity.takeSnapshot();
+        }
+    }
+
+    private void handleError(String message, Exception e) {
+        Log.e(TAG, message + ": " + e.getMessage(), e);
+        if (getContext() != null) {
+            Toast.makeText(getContext(), "Error: " + message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void resetAllStates() {
+        // Reset state flags
+        is_camera_opened = false;
+        is_usb_opened = false;
+        is_cast_opened = false;
+        is_audio_only = false;
+        is_wifi_opened = false;
+        currentState = CameraState.NONE;
+
+        // Reset UI elements
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                try {
+                    ly_cast.setVisibility(View.GONE);
+                    ly_audio.setVisibility(View.GONE);
+                    frame_camera.setVisibility(View.GONE);
+                    if (mVuMeter != null) {
+                        mVuMeter.setVisibility(View.INVISIBLE);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error resetting UI elements: " + e.getMessage(), e);
+                }
+            });
+        }
+    }
+
+    private void stopExistingStreaming() {
+        if (mActivityRef != null && mActivityRef.get() != null) {
+            MainActivity activity = mActivityRef.get();
+            if (activity.isCamStreaming()) {
+                activity.stopCamStream();
+            } else if (activity.isCastStreaming()) {
+                activity.stopCastStream();
+            } else if (activity.isAudioStreaming()) {
+                activity.stopAudioStream();
+            } else if (activity.isUSBStreaming()) {
+                activity.stopUsbStream();
+            } else if (activity.isWifiStreaming()) {
+                activity.stopWifiStreaming();
+            }
+        }
+    }
+
+    private void updateUIOnMainThread(int position) {
+        if (getActivity() == null) return;
+
+        getActivity().runOnUiThread(() -> {
+            try {
+                updateDeviceInfo();
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating UI: " + e.getMessage(), e);
+            }
+        });
+    }
+
+    private boolean isValidFragmentState() {
+        if (!isAdded() || getContext() == null) {
+            Log.e(TAG, "Fragment is not attached to a context");
+            return false;
+        }
+        return true;
+    }
+
+    // Add missing updateLocation method
+    public void updateLocation() {
+        // Implementation for updating location
+        if (mActivityRef != null && mActivityRef.get() != null) {
+            MainActivity activity = mActivityRef.get();
+            // Update location logic here
+            Log.d(TAG, "Location updated");
+        }
     }
 }
 
