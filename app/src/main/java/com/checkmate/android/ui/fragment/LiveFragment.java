@@ -123,6 +123,10 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     private int origin_count = 0;
     private String m_wifi_in = "", m_wifi_out = "";
     private boolean isRetry = true;
+    
+    // Dialog references to prevent window leaks
+    private BottomSheetDialog cameraBottomSheetDialog;
+    private BottomSheetDialog rotationBottomSheetDialog;
 
     // Add these constants at the top of the class
     private static final int UI_UPDATE_DELAY = 500;
@@ -274,8 +278,30 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
     public void onDestroy() {
         super.onDestroy();
         Log.e(TAG, "onDestroy: isRetry:" + isRetry);
+        
+        // Dismiss any open dialogs to prevent window leaks
+        try {
+            if (cameraBottomSheetDialog != null && cameraBottomSheetDialog.isShowing()) {
+                cameraBottomSheetDialog.dismiss();
+            }
+            cameraBottomSheetDialog = null;
+            
+            if (rotationBottomSheetDialog != null && rotationBottomSheetDialog.isShowing()) {
+                rotationBottomSheetDialog.dismiss();
+            }
+            rotationBottomSheetDialog = null;
+        } catch (Exception e) {
+            Log.e(TAG, "Error dismissing dialogs: " + e.getMessage());
+        }
+        
         // Cancel any pending auto-start operations
         cancelAutoStart();
+        
+        // Remove all handler callbacks
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
+        
         mListener = null;
         if (instance != null && instance.get() == this) {
             instance.clear();
@@ -915,41 +941,43 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (TextUtils.isEmpty(wifi_cam.wifi_password)) {
                     wifi_cam.wifi_password = "12345678";
                 }
-                new AlertDialog.Builder(mActivityRef.get())
-                        .setTitle(R.string.app_name)
-                        .setMessage(String.format(getString(R.string.wifi_warning), wifi_cam.camera_name, wifi_ssid))
-                        .setIcon(R.mipmap.ic_launcher)
-                        .setPositiveButton(R.string.OK, (dialog, whichButton) -> {
-                            dialog.dismiss();
-                            mListener.isDialog(true);
-                            mListener.showDialog();
-                            WifiUtils.withContext(mActivityRef.get())
-                                    .connectWith(wifi_ssid, wifi_cam.wifi_password)
-                                    .setTimeout(15000)
-                                    .onConnectionResult(new ConnectionSuccessListener() {
-                                        @Override
-                                        public void success() {
-                                            mListener.isDialog(false);
-                                            openWifiCamera(wifi_cam);
-                                            setNetworkText(wifi_cam.wifi_in, wifi_cam.wifi_out);
-                                            mListener.dismissDialog();
-                                        }
-                                        @Override
-                                        public void failed(@NonNull ConnectionErrorCode errorCode) {
-                                            MessageUtil.showToast(mActivityRef.get(), R.string.connection_fail);
-                                            mListener.isDialog(false);
-                                            mListener.dismissDialog();
-                                        }
-                                    })
-                                    .start();
-                        })
-                        .setNegativeButton(R.string.CANCEL, (dialog, whichButton) -> {
-                            dialog.dismiss();
-                            mListener.isDialog(false);
-                            openWifiCamera(wifi_cam);
-                            setNetworkText(wifi_ssid, wifi_cam.wifi_out);
-                        })
-                        .show();
+                if (mActivityRef.get() != null && !mActivityRef.get().isFinishing()) {
+                    new AlertDialog.Builder(mActivityRef.get())
+                            .setTitle(R.string.app_name)
+                            .setMessage(String.format(getString(R.string.wifi_warning), wifi_cam.camera_name, wifi_ssid))
+                            .setIcon(R.mipmap.ic_launcher)
+                            .setPositiveButton(R.string.OK, (dialog, whichButton) -> {
+                                dialog.dismiss();
+                                mListener.isDialog(true);
+                                mListener.showDialog();
+                                WifiUtils.withContext(mActivityRef.get())
+                                        .connectWith(wifi_ssid, wifi_cam.wifi_password)
+                                        .setTimeout(15000)
+                                        .onConnectionResult(new ConnectionSuccessListener() {
+                                            @Override
+                                            public void success() {
+                                                mListener.isDialog(false);
+                                                openWifiCamera(wifi_cam);
+                                                setNetworkText(wifi_cam.wifi_in, wifi_cam.wifi_out);
+                                                mListener.dismissDialog();
+                                            }
+                                            @Override
+                                            public void failed(@NonNull ConnectionErrorCode errorCode) {
+                                                MessageUtil.showToast(mActivityRef.get(), R.string.connection_fail);
+                                                mListener.isDialog(false);
+                                                mListener.dismissDialog();
+                                            }
+                                        })
+                                        .start();
+                            })
+                            .setNegativeButton(R.string.CANCEL, (dialog, whichButton) -> {
+                                dialog.dismiss();
+                                mListener.isDialog(false);
+                                openWifiCamera(wifi_cam);
+                                setNetworkText(wifi_ssid, wifi_cam.wifi_out);
+                            })
+                            .show();
+                }
             } else {
                 mListener.isDialog(true);
                 mListener.showDialog();
@@ -1903,15 +1931,17 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
                 if (!isLocationEnabled) {
                     txt_gps.setText("GPS:ON - Enable location from settings");
                     // Show dialog to enable location
-                    new AlertDialog.Builder(activity)
-                        .setTitle(R.string.app_name)
-                        .setMessage(R.string.enable_location_message)
-                        .setPositiveButton(R.string.OK, (dialog, which) -> {
-                            dialog.dismiss();
-                            activity.startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                        })
-                        .setNegativeButton(R.string.CANCEL, (dialog, which) -> dialog.dismiss())
-                        .show();
+                    if (!activity.isFinishing()) {
+                        new AlertDialog.Builder(activity)
+                            .setTitle(R.string.app_name)
+                            .setMessage(R.string.enable_location_message)
+                            .setPositiveButton(R.string.OK, (dialog, which) -> {
+                                dialog.dismiss();
+                                activity.startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            })
+                            .setNegativeButton(R.string.CANCEL, (dialog, which) -> dialog.dismiss())
+                            .show();
+                    }
                 } else {
                     if (!LocationManagerService.isRunning) {
                         activity.startLocationService();
@@ -2083,11 +2113,19 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
      * Show bottom sheet dialog for camera selection
      */
     private void showCameraBottomSheet() {
-        if (!isAdded() || getContext() == null) return;
+        if (!isAdded() || getContext() == null || getActivity() == null) return;
         
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+        // Check if activity is finishing to prevent window leak
+        if (getActivity().isFinishing() || getActivity().isDestroyed()) return;
+        
+        // Dismiss any existing dialog
+        if (cameraBottomSheetDialog != null && cameraBottomSheetDialog.isShowing()) {
+            cameraBottomSheetDialog.dismiss();
+        }
+        
+        cameraBottomSheetDialog = new BottomSheetDialog(getContext());
         View bottomSheetView = LayoutInflater.from(getContext()).inflate(R.layout.bottom_sheet_camera_selection, null);
-        bottomSheetDialog.setContentView(bottomSheetView);
+        cameraBottomSheetDialog.setContentView(bottomSheetView);
         
         RecyclerView recyclerView = bottomSheetView.findViewById(R.id.rv_camera_options);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -2096,7 +2134,9 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         CameraSelectionAdapter adapter = new CameraSelectionAdapter(cam_spinnerArray, new CameraSelectionAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                bottomSheetDialog.dismiss();
+                if (cameraBottomSheetDialog != null && cameraBottomSheetDialog.isShowing()) {
+                    cameraBottomSheetDialog.dismiss();
+                }
                 handleCameraSelectionFromBottomSheet(position);
             }
         });
@@ -2106,7 +2146,15 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         adapter.setCurrentSelection(currentSelection);
         
         recyclerView.setAdapter(adapter);
-        bottomSheetDialog.show();
+        
+        // Set dismiss listener to clear reference
+        cameraBottomSheetDialog.setOnDismissListener(dialog -> cameraBottomSheetDialog = null);
+        
+        try {
+            cameraBottomSheetDialog.show();
+        } catch (Exception e) {
+            Log.e(TAG, "Error showing camera bottom sheet: " + e.getMessage());
+        }
     }
     
     /**
@@ -2149,11 +2197,19 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
      * Show bottom sheet dialog for rotation options
      */
     private void showRotationBottomSheet() {
-        if (!isAdded() || getContext() == null) return;
+        if (!isAdded() || getContext() == null || getActivity() == null) return;
         
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+        // Check if activity is finishing to prevent window leak
+        if (getActivity().isFinishing() || getActivity().isDestroyed()) return;
+        
+        // Dismiss any existing dialog
+        if (rotationBottomSheetDialog != null && rotationBottomSheetDialog.isShowing()) {
+            rotationBottomSheetDialog.dismiss();
+        }
+        
+        rotationBottomSheetDialog = new BottomSheetDialog(getContext());
         View bottomSheetView = LayoutInflater.from(getContext()).inflate(R.layout.bottom_sheet_rotation, null);
-        bottomSheetDialog.setContentView(bottomSheetView);
+        rotationBottomSheetDialog.setContentView(bottomSheetView);
         
         // Initialize rotation degree options
         View rotate90 = bottomSheetView.findViewById(R.id.ly_rotate_90);
@@ -2204,10 +2260,19 @@ public class LiveFragment extends BaseFragment implements AdapterView.OnItemSele
         normalOption.setOnClickListener(v -> {
             onNormal();
             updateRotationUI(iv90, iv180, iv270, ivFlip, ivMirror, ivNormal);
-            bottomSheetDialog.dismiss();
+            if (rotationBottomSheetDialog != null && rotationBottomSheetDialog.isShowing()) {
+                rotationBottomSheetDialog.dismiss();
+            }
         });
         
-        bottomSheetDialog.show();
+        // Set dismiss listener to clear reference
+        rotationBottomSheetDialog.setOnDismissListener(dialog -> rotationBottomSheetDialog = null);
+        
+        try {
+            rotationBottomSheetDialog.show();
+        } catch (Exception e) {
+            Log.e(TAG, "Error showing rotation bottom sheet: " + e.getMessage());
+        }
     }
     
     /**
