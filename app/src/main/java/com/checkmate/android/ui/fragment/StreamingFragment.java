@@ -221,6 +221,11 @@ public class StreamingFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        // Ensure mActivity is properly initialized
+        if (mActivity == null) {
+            mActivity = MainActivity.instance;
+        }
+
         if (mActivity != null && isAdded()) {
             sharedViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
             // Observe LiveData events
@@ -250,6 +255,11 @@ public class StreamingFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mView = inflater.inflate(R.layout.fragment_streaming, container, false);
+        
+        // Ensure mActivity is initialized
+        if (mActivity == null) {
+            mActivity = MainActivity.instance;
+        }
         
         // Initialize UI components
         swipe_refresh = mView.findViewById(R.id.swipe_refresh);
@@ -356,7 +366,11 @@ public class StreamingFragment extends BaseFragment {
         btn_refresh.setOnClickListener(v -> onRefresh());
         btn_logout.setOnClickListener(v -> onLogout());
         btn_start.setOnClickListener(v -> onShare());
-        btn_share.setOnClickListener(v -> onShare());
+        btn_share.setOnClickListener(v -> {
+            Log.d("StreamingFragment", "Share button clicked!");
+            MessageUtil.showToast(getContext(), "Share button clicked!");
+            onShare();
+        });
         btn_back.setOnClickListener(v -> onBackPressed());
         btn_login.setOnClickListener(v -> onLogin());
         btn_code.setOnClickListener(v -> onCode());
@@ -1500,22 +1514,48 @@ public class StreamingFragment extends BaseFragment {
 
     // Clicking "Share new" invites user by email
     void onShare() {
-        if (mActivity != null) {
+        Log.d("StreamingFragment", "onShare() called");
+        
+        // Check if mActivity is available
+        if (mActivity == null) {
+            Log.e("StreamingFragment", "mActivity is null, trying to reinitialize");
+            mActivity = MainActivity.instance;
+        }
+        
+        if (mActivity == null) {
+            Log.e("StreamingFragment", "mActivity is still null, cannot show share dialog");
+            MessageUtil.showToast(getContext(), "Activity not available. Please try again.");
+            return;
+        }
+        
+        Log.d("StreamingFragment", "mActivity found, showing InviteDialog");
+        
+        try {
             InviteDialog codeDialog = new InviteDialog(mActivity);
+            
             if (mListener != null) {
+                Log.d("StreamingFragment", "mListener found, setting dialog state");
                 mListener.isDialog(true);
+            } else {
+                Log.w("StreamingFragment", "mListener is null");
             }
+            
             codeDialog.setCloseListener(view -> {
+                Log.d("StreamingFragment", "Close button clicked");
                 if (mListener != null) {
                     mListener.isDialog(false);
                 }
                 codeDialog.dismiss();
             });
+            
             codeDialog.setOkListener(view -> {
+                Log.d("StreamingFragment", "OK button clicked");
                 if (mListener != null) {
                     mListener.isDialog(false);
                 }
                 String email = codeDialog.edt_email.getText().toString();
+                Log.d("StreamingFragment", "Email entered: " + email);
+                
                 if (!CommonUtil.isValidEmail(email)) {
                     MessageUtil.showToast(mActivity, R.string.invalid_email);
                 } else {
@@ -1523,7 +1563,13 @@ public class StreamingFragment extends BaseFragment {
                 }
                 codeDialog.dismiss();
             });
+            
+            Log.d("StreamingFragment", "Showing InviteDialog");
             codeDialog.show();
+            
+        } catch (Exception e) {
+            Log.e("StreamingFragment", "Error showing InviteDialog", e);
+            MessageUtil.showToast(mActivity, "Error showing share dialog: " + e.getMessage());
         }
     }
 

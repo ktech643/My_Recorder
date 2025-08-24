@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -91,7 +92,8 @@ public class StreamingModeBottomSheet extends BottomSheetDialogFragment {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             StreamingModeOption option = options.get(position);
-            holder.bind(option);
+            boolean isLastItem = position == options.size() - 1;
+            holder.bind(option, isLastItem);
         }
 
         @Override
@@ -111,10 +113,18 @@ public class StreamingModeBottomSheet extends BottomSheetDialogFragment {
                 ivCheck = itemView.findViewById(R.id.iv_check);
             }
 
-            void bind(StreamingModeOption option) {
+            void bind(StreamingModeOption option, boolean isLastItem) {
                 tvTitle.setText(option.title);
                 tvDescription.setText(option.description);
                 ivCheck.setVisibility(option.isSelected ? View.VISIBLE : View.GONE);
+
+                // Remove bottom margin for the last item to eliminate bottom padding
+                if (isLastItem) {
+                    itemView.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ));
+                }
 
                 itemView.setOnClickListener(v -> {
                     if (listener != null) {
