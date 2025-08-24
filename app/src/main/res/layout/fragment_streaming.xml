@@ -813,13 +813,17 @@
 
                     <ImageView
                         android:id="@+id/btn_back"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginStart="@dimen/margin_normal"
-                        android:src="@drawable/ic_action_back"
-                        app:tint="@color/black" />
+                        android:layout_marginStart="@dimen/margin_small"
+                        android:src="@drawable/ic_back_arrow_black"
+                        android:background="@drawable/back_button_prominent"
+                        android:padding="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="@string/back" />
 
                     <TextView
                         android:id="@+id/txt_login"

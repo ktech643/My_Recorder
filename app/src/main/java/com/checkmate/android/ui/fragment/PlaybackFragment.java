@@ -578,10 +578,17 @@ public class PlaybackFragment extends BaseFragment
         private List<Media> loadFromSAF() {
             List<Media> result = new ArrayList<>();
             
+            // Check if treeUri is null or invalid
+            if (treeUri == null) {
+                Log.w("LoadSAF", "treeUri is null, skipping SAF loading");
+                return result;
+            }
+            
             try {
                 Context context = requireContext();
                 DocumentFile rootDoc = DocumentFile.fromTreeUri(context, treeUri);
                 if (rootDoc == null || !rootDoc.isDirectory()) {
+                    Log.w("LoadSAF", "rootDoc is null or not a directory");
                     return result;
                 }
 
