@@ -31,6 +31,6 @@
         android:layout_centerVertical="true"
         android:src="@android:drawable/ic_menu_more"
         android:visibility="gone"
-        android:tint="@color/colorPrimary" />
+        android:tint="@color/teal" />
 
 </RelativeLayout>

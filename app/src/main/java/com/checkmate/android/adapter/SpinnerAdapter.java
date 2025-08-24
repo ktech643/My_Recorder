@@ -58,7 +58,7 @@ public class SpinnerAdapter extends ArrayAdapter<RotateModel> {
         }
         holder.txt_item.setText(model.title);
         if (model.is_selected) {
-            holder.txt_item.setTextColor(getContext().getResources().getColor(R.color.red));
+            holder.txt_item.setTextColor(getContext().getResources().getColor(R.color.teal));
         } else {
             holder.txt_item.setTextColor(getContext().getResources().getColor(R.color.black));
         }

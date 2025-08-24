@@ -260,7 +260,7 @@ public class MainActivity extends BaseActivity
         ╰──────────────────────────────────────────────────────────────────────╯ */
     private UsbManager  usbManager;
     private PendingIntent permissionIntent;
-    private boolean     isUsbServiceBound  = false,
+    public boolean     isUsbServiceBound  = false,
             isCamServiceBond   = false,
             isWifiServiceBound = false,
             isCastServiceBound = false,
