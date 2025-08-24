@@ -31,6 +31,8 @@ import com.checkmate.android.R;
 import com.checkmate.android.database.FileStoreDb;
 import com.checkmate.android.model.Media;
 import com.checkmate.android.ui.view.DragListView;
+import com.checkmate.android.ui.activity.ImageViewerActivity;
+import com.checkmate.android.ui.activity.VideoPlayerActivity;
 import com.checkmate.android.util.MessageUtil;
 import com.checkmate.android.util.ResourceUtil;
 import com.checkmate.android.viewmodels.EventType;
@@ -243,12 +245,10 @@ public class PlaybackFragment extends BaseFragment
         if (media.is_encrypted) {
             decryptAndOpen(media, "video/mp4");
         } else {
-            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-            Uri contentUri = media.contentUri;
-            viewIntent.setType("video/mp4");
-            viewIntent.setDataAndType(contentUri, "video/*");
-            viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(viewIntent, null));
+            Intent intent = new Intent(getActivity(), VideoPlayerActivity.class);
+            intent.putExtra(VideoPlayerActivity.EXTRA_VIDEO_URI, media.contentUri.toString());
+            intent.putExtra(VideoPlayerActivity.EXTRA_IS_ENCRYPTED, false);
+            startActivity(intent);
         }
     }
 
@@ -256,12 +256,10 @@ public class PlaybackFragment extends BaseFragment
         if (media.is_encrypted) {
             decryptAndOpen(media, "image/*");
         } else {
-            Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-            Uri contentUri = media.contentUri;
-            viewIntent.setType("image/*");
-            viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            viewIntent.setDataAndType(contentUri, "image/*");
-            startActivity(Intent.createChooser(viewIntent, null));
+            Intent intent = new Intent(getActivity(), ImageViewerActivity.class);
+            intent.putExtra(ImageViewerActivity.EXTRA_IMAGE_URI, media.contentUri.toString());
+            intent.putExtra(ImageViewerActivity.EXTRA_IS_ENCRYPTED, false);
+            startActivity(intent);
         }
     }
 
@@ -278,10 +276,20 @@ public class PlaybackFragment extends BaseFragment
                 boolean result = decryptFile(media.contentUri, tempDecryptedFile, password);
                 if (result) {
                     Uri fileUri = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName() + ".provider", tempDecryptedFile);
-                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    viewIntent.setDataAndType(fileUri, mimeType);
-                    viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(Intent.createChooser(viewIntent, null));
+                    
+                    // Launch appropriate in-app viewer based on mime type
+                    Intent intent;
+                    if (mimeType.startsWith("video/")) {
+                        intent = new Intent(getActivity(), VideoPlayerActivity.class);
+                        intent.putExtra(VideoPlayerActivity.EXTRA_VIDEO_URI, fileUri.toString());
+                        intent.putExtra(VideoPlayerActivity.EXTRA_IS_ENCRYPTED, true);
+                    } else {
+                        intent = new Intent(getActivity(), ImageViewerActivity.class);
+                        intent.putExtra(ImageViewerActivity.EXTRA_IMAGE_URI, fileUri.toString());
+                        intent.putExtra(ImageViewerActivity.EXTRA_IS_ENCRYPTED, true);
+                    }
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(intent);
                 } else {
                     MessageUtil.showToast(getActivity(), "Failed to decrypt");
                 }

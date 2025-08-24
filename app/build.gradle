@@ -131,6 +131,15 @@ dependencies {
     
     // Add missing dependencies
     implementation 'com.google.guava:guava:31.1-jre'
+    
+    // Image viewing library (PhotoView for zoom/pan)
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    
+    // Video player library (ExoPlayer for in-app video playback)
+    implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
+    
+    // For better metadata extraction
+    implementation 'androidx.exifinterface:exifinterface:1.3.6'
 }
 configurations.configureEach {
     exclude group: 'com.serenegiant', module: 'common'
