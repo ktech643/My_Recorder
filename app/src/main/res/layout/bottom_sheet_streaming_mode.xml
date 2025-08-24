@@ -4,7 +4,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/bottom_sheet_background"
-    android:padding="16dp">
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="0dp">
 
     <!-- Title -->
     <TextView

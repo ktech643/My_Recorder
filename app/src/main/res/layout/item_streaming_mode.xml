@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:text="Stream to cloud servers"
             android:textSize="13sp"
-            android:textColor="@color/gray"
+            android:textColor="#666666"
             android:alpha="0.7" />
 
     </LinearLayout>
