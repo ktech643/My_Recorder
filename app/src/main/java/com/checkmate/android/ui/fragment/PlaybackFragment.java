@@ -8,7 +8,9 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.util.Log;
@@ -92,6 +94,7 @@ public class PlaybackFragment extends BaseFragment
     TextView txt_delete;
     TextView tv_storage_path;
     TextView tv_storage_location;
+    TextView tv_refresh_hint;
 
     public static PlaybackFragment newInstance() {
         PlaybackFragment fragment = new PlaybackFragment();
@@ -142,7 +145,7 @@ public class PlaybackFragment extends BaseFragment
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser && isResumed()) {
-            list_view.refresh();
+            loadMediaFromAllSources();
             updateUI();
         }
     }
@@ -161,6 +164,7 @@ public class PlaybackFragment extends BaseFragment
         txt_delete = mView.findViewById(R.id.txt_delete);
         tv_storage_path = mView.findViewById(R.id.tv_storage_path);
         tv_storage_location = mView.findViewById(R.id.tv_storage_location);
+        tv_refresh_hint = mView.findViewById(R.id.tv_refresh_hint);
 
         txt_select.setOnClickListener(v -> onSelect());
         txt_delete.setOnClickListener(v -> onDelete());
@@ -227,7 +231,9 @@ public class PlaybackFragment extends BaseFragment
         adapter = new ListAdapter(getActivity());
         list_view.setAdapter(adapter);
         list_view.setOnRefreshListener(this);
-        list_view.refresh();
+        
+        // Load from all available sources
+        loadMediaFromAllSources();
 
         list_view.setOnItemClickListener((adapterView, view, i, l) -> {
             Media media = mDataList.get(i - 1);
@@ -345,21 +351,27 @@ public class PlaybackFragment extends BaseFragment
     }
 
     @Override
-    public void onRefresh() {}
+    public void onRefresh() {
+        loadMediaFromAllSources();
+    }
 
     @Override
     public void onDragRefresh() {
-        loadFromTreeUriSingleDirectory();
+        loadMediaFromAllSources();
     }
 
     @Override
     public void onDragLoadMore() {}
 
+    private void loadMediaFromAllSources() {
+        txt_no_data.setVisibility(View.GONE);
+        new LoadAllMediaTask().execute();
+    }
+    
     private void loadFromTreeUriSingleDirectory() {
         if (treeUri == null) {
-            // This means we're using file path storage, not content URI storage
-            txt_no_data.setVisibility(View.VISIBLE);
-            txt_no_data.setText("Content URI access required for this feature");
+            // Load from file paths instead
+            loadMediaFromAllSources();
             return;
         }
         txt_no_data.setVisibility(View.GONE);
@@ -530,6 +542,352 @@ public class PlaybackFragment extends BaseFragment
             list_view.onRefreshComplete();
         }
     }
+
+    private class LoadAllMediaTask extends AsyncTask<Void, Void, List<Media>> {
+        @Override
+        protected List<Media> doInBackground(Void... voids) {
+            List<Media> result = new ArrayList<>();
+            
+            try {
+                // First, try to load from SAF if available
+                if (treeUri != null) {
+                    result.addAll(loadFromSAF());
+                }
+                
+                // Also load from traditional file paths and MediaStore
+                result.addAll(loadFromFilePaths());
+                result.addAll(loadFromMediaStore());
+                
+                // Remove duplicates based on content URI
+                Set<String> seenUris = new HashSet<>();
+                List<Media> uniqueResult = new ArrayList<>();
+                for (Media media : result) {
+                    String uriString = media.contentUri.toString();
+                    if (!seenUris.contains(uriString)) {
+                        seenUris.add(uriString);
+                        uniqueResult.add(media);
+                    }
+                }
+                
+                // Sort by date (newest first)
+                Collections.sort(uniqueResult, (m1, m2) -> Long.compare(m2.date, m1.date));
+                
+                return uniqueResult;
+                
+            } catch (Exception e) {
+                Log.e("LoadAllMedia", "Error loading media", e);
+                return result;
+            }
+        }
+        
+        private List<Media> loadFromSAF() {
+            List<Media> result = new ArrayList<>();
+            
+            try {
+                Context context = requireContext();
+                DocumentFile rootDoc = DocumentFile.fromTreeUri(context, treeUri);
+                if (rootDoc == null || !rootDoc.isDirectory()) {
+                    return result;
+                }
+
+                // Get existing records from DB
+                Map<String, Media> dbMediaMap = new HashMap<>();
+                List<Media> dbMediaList = fileStoreDb.getMediaForPath(treeUri.toString());
+                for (Media media : dbMediaList) {
+                    dbMediaMap.put(media.contentUri.toString(), media);
+                }
+
+                // Scan directory
+                DocumentFile[] children = rootDoc.listFiles();
+                if (children == null) return result;
+
+                for (DocumentFile doc : children) {
+                    if (doc.isDirectory()) continue;
+                    String name = doc.getName();
+                    if (TextUtils.isEmpty(name)) continue;
+
+                    Uri contentUri = doc.getUri();
+                    String uriString = contentUri.toString();
+
+                    Media media = dbMediaMap.get(uriString);
+                    if (media == null) {
+                        media = new Media();
+                        media.name = name;
+                        media.contentUri = contentUri;
+                        media.path = treeUri.toString();
+                        media.date = doc.lastModified();
+                        media.file = doc;
+
+                        // Determine media type
+                        if (isVideoFile(name)) {
+                            media.type = Media.TYPE.VIDEO;
+                            extractVideoMetadata(media);
+                        } else if (isImageFile(name)) {
+                            media.type = Media.TYPE.IMAGE;
+                        }
+
+                        // Check if encrypted
+                        media.is_encrypted = name.endsWith(".enc");
+
+                        // Save to database
+                        long id = fileStoreDb.insert(media);
+                        media.id = id;
+                    }
+                    result.add(media);
+                }
+                
+            } catch (Exception e) {
+                Log.e("LoadSAF", "Error loading from SAF", e);
+            }
+            
+            return result;
+        }
+        
+        private List<Media> loadFromFilePaths() {
+            List<Media> result = new ArrayList<>();
+            
+            try {
+                String storagePath = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
+                
+                // If storage path is not a SAF URI, treat it as a file path
+                if (!storagePath.startsWith("content://") && !storagePath.isEmpty()) {
+                    File directory = new File(storagePath);
+                    if (directory.exists() && directory.isDirectory()) {
+                        File[] files = directory.listFiles();
+                        if (files != null) {
+                            for (File file : files) {
+                                if (file.isFile()) {
+                                    String name = file.getName();
+                                    if (isImageFile(name) || isVideoFile(name)) {
+                                        Media media = new Media();
+                                        media.name = name;
+                                        media.contentUri = Uri.fromFile(file);
+                                        media.path = storagePath;
+                                        media.date = file.lastModified();
+                                        media.fileSize = file.length();
+                                        
+                                        // Determine media type
+                                        if (isVideoFile(name)) {
+                                            media.type = Media.TYPE.VIDEO;
+                                            extractVideoMetadata(media);
+                                        } else if (isImageFile(name)) {
+                                            media.type = Media.TYPE.IMAGE;
+                                        }
+                                        
+                                        // Check if encrypted
+                                        media.is_encrypted = name.endsWith(".enc");
+                                        
+                                        result.add(media);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            } catch (Exception e) {
+                Log.e("LoadFilePaths", "Error loading from file paths", e);
+            }
+            
+            return result;
+        }
+        
+        private List<Media> loadFromMediaStore() {
+            List<Media> result = new ArrayList<>();
+            
+            try {
+                Context context = requireContext();
+                
+                // Load images from MediaStore
+                String[] imageProjection = {
+                    MediaStore.Images.Media._ID,
+                    MediaStore.Images.Media.DISPLAY_NAME,
+                    MediaStore.Images.Media.DATE_ADDED,
+                    MediaStore.Images.Media.SIZE,
+                    MediaStore.Images.Media.DATA
+                };
+                
+                Cursor imageCursor = context.getContentResolver().query(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    imageProjection,
+                    null,
+                    null,
+                    MediaStore.Images.Media.DATE_ADDED + " DESC LIMIT 100"
+                );
+                
+                if (imageCursor != null) {
+                    while (imageCursor.moveToNext()) {
+                        try {
+                            long id = imageCursor.getLong(imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID));
+                            String name = imageCursor.getString(imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME));
+                            long dateAdded = imageCursor.getLong(imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED));
+                            long size = imageCursor.getLong(imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE));
+                            String path = imageCursor.getString(imageCursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+                            
+                            Uri contentUri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, String.valueOf(id));
+                            
+                            Media media = new Media();
+                            media.name = name;
+                            media.contentUri = contentUri;
+                            media.path = "MediaStore";
+                            media.date = dateAdded * 1000; // Convert to milliseconds
+                            media.fileSize = size;
+                            media.type = Media.TYPE.IMAGE;
+                            media.is_encrypted = false;
+                            
+                            result.add(media);
+                        } catch (Exception e) {
+                            Log.e("MediaStore", "Error processing image", e);
+                        }
+                    }
+                    imageCursor.close();
+                }
+                
+                // Load videos from MediaStore
+                String[] videoProjection = {
+                    MediaStore.Video.Media._ID,
+                    MediaStore.Video.Media.DISPLAY_NAME,
+                    MediaStore.Video.Media.DATE_ADDED,
+                    MediaStore.Video.Media.SIZE,
+                    MediaStore.Video.Media.DURATION,
+                    MediaStore.Video.Media.DATA
+                };
+                
+                Cursor videoCursor = context.getContentResolver().query(
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    videoProjection,
+                    null,
+                    null,
+                    MediaStore.Video.Media.DATE_ADDED + " DESC LIMIT 100"
+                );
+                
+                if (videoCursor != null) {
+                    while (videoCursor.moveToNext()) {
+                        try {
+                            long id = videoCursor.getLong(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID));
+                            String name = videoCursor.getString(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME));
+                            long dateAdded = videoCursor.getLong(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED));
+                            long size = videoCursor.getLong(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE));
+                            long duration = videoCursor.getLong(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION));
+                            String path = videoCursor.getString(videoCursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
+                            
+                            Uri contentUri = Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, String.valueOf(id));
+                            
+                            Media media = new Media();
+                            media.name = name;
+                            media.contentUri = contentUri;
+                            media.path = "MediaStore";
+                            media.date = dateAdded * 1000; // Convert to milliseconds
+                            media.fileSize = size;
+                            media.duration = duration;
+                            media.type = Media.TYPE.VIDEO;
+                            media.is_encrypted = false;
+                            
+                            result.add(media);
+                        } catch (Exception e) {
+                            Log.e("MediaStore", "Error processing video", e);
+                        }
+                    }
+                    videoCursor.close();
+                }
+                
+            } catch (Exception e) {
+                Log.e("LoadMediaStore", "Error loading from MediaStore", e);
+            }
+            
+            return result;
+        }
+        
+        private boolean isImageFile(String fileName) {
+            String ext = fileName.toLowerCase();
+            return ext.endsWith(".jpg") || ext.endsWith(".jpeg") || ext.endsWith(".png") || 
+                   ext.endsWith(".gif") || ext.endsWith(".bmp") || ext.endsWith(".webp") ||
+                   ext.endsWith(".jpg.enc") || ext.endsWith(".jpeg.enc") || ext.endsWith(".png.enc");
+        }
+        
+        private boolean isVideoFile(String fileName) {
+            String ext = fileName.toLowerCase();
+            return ext.endsWith(".mp4") || ext.endsWith(".avi") || ext.endsWith(".mkv") || 
+                   ext.endsWith(".mov") || ext.endsWith(".wmv") || ext.endsWith(".flv") ||
+                   ext.endsWith(".webm") || ext.endsWith(".3gp") || ext.endsWith(".mp4.enc");
+        }
+        
+        private void extractVideoMetadata(Media media) {
+            try (Cursor cursor = requireContext().getContentResolver().query(media.contentUri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                    if (sizeIndex != -1) {
+                        media.fileSize = cursor.getLong(sizeIndex);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("Metadata", "Error extracting metadata", e);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(List<Media> result) {
+            mDataList.clear();
+            mDataList.addAll(result);
+            adapter.notifyDataSetChanged();
+            
+            // Update UI with source information
+            updateStorageLocationDisplay(result);
+            
+            txt_no_data.setVisibility(mDataList.isEmpty() ? View.VISIBLE : View.GONE);
+            if (mDataList.isEmpty()) {
+                txt_no_data.setText("No media files found in any storage location");
+            }
+            
+            list_view.onRefreshComplete();
+        }
+        
+        private void updateStorageLocationDisplay(List<Media> mediaList) {
+            int safCount = 0;
+            int filePathCount = 0;
+            int mediaStoreCount = 0;
+            
+            for (Media media : mediaList) {
+                if (media.path != null) {
+                    if (media.path.startsWith("content://")) {
+                        safCount++;
+                    } else if (media.path.equals("MediaStore")) {
+                        mediaStoreCount++;
+                    } else {
+                        filePathCount++;
+                    }
+                }
+            }
+            
+            StringBuilder displayText = new StringBuilder();
+            displayText.append("Multiple Sources: ");
+            
+            if (safCount > 0) {
+                displayText.append("SAF (").append(safCount).append(") ");
+            }
+            if (filePathCount > 0) {
+                displayText.append("Files (").append(filePathCount).append(") ");
+            }
+            if (mediaStoreCount > 0) {
+                displayText.append("MediaStore (").append(mediaStoreCount).append(")");
+            }
+            
+            tv_storage_location.setText(displayText.toString());
+            
+            // Show combined path info
+            String storagePath = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
+            if (!storagePath.isEmpty()) {
+                if (storagePath.startsWith("content://")) {
+                    tv_storage_path.setText("SAF: " + getFullPathFromTreeUri(treeUri));
+                } else {
+                    tv_storage_path.setText("Path: " + storagePath);
+                }
+            } else {
+                tv_storage_path.setText("All available storage locations");
+            }
+        }
+    }
+
     private void onSelect() {
         is_selectable = !is_selectable;
         for (Media media : mDataList) {
@@ -594,7 +952,7 @@ public class PlaybackFragment extends BaseFragment
 
         class ViewHolder {
             ImageView img_thumbnail;
-            TextView txt_name, txt_type, txt_date, txt_time, txt_duration;
+            TextView txt_name, txt_type, txt_date, txt_time, txt_duration, txt_source;
             ImageView ic_share, ic_trash;
             CheckBox checkbox;
 
@@ -605,6 +963,7 @@ public class PlaybackFragment extends BaseFragment
                 txt_date = convertView.findViewById(R.id.txt_date);
                 txt_time = convertView.findViewById(R.id.txt_time);
                 txt_duration = convertView.findViewById(R.id.txt_duration);
+                txt_source = convertView.findViewById(R.id.txt_source);
                 ic_share = convertView.findViewById(R.id.ic_share);
                 ic_trash = convertView.findViewById(R.id.ic_trash);
                 checkbox = convertView.findViewById(R.id.checkbox);
@@ -659,6 +1018,23 @@ public class PlaybackFragment extends BaseFragment
                             .thumbnail(0.1f)
                             .into(holder.img_thumbnail);
                 }
+            }
+
+            // Set source indicator
+            if (media.path != null) {
+                if (media.path.startsWith("content://")) {
+                    holder.txt_source.setText("SAF");
+                    holder.txt_source.setBackgroundColor(getResources().getColor(R.color.blue));
+                } else if (media.path.equals("MediaStore")) {
+                    holder.txt_source.setText("Gallery");
+                    holder.txt_source.setBackgroundColor(getResources().getColor(R.color.teal));
+                } else {
+                    holder.txt_source.setText("File");
+                    holder.txt_source.setBackgroundColor(getResources().getColor(R.color.red));
+                }
+            } else {
+                holder.txt_source.setText("Unknown");
+                holder.txt_source.setBackgroundColor(getResources().getColor(R.color.gray_dark));
             }
 
             holder.checkbox.setVisibility(is_selectable ? View.VISIBLE : View.GONE);
