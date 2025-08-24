@@ -26,7 +26,7 @@ android {
         compileSdkVersion 34
         applicationId "com.checkmate.android"
         minSdkVersion 29
-        targetSdkVersion 31
+        targetSdkVersion 33
         versionCode 1
         versionName "4.003"
         setProperty("archivesBaseName", "CheckMate!_" + versionName)
@@ -89,12 +89,9 @@ dependencies {
     implementation 'androidx.fragment:fragment:1.5.7'  // Or latest version
     implementation "androidx.constraintlayout:constraintlayout:2.1.4"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation(project(':usbCameraCommon')) {
-        exclude group: 'com.serenegiant', module: 'common'
-        exclude group: 'com.serenegiant', module: 'uvccamera'
-        exclude group: 'com.serenegiant', module: 'libuvccamera'
-    }
+
     implementation project(':libuvccamera')
+    implementation project(':usbCameraCommon')
 
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation "com.google.android.material:material:1.9.0"

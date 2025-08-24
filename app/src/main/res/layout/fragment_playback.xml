@@ -9,45 +9,71 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!-- Top Header with Styled Buttons -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="@drawable/header_background">
 
-            <TextView
-                style="@style/normalText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginTop="@dimen/margin_normal"
-                android:text="@string/playback"
-                android:textSize="@dimen/textsize_large"
-                android:textStyle="bold" />
-
+            <!-- Left Side Buttons -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:spacing="4dp">
 
                 <TextView
                     android:id="@+id/txt_select"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="@dimen/image_very_small"
-                    android:paddingRight="@dimen/image_very_small"
-                    android:text="@string/select" />
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="@string/select"
+                    android:textColor="@color/teal"
+                    android:textStyle="bold"
+                    android:background="@drawable/button_primary_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground" />
 
                 <TextView
                     android:id="@+id/txt_select_all"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/select_all" />
+                    android:layout_marginTop="4dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="@string/select_all"
+                    android:textColor="@color/teal"
+                    android:textStyle="bold"
+                    android:background="@drawable/button_primary_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground" />
 
             </LinearLayout>
 
+            <!-- Center Title -->
+            <TextView
+                style="@style/normalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/playback"
+                android:textSize="@dimen/textsize_large"
+                android:textStyle="bold"
+                android:textColor="@color/white" />
+
+            <!-- Right Side Delete Button -->
             <TextView
                 android:id="@+id/txt_delete"
                 style="@style/normalText"
@@ -55,18 +81,27 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginTop="@dimen/margin_normal"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:text="@string/delete"
-                android:textColor="@color/gray_dark" />
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:background="@drawable/button_danger_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground" />
         </RelativeLayout>
 
+        <!-- Storage Info Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_margin="5dp"
+            android:layout_margin="16dp"
             android:background="@drawable/round_border_background"
-            android:padding="8dp">
+            android:padding="16dp">
             
             <TextView
                 android:id="@+id/tv_storage_location"
@@ -75,45 +110,50 @@
                 android:text="Storage Sources"
                 android:textStyle="bold"
                 android:textColor="@color/blue"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
                 
             <TextView
                 android:id="@+id/tv_storage_path"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textSize="12sp"
+                android:layout_marginTop="8dp"
+                android:textSize="14sp"
                 android:textColor="@color/text_light" />
                 
             <TextView
                 android:id="@+id/tv_refresh_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:text="Pull down to refresh from all sources"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:textColor="@color/gray_dark"
                 android:textStyle="italic" />
                 
         </LinearLayout>
+
+        <!-- Media List -->
         <com.checkmate.android.ui.view.DragListView
             android:id="@+id/list_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:divider="@null" />
     </LinearLayout>
 
+    <!-- Centered No Data Message -->
     <TextView
         android:id="@+id/txt_no_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/image_extra_large"
-        android:background="@drawable/round_border_background"
-        android:padding="@dimen/margin_large"
+        android:layout_centerInParent="true"
+        android:background="@drawable/no_data_background"
+        android:padding="24dp"
         android:text="@string/no_data"
-        android:textColor="@color/black"
-        android:textSize="@dimen/textsize_large"
+        android:textColor="@color/gray_dark"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
         android:visibility="gone" />
 
 </RelativeLayout>

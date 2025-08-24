@@ -1,25 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginRight="@dimen/margin_normal"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingLeft="@dimen/margin_normal"
-    android:paddingTop="@dimen/margin_small">
+    android:paddingTop="2dp">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/margin_small"
-        android:layout_marginBottom="@dimen/margin_small"
-        android:padding="@dimen/margin_small">
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp"
+        android:padding="2dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="true"
+        android:background="@drawable/list_item_background">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:background="@drawable/list_item_inner_background"
+            android:padding="4dp">
 
             <CheckBox
                 android:id="@+id/checkbox"
@@ -30,23 +37,26 @@
                 android:id="@+id/img_thumbnail"
                 android:layout_width="@dimen/image_small"
                 android:layout_height="@dimen/image_small"
-                android:layout_margin="@dimen/margin_small"
-                android:scaleType="center"
-                android:src="@mipmap/ic_launcher" />
+                android:layout_margin="3dp"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/ic_launcher"
+                android:background="@drawable/image_rounded_background"
+                android:clipToOutline="true" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:padding="@dimen/margin_small">
+                android:padding="3dp">
 
                 <TextView
                     android:id="@+id/txt_name"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -82,26 +92,6 @@
                         android:layout_gravity="right"
                         android:textSize="@dimen/textsize_small" />
 
-                </LinearLayout>
-                
-                <!-- Source indicator -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    
-                    <TextView
-                        android:id="@+id/txt_source"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="10sp"
-                        android:textColor="@color/blue"
-                        android:background="@drawable/round_border_background"
-                        android:paddingLeft="4dp"
-                        android:paddingRight="4dp"
-                        android:paddingTop="1dp"
-                        android:paddingBottom="1dp"
-                        android:text="SAF" />
-                        
                 </LinearLayout>
             </LinearLayout>
 
