@@ -80,13 +80,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <!-- Fullscreen theme for video/image viewer activities -->
-    <style name="Theme.MaterialComponents.Light.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@android:color/black</item>
-    </style>
-
     <style name="NumberPickerStyle">
         <item name="android:textSize">22dp</item>
         <item name="android:textColorPrimary">@color/blue</item>
@@ -113,20 +106,5 @@
         <item name="android:spinnerMode">dropdown</item>
     </style>
 
-    <!-- Bottom Navigation Styles -->
-    <style name="BottomNavigationView" parent="Widget.Design.BottomNavigationView">
-        <item name="itemTextAppearanceActive">@style/BottomNavigationViewActiveText</item>
-        <item name="itemTextAppearanceInactive">@style/BottomNavigationViewInactiveText</item>
-    </style>
-
-    <style name="BottomNavigationViewActiveText" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="BottomNavigationViewInactiveText" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:textSize">10sp</item>
-        <item name="android:textStyle">normal</item>
-    </style>
 
 </resources>

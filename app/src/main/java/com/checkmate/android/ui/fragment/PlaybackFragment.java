@@ -24,8 +24,6 @@ import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.checkmate.android.AppPreference;
@@ -33,7 +31,6 @@ import com.checkmate.android.R;
 import com.checkmate.android.database.FileStoreDb;
 import com.checkmate.android.model.Media;
 import com.checkmate.android.ui.view.DragListView;
-import com.checkmate.android.ui.adapter.ModernMediaAdapter;
 import com.checkmate.android.util.MessageUtil;
 import com.checkmate.android.util.ResourceUtil;
 import com.checkmate.android.viewmodels.EventType;
@@ -71,7 +68,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class PlaybackFragment extends BaseFragment
-        implements DragListView.OnRefreshLoadingMoreListener, ModernMediaAdapter.OnDeleteClickListener, ModernMediaAdapter.OnLoadMoreListener {
+        implements DragListView.OnRefreshLoadingMoreListener {
 
     public static final String ARG_TREE_URI = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
     public static WeakReference<PlaybackFragment> instance;
@@ -83,16 +80,10 @@ public class PlaybackFragment extends BaseFragment
     private Uri treeUri;
     private List<Media> mDataList = new ArrayList<>();
     private ListAdapter adapter;
-    private ModernMediaAdapter modernAdapter;
     private FileStoreDb fileStoreDb;
-    private int currentPage = 0;
-    private final int PAGE_SIZE = 10;
-    private boolean isLoading = false;
-    private boolean hasMoreData = true;
 
     // UI references
     DragListView list_view;
-    RecyclerView recyclerView;
     TextView txt_select;
     TextView txt_no_data;
     TextView txt_select_all;
@@ -104,13 +95,13 @@ public class PlaybackFragment extends BaseFragment
         PlaybackFragment fragment = new PlaybackFragment();
         Bundle args = new Bundle();
         String storage_location = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-
+        
         // Only set treeUri if it's a valid content URI
         if (storage_location.startsWith("content://")) {
             Uri treeUri = Uri.parse(storage_location);
             args.putParcelable(ARG_TREE_URI, treeUri);
         }
-
+        
         fragment.setArguments(args);
         return fragment;
     }
@@ -149,20 +140,8 @@ public class PlaybackFragment extends BaseFragment
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser && isResumed()) {
-            refreshData();
-            updateUI();
-        }
-    }
-    
-    private void refreshData() {
-        resetPagination();
-        loadFromTreeUriSingleDirectory();
-        if (list_view != null) {
             list_view.refresh();
-        }
-        // Also notify the modern adapter
-        if (modernAdapter != null) {
-            modernAdapter.notifyDataSetChanged();
+            updateUI();
         }
     }
 
@@ -173,9 +152,7 @@ public class PlaybackFragment extends BaseFragment
     }
 
     private void initViews() {
-        // Note: list_view doesn't exist in the current layout, only recycler_view
-        list_view = mView.findViewById(R.id.list_view); // This will be null
-        recyclerView = mView.findViewById(R.id.recycler_view);
+        list_view = mView.findViewById(R.id.list_view);
         txt_no_data = mView.findViewById(R.id.txt_no_data);
         txt_select = mView.findViewById(R.id.txt_select);
         txt_select_all = mView.findViewById(R.id.txt_select_all);
@@ -183,37 +160,26 @@ public class PlaybackFragment extends BaseFragment
         tv_storage_path = mView.findViewById(R.id.tv_storage_path);
         tv_storage_location = mView.findViewById(R.id.tv_storage_location);
 
-        // Add null checks for click listeners
-        if (txt_select != null) {
-            txt_select.setOnClickListener(v -> onSelect());
-        }
-        if (txt_delete != null) {
-            txt_delete.setOnClickListener(v -> onDelete());
-        }
-        if (txt_select_all != null) {
-            txt_select_all.setOnClickListener(v -> onSelectAll());
-        }
+        txt_select.setOnClickListener(v -> onSelect());
+        txt_delete.setOnClickListener(v -> onDelete());
+        txt_select_all.setOnClickListener(v -> onSelectAll());
     }
 
     private void handleArguments() {
         if (getArguments() != null) {
             String storage_location = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-
+            
             // Check if storage_location is a valid content URI or just a file path
             if (storage_location.startsWith("content://")) {
                 treeUri = Uri.parse(storage_location);
             } else {
                 // It's a file path, not a content URI - we can't use DocumentFile with this
                 treeUri = null;
-                if (tv_storage_path != null) {
-                    tv_storage_path.setText(storage_location);
-                }
-                if (tv_storage_location != null) {
-                    tv_storage_location.setText("Storage Location: File Path (Limited Access)");
-                }
+                tv_storage_path.setText(storage_location);
+                tv_storage_location.setText("Storage Location: File Path (Limited Access)");
                 return;
             }
-
+            
             String strName = getFullPathFromTreeUri(treeUri);
             tv_storage_path.setText(strName);
             String storageType = AppPreference.getStr(AppPreference.KEY.Storage_Type, "Storage Location: Default Storage");
@@ -256,39 +222,21 @@ public class PlaybackFragment extends BaseFragment
 
     private void initialize() {
         is_selectable = false;
-        
-        // Only proceed if recyclerView is available
-        if (recyclerView == null) {
-            Log.e("PlaybackFragment", "RecyclerView not found in layout");
-            return;
-        }
-        
-        // Setup modern RecyclerView adapter
-        modernAdapter = new ModernMediaAdapter(getActivity());
-        modernAdapter.setOnDeleteClickListener(this);
-        modernAdapter.setOnLoadMoreListener(this);
-        
-        // Setup RecyclerView
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(modernAdapter);
-        recyclerView.setVisibility(android.view.View.VISIBLE);
-        
-        // Hide old list view if it exists (it won't in current layout)
-        if (list_view != null) {
-            list_view.setVisibility(android.view.View.GONE);
-            // Setup old adapter for compatibility only if list_view exists
-            adapter = new ListAdapter(getActivity());
-            list_view.setAdapter(adapter);
-            list_view.setOnRefreshListener(this);
-        } else {
-            // list_view doesn't exist in current layout, so create adapter but don't set it anywhere
-            adapter = new ListAdapter(getActivity());
-        }
-        
-        // Load initial data
-        resetPagination();
-        loadFromTreeUriSingleDirectory();
+        adapter = new ListAdapter(getActivity());
+        list_view.setAdapter(adapter);
+        list_view.setOnRefreshListener(this);
+        list_view.refresh();
+
+        list_view.setOnItemClickListener((adapterView, view, i, l) -> {
+            Media media = mDataList.get(i - 1);
+            AppPreference.setBool(AppPreference.KEY.IS_FOR_PLAYBACK_LOCATION, true);
+
+            if (media.type == Media.TYPE.VIDEO) {
+                openVideo(media);
+            } else {
+                openImage(media);
+            }
+        });
     }
 
     private void openVideo(Media media) {
@@ -393,7 +341,6 @@ public class PlaybackFragment extends BaseFragment
 
     @Override
     public void onDragRefresh() {
-        resetPagination();
         loadFromTreeUriSingleDirectory();
     }
 
@@ -480,8 +427,6 @@ public class PlaybackFragment extends BaseFragment
                     // Extract and store metadata for non-encrypted files
                     if (!media.is_encrypted) {
                         extractAndStoreMetadata(context, media);
-                        // Extract additional metadata using new utility
-                        com.checkmate.android.util.MetadataExtractor.extractAndPopulateMetadata(context, media);
                     }
 
                     // Insert into database
@@ -570,121 +515,55 @@ public class PlaybackFragment extends BaseFragment
 
         @Override
         protected void onPostExecute(List<Media> result) {
-            isLoading = false;
-            
-            if (currentPage == 0) {
-                // First page - replace all data
-                mDataList.clear();
-                mDataList.addAll(result);
-                modernAdapter.updateData(result);
-                
-                // Check if we have fewer items than page size, meaning no more data
-                if (result.size() < PAGE_SIZE) {
-                    hasMoreData = false;
-                }
-            } else {
-                // Subsequent pages - append data
-                int startIndex = currentPage * PAGE_SIZE;
-                List<Media> newItems = new ArrayList<>();
-                
-                // Add new items that aren't already in the list
-                for (int i = startIndex; i < result.size() && i < startIndex + PAGE_SIZE; i++) {
-                    if (i < result.size()) {
-                        newItems.add(result.get(i));
-                    }
-                }
-                
-                if (newItems.size() < PAGE_SIZE) {
-                    hasMoreData = false; // No more data to load
-                }
-                
-                mDataList.addAll(newItems);
-                modernAdapter.addData(newItems);
-            }
-            
-            // Legacy adapter update
+            mDataList.clear();
+            mDataList.addAll(result);
             adapter.notifyDataSetChanged();
             txt_no_data.setVisibility(mDataList.isEmpty() ? View.VISIBLE : View.GONE);
-            
-            if (list_view != null) {
-                list_view.onRefreshComplete();
-            }
+            list_view.onRefreshComplete();
         }
     }
-    private void resetPagination() {
-        currentPage = 0;
-        isLoading = false;
-        hasMoreData = true;
-        mDataList.clear();
-    }
-    
-    // Interface implementations for ModernMediaAdapter
-    @Override
-    public void onDeleteClick(Media media) {
-        if (media.file != null) {
-            media.file.delete();
-            fileStoreDb.deleteByPath(media.contentUri.toString());
-            refreshData(); // Refresh data
-        }
-    }
-    
-    @Override
-    public void onDeleteMultiple(List<Media> selectedMedia) {
-        for (Media media : selectedMedia) {
-            if (media.file != null) {
-                media.file.delete();
-                fileStoreDb.deleteByPath(media.contentUri.toString());
-            }
-        }
-        refreshData(); // Refresh data
-    }
-    
-    @Override
-    public void onLoadMore() {
-        if (!isLoading && hasMoreData) {
-            isLoading = true;
-            currentPage++;
-            loadFromTreeUriSingleDirectory();
-        }
-    }
-
     private void onSelect() {
         is_selectable = !is_selectable;
-        modernAdapter.setSelectable(is_selectable);
-        txt_delete.setTextColor(is_selectable ?
-                getResources().getColor(R.color.black) :
-                getResources().getColor(R.color.gray_dark));
-        
-        // Legacy support
         for (Media media : mDataList) {
             media.is_selected = false;
         }
+        txt_delete.setTextColor(is_selectable ?
+                getResources().getColor(R.color.black) :
+                getResources().getColor(R.color.gray_dark));
         adapter.notifyDataSetChanged();
     }
 
     private void onSelectAll() {
         if (!is_selectable) return;
-        is_all_selected = !is_all_selected;
-        modernAdapter.selectAll(is_all_selected);
-        
-        // Legacy support
         for (Media media : mDataList) {
-            media.is_selected = is_all_selected;
+            media.is_selected = !is_all_selected;
         }
+        is_all_selected = !is_all_selected;
         adapter.notifyDataSetChanged();
     }
 
     private void onDelete() {
         if (!is_selectable) return;
-        
-        List<Media> selectedMedia = modernAdapter.getSelectedMedia();
-        if (selectedMedia.isEmpty()) return;
+        boolean anySelected = false;
+        for (Media media : mDataList) {
+            if (media.is_selected) {
+                anySelected = true;
+                break;
+            }
+        }
+        if (!anySelected) return;
 
         MessageDialog.show(getString(R.string.delete), getString(R.string.confirm_delete_multi),
                         getString(R.string.Okay), getString(R.string.cancel))
                 .setCancelButton((dialog, view) -> false)
                 .setOkButton((baseDialog, view) -> {
-                    onDeleteMultiple(selectedMedia);
+                    for (Media media : mDataList) {
+                        if (media.is_selected && media.file != null) {
+                            media.file.delete();
+                            fileStoreDb.deleteByPath(media.contentUri.toString());
+                        }
+                    }
+                    list_view.refresh();
                     return false;
                 });
     }
@@ -796,11 +675,7 @@ public class PlaybackFragment extends BaseFragment
                                 if (media.file != null) {
                                     media.file.delete();
                                     fileStoreDb.deleteByPath(media.contentUri.toString());
-                                    if (list_view != null) {
-                                        list_view.refresh();
-                                    }
-                                    // Also refresh the modern adapter
-                                    refreshData();
+                                    list_view.refresh();
                                 }
                                 return false;
                             }));

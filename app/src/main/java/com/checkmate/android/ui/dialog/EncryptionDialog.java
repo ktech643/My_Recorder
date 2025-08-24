@@ -36,7 +36,6 @@ public class EncryptionDialog extends Dialog {
         setCancelable(false);
                 btn_ok = findViewById(R.id.btn_ok);
         btn_close = findViewById(R.id.btn_close);
-        edt_code = findViewById(R.id.edt_code);
 
     }
 

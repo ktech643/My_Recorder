@@ -50,7 +50,6 @@ public class SerialDialog extends Dialog {
         img_help = findViewById(R.id.img_help);
         btn_qr = findViewById(R.id.btn_qr);
         txt_content = findViewById(R.id.txt_content);
-        edt_serial = findViewById(R.id.edt_serial);
 
     }
 

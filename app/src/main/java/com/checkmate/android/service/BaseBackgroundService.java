@@ -24,11 +24,7 @@ import toothpick.Toothpick;
 import toothpick.config.Module;
 import javax.inject.Inject;
 import android.annotation.SuppressLint;
-import android.util.Log;
-
 public abstract class BaseBackgroundService extends Service {
-    private static final String TAG = "BaseBackgroundService";
-    
     // Common fields
     @Inject
     public SharedEglManager mEglManager;
@@ -207,8 +203,6 @@ public abstract class BaseBackgroundService extends Service {
     public void takeSnapshot() {
         if (mEglManager != null) {
             mEglManager.takeSnapshot();
-        } else {
-            Log.w(TAG, "EGL Manager is null, cannot take snapshot");
         }
     }
 
@@ -240,18 +234,11 @@ public abstract class BaseBackgroundService extends Service {
     }
 
     public void setPreviewSurface(SurfaceTexture surface, int width, int height) {
-        if (surface == null) {
-            Log.w(TAG, "Attempting to set null preview surface");
-        }
-        
         mPreviewTexture = surface;
         mSurfaceWidth = width;
         mSurfaceHeight = height;
-        
         if (mEglManager != null) {
             mEglManager.setPreviewSurface(surface, width, height);
-        } else {
-            Log.w(TAG, "EGL Manager is null, cannot set preview surface");
         }
     }
 
@@ -351,11 +338,6 @@ public abstract class BaseBackgroundService extends Service {
 
     // Add method to switch to this service
     public void activateService(SurfaceTexture surface, int width, int height) {
-        if (surface == null) {
-            Log.e(TAG, "Cannot activate service with null surface");
-            return;
-        }
-        
         if (mEglManager != null) {
             mEglManager.switchActiveService(
                 getServiceType(),
@@ -363,8 +345,6 @@ public abstract class BaseBackgroundService extends Service {
                 width,
                 height
             );
-        } else {
-            Log.e(TAG, "EGL Manager is null, cannot activate service");
         }
     }
 }
