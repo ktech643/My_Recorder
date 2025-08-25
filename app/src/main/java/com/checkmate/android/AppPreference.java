@@ -1,9 +1,17 @@
 package com.checkmate.android;
 
 import android.content.SharedPreferences;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.checkmate.android.util.AppLogger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class AppPreference {
-    private static SharedPreferences instance = null;
+    private static final String TAG = "AppPreference";
+    private static volatile SharedPreferences instance = null;
+    private static final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final Object initLock = new Object();
 
     public static class KEY {
         // settings
@@ -176,71 +184,223 @@ public class AppPreference {
         final public static String IS_MIRRORED = "IS_MIRRORED";
     }
 
-    public static void initialize(SharedPreferences pref) {
-        instance = pref;
+    public static void initialize(@NonNull SharedPreferences pref) {
+        if (pref == null) {
+            AppLogger.e(TAG, "Cannot initialize with null SharedPreferences");
+            return;
+        }
+        synchronized (initLock) {
+            instance = pref;
+            AppLogger.i(TAG, "AppPreference initialized");
+        }
     }
 
     // check contain
-    public static boolean contains(String key) {
-        return instance.contains(key);
+    public static boolean contains(@Nullable String key) {
+        if (key == null || instance == null) {
+            AppLogger.w(TAG, "contains() called with null key or uninitialized instance");
+            return false;
+        }
+        lock.readLock().lock();
+        try {
+            return instance.contains(key);
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error checking key existence: " + key, e);
+            return false;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     // boolean
-    public static boolean getBool(String key, boolean def) {
-        return instance.getBoolean(key, def);
+    public static boolean getBool(@Nullable String key, boolean def) {
+        if (key == null || instance == null) {
+            AppLogger.w(TAG, "getBool() called with null key or uninitialized instance");
+            return def;
+        }
+        lock.readLock().lock();
+        try {
+            return instance.getBoolean(key, def);
+        } catch (ClassCastException e) {
+            AppLogger.e(TAG, "Type mismatch for key: " + key + ", expected boolean", e);
+            return def;
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error getting boolean value for key: " + key, e);
+            return def;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
-    public static void setBool(String key, boolean value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putBoolean(key, value);
-        editor.commit();
+    public static void setBool(@Nullable String key, boolean value) {
+        if (key == null || instance == null) {
+            AppLogger.e(TAG, "setBool() called with null key or uninitialized instance");
+            return;
+        }
+        lock.writeLock().lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            editor.putBoolean(key, value);
+            editor.apply(); // Use apply() for better performance
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error setting boolean value for key: " + key, e);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     // int
-    public static int getInt(String key, int def) {
-        return instance.getInt(key, def);
+    public static int getInt(@Nullable String key, int def) {
+        if (key == null || instance == null) {
+            AppLogger.w(TAG, "getInt() called with null key or uninitialized instance");
+            return def;
+        }
+        lock.readLock().lock();
+        try {
+            return instance.getInt(key, def);
+        } catch (ClassCastException e) {
+            AppLogger.e(TAG, "Type mismatch for key: " + key + ", expected int", e);
+            return def;
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error getting int value for key: " + key, e);
+            return def;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
-    public static void setInt(String key, int value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putInt(key, value);
-        editor.commit();
+    public static void setInt(@Nullable String key, int value) {
+        if (key == null || instance == null) {
+            AppLogger.e(TAG, "setInt() called with null key or uninitialized instance");
+            return;
+        }
+        lock.writeLock().lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            editor.putInt(key, value);
+            editor.apply();
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error setting int value for key: " + key, e);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     // long
-    public static long getLong(String key, long def) {
-        return instance.getLong(key, def);
+    public static long getLong(@Nullable String key, long def) {
+        if (key == null || instance == null) {
+            AppLogger.w(TAG, "getLong() called with null key or uninitialized instance");
+            return def;
+        }
+        lock.readLock().lock();
+        try {
+            return instance.getLong(key, def);
+        } catch (ClassCastException e) {
+            AppLogger.e(TAG, "Type mismatch for key: " + key + ", expected long", e);
+            return def;
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error getting long value for key: " + key, e);
+            return def;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
-    public static void setLong(String key, long value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putLong(key, value);
-        editor.apply();
+    public static void setLong(@Nullable String key, long value) {
+        if (key == null || instance == null) {
+            AppLogger.e(TAG, "setLong() called with null key or uninitialized instance");
+            return;
+        }
+        lock.writeLock().lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            editor.putLong(key, value);
+            editor.apply();
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error setting long value for key: " + key, e);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     // string
-    public static String getStr(String key, String def) {
-        return instance.getString(key, def);
+    @Nullable
+    public static String getStr(@Nullable String key, @Nullable String def) {
+        if (key == null || instance == null) {
+            AppLogger.w(TAG, "getStr() called with null key or uninitialized instance");
+            return def;
+        }
+        lock.readLock().lock();
+        try {
+            return instance.getString(key, def);
+        } catch (ClassCastException e) {
+            AppLogger.e(TAG, "Type mismatch for key: " + key + ", expected String", e);
+            return def;
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error getting String value for key: " + key, e);
+            return def;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
-    public static void setStr(String key, String value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putString(key, value);
-        editor.apply();
+    public static void setStr(@Nullable String key, @Nullable String value) {
+        if (key == null || instance == null) {
+            AppLogger.e(TAG, "setStr() called with null key or uninitialized instance");
+            return;
+        }
+        lock.writeLock().lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            if (value == null) {
+                editor.remove(key); // Remove key if value is null
+            } else {
+                editor.putString(key, value);
+            }
+            editor.apply();
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error setting String value for key: " + key, e);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     // remove
-    public static void removeKey(String key) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.remove(key);
-        editor.apply();
+    public static void removeKey(@Nullable String key) {
+        if (key == null || instance == null) {
+            AppLogger.e(TAG, "removeKey() called with null key or uninitialized instance");
+            return;
+        }
+        lock.writeLock().lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            editor.remove(key);
+            editor.apply();
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error removing key: " + key, e);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
     
     // Rotation settings methods
     public static void saveRotationSettings(int rotation, boolean isFlipped, boolean isMirrored) {
-        setInt(KEY.IS_ROTATED, rotation);
-        setBool(KEY.IS_FLIPPED, isFlipped);
-        setBool(KEY.IS_MIRRORED, isMirrored);
+        if (instance == null) {
+            AppLogger.e(TAG, "saveRotationSettings() called with uninitialized instance");
+            return;
+        }
+        lock.writeLock().lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            editor.putInt(KEY.IS_ROTATED, rotation);
+            editor.putBoolean(KEY.IS_FLIPPED, isFlipped);
+            editor.putBoolean(KEY.IS_MIRRORED, isMirrored);
+            editor.apply();
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error saving rotation settings", e);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
     
     public static int getRotation() {
@@ -253,6 +413,70 @@ public class AppPreference {
     
     public static boolean isMirrored() {
         return getBool(KEY.IS_MIRRORED, false);
+    }
+    
+    // Helper method to check if preferences are initialized
+    public static boolean isInitialized() {
+        return instance != null;
+    }
+    
+    // Batch operations for better performance
+    public static void batchUpdate(@NonNull BatchUpdateCallback callback) {
+        if (instance == null) {
+            AppLogger.e(TAG, "batchUpdate() called with uninitialized instance");
+            return;
+        }
+        lock.writeLock().lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            callback.performUpdate(new BatchEditor(editor));
+            editor.apply();
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error during batch update", e);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+    
+    public interface BatchUpdateCallback {
+        void performUpdate(BatchEditor editor);
+    }
+    
+    public static class BatchEditor {
+        private final SharedPreferences.Editor editor;
+        
+        private BatchEditor(SharedPreferences.Editor editor) {
+            this.editor = editor;
+        }
+        
+        public BatchEditor putBoolean(@NonNull String key, boolean value) {
+            editor.putBoolean(key, value);
+            return this;
+        }
+        
+        public BatchEditor putInt(@NonNull String key, int value) {
+            editor.putInt(key, value);
+            return this;
+        }
+        
+        public BatchEditor putLong(@NonNull String key, long value) {
+            editor.putLong(key, value);
+            return this;
+        }
+        
+        public BatchEditor putString(@NonNull String key, @Nullable String value) {
+            if (value == null) {
+                editor.remove(key);
+            } else {
+                editor.putString(key, value);
+            }
+            return this;
+        }
+        
+        public BatchEditor remove(@NonNull String key) {
+            editor.remove(key);
+            return this;
+        }
     }
     
     public static void resetRotationSettings() {

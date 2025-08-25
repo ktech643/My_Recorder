@@ -144,6 +144,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.checkmate.android.AppPreference.KEY.RECORD_AUDIO;
+import com.checkmate.android.util.AppLogger;
+import com.checkmate.android.util.SafeUtils;
+import com.checkmate.android.util.ThreadUtils;
 /*  ╭──────────────────────────────────────────────────────────────────────────╮
     │  Class Declaration                                                       │
     ╰──────────────────────────────────────────────────────────────────────────╯ */
@@ -317,26 +320,36 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,WindowManager.LayoutParams.FLAG_SECURE);
+        try {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,WindowManager.LayoutParams.FLAG_SECURE);
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // kept once
-        setContentView(R.layout.activity_service);
-        instance = this;
-        fragmentManager = getSupportFragmentManager();
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // kept once
+            setContentView(R.layout.activity_service);
+            instance = this;
+            fragmentManager = getSupportFragmentManager();
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error in onCreate setup", e);
+            finish();
+            return;
+        }
 
-        dlg_progress = KProgressHUD.create(this)
-                .setStyle(KProgressHUD.Style.PIE_DETERMINATE)
-                .setLabel("Processing")
-                .setDetailsLabel("Please Wait...")
-                .setCancellable(false)
-                .setAnimationSpeed(3)
-                .setDimAmount(0.6f)
-                .setBackgroundColor(Color.parseColor("#000000"))
-                .setWindowColor(Color.parseColor("#0D0D0D"))
-                .setCornerRadius(18f)
-                .setMaxProgress(100)
-                .setCancellable(true);
-                //.show();
+        try {
+            dlg_progress = KProgressHUD.create(this)
+                    .setStyle(KProgressHUD.Style.PIE_DETERMINATE)
+                    .setLabel("Processing")
+                    .setDetailsLabel("Please Wait...")
+                    .setCancellable(false)
+                    .setAnimationSpeed(3)
+                    .setDimAmount(0.6f)
+                    .setBackgroundColor(Color.parseColor("#000000"))
+                    .setWindowColor(Color.parseColor("#0D0D0D"))
+                    .setCornerRadius(18f)
+                    .setMaxProgress(100)
+                    .setCancellable(true);
+                    //.show();
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error creating progress dialog", e);
+        }
 
 
         init();
@@ -372,17 +385,28 @@ public class MainActivity extends BaseActivity
      *  HTTP-server helpers
      * ──────────────────────────────────────────────────────────────────────── */
     void startHTTPServer() {
-        server = new MyHttpServer(SERVER_PORT, getApplicationContext(), serviceManager);
-        server.startServer();
+        try {
+            server = new MyHttpServer(SERVER_PORT, getApplicationContext(), serviceManager);
+            server.startServer();
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error starting HTTP server", e);
+        }
     }
 
     void stopHTTPServer() {
-        if (server != null) server.stopServer();
+        try {
+            if (server != null) server.stopServer();
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error stopping HTTP server", e);
+        }
     }
 
     /** Resize the preview TextureView after any surface-change. */
     private void updatePreviewRatio() {
         // If you have real logic already, keep it; the empty body just silences the call.
+        ThreadUtils.runOnMainThread(() -> {
+            // Add any preview ratio update logic here if needed
+        });
     }
 
     /** Exposes the active camera's static info to SettingsFragment. */
@@ -391,12 +415,12 @@ public class MainActivity extends BaseActivity
         List<CameraInfo> mCameraList = CameraManager.getCameraList(this, true);
 
         if (mCameraList == null || mCameraList.isEmpty()) {
-            Log.e(TAG, "No cameras found");
+            AppLogger.e(TAG, "No cameras found");
             return null;
         }
 
         String cameraId = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
-        if (TextUtils.isEmpty(cameraId)) {
+        if (SafeUtils.isEmpty(cameraId)) {
             cameraId = AppConstant.REAR_CAMERA;
         }
 
@@ -415,12 +439,17 @@ public class MainActivity extends BaseActivity
      *  Camera-selection pop-up for USB list
      * ──────────────────────────────────────────────────────────────────────── */
     public void showCamerasList(String[] names) {
-        Log.e(TAG, "showCamerasList triggered");
+        AppLogger.d(TAG, "showCamerasList triggered");
+        if (names == null || names.length == 0) {
+            AppLogger.w(TAG, "No camera names provided");
+            return;
+        }
+        
         boolean isChessPin = AppPreference.getBool(AppPreference.KEY.CHESS_MODE_PIN, false);
 
         if (!isChessPin) {
             // show popup activity after a short delay to let UI settle
-            handler.postDelayed(() -> {
+            SafeUtils.postDelayed(handler, () -> {
                 Intent i = new Intent(MainActivity.this, UsbPopupActivity.class);
                 i.putExtra("list", names);
                 startActivityForResult(i, REQUEST_CODE_INTENT);
@@ -430,7 +459,9 @@ public class MainActivity extends BaseActivity
             int selectedIndex = 0;
             if (liveFragment != null && liveFragment.is_usb_opened) {
                 if (mUSBService != null) {
-                    mUSBService.selectedPositionForCameraList(selectedIndex);
+                    ThreadUtils.runOnBackgroundThread(() -> {
+                        mUSBService.selectedPositionForCameraList(selectedIndex);
+                    });
                 } else {
                     startBgUSB();     // kick service if not yet running
                 }
@@ -466,21 +497,33 @@ public class MainActivity extends BaseActivity
     }
 
     private void showAlertDialogForAccessbiliity() {
-        if (isFinishing() || isDestroyed()) return;
+        if (!SafeUtils.isActivityValid(this)) return;
         if (alertDialog != null && alertDialog.isShowing()) return;   // already showing
 
-        isShowingAccServiceAlert = true;
-        alertDialog = new AlertDialog.Builder(this)
-                .setMessage("Please enable the accessibility service for the app to function properly.")
-                .setPositiveButton("Go to Settings", (d, id) ->
-                        startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)))
-                .setNegativeButton("Cancel", (d, id) -> {
-                    isShowingAccServiceAlert = false;
-                    d.dismiss();
-                })
-                .setCancelable(false)
-                .create();
-        alertDialog.show();
+        ThreadUtils.runOnMainThread(() -> {
+            try {
+                isShowingAccServiceAlert = true;
+                alertDialog = new AlertDialog.Builder(this)
+                        .setMessage("Please enable the accessibility service for the app to function properly.")
+                        .setPositiveButton("Go to Settings", (d, id) -> {
+                            try {
+                                startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+                            } catch (Exception e) {
+                                AppLogger.e(TAG, "Error opening accessibility settings", e);
+                            }
+                        })
+                        .setNegativeButton("Cancel", (d, id) -> {
+                            isShowingAccServiceAlert = false;
+                            d.dismiss();
+                        })
+                        .setCancelable(false)
+                        .create();
+                alertDialog.show();
+            } catch (Exception e) {
+                AppLogger.e(TAG, "Error showing accessibility dialog", e);
+                isShowingAccServiceAlert = false;
+            }
+        });
     }
 
     private void checkAccessService() {
@@ -509,24 +552,38 @@ public class MainActivity extends BaseActivity
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        // Initialize views
-        bottom_tab = findViewById(R.id.bottom_tab);
-        txt_record = findViewById(R.id.txt_record);
-        flImages = findViewById(R.id.flImages);
-        
-        flImages.setVisibility(View.GONE);
+        // Initialize views with null safety
+        try {
+            bottom_tab = findViewById(R.id.bottom_tab);
+            txt_record = findViewById(R.id.txt_record);
+            flImages = findViewById(R.id.flImages);
+            
+            SafeUtils.hide(flImages);
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error initializing views", e);
+        }
 
         /* ── USB permission handling ─────────────────────────────────────── */
-        usbManager       = (UsbManager) getSystemService(USB_SERVICE);
-        permissionIntent = PendingIntent.getBroadcast(this, 0,
-                new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
+        try {
+            usbManager = (UsbManager) getSystemService(USB_SERVICE);
+            if (usbManager != null) {
+                permissionIntent = PendingIntent.getBroadcast(this, 0,
+                        new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
 
-        IntentFilter usbFilter = new IntentFilter(ACTION_USB_PERMISSION);
-        usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        registerReceiver(usbReceiver, usbFilter);
+                IntentFilter usbFilter = new IntentFilter(ACTION_USB_PERMISSION);
+                usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+                registerReceiver(usbReceiver, usbFilter);
 
-        // grant permission if a device already plugged in at launch
-        for (UsbDevice d : usbManager.getDeviceList().values()) requestPermission(d);
+                // grant permission if a device already plugged in at launch
+                if (usbManager.getDeviceList() != null) {
+                    for (UsbDevice d : usbManager.getDeviceList().values()) {
+                        if (d != null) requestPermission(d);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            AppLogger.e(TAG, "Error setting up USB permissions", e);
+        }
 
         /* Cached camera ID & basic connectivity manager */
         mCameraId          = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION,
@@ -535,8 +592,10 @@ public class MainActivity extends BaseActivity
                 getSystemService(Context.CONNECTIVITY_SERVICE);
 
         /* ── Bottom navigation listener (new UI) ─────────────────────────── */
-        bottom_tab.setOnNavigationItemChangedListener(item -> {
-            int position = item.getPosition();
+        if (bottom_tab != null) {
+            bottom_tab.setOnNavigationItemChangedListener(item -> {
+                if (item == null) return;
+                int position = item.getPosition();
 
             // Prevent switching to settings while recording/streaming
             if ((isRecordingCamera()   && position == AppConstant.SW_FRAGMENT_SETTINGS) ||
@@ -549,20 +608,25 @@ public class MainActivity extends BaseActivity
 
                 if (mCurrentFragmentIndex < 0 || mCurrentFragmentIndex >= 5)
                     mCurrentFragmentIndex = 0;                         // safety
-                bottom_tab.setActiveNavigationIndex(mCurrentFragmentIndex);
-                return;
-            }
+                    if (bottom_tab != null) {
+                        bottom_tab.setActiveNavigationIndex(mCurrentFragmentIndex);
+                    }
+                    return;
+                }
 
-            CommonUtil.hideKeyboard(this, bottom_tab);
-            if (position != AppConstant.SW_FRAGMENT_LIVE) txt_record.setVisibility(View.GONE);
+                CommonUtil.hideKeyboard(this, bottom_tab);
+                if (position != AppConstant.SW_FRAGMENT_LIVE) {
+                    SafeUtils.hide(txt_record);
+                }
 
             if (position == AppConstant.SW_FRAGMENT_HIDE) {            // quick hide
                 mCurrentFragmentIndex = AppConstant.SW_FRAGMENT_HIDE;
                 hide_app();
                 return;
             }
-            SwitchContent(position, null);
-        });
+                SwitchContent(position, null);
+            });
+        }
 
 
 
@@ -680,19 +744,34 @@ public class MainActivity extends BaseActivity
      *  Audio callback from BgAudioService
      * ──────────────────────────────────────────────────────────────────────── */
     public void onAudioDelivered(byte[] data, int chanCnt, int sampleRate) {
-        runOnUiThread(() -> {
+        if (data == null) {
+            AppLogger.w(TAG, "Received null audio data");
+            return;
+        }
+        
+        SafeUtils.runOnUiThread(this, () -> {
             if (!AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false)) {
-                sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, false);
+                if (sharedViewModel != null) {
+                    sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, false);
+                }
                 return;
             }
 
             boolean vuVisible = AppPreference.getBool(AppPreference.KEY.VU_METER, true);
             LiveFragment live = LiveFragment.getInstance();
             if (vuVisible && live != null && live.mVuMeter != null) {
-                live.mVuMeter.putBuffer(data, chanCnt, sampleRate);
-                sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, true);
+                try {
+                    live.mVuMeter.putBuffer(data, chanCnt, sampleRate);
+                    if (sharedViewModel != null) {
+                        sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, true);
+                    }
+                } catch (Exception e) {
+                    AppLogger.e(TAG, "Error processing audio data", e);
+                }
             } else {
-                sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, false);
+                if (sharedViewModel != null) {
+                    sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, false);
+                }
             }
         });
     }
