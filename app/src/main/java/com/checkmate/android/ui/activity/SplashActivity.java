@@ -168,10 +168,43 @@ public class SplashActivity extends BaseActivity {
         // Keep the screen on even when paused to prevent blinking
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Clean up permission handler to prevent memory leaks
+        if (mPermissionHandler != null) {
+            mPermissionHandler.removeCallbacksAndMessages(null);
+            mPermissionHandler = null;
+        }
+    }
 
     private boolean mPermissionsRequested = false;
     private boolean mInitialResumeDone = false;
     private boolean mActivationContinued = false; // Prevent multiple activation continuations
+    
+    // Permission synchronization system
+    private boolean mIsRequestingPermissions = false;
+    private int mCurrentPermissionStep = 0;
+    private Handler mPermissionHandler;
+    
+    // Permission groups for sequential requests
+    private static final String[][] PERMISSION_GROUPS = {
+        // Group 1: Essential camera and audio permissions
+        {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO},
+        // Group 2: Storage permissions  
+        {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+        // Group 3: System permissions
+        {Manifest.permission.VIBRATE, Manifest.permission.MODIFY_AUDIO_SETTINGS, Manifest.permission.WAKE_LOCK},
+        // Group 4: Network and location permissions
+        {Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.CHANGE_NETWORK_STATE},
+        // Group 5: Additional permissions
+        {Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}
+    };
+    
+    private static final int[] PERMISSION_GROUP_REQUEST_CODES = {
+        100, 101, 102, 103, 104  // Request codes for each group
+    };
     
     @Override
     protected void onResume() {
@@ -218,8 +251,6 @@ public class SplashActivity extends BaseActivity {
     }
 
     ConnectivityManager connection_manager;
-
-    private boolean mIsRequestingPermissions = false;
     
     public void verifyPermissions(Activity activity) {
         // Prevent multiple simultaneous permission requests
@@ -228,79 +259,133 @@ public class SplashActivity extends BaseActivity {
             return;
         }
         
-        int permission0 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
-        int permission1 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int permission2 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
-        int permission3 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.RECORD_AUDIO);
-        int permission4 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.VIBRATE);
-        int permission5 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.MODIFY_AUDIO_SETTINGS);
-        int permission6 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_PHONE_STATE);
-        int permission7 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_WIFI_STATE);
-        int permission8 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CHANGE_WIFI_STATE);
-        int permission9 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
-        int permission10 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION);
-        int permission11 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CHANGE_NETWORK_STATE);
-        int permission12 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WAKE_LOCK);
-
-        if (permission0 != PackageManager.PERMISSION_GRANTED
-                || permission1 != PackageManager.PERMISSION_GRANTED
-                || permission2 != PackageManager.PERMISSION_GRANTED
-                || permission3 != PackageManager.PERMISSION_GRANTED
-                || permission4 != PackageManager.PERMISSION_GRANTED
-                || permission5 != PackageManager.PERMISSION_GRANTED
-                || permission6 != PackageManager.PERMISSION_GRANTED
-                || permission7 != PackageManager.PERMISSION_GRANTED
-                || permission8 != PackageManager.PERMISSION_GRANTED
-                || permission9 != PackageManager.PERMISSION_GRANTED
-                || permission10 != PackageManager.PERMISSION_GRANTED
-                || permission11 != PackageManager.PERMISSION_GRANTED
-                || permission12 != PackageManager.PERMISSION_GRANTED
-        ) {
-            // Set flag to prevent multiple simultaneous requests
-            mIsRequestingPermissions = true;
-            
-            // Request permissions in sequence to avoid conflicts
-            Log.d(TAG, "Requesting core permissions...");
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS,
-                    PERMISSION_REQUEST_CODE_FOR_PERMISSION
-            );
-
-            // Schedule other permission requests with delays to prevent conflicts
-            new Handler().postDelayed(() -> {
-                if (!isFinishing() && !isDestroyed()) {
-                    requestDrawOverAppsPermission(activity);
-                }
-            }, 500);
-            
-            new Handler().postDelayed(() -> {
-                if (!isFinishing() && !isDestroyed()) {
-                    requestIgnoreBatteryOptimizationsPermission(activity);
-                }
-            }, 1000);
-            
-            new Handler().postDelayed(() -> {
-                if (!isFinishing() && !isDestroyed()) {
-                    requestDoNotDisturbPermission(activity);
-                }
-            }, 1500);
-            
-            new Handler().postDelayed(() -> {
-                if (!isFinishing() && !isDestroyed()) {
-                    verifyStoragePermissions(activity);
-                }
-            }, 2000);
-            
-            new Handler().postDelayed(() -> {
-                if (!isFinishing() && !isDestroyed()) {
-                    requestModifySystemSettingsPermission(activity);
-                }
-            }, 2500);
-        } else {
-            Log.d(TAG, "All permissions granted, proceeding to next view");
-            gotoNextView();
+        // Initialize permission handler
+        if (mPermissionHandler == null) {
+            mPermissionHandler = new Handler();
         }
+        
+        // Check if all permissions are already granted
+        if (areAllPermissionsGranted()) {
+            Log.d(TAG, "All permissions already granted, proceeding to next view");
+            gotoNextView();
+            return;
+        }
+        
+        // Start sequential permission requests
+        mIsRequestingPermissions = true;
+        mCurrentPermissionStep = 0;
+        Log.d(TAG, "🔐 Starting sequential permission requests to prevent app overload");
+        requestNextPermissionGroup();
+    }
+    
+    /**
+     * Check if all required permissions are granted
+     */
+    private boolean areAllPermissionsGranted() {
+        for (String[] group : PERMISSION_GROUPS) {
+            for (String permission : group) {
+                if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Request the next group of permissions sequentially
+     */
+    private void requestNextPermissionGroup() {
+        if (mCurrentPermissionStep >= PERMISSION_GROUPS.length) {
+            // All permission groups processed, now handle system permissions
+            handleSystemPermissions();
+            return;
+        }
+        
+        String[] currentGroup = PERMISSION_GROUPS[mCurrentPermissionStep];
+        
+        // Check if this group needs permissions
+        List<String> neededPermissions = new ArrayList<>();
+        for (String permission : currentGroup) {
+            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                neededPermissions.add(permission);
+            }
+        }
+        
+        if (neededPermissions.isEmpty()) {
+            // This group is already granted, move to next
+            Log.d(TAG, "📱 Permission group " + (mCurrentPermissionStep + 1) + " already granted, skipping");
+            mCurrentPermissionStep++;
+            // Small delay to prevent overwhelming the system
+            mPermissionHandler.postDelayed(this::requestNextPermissionGroup, 100);
+        } else {
+            // Request this group of permissions
+            Log.d(TAG, "📝 Requesting permission group " + (mCurrentPermissionStep + 1) + " (" + neededPermissions.size() + " permissions)");
+            ActivityCompat.requestPermissions(
+                this,
+                neededPermissions.toArray(new String[0]),
+                PERMISSION_GROUP_REQUEST_CODES[mCurrentPermissionStep]
+            );
+        }
+    }
+    
+    /**
+     * Handle system permissions (non-runtime permissions) sequentially
+     */
+    private void handleSystemPermissions() {
+        Log.d(TAG, "🔧 Handling system permissions sequentially...");
+        
+        // Schedule system permissions with proper delays
+        mPermissionHandler.postDelayed(() -> {
+            if (!isFinishing() && !isDestroyed()) {
+                Log.d(TAG, "🖼️ Requesting draw over apps permission");
+                requestDrawOverAppsPermission(this);
+            }
+        }, 500);
+        
+        mPermissionHandler.postDelayed(() -> {
+            if (!isFinishing() && !isDestroyed()) {
+                Log.d(TAG, "🔋 Requesting battery optimization permission");
+                requestIgnoreBatteryOptimizationsPermission(this);
+            }
+        }, 1000);
+        
+        mPermissionHandler.postDelayed(() -> {
+            if (!isFinishing() && !isDestroyed()) {
+                Log.d(TAG, "🔕 Requesting do not disturb permission");
+                requestDoNotDisturbPermission(this);
+            }
+        }, 1500);
+        
+        mPermissionHandler.postDelayed(() -> {
+            if (!isFinishing() && !isDestroyed()) {
+                Log.d(TAG, "⚙️ Requesting modify system settings permission");
+                requestModifySystemSettingsPermission(this);
+            }
+        }, 2000);
+        
+        mPermissionHandler.postDelayed(() -> {
+            if (!isFinishing() && !isDestroyed()) {
+                Log.d(TAG, "💾 Verifying storage permissions");
+                verifyStoragePermissions(this);
+            }
+        }, 2500);
+        
+        // Final step - complete permission process
+        mPermissionHandler.postDelayed(() -> {
+            if (!isFinishing() && !isDestroyed()) {
+                completePermissionProcess();
+            }
+        }, 3000);
+    }
+    
+    /**
+     * Complete the permission process and proceed
+     */
+    private void completePermissionProcess() {
+        mIsRequestingPermissions = false;
+        Log.d(TAG, "✅ Permission process completed, proceeding to next view");
+        gotoNextView();
     }
 
     public void verifyStoragePermissions(Activity activity) {
@@ -346,28 +431,20 @@ public class SplashActivity extends BaseActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        // Reset permission request flag when core permissions are handled
+        // Handle sequential permission group responses
+        for (int i = 0; i < PERMISSION_GROUP_REQUEST_CODES.length; i++) {
+            if (requestCode == PERMISSION_GROUP_REQUEST_CODES[i]) {
+                handlePermissionGroupResult(i, permissions, grantResults);
+                return;
+            }
+        }
+
+        // Handle legacy permission requests
         if (requestCode == PERMISSION_REQUEST_CODE_FOR_PERMISSION) {
+            Log.d(TAG, "Legacy permission request handled");
             mIsRequestingPermissions = false;
-            Log.d(TAG, "Core permissions handled, flag reset");
-            
-            // Check if we got all permissions and proceed
-            boolean allGranted = true;
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allGranted = false;
-                    break;
-                }
-            }
-            
-            if (allGranted) {
-                Log.d(TAG, "All core permissions granted, proceeding...");
-                gotoNextView();
-            } else {
-                Log.d(TAG, "Some permissions denied, will proceed anyway");
-                // Still proceed as some permissions are optional
-                gotoNextView();
-            }
+            gotoNextView();
+            return;
         }
 
         // Handle storage permissions using StoragePermissionHelper
@@ -406,6 +483,33 @@ public class SplashActivity extends BaseActivity {
                 // Show dialog to guide user to settings
                 navigateToNotificationSettings();
             }
+        }
+    }
+    
+    /**
+     * Handle permission group result and continue to next group
+     */
+    private void handlePermissionGroupResult(int groupIndex, String[] permissions, int[] grantResults) {
+        // Log results for this group
+        int grantedCount = 0;
+        for (int result : grantResults) {
+            if (result == PackageManager.PERMISSION_GRANTED) {
+                grantedCount++;
+            }
+        }
+        
+        Log.d(TAG, "🔓 Permission group " + (groupIndex + 1) + " result: " + grantedCount + "/" + grantResults.length + " granted");
+        
+        // Move to next permission group
+        mCurrentPermissionStep++;
+        
+        // Small delay before requesting next group to prevent system overload
+        if (mPermissionHandler != null) {
+            mPermissionHandler.postDelayed(() -> {
+                if (!isFinishing() && !isDestroyed()) {
+                    requestNextPermissionGroup();
+                }
+            }, 300); // 300ms delay between permission groups
         }
     }
 
