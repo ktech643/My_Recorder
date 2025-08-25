@@ -427,27 +427,44 @@ public class SharedEglManager {
      * @return true if registration was successful
      */
     public boolean registerService(ServiceType serviceType, BaseBackgroundService service) {
-        synchronized (mServiceLock) {
-            Log.d(TAG, "Registering service: " + serviceType);
-            
-            // Clean up any dead references
-            cleanupDeadReferences();
-            
-            // Register the new service
-            mRegisteredServices.put(serviceType, new WeakReference<>(service));
-            
-            // If this is the first service or we're switching services, make it active
-            if (mCurrentActiveService == null || mCurrentActiveService != serviceType) {
-                if (mCurrentActiveService != null) {
-                    Log.d(TAG, "Switching from " + mCurrentActiveService + " to " + serviceType);
-                    // Notify the previous service that it's being deactivated
-                    notifyServiceDeactivated(mCurrentActiveService);
-                }
-                mCurrentActiveService = serviceType;
-                Log.d(TAG, "Service " + serviceType + " is now active");
+        if (serviceType == null || service == null) {
+            Log.e(TAG, "Cannot register null service or serviceType");
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "Null parameter in registerService", 
+                    new IllegalArgumentException("serviceType=" + serviceType + ", service=" + service));
             }
-            
-            return true;
+            return false;
+        }
+        
+        synchronized (mServiceLock) {
+            try {
+                Log.d(TAG, "Registering service: " + serviceType);
+                
+                // Clean up any dead references
+                cleanupDeadReferences();
+                
+                // Register the new service
+                mRegisteredServices.put(serviceType, new WeakReference<>(service));
+                
+                // If this is the first service or we're switching services, make it active
+                if (mCurrentActiveService == null || mCurrentActiveService != serviceType) {
+                    if (mCurrentActiveService != null) {
+                        Log.d(TAG, "Switching from " + mCurrentActiveService + " to " + serviceType);
+                        // Notify the previous service that it's being deactivated
+                        notifyServiceDeactivated(mCurrentActiveService);
+                    }
+                    mCurrentActiveService = serviceType;
+                    Log.d(TAG, "Service " + serviceType + " is now active");
+                }
+                
+                return true;
+            } catch (Exception e) {
+                Log.e(TAG, "Error registering service: " + serviceType, e);
+                if (CrashLogger.getInstance() != null) {
+                    CrashLogger.getInstance().logError(TAG, "registerService", e);
+                }
+                return false;
+            }
         }
     }
 
@@ -456,18 +473,24 @@ public class SharedEglManager {
      * @param serviceType The type of service being unregistered
      */
     public void unregisterService(ServiceType serviceType) {
+        if (serviceType == null) {
+            Log.e(TAG, "Cannot unregister null serviceType");
+            return;
+        }
+        
         synchronized (mServiceLock) {
-            Log.d(TAG, "Unregistering service: " + serviceType);
-            
-            mRegisteredServices.remove(serviceType);
-            
-            if (mCurrentActiveService == serviceType) {
-                mCurrentActiveService = null;
+            try {
+                Log.d(TAG, "Unregistering service: " + serviceType);
                 
-                // Find another service to activate ONLY if not streaming/recording
-                if (!mStreaming && !mRecording) {
-                    for (Map.Entry<ServiceType, WeakReference<BaseBackgroundService>> entry : mRegisteredServices.entrySet()) {
-                        if (entry.getValue().get() != null) {
+                mRegisteredServices.remove(serviceType);
+                
+                if (mCurrentActiveService == serviceType) {
+                    mCurrentActiveService = null;
+                    
+                    // Find another service to activate ONLY if not streaming/recording
+                    if (!mStreaming && !mRecording) {
+                        for (Map.Entry<ServiceType, WeakReference<BaseBackgroundService>> entry : mRegisteredServices.entrySet()) {
+                            if (entry.getValue().get() != null) {
                             mCurrentActiveService = entry.getKey();
                             Log.d(TAG, "Auto-switched active service to: " + mCurrentActiveService);
                             break;
@@ -481,6 +504,12 @@ public class SharedEglManager {
             if (mRegisteredServices.isEmpty() && !mStreaming && !mRecording) {
                 Log.d(TAG, "No active services remaining, shutting down EGL context");
                 shutdown();
+            }
+            } catch (Exception e) {
+                Log.e(TAG, "Error unregistering service: " + serviceType, e);
+                if (CrashLogger.getInstance() != null) {
+                    CrashLogger.getInstance().logError(TAG, "unregisterService", e);
+                }
             }
         }
     }
@@ -625,20 +654,37 @@ public class SharedEglManager {
     }
 
     public void initialize(Context ctx, ServiceType serviceType) {
+        if (ctx == null || serviceType == null) {
+            Log.e(TAG, "Cannot initialize with null parameters");
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "Null parameters in initialize", 
+                    new IllegalArgumentException("ctx=" + ctx + ", serviceType=" + serviceType));
+            }
+            return;
+        }
+        
         synchronized (SharedEglManager.class) {
-            if (mIsInitialized && !mIsShuttingDown) {
-                Log.d(TAG, "SharedEglManager already initialized, skipping initialization");
+            try {
+                if (mIsInitialized && !mIsShuttingDown) {
+                    Log.d(TAG, "SharedEglManager already initialized, skipping initialization");
+                    return;
+                }
+                
+                if (mIsShuttingDown) {
+                    Log.w(TAG, "SharedEglManager is shutting down, cannot initialize");
+                    return;
+                }
+                
+                mServiceType = serviceType;
+                context = ctx;
+                mIsShuttingDown = false;
+            } catch (Exception e) {
+                Log.e(TAG, "Error in initialize setup", e);
+                if (CrashLogger.getInstance() != null) {
+                    CrashLogger.getInstance().logError(TAG, "initialize", e);
+                }
                 return;
             }
-            
-            if (mIsShuttingDown) {
-                Log.w(TAG, "SharedEglManager is shutting down, cannot initialize");
-                return;
-            }
-            
-            mServiceType = serviceType;
-            context = ctx;
-            mIsShuttingDown = false;
         }
 
         mCameraHandler.postDelayed(this::internalInit, 500);
@@ -909,19 +955,27 @@ public class SharedEglManager {
     public void drawFrame() {
         if (mClosing || eglCore == null || !eglIsReady) return;
 
-        mCameraHandler.post(() -> {
-            if (shouldSkipFrame()) {
-                return;
-            }
+        // Use tryLock to avoid blocking if already drawing
+        if (!drawLock.tryLock()) {
+            Log.w(TAG, "drawFrame skipped - already drawing");
+            return;
+        }
 
-            if (mServiceType == ServiceType.BgAudio) {
-                // Draw a blank frame with overlay for BgAudio
-                drawBlankFrameWithOverlay();
-                return;
-            }
-
-            if (mServiceType == ServiceType.BgScreenCast) {
+        try {
+            mCameraHandler.post(() -> {
                 try {
+                    if (shouldSkipFrame()) {
+                        return;
+                    }
+
+                    if (mServiceType == ServiceType.BgAudio) {
+                        // Draw a blank frame with overlay for BgAudio
+                        drawBlankFrameWithOverlay();
+                        return;
+                    }
+
+                    if (mServiceType == ServiceType.BgScreenCast) {
+                        try {
                     // Draw to encoder surface
                     if (encoderSurface != null) {
                         encoderSurface.makeCurrent();
