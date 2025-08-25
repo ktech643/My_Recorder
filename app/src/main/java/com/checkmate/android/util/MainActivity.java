@@ -58,6 +58,11 @@ import android.widget.Toast;
 
 import com.checkmate.android.service.BaseBackgroundService;
 import com.checkmate.android.service.SharedEGL.ServiceType;
+import com.checkmate.android.service.SharedEGL.EGLLifecycleManager;
+import com.checkmate.android.service.SharedEGL.StreamStateManager;
+import com.checkmate.android.service.SharedEGL.SeamlessTransitionManager;
+import com.checkmate.android.service.SharedEGL.DynamicConfigurationManager;
+import com.checkmate.android.service.SharedEGL.ServicePreloadManager;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -231,6 +236,13 @@ public class MainActivity extends BaseActivity
     private ConnectivityManager _connectivityManager;
     private MyHttpServer       server;
     private ServiceManager     serviceManager;
+    
+    // Optimization managers
+    private EGLLifecycleManager mEGLLifecycleManager;
+    private StreamStateManager mStreamStateManager;
+    private SeamlessTransitionManager mSeamlessTransitionManager;
+    private DynamicConfigurationManager mDynamicConfigManager;
+    private ServicePreloadManager mServicePreloadManager;
 
     /*  ╭──────────────────────────────────────────────────────────────────────╮
         │  Fragment & Camera state                                             │
@@ -338,9 +350,14 @@ public class MainActivity extends BaseActivity
                 .setCancellable(true);
                 //.show();
 
+        // Initialize EGL early for seamless transitions
+        initializeEGLEarly();
 
         init();
         showChessIfNeeded();
+        
+        // Preload common services for faster switching
+        initializeServicePreloading();
     }
 
     private void showChessIfNeeded() {
@@ -355,6 +372,119 @@ public class MainActivity extends BaseActivity
             overridePendingTransition(0, 0);
             startActivity(i);
         }
+    }
+    
+    /**
+     * Initialize EGL context early in the application lifecycle.
+     * This ensures smooth transitions between services.
+     */
+    private void initializeEGLEarly() {
+        Log.d(TAG, "Initializing EGL early");
+        
+        mEGLLifecycleManager = EGLLifecycleManager.getInstance();
+        mEGLLifecycleManager.initializeEGL(this, new EGLLifecycleManager.EGLCallback() {
+            @Override
+            public void onEGLInitialized() {
+                Log.d(TAG, "EGL initialized successfully");
+                // EGL is ready for use by all services
+            }
+            
+            @Override
+            public void onEGLError(String error) {
+                Log.e(TAG, "EGL initialization failed: " + error);
+                // Handle error - maybe show a dialog or retry
+            }
+        });
+    }
+    
+    /**
+     * Initialize service preloading for faster transitions.
+     */
+    private void initializeServicePreloading() {
+        Log.d(TAG, "Initializing service preloading");
+        
+        mServicePreloadManager = ServicePreloadManager.getInstance(this);
+        mServicePreloadManager.setAutoPreloadEnabled(true);
+        
+        // Preload common services in the background
+        handler.postDelayed(() -> {
+            mServicePreloadManager.preloadCommonServices();
+        }, 1000); // Delay to avoid impacting initial startup
+    }
+    
+    /**
+     * Initialize optimization managers.
+     */
+    private void initializeOptimizationManagers() {
+        // Stream state manager
+        mStreamStateManager = StreamStateManager.getInstance();
+        
+        // Seamless transition manager
+        mSeamlessTransitionManager = SeamlessTransitionManager.getInstance(this);
+        mSeamlessTransitionManager.setTransitionListener(new SeamlessTransitionManager.TransitionListener() {
+            @Override
+            public void onTransitionStart(ServiceType from, ServiceType to) {
+                Log.d(TAG, "Service transition started: " + from + " -> " + to);
+                // Could show a subtle UI indicator
+            }
+            
+            @Override
+            public void onTransitionProgress(float progress) {
+                // Could update a progress indicator
+            }
+            
+            @Override
+            public void onTransitionComplete(ServiceType newService) {
+                Log.d(TAG, "Service transition completed: " + newService);
+                // Update UI to reflect new service
+                updateUIForService(newService);
+            }
+            
+            @Override
+            public void onTransitionError(String error) {
+                Log.e(TAG, "Service transition failed: " + error);
+                MessageUtil.showToast(getApplicationContext(), "Service switch failed");
+            }
+        });
+        
+        // Dynamic configuration manager
+        mDynamicConfigManager = DynamicConfigurationManager.getInstance();
+        mDynamicConfigManager.setConfigurationListener(new DynamicConfigurationManager.ConfigurationListener() {
+            @Override
+            public void onConfigurationChanged(String key, Object value) {
+                Log.d(TAG, "Configuration changed: " + key + " = " + value);
+            }
+            
+            @Override
+            public void onConfigurationError(String key, String error) {
+                Log.e(TAG, "Configuration error: " + key + " - " + error);
+            }
+        });
+    }
+    
+    /**
+     * Update UI elements for the active service.
+     */
+    private void updateUIForService(ServiceType serviceType) {
+        runOnUiThread(() -> {
+            // Update UI based on active service
+            if (liveFragment != null) {
+                switch (serviceType) {
+                    case BgCamera:
+                        liveFragment.showCameraUI();
+                        break;
+                    case BgUSBCamera:
+                        liveFragment.showUSBCameraUI();
+                        break;
+                    case BgScreenCast:
+                        liveFragment.showScreenCastUI();
+                        break;
+                    case BgAudio:
+                        liveFragment.showAudioUI();
+                        break;
+                }
+            }
+        });
     }
     
     @Override
@@ -621,6 +751,9 @@ public class MainActivity extends BaseActivity
         setCallbacks();        // native logging hooks
         OpenLog();             // create log dir & native writer
         initNetworkTimer();    // periodic UI updates
+        
+        // Initialize optimization managers
+        initializeOptimizationManagers();
     } // end init()
     /* ─────────────────────────────────────────────────────────────────────────
      *  Graceful tear-down helpers
