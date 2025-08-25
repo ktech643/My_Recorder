@@ -150,7 +150,7 @@ public final class BgCastService extends BaseBackgroundService {
                 // Stop screen casting safely
                 ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
                     stopScreenCast();
-                    
+                    return true;
                 }, false);
                 
                 super.onDestroy();

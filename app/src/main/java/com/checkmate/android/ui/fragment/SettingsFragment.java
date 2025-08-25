@@ -1343,8 +1343,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         streaming_frame.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         List<String> bitrates = Arrays.asList(getResources().getStringArray(R.array.audio_bitrate));
@@ -1373,8 +1374,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         streaming_audio_bitrate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         usb_audio_bitrate.setAdapter(bitrate_adapter);
@@ -1398,8 +1400,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         usb_audio_bitrate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         List<String> audio_sources = Arrays.asList(getResources().getStringArray(R.array.audio_source));
@@ -1429,8 +1432,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         spinner_audio_src.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         usb_audio_src.setAdapter(source_adapter);
@@ -1455,8 +1459,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         usb_audio_src.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         List<String> channel_count = Arrays.asList(getResources().getStringArray(R.array.channel_count));
@@ -1486,8 +1491,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         usb_channel_count.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         bluetooth_audio_src.setAdapter(source_adapter);
@@ -1512,8 +1518,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         bluetooth_audio_src.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         usb_bluetooth_src.setAdapter(source_adapter);
@@ -1539,8 +1546,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         usb_bluetooth_src.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         List<String> sample_rates = Arrays.asList(getResources().getStringArray(R.array.sample_rates));
@@ -1570,8 +1578,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         spinner_sample_rate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
         usb_sample_rate.setAdapter(sample_adapter);
         int usb_rate = AppPreference.getInt(AppPreference.KEY.USB_SAMPLE_RATE, 7);
@@ -1595,8 +1604,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         usb_sample_rate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         swt_radio_mode.setChecked(AppPreference.getBool(AppPreference.KEY.STREAMING_RADIO_MODE, false));
@@ -1737,14 +1747,16 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         spinner_usb_codec.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
         spinner_usb_resolution.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         if (mActivity != null) {
@@ -1850,8 +1862,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_src.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         List<String> audio_option_audio_pre_mic = Arrays.asList(getResources().getStringArray(R.array.audio_option_audio_source));
@@ -1881,8 +1894,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_pref_mic.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         List<String> bitrates = Arrays.asList(getResources().getStringArray(R.array.audio_option_audio_bitrate));
@@ -1911,8 +1925,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_option_bitrate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         List<String> sample_rates = Arrays.asList(getResources().getStringArray(R.array.audio_option_sample_rates));
@@ -1942,8 +1957,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_option_sample_rate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
         List<String> channel_count = Arrays.asList(getResources().getStringArray(R.array.channel_count));
@@ -1973,8 +1989,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_option_channel_count.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
-            return true;
+                return true;
             }
+            return false;
         });
 
     }

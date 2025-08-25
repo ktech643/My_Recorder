@@ -81,6 +81,8 @@ public class AppPreference {
         final public static String STREAMING_CUSTOM = "STREAMING_CUSTOM";
         final public static String STREAMING_AUDIO_BITRATE = "STREAMING_AUDIO_BITRATE";
         final public static String USB_AUDIO_BITRATE = "USB_AUDIO_BITRATE";
+        final public static String USB_BITRATE = "USB_BITRATE";
+        final public static String AUDIO_BITRATE = "AUDIO_BITRATE";
         final public static String STREAMING_RADIO_MODE = "STREAMING_RADIO_MODE";
         final public static String ADAPTIVE_FRAMERATE = "ADAPTIVE_FRAMERATE";
         final public static String BLUETOOTH_MIC = "BLUETOOTH_MIC";
@@ -514,6 +516,38 @@ public class AppPreference {
                 editor.putString(key, safeValue);
                 if (!editor.commit()) {
                     InternalLogger.e(TAG, "Failed to commit string preference for key: " + key);
+                }
+            }
+            return null;
+        }, null);
+    }
+
+    /**
+     * Thread-safe float setter with error recovery and ANR protection
+     * @param key Preference key
+     * @param value Float value to set
+     */
+    public static void setFloat(String key, float value) {
+        if (key == null || key.trim().isEmpty()) {
+            InternalLogger.w(TAG, "setFloat() called with null or empty key, ignoring");
+            return;
+        }
+        
+        executeWithTimeout(prefs -> {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putFloat(key, value);
+            
+            // Use apply() for better performance and ANR prevention
+            editor.apply();
+            
+            // Verify write was successful
+            float stored = prefs.getFloat(key, Float.MIN_VALUE);
+            if (stored != value) {
+                InternalLogger.w(TAG, "Failed to verify float write for key: " + key + ", attempting commit");
+                editor = prefs.edit();
+                editor.putFloat(key, value);
+                if (!editor.commit()) {
+                    InternalLogger.e(TAG, "Failed to commit float preference for key: " + key);
                 }
             }
             return null;
