@@ -16,6 +16,7 @@ import com.checkmate.android.database.DBManager;
 import com.checkmate.android.service.SharedEGL.GraphicsModule;
 import com.checkmate.android.util.HttpServer.ServiceModule;
 import com.checkmate.android.util.ANRProtectionManager;
+import com.checkmate.android.util.GlobalResourcePool;
 import com.checkmate.android.util.StartupOptimizer;
 
 import toothpick.Scope;
@@ -39,6 +40,9 @@ public class MyApp extends Application {
             
             mContext = getApplicationContext();
 
+            // Initialize global resource pool for optimal performance
+            GlobalResourcePool.getInstance();
+            
             // Initialize startup optimizer first
             StartupOptimizer.getInstance().initializeOptimizedStartup(this);
             
@@ -204,7 +208,8 @@ public class MyApp extends Application {
         try {
             return "App Performance: " + 
                    ANRProtectionManager.getInstance().getPerformanceStats() + 
-                   ", " + StartupOptimizer.getInstance().getStartupSummary();
+                   ", " + StartupOptimizer.getInstance().getStartupSummary() +
+                   ", " + GlobalResourcePool.getInstance().getPerformanceStats();
         } catch (Exception e) {
             return "Performance stats unavailable";
         }
@@ -215,6 +220,7 @@ public class MyApp extends Application {
         super.onLowMemory();
         try {
             Log.w("MyApp", "🚨 Low memory warning - performing emergency cleanup");
+            GlobalResourcePool.getInstance().emergencyCleanup();
             ANRProtectionManager.getInstance().emergencyCleanup();
             StartupOptimizer.getInstance().emergencyCleanup();
         } catch (Exception e) {
