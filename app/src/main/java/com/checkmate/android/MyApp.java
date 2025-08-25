@@ -407,7 +407,7 @@ public class MyApp extends Application {
             InternalLogger.i(TAG, "Initializing monitoring systems");
             
             // Initialize Critical Components Monitor
-            CriticalComponentsMonitor.init(this);
+            CriticalComponentsMonitor.getInstance(this).startMonitoring();
             
             // Initialize Thread Safety Manager
             ThreadSafetyManager.getInstance().init();

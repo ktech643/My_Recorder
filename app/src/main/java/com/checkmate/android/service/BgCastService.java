@@ -111,16 +111,16 @@ public final class BgCastService extends BaseBackgroundService {
                 }
                 
                 InternalLogger.i(TAG, "BgCastService onCreate completed successfully");
-                return true;
+                
                 
             } catch (Exception e) {
                 InternalLogger.e(TAG, "Error in BgCastService onCreate", e);
                 CriticalComponentsMonitor.recordComponentError("BgCastService", "onCreate failed", e);
-                return false;
+                
             }
         }, () -> {
             InternalLogger.e(TAG, "Failed to create BgCastService");
-            return false;
+            
         });
     }
 
@@ -141,7 +141,7 @@ public final class BgCastService extends BaseBackgroundService {
                 CriticalComponentsMonitor.recordComponentError("BgCastService", "onStartCommand failed", e);
                 return START_NOT_STICKY;
             }
-        }, START_NOT_STICKY, "BgCastService.onStartCommand");
+        }, START_NOT_STICKY);
     }
 
     @Override
@@ -153,8 +153,8 @@ public final class BgCastService extends BaseBackgroundService {
                 // Stop screen casting safely
                 ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
                     stopScreenCast();
-                    return true;
-                }, false, "stopScreenCast");
+                    
+                }, false);
                 
                 super.onDestroy();
                 instance = null;
@@ -162,20 +162,20 @@ public final class BgCastService extends BaseBackgroundService {
                 // Stop additional resources safely
                 ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
                     stopSafe();
-                    return true;
-                }, false, "stopSafe");
+                    
+                }, false);
                 
                 InternalLogger.i(TAG, "BgCastService onDestroy completed successfully");
-                return true;
+                
                 
             } catch (Exception e) {
                 InternalLogger.e(TAG, "Error in BgCastService onDestroy", e);
                 CriticalComponentsMonitor.recordComponentError("BgCastService", "onDestroy failed", e);
-                return false;
+                
             }
         }, () -> {
             InternalLogger.e(TAG, "Failed to destroy BgCastService properly");
-            return false;
+            
         });
     }
 

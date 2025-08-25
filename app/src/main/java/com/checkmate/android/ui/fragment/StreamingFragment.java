@@ -168,7 +168,6 @@ public class StreamingFragment extends BaseFragment {
     private ActivityFragmentCallbacks mListener;
     private SharedViewModel sharedViewModel;
 
-    private final String TAG = "StreamingFragment";
     private View rootView;
 
     // Handler for location updates
@@ -252,23 +251,7 @@ public class StreamingFragment extends BaseFragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        try {
-            InternalLogger.d(TAG, "StreamingFragment onAttach starting");
-            CriticalComponentsMonitor.executeComponentSafely("StreamingFragment", () -> {
-                super.onAttach(context);
-                if (context instanceof ActivityFragmentCallbacks) {
-                    mListener = (ActivityFragmentCallbacks) context;
-                } else {
-                    InternalLogger.e(TAG, "Context does not implement ActivityFragmentCallbacks");
-                }
-                InternalLogger.d(TAG, "StreamingFragment onAttach completed successfully");
-            });
-        } catch (Exception e) {
-            InternalLogger.e(TAG, "Error in StreamingFragment onAttach", e);
-            CriticalComponentsMonitor.recordComponentError("StreamingFragment", "onAttach failed", e);
-        }
-    }
+
 
     @Override
     public void onDestroyView() {

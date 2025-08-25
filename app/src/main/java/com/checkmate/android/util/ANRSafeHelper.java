@@ -96,7 +96,7 @@ public class ANRSafeHelper {
                     long executionTime = System.currentTimeMillis() - startTime;
                     
                     if (executionTime > ANR_DETECTION_THRESHOLD) {
-                        InternalLogger.w(TAG, "Slow operation detected ({}ms), attempt {}", executionTime, attempt);
+                        InternalLogger.w(TAG, "Slow operation detected (" + executionTime + "ms), attempt " + attempt);
                     }
                     
                     return result;
@@ -268,7 +268,7 @@ public class ANRSafeHelper {
     /**
      * Enter ANR recovery mode
      */
-    private void enterRecoveryMode() {
+    public void enterRecoveryMode() {
         if (isInRecoveryMode.compareAndSet(false, true)) {
             InternalLogger.e(TAG, "Entering ANR recovery mode");
             AppPreference.incrementRestartCount();
