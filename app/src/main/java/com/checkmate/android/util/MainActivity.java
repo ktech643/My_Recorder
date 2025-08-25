@@ -74,6 +74,7 @@ import com.checkmate.android.BuildConfig;
 import com.checkmate.android.R;
 import com.checkmate.android.util.InternalLogger;
 import com.checkmate.android.util.ANRSafeHelper;
+import com.checkmate.android.util.DynamicSettingsManager;
 
 import com.checkmate.android.model.Camera;
 import com.checkmate.android.networking.HttpApiService;
@@ -739,20 +740,8 @@ public class MainActivity extends BaseActivity
         bottom_tab.setOnNavigationItemChangedListener(item -> {
             int position = item.getPosition();
 
-            // Prevent switching to settings while recording/streaming
-            if ((isRecordingCamera()   && position == AppConstant.SW_FRAGMENT_SETTINGS) ||
-                    (isRecordingUSB()      && position == AppConstant.SW_FRAGMENT_SETTINGS) ||
-                    (isStreaming()         && position == AppConstant.SW_FRAGMENT_SETTINGS) ||
-                    ((mUSBService != null && position == AppConstant.SW_FRAGMENT_SETTINGS
-                            && mUSBService.isStreaming())) ||
-                    (isWifiStreaming()     && position == AppConstant.SW_FRAGMENT_SETTINGS) ||
-                    (isWifiRecording()     && position == AppConstant.SW_FRAGMENT_SETTINGS)) {
-
-                if (mCurrentFragmentIndex < 0 || mCurrentFragmentIndex >= 5)
-                    mCurrentFragmentIndex = 0;                         // safety
-                bottom_tab.setActiveNavigationIndex(mCurrentFragmentIndex);
-                return;
-            }
+            // Allow settings access during streaming/recording for dynamic configuration
+            // Settings changes will be applied dynamically without interrupting stream
 
             CommonUtil.hideKeyboard(this, bottom_tab);
             if (position != AppConstant.SW_FRAGMENT_LIVE) txt_record.setVisibility(View.GONE);
