@@ -2419,6 +2419,22 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 });
                 dlg.show();
                 break;
+            case R.id.txt_cast_video_details:
+                // Toggle cast video details visibility
+                if (ly_cast_video_settings != null) {
+                    if (ly_cast_video_settings.getVisibility() == View.VISIBLE) {
+                        ly_cast_video_settings.setVisibility(View.GONE);
+                        if (txt_cast_video_details != null) {
+                            txt_cast_video_details.setText(R.string.show_details);
+                        }
+                    } else {
+                        ly_cast_video_settings.setVisibility(View.VISIBLE);
+                        if (txt_cast_video_details != null) {
+                            txt_cast_video_details.setText(R.string.hide_details);
+                        }
+                    }
+                }
+                break;
         }
     }
 
