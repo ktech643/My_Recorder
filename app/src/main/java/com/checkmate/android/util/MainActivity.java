@@ -85,6 +85,7 @@ import com.checkmate.android.service.BgCameraService;
 import com.checkmate.android.service.BgCastService;
 import com.checkmate.android.service.BgUSBService;
 import com.checkmate.android.service.BgWifiService;
+import com.checkmate.android.service.SharedEGL.SharedEglManager;
 import com.checkmate.android.service.LocationManagerService;
 import com.checkmate.android.service.MyAccessibilityService;
 import com.checkmate.android.service.PlayService;
@@ -508,6 +509,22 @@ public class MainActivity extends BaseActivity
        // checkAccessService();                              // ensure accessibility service
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
+        // Initialize shared EGL early to avoid service-driven cold starts
+        try {
+            SharedEglManager eglMgr = SharedEglManager.getInstance();
+            // Prewire a ready-callback to attach the UI surface as soon as EGL is up
+            eglMgr.setListener(() -> {
+                TextureView tv = sharedViewModel.getTextureView();
+                if (tv != null && tv.getSurfaceTexture() != null) {
+                    eglMgr.setPreviewSurface(tv.getSurfaceTexture(), tv.getWidth(), tv.getHeight());
+                }
+            });
+            // Use camera as default initialization service; services will override as needed
+            eglMgr.initialize(getApplicationContext(), ServiceType.BgCamera);
+        } catch (Throwable t) {
+            Log.e(TAG, "Failed to initialize SharedEGL in MainActivity", t);
+        }
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // Initialize views
         bottom_tab = findViewById(R.id.bottom_tab);
@@ -603,11 +620,21 @@ public class MainActivity extends BaseActivity
             public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surface, int width, int height) {
                 sharedViewModel.setSurfaceModel(surface,width,height);
                 Log.e(TAG, "onSurfaceTextureAvailable (Cam)");
-
+                // Immediately attach surface to shared EGL to prevent blank frames
+                try {
+                    SharedEglManager.getInstance().setPreviewSurface(surface, width, height);
+                } catch (Throwable t) {
+                    Log.w(TAG, "setPreviewSurface failed in onSurfaceTextureAvailable", t);
+                }
             }
             public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) {
                 sharedViewModel.setSurfaceModel(surface,width,height);
                 updatePreviewRatio();
+                try {
+                    SharedEglManager.getInstance().setPreviewSurface(surface, width, height);
+                } catch (Throwable t) {
+                    Log.w(TAG, "setPreviewSurface failed in onSurfaceTextureSizeChanged", t);
+                }
             }
             public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
                 if (surface != null) surface.release();
