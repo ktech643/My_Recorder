@@ -43,6 +43,14 @@ public class DynamicSettingsManager implements SharedPreferences.OnSharedPrefere
         initializeCriticalSettings();
     }
     
+    /**
+     * Initialize the DynamicSettingsManager
+     * Should be called from Application.onCreate()
+     */
+    public static void initialize(Context context) {
+        getInstance(context);
+    }
+    
     public static DynamicSettingsManager getInstance(Context context) {
         if (instance == null) {
             synchronized (DynamicSettingsManager.class) {

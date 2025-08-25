@@ -71,7 +71,11 @@ public class MyApp extends Application {
             
         
         CrashLogger.initialize(mContext);
-        DynamicSettingsManager.initialize(this);} catch (Exception e) {
+        DynamicSettingsManager.getInstance(this);
+            
+            InternalLogger.i(TAG, "Monitoring systems initialized successfully");
+            
+        } catch (Exception e) {
             // Even if internal logger fails, try to log to system
             Log.e(TAG, "Critical error during app initialization", e);
             

@@ -355,7 +355,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             try {
                 super.onAttach(context);
                 instance = new WeakReference<>(this);
-                mActivity = ANRSafeHelper.nullSafe(MainActivity.getInstance(), null);
+                mActivity = ANRSafeHelper.nullSafe(MainActivity.getInstance(), null, "MainActivity");
                 
                 if (ANRSafeHelper.isNullWithLog(context, "context")) {
                     InternalLogger.e("SettingsFragment", "Context is null in onAttach");
@@ -1345,6 +1345,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         List<String> bitrates = Arrays.asList(getResources().getStringArray(R.array.audio_bitrate));
@@ -1375,6 +1376,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         usb_audio_bitrate.setAdapter(bitrate_adapter);
@@ -1400,6 +1402,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         List<String> audio_sources = Arrays.asList(getResources().getStringArray(R.array.audio_source));
@@ -1431,6 +1434,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         usb_audio_src.setAdapter(source_adapter);
@@ -1457,6 +1461,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         List<String> channel_count = Arrays.asList(getResources().getStringArray(R.array.channel_count));
@@ -1488,6 +1493,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         bluetooth_audio_src.setAdapter(source_adapter);
@@ -1514,6 +1520,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         usb_bluetooth_src.setAdapter(source_adapter);
@@ -1541,6 +1548,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         List<String> sample_rates = Arrays.asList(getResources().getStringArray(R.array.sample_rates));
@@ -1572,6 +1580,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
         usb_sample_rate.setAdapter(sample_adapter);
         int usb_rate = AppPreference.getInt(AppPreference.KEY.USB_SAMPLE_RATE, 7);
@@ -1597,6 +1606,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         swt_radio_mode.setChecked(AppPreference.getBool(AppPreference.KEY.STREAMING_RADIO_MODE, false));
@@ -1739,12 +1749,14 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
         spinner_usb_resolution.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         if (mActivity != null) {
@@ -1819,6 +1831,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 }
             }
         }
+        return false;
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -1852,6 +1865,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         List<String> audio_option_audio_pre_mic = Arrays.asList(getResources().getStringArray(R.array.audio_option_audio_source));
@@ -1883,6 +1897,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         List<String> bitrates = Arrays.asList(getResources().getStringArray(R.array.audio_option_audio_bitrate));
@@ -1913,6 +1928,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         List<String> sample_rates = Arrays.asList(getResources().getStringArray(R.array.audio_option_sample_rates));
@@ -1944,6 +1960,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
         List<String> channel_count = Arrays.asList(getResources().getStringArray(R.array.channel_count));
@@ -1975,6 +1992,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
             return true;
             }
+        return true;
         });
 
     }
@@ -2928,6 +2946,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
         }
         
+        return false;
     }
 
     private void buildAlertMessageNoGps() {
@@ -2936,12 +2955,14 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     @Override
                     public boolean onClick(MessageDialog dialog, View v) {
                         dialog.dismiss();
+                    return false;
                     }
                 }).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
                     @Override
                     public boolean onClick(MessageDialog baseDialog, View v) {
                         startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                         baseDialog.dismiss();
+                    return false;
                     }
                 });
         messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
@@ -3284,12 +3305,14 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                                     @Override
                                     public boolean onClick(MessageDialog dialog, View v) {
                                         dialog.dismiss();
+                                    return false;
                                     }
                                 }).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
                                     @Override
                                     public boolean onClick(MessageDialog baseDialog, View v) {
                                         mActivity.updateApp(response.body().url);
                                         baseDialog.dismiss();
+                                    return false;
                                     }
                                 });
                         messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
@@ -3320,6 +3343,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     @Override
                     public boolean onClick(MessageDialog dialog, View v) {
                         dialog.dismiss();
+                    return false;
                     }
                 }).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
                     @Override
@@ -3329,6 +3353,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                         AppPreference.removeKey(AppPreference.KEY.ACTIVATION_CODE);
                         startActivity(new Intent(requireContext(), SplashActivity.class));
                         requireActivity().finish();
+                    return false;
                     }
                 });
         messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
@@ -3443,6 +3468,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                                 @Override
                                 public boolean onClick(MessageDialog dialog, View v) {
                                     dialog.dismiss();
+                                return false;
                                 }
                             }).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
                                 @Override
@@ -3453,6 +3479,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                                     initialize();
                                     mListener.fragUpdateMenu(true);
                                     baseDialog.dismiss();
+                                return false;
                                 }
                             });
                     messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
