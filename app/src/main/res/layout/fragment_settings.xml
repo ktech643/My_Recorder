@@ -21,6 +21,7 @@
                 android:id="@+id/card_beta"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_normal"
                 android:padding="@dimen/margin_normal"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="6dp"
@@ -118,14 +119,19 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <TextView
                         style="@style/normalText"
@@ -217,14 +223,19 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <TextView
                         style="@style/normalText"
@@ -374,14 +385,19 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -551,7 +567,13 @@
                             android:id="@+id/txt_storage"
                             android:text="Select storage"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="@drawable/clickable_text_background"
+                            android:padding="8dp"
+                            android:textColor="@color/blue"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
 
@@ -562,14 +584,19 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <TextView
                         style="@style/normalText"
@@ -608,14 +635,19 @@
                 android:id="@+id/ly_recording_settings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -664,7 +696,8 @@
                         android:id="@+id/ly_video_custom"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:visibility="gone">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -762,14 +795,19 @@
                 android:id="@+id/ly_streaming_settings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -820,7 +858,8 @@
                         android:id="@+id/ly_streaming_custom"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:visibility="gone">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -1070,14 +1109,19 @@
                 android:id="@+id/ly_cast_video_settings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/margin_normal">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1197,24 +1241,7 @@
                                 android:inputType="number" />
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
 
-                            <TextView
-                                style="@style/normalText"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/adaptive_mode" />
-
-                            <com.checkmate.android.ui.view.MySpinner
-                                android:id="@+id/spinner_cast_adaptive"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
-                        </LinearLayout>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -1225,14 +1252,19 @@
                 android:id="@+id/ly_usb"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/margin_normal">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1478,14 +1510,19 @@
                 android:id="@+id/audio_options"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/margin_normal">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                 <TextView
                     style="@style/normalText"
@@ -1597,14 +1634,19 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/margin_normal">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <TextView
                         style="@style/normalText"
@@ -1705,14 +1747,19 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/margin_normal">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <TextView
                         style="@style/normalText"
@@ -1749,14 +1796,19 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/margin_normal">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <TextView
                         style="@style/normalText"
@@ -1882,14 +1934,19 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
-                android:padding="@dimen/margin_normal">
+                android:layout_marginTop="@dimen/margin_normal"
+                android:padding="@dimen/margin_normal"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true"
+                android:background="@drawable/settings_card_background">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/margin_normal">
+                    android:padding="12dp"
+                    android:background="@drawable/settings_card_inner_background">
 
                     <!-- Single row for the two TextViews -->
                     <LinearLayout
