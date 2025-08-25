@@ -423,14 +423,18 @@ public class StreamingFragment extends BaseFragment {
         try {
             initializeRestOfUIComponents();
             showInitialLogin();
-        String login_email = AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, "");
-        String login_password = AppPreference.getStr(AppPreference.KEY.LOGIN_PASSWORD, "");
-        if (!TextUtils.isEmpty(login_email) && !TextUtils.isEmpty(login_password)) {
-            edt_username.setText(login_email);
-            edt_password.setText(login_password);
-            onLogin();
-        } else {
-            initialize();
+            
+            String login_email = AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, "");
+            String login_password = AppPreference.getStr(AppPreference.KEY.LOGIN_PASSWORD, "");
+            if (!TextUtils.isEmpty(login_email) && !TextUtils.isEmpty(login_password)) {
+                edt_username.setText(login_email);
+                edt_password.setText(login_password);
+                onLogin();
+            } else {
+                initialize();
+            }
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in onCreateView initialization", e);
         }
 
         if (mActivity != null) {

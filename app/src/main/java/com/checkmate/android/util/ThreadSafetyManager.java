@@ -1,40 +1,110 @@
 package com.checkmate.android.util;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Process;
-
-import com.checkmate.android.AppPreference;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Thread Safety Manager for the CheckMate Android app
- * Monitors thread safety, detects potential ANR conditions, and implements recovery mechanisms
+ * ThreadSafetyManager - Comprehensive ANR and thread safety monitoring system
+ * Provides real-time monitoring, detection, and recovery mechanisms for thread safety
  */
 public class ThreadSafetyManager {
     private static final String TAG = "ThreadSafetyManager";
+    
+    // Singleton instance
+    private static volatile ThreadSafetyManager instance;
+    private static final Object LOCK = new Object();
+    
+    // Configuration constants
     private static final long ANR_THRESHOLD = 5000; // 5 seconds
     private static final long WATCHDOG_INTERVAL = 1000; // 1 second
-    private static final int MAX_BACKGROUND_THREADS = 10;
+    private static final int MAX_BACKGROUND_THREADS = 20;
     
-    private static volatile ThreadSafetyManager instance;
-    private final Context context;
-    private final Handler mainHandler;
-    private final AtomicBoolean isMonitoring;
-    private final AtomicLong lastMainThreadActivity;
-    private final AtomicInteger backgroundThreadCount;
-    private final ConcurrentHashMap<String, ThreadInfo> activeThreads;
-    private final AtomicBoolean anrDetected;
+    // Monitoring state
+    private final AtomicBoolean isMonitoring = new AtomicBoolean(false);
+    private final AtomicBoolean anrDetected = new AtomicBoolean(false);
+    private final AtomicLong lastMainThreadActivity = new AtomicLong(System.currentTimeMillis());
     
-    // Watchdog thread for ANR detection
+    // Thread tracking
+    private final AtomicInteger backgroundThreadCount = new AtomicInteger(0);
+    private final ConcurrentHashMap<String, ThreadInfo> activeThreads = new ConcurrentHashMap<>();
+    
+    // Watchdog thread
     private Thread watchdogThread;
-    private final AtomicBoolean watchdogRunning;
+    private final AtomicBoolean watchdogRunning = new AtomicBoolean(false);
     
+    // Main thread handler for monitoring
+    private Handler mainHandler;
+    
+    /**
+     * Get singleton instance
+     */
+    public static ThreadSafetyManager getInstance() {
+        if (instance == null) {
+            synchronized (LOCK) {
+                if (instance == null) {
+                    instance = new ThreadSafetyManager();
+                }
+            }
+        }
+        return instance;
+    }
+    
+    /**
+     * Private constructor
+     */
+    private ThreadSafetyManager() {
+        try {
+            mainHandler = new Handler(Looper.getMainLooper());
+            InternalLogger.d(TAG, "ThreadSafetyManager initialized");
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error initializing ThreadSafetyManager", e);
+        }
+    }
+    
+    /**
+     * Initialize and start monitoring
+     */
+    public void init() {
+        try {
+            if (isMonitoring.compareAndSet(false, true)) {
+                startMainThreadMonitoring();
+                startWatchdogThread();
+                InternalLogger.i(TAG, "Thread safety monitoring started");
+            }
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error starting thread safety monitoring", e);
+        }
+    }
+    
+    /**
+     * Stop monitoring
+     */
+    public void shutdown() {
+        try {
+            isMonitoring.set(false);
+            watchdogRunning.set(false);
+            
+            if (watchdogThread != null && watchdogThread.isAlive()) {
+                watchdogThread.interrupt();
+            }
+            
+            activeThreads.clear();
+            backgroundThreadCount.set(0);
+            
+            InternalLogger.i(TAG, "Thread safety monitoring stopped");
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error stopping thread safety monitoring", e);
+        }
+    }
+    
+    /**
+     * Internal ThreadInfo class for tracking thread state
+     */
     private static class ThreadInfo {
         final String name;
         final long createdTime;
@@ -44,7 +114,7 @@ public class ThreadSafetyManager {
         ThreadInfo(String name) {
             this.name = name;
             this.createdTime = System.currentTimeMillis();
-            this.lastActivity = new AtomicLong(createdTime);
+            this.lastActivity = new AtomicLong(System.currentTimeMillis());
             this.isActive = new AtomicBoolean(true);
         }
         
@@ -53,70 +123,12 @@ public class ThreadSafetyManager {
         }
         
         boolean isStuck() {
-            return System.currentTimeMillis() - lastActivity.get() > ANR_THRESHOLD;
-        }
-    }
-    
-    private ThreadSafetyManager(Context context) {
-        this.context = context.getApplicationContext();
-        this.mainHandler = new Handler(Looper.getMainLooper());
-        this.isMonitoring = new AtomicBoolean(false);
-        this.lastMainThreadActivity = new AtomicLong(System.currentTimeMillis());
-        this.backgroundThreadCount = new AtomicInteger(0);
-        this.activeThreads = new ConcurrentHashMap<>();
-        this.anrDetected = new AtomicBoolean(false);
-        this.watchdogRunning = new AtomicBoolean(false);
-    }
-    
-    public static ThreadSafetyManager getInstance(Context context) {
-        if (instance == null) {
-            synchronized (ThreadSafetyManager.class) {
-                if (instance == null) {
-                    instance = new ThreadSafetyManager(context);
-                }
-            }
-        }
-        return instance;
-    }
-    
-    /**
-     * Start monitoring thread safety and ANR conditions
-     */
-    public void startMonitoring() {
-        if (isMonitoring.compareAndSet(false, true)) {
-            InternalLogger.i(TAG, "Starting thread safety monitoring");
-            
-            // Start main thread activity monitoring
-            startMainThreadMonitoring();
-            
-            // Start watchdog thread
-            startWatchdogThread();
-            
-            InternalLogger.i(TAG, "Thread safety monitoring started successfully");
+            return isActive.get() && (System.currentTimeMillis() - lastActivity.get()) > 10000; // 10 seconds
         }
     }
     
     /**
-     * Stop monitoring
-     */
-    public void stopMonitoring() {
-        if (isMonitoring.compareAndSet(true, false)) {
-            InternalLogger.i(TAG, "Stopping thread safety monitoring");
-            
-            // Stop watchdog thread
-            if (watchdogRunning.compareAndSet(true, false) && watchdogThread != null) {
-                watchdogThread.interrupt();
-            }
-            
-            // Clear active threads
-            activeThreads.clear();
-            
-            InternalLogger.i(TAG, "Thread safety monitoring stopped");
-        }
-    }
-    
-    /**
-     * Start monitoring main thread activity
+     * Start main thread monitoring
      */
     private void startMainThreadMonitoring() {
         mainHandler.post(new Runnable() {
@@ -128,4 +140,309 @@ public class ThreadSafetyManager {
                     // Schedule next check
                     mainHandler.postDelayed(this, 100); // Check every 100ms
                 }
-            }\n        });\n    }\n    \n    /**\n     * Start watchdog thread for ANR detection\n     */\n    private void startWatchdogThread() {\n        if (watchdogRunning.compareAndSet(false, true)) {\n            watchdogThread = new Thread(() -> {\n                android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);\n                \n                while (watchdogRunning.get() && !Thread.currentThread().isInterrupted()) {\n                    try {\n                        // Check for ANR conditions\n                        checkForAnrConditions();\n                        \n                        // Check background threads\n                        checkBackgroundThreads();\n                        \n                        // Clean up inactive threads\n                        cleanupInactiveThreads();\n                        \n                        Thread.sleep(WATCHDOG_INTERVAL);\n                    } catch (InterruptedException e) {\n                        Thread.currentThread().interrupt();\n                        break;\n                    } catch (Exception e) {\n                        InternalLogger.e(TAG, \"Error in watchdog thread\", e);\n                    }\n                }\n                \n                InternalLogger.d(TAG, \"Watchdog thread stopped\");\n            }, \"ThreadSafety-Watchdog\");\n            \n            watchdogThread.setDaemon(true);\n            watchdogThread.start();\n        }\n    }\n    \n    /**\n     * Check for ANR conditions\n     */\n    private void checkForAnrConditions() {\n        long timeSinceLastActivity = System.currentTimeMillis() - lastMainThreadActivity.get();\n        \n        if (timeSinceLastActivity > ANR_THRESHOLD) {\n            if (anrDetected.compareAndSet(false, true)) {\n                InternalLogger.e(TAG, \"ANR condition detected! Main thread unresponsive for \" + timeSinceLastActivity + \"ms\");\n                handleAnrCondition(timeSinceLastActivity);\n            }\n        } else if (anrDetected.get() && timeSinceLastActivity < (ANR_THRESHOLD / 2)) {\n            // ANR resolved\n            if (anrDetected.compareAndSet(true, false)) {\n                InternalLogger.i(TAG, \"ANR condition resolved, main thread responsive again\");\n                handleAnrResolved();\n            }\n        }\n    }\n    \n    /**\n     * Handle ANR condition\n     */\n    private void handleAnrCondition(long unresponsiveTime) {\n        try {\n            // Log thread dump\n            logThreadDump();\n            \n            // Update app preferences\n            AppPreference.incrementRestartCount();\n            \n            // Enter recovery mode\n            ANRSafeHelper.getInstance().exitRecoveryMode(); // This will enter recovery mode\n            \n            // Log system state\n            logSystemState();\n            \n            InternalLogger.e(TAG, \"ANR recovery procedures initiated\");\n            \n        } catch (Exception e) {\n            InternalLogger.e(TAG, \"Error handling ANR condition\", e);\n        }\n    }\n    \n    /**\n     * Handle ANR resolved\n     */\n    private void handleAnrResolved() {\n        try {\n            // Exit recovery mode\n            ANRSafeHelper.getInstance().exitRecoveryMode();\n            \n            InternalLogger.i(TAG, \"ANR recovery completed successfully\");\n            \n        } catch (Exception e) {\n            InternalLogger.e(TAG, \"Error handling ANR resolution\", e);\n        }\n    }\n    \n    /**\n     * Check background threads for issues\n     */\n    private void checkBackgroundThreads() {\n        try {\n            // Check if we have too many background threads\n            if (backgroundThreadCount.get() > MAX_BACKGROUND_THREADS) {\n                InternalLogger.w(TAG, \"Too many background threads: \" + backgroundThreadCount.get());\n            }\n            \n            // Check for stuck threads\n            for (ThreadInfo threadInfo : activeThreads.values()) {\n                if (threadInfo.isStuck()) {\n                    InternalLogger.w(TAG, \"Stuck thread detected: \" + threadInfo.name + \n                                   \", inactive for \" + (System.currentTimeMillis() - threadInfo.lastActivity.get()) + \"ms\");\n                }\n            }\n            \n        } catch (Exception e) {\n            InternalLogger.e(TAG, \"Error checking background threads\", e);\n        }\n    }\n    \n    /**\n     * Clean up inactive threads from tracking\n     */\n    private void cleanupInactiveThreads() {\n        try {\n            long currentTime = System.currentTimeMillis();\n            activeThreads.entrySet().removeIf(entry -> {\n                ThreadInfo threadInfo = entry.getValue();\n                // Remove threads that have been inactive for more than 30 seconds\n                boolean shouldRemove = !threadInfo.isActive.get() || \n                                     (currentTime - threadInfo.lastActivity.get()) > 30000;\n                \n                if (shouldRemove) {\n                    InternalLogger.d(TAG, \"Removing inactive thread from tracking: \" + threadInfo.name);\n                }\n                \n                return shouldRemove;\n            });\n        } catch (Exception e) {\n            InternalLogger.e(TAG, \"Error cleaning up inactive threads\", e);\n        }\n    }\n    \n    /**\n     * Register a background thread for monitoring\n     */\n    public void registerBackgroundThread(String threadName) {\n        try {\n            backgroundThreadCount.incrementAndGet();\n            ThreadInfo threadInfo = new ThreadInfo(threadName);\n            activeThreads.put(threadName, threadInfo);\n            \n            InternalLogger.d(TAG, \"Registered background thread: \" + threadName + \n                           \", total: \" + backgroundThreadCount.get());\n        } catch (Exception e) {\n            InternalLogger.e(TAG, \"Error registering background thread\", e);\n        }\n    }\n    \n    /**\n     * Unregister a background thread\n     */\n    public void unregisterBackgroundThread(String threadName) {\n        try {\n            ThreadInfo threadInfo = activeThreads.remove(threadName);\n            if (threadInfo != null) {\n                threadInfo.isActive.set(false);\n                backgroundThreadCount.decrementAndGet();\n                \n                InternalLogger.d(TAG, \"Unregistered background thread: \" + threadName + \n                               \", total: \" + backgroundThreadCount.get());\n            }\n        } catch (Exception e) {\n            InternalLogger.e(TAG, \"Error unregistering background thread\", e);\n        }\n    }\n    \n    /**\n     * Update thread activity\n     */\n    public void updateThreadActivity(String threadName) {\n        try {\n            ThreadInfo threadInfo = activeThreads.get(threadName);\n            if (threadInfo != null) {\n                threadInfo.updateActivity();\n            }\n        } catch (Exception e) {\n            InternalLogger.e(TAG, \"Error updating thread activity\", e);\n        }\n    }\n    \n    /**\n     * Log thread dump for debugging\n     */\n    private void logThreadDump() {\n        try {\n            StringBuilder dump = new StringBuilder();\n            dump.append(\"=== THREAD DUMP ===\\n\");\n            dump.append(\"Timestamp: \").append(System.currentTimeMillis()).append(\"\\n\");\n            dump.append(\"Active Threads: \").append(activeThreads.size()).append(\"\\n\");\n            dump.append(\"Background Thread Count: \").append(backgroundThreadCount.get()).append(\"\\n\");\n            \n            for (ThreadInfo threadInfo : activeThreads.values()) {\n                dump.append(\"Thread: \").append(threadInfo.name)\n                    .append(\", Created: \").append(threadInfo.createdTime)\n                    .append(\", Last Activity: \").append(threadInfo.lastActivity.get())\n                    .append(\", Active: \").append(threadInfo.isActive.get())\n                    .append(\"\\n\");\n            }\n            \n            dump.append(\"=== END THREAD DUMP ===\\n\");\n            \n            InternalLogger.e(TAG, dump.toString());\n            \n        } catch (Exception e) {\n            InternalLogger.e(TAG, \"Error creating thread dump\", e);\n        }\n    }\n    \n    /**\n     * Log system state information\n     */\n    private void logSystemState() {\n        try {\n            Runtime runtime = Runtime.getRuntime();\n            long maxMemory = runtime.maxMemory();\n            long totalMemory = runtime.totalMemory();\n            long freeMemory = runtime.freeMemory();\n            long usedMemory = totalMemory - freeMemory;\n            \n            StringBuilder state = new StringBuilder();\n            state.append(\"=== SYSTEM STATE ===\\n\");\n            state.append(\"Max Memory: \").append(maxMemory / 1024 / 1024).append(\" MB\\n\");\n            state.append(\"Total Memory: \").append(totalMemory / 1024 / 1024).append(\" MB\\n\");\n            state.append(\"Used Memory: \").append(usedMemory / 1024 / 1024).append(\" MB\\n\");\n            state.append(\"Free Memory: \").append(freeMemory / 1024 / 1024).append(\" MB\\n\");\n            state.append(\"Available Processors: \").append(runtime.availableProcessors()).append(\"\\n\");\n            state.append(\"=== END SYSTEM STATE ===\\n\");\n            \n            InternalLogger.i(TAG, state.toString());\n            \n        } catch (Exception e) {\n            InternalLogger.e(TAG, \"Error logging system state\", e);\n        }\n    }\n    \n    /**\n     * Get current thread safety status\n     */\n    public ThreadSafetyStatus getStatus() {\n        boolean isMainThreadResponsive = (System.currentTimeMillis() - lastMainThreadActivity.get()) < ANR_THRESHOLD;\n        boolean hasStuckThreads = activeThreads.values().stream().anyMatch(ThreadInfo::isStuck);\n        boolean tooManyBackgroundThreads = backgroundThreadCount.get() > MAX_BACKGROUND_THREADS;\n        \n        return new ThreadSafetyStatus(\n            isMainThreadResponsive,\n            !hasStuckThreads,\n            !tooManyBackgroundThreads,\n            backgroundThreadCount.get(),\n            activeThreads.size(),\n            anrDetected.get()\n        );\n    }\n    \n    /**\n     * Thread safety status information\n     */\n    public static class ThreadSafetyStatus {\n        public final boolean mainThreadResponsive;\n        public final boolean noStuckThreads;\n        public final boolean backgroundThreadCountOk;\n        public final int backgroundThreadCount;\n        public final int activeThreadCount;\n        public final boolean anrDetected;\n        \n        ThreadSafetyStatus(boolean mainThreadResponsive, boolean noStuckThreads, \n                          boolean backgroundThreadCountOk, int backgroundThreadCount, \n                          int activeThreadCount, boolean anrDetected) {\n            this.mainThreadResponsive = mainThreadResponsive;\n            this.noStuckThreads = noStuckThreads;\n            this.backgroundThreadCountOk = backgroundThreadCountOk;\n            this.backgroundThreadCount = backgroundThreadCount;\n            this.activeThreadCount = activeThreadCount;\n            this.anrDetected = anrDetected;\n        }\n        \n        public boolean isHealthy() {\n            return mainThreadResponsive && noStuckThreads && backgroundThreadCountOk && !anrDetected;\n        }\n        \n        @Override\n        public String toString() {\n            return \"ThreadSafetyStatus{\" +\n                    \"mainThreadResponsive=\" + mainThreadResponsive +\n                    \", noStuckThreads=\" + noStuckThreads +\n                    \", backgroundThreadCountOk=\" + backgroundThreadCountOk +\n                    \", backgroundThreadCount=\" + backgroundThreadCount +\n                    \", activeThreadCount=\" + activeThreadCount +\n                    \", anrDetected=\" + anrDetected +\n                    \", healthy=\" + isHealthy() +\n                    '}';\n        }\n    }\n}
+            }
+        });
+    }
+    
+    /**
+     * Start watchdog thread for ANR detection
+     */
+    private void startWatchdogThread() {
+        if (watchdogRunning.compareAndSet(false, true)) {
+            watchdogThread = new Thread(() -> {
+                android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                
+                while (watchdogRunning.get() && !Thread.currentThread().isInterrupted()) {
+                    try {
+                        // Check for ANR conditions
+                        checkForAnrConditions();
+                        
+                        // Check background threads
+                        checkBackgroundThreads();
+                        
+                        // Clean up inactive threads
+                        cleanupInactiveThreads();
+                        
+                        Thread.sleep(WATCHDOG_INTERVAL);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    } catch (Exception e) {
+                        InternalLogger.e(TAG, "Error in watchdog thread", e);
+                    }
+                }
+                
+                InternalLogger.d(TAG, "Watchdog thread stopped");
+            }, "ThreadSafety-Watchdog");
+            
+            watchdogThread.setDaemon(true);
+            watchdogThread.start();
+        }
+    }
+    
+    /**
+     * Check for ANR conditions
+     */
+    private void checkForAnrConditions() {
+        long timeSinceLastActivity = System.currentTimeMillis() - lastMainThreadActivity.get();
+        
+        if (timeSinceLastActivity > ANR_THRESHOLD) {
+            if (anrDetected.compareAndSet(false, true)) {
+                InternalLogger.e(TAG, "ANR condition detected! Main thread unresponsive for " + timeSinceLastActivity + "ms");
+                handleAnrCondition(timeSinceLastActivity);
+            }
+        } else if (anrDetected.get() && timeSinceLastActivity < (ANR_THRESHOLD / 2)) {
+            // ANR resolved
+            if (anrDetected.compareAndSet(true, false)) {
+                InternalLogger.i(TAG, "ANR condition resolved, main thread responsive again");
+                handleAnrResolved();
+            }
+        }
+    }
+    
+    /**
+     * Handle ANR condition
+     */
+    private void handleAnrCondition(long unresponsiveTime) {
+        try {
+            // Log thread dump
+            logThreadDump();
+            
+            // Update app preferences
+            AppPreference.incrementRestartCount();
+            
+            // Enter recovery mode
+            ANRSafeHelper.getInstance().enterRecoveryMode();
+            
+            // Log system state
+            logSystemState();
+            
+            InternalLogger.e(TAG, "ANR recovery procedures initiated");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error handling ANR condition", e);
+        }
+    }
+    
+    /**
+     * Handle ANR resolved
+     */
+    private void handleAnrResolved() {
+        try {
+            // Exit recovery mode
+            ANRSafeHelper.getInstance().exitRecoveryMode();
+            
+            InternalLogger.i(TAG, "ANR recovery completed successfully");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error handling ANR resolution", e);
+        }
+    }
+    
+    /**
+     * Check background threads for issues
+     */
+    private void checkBackgroundThreads() {
+        try {
+            // Check if we have too many background threads
+            if (backgroundThreadCount.get() > MAX_BACKGROUND_THREADS) {
+                InternalLogger.w(TAG, "Too many background threads: " + backgroundThreadCount.get());
+            }
+            
+            // Check for stuck threads
+            for (ThreadInfo threadInfo : activeThreads.values()) {
+                if (threadInfo.isStuck()) {
+                    InternalLogger.w(TAG, "Stuck thread detected: " + threadInfo.name + 
+                                   ", inactive for " + (System.currentTimeMillis() - threadInfo.lastActivity.get()) + "ms");
+                }
+            }
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error checking background threads", e);
+        }
+    }
+    
+    /**
+     * Clean up inactive threads from tracking
+     */
+    private void cleanupInactiveThreads() {
+        try {
+            long currentTime = System.currentTimeMillis();
+            activeThreads.entrySet().removeIf(entry -> {
+                ThreadInfo threadInfo = entry.getValue();
+                // Remove threads that have been inactive for more than 30 seconds
+                boolean shouldRemove = !threadInfo.isActive.get() || 
+                                     (currentTime - threadInfo.lastActivity.get()) > 30000;
+                
+                if (shouldRemove) {
+                    InternalLogger.d(TAG, "Removing inactive thread from tracking: " + threadInfo.name);
+                }
+                
+                return shouldRemove;
+            });
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error cleaning up inactive threads", e);
+        }
+    }
+    
+    /**
+     * Register a background thread for monitoring
+     */
+    public void registerBackgroundThread(String threadName) {
+        try {
+            backgroundThreadCount.incrementAndGet();
+            ThreadInfo threadInfo = new ThreadInfo(threadName);
+            activeThreads.put(threadName, threadInfo);
+            
+            InternalLogger.d(TAG, "Registered background thread: " + threadName + 
+                           ", total: " + backgroundThreadCount.get());
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error registering background thread", e);
+        }
+    }
+    
+    /**
+     * Unregister a background thread
+     */
+    public void unregisterBackgroundThread(String threadName) {
+        try {
+            ThreadInfo threadInfo = activeThreads.remove(threadName);
+            if (threadInfo != null) {
+                threadInfo.isActive.set(false);
+                backgroundThreadCount.decrementAndGet();
+                
+                InternalLogger.d(TAG, "Unregistered background thread: " + threadName + 
+                               ", total: " + backgroundThreadCount.get());
+            }
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error unregistering background thread", e);
+        }
+    }
+    
+    /**
+     * Update thread activity
+     */
+    public void updateThreadActivity(String threadName) {
+        try {
+            ThreadInfo threadInfo = activeThreads.get(threadName);
+            if (threadInfo != null) {
+                threadInfo.updateActivity();
+            }
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error updating thread activity", e);
+        }
+    }
+    
+    /**
+     * Log thread dump for debugging
+     */
+    private void logThreadDump() {
+        try {
+            StringBuilder dump = new StringBuilder();
+            dump.append("=== THREAD DUMP ===\n");
+            dump.append("Timestamp: ").append(System.currentTimeMillis()).append("\n");
+            dump.append("Active Threads: ").append(activeThreads.size()).append("\n");
+            dump.append("Background Thread Count: ").append(backgroundThreadCount.get()).append("\n");
+            
+            for (ThreadInfo threadInfo : activeThreads.values()) {
+                dump.append("Thread: ").append(threadInfo.name)
+                    .append(", Created: ").append(threadInfo.createdTime)
+                    .append(", Last Activity: ").append(threadInfo.lastActivity.get())
+                    .append(", Active: ").append(threadInfo.isActive.get())
+                    .append("\n");
+            }
+            
+            dump.append("=== END THREAD DUMP ===\n");
+            
+            InternalLogger.e(TAG, dump.toString());
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error creating thread dump", e);
+        }
+    }
+    
+    /**
+     * Log system state information
+     */
+    private void logSystemState() {
+        try {
+            Runtime runtime = Runtime.getRuntime();
+            long maxMemory = runtime.maxMemory();
+            long totalMemory = runtime.totalMemory();
+            long freeMemory = runtime.freeMemory();
+            long usedMemory = totalMemory - freeMemory;
+            
+            StringBuilder state = new StringBuilder();
+            state.append("=== SYSTEM STATE ===\n");
+            state.append("Max Memory: ").append(maxMemory / 1024 / 1024).append(" MB\n");
+            state.append("Total Memory: ").append(totalMemory / 1024 / 1024).append(" MB\n");
+            state.append("Used Memory: ").append(usedMemory / 1024 / 1024).append(" MB\n");
+            state.append("Free Memory: ").append(freeMemory / 1024 / 1024).append(" MB\n");
+            state.append("Available Processors: ").append(runtime.availableProcessors()).append("\n");
+            state.append("=== END SYSTEM STATE ===\n");
+            
+            InternalLogger.i(TAG, state.toString());
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error logging system state", e);
+        }
+    }
+    
+    /**
+     * Get current thread safety status
+     */
+    public ThreadSafetyStatus getStatus() {
+        boolean isMainThreadResponsive = (System.currentTimeMillis() - lastMainThreadActivity.get()) < ANR_THRESHOLD;
+        boolean hasStuckThreads = activeThreads.values().stream().anyMatch(ThreadInfo::isStuck);
+        boolean tooManyBackgroundThreads = backgroundThreadCount.get() > MAX_BACKGROUND_THREADS;
+        
+        return new ThreadSafetyStatus(
+            isMainThreadResponsive,
+            !hasStuckThreads,
+            !tooManyBackgroundThreads,
+            backgroundThreadCount.get(),
+            activeThreads.size(),
+            anrDetected.get()
+        );
+    }
+    
+    /**
+     * Thread safety status information
+     */
+    public static class ThreadSafetyStatus {
+        public final boolean mainThreadResponsive;
+        public final boolean noStuckThreads;
+        public final boolean backgroundThreadCountOk;
+        public final int backgroundThreadCount;
+        public final int activeThreadCount;
+        public final boolean anrDetected;
+        
+        ThreadSafetyStatus(boolean mainThreadResponsive, boolean noStuckThreads, 
+                          boolean backgroundThreadCountOk, int backgroundThreadCount, 
+                          int activeThreadCount, boolean anrDetected) {
+            this.mainThreadResponsive = mainThreadResponsive;
+            this.noStuckThreads = noStuckThreads;
+            this.backgroundThreadCountOk = backgroundThreadCountOk;
+            this.backgroundThreadCount = backgroundThreadCount;
+            this.activeThreadCount = activeThreadCount;
+            this.anrDetected = anrDetected;
+        }
+        
+        public boolean isHealthy() {
+            return mainThreadResponsive && noStuckThreads && backgroundThreadCountOk && !anrDetected;
+        }
+        
+        @Override
+        public String toString() {
+            return "ThreadSafetyStatus{" +
+                    "mainThreadResponsive=" + mainThreadResponsive +
+                    ", noStuckThreads=" + noStuckThreads +
+                    ", backgroundThreadCountOk=" + backgroundThreadCountOk +
+                    ", backgroundThreadCount=" + backgroundThreadCount +
+                    ", activeThreadCount=" + activeThreadCount +
+                    ", anrDetected=" + anrDetected +
+                    ", healthy=" + isHealthy() +
+                    '}';
+        }
+    }
+}
