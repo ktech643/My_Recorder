@@ -88,23 +88,35 @@ public class SplashActivity extends BaseActivity {
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 105; // Define your request code
     private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 106; // Notification permission request code
 
-    private static final String[] PERMISSIONS = {
+    // Essential permissions needed for core app functionality - request these first
+    private static final String[] ESSENTIAL_PERMISSIONS = {
             Manifest.permission.CAMERA,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
+    
+    // Secondary permissions for additional features - request these after essential ones
+    private static final String[] SECONDARY_PERMISSIONS = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.VIBRATE,
             Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.ACCESS_WIFI_STATE,
             Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.MODIFY_AUDIO_SETTINGS
+    };
+    
+    // Optional permissions for advanced features - request last
+    private static final String[] OPTIONAL_PERMISSIONS = {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.CHANGE_NETWORK_STATE,
             Manifest.permission.WAKE_LOCK,
-            Manifest.permission.MODIFY_AUDIO_SETTINGS,
             Manifest.permission.READ_MEDIA_AUDIO,
             Manifest.permission.CAPTURE_AUDIO_OUTPUT
     };
+    
+    // Legacy - keeping for backward compatibility
+    private static final String[] PERMISSIONS = ESSENTIAL_PERMISSIONS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,42 +217,61 @@ public class SplashActivity extends BaseActivity {
     ConnectivityManager connection_manager;
 
     public void verifyPermissions(Activity activity) {
-        int permission0 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
-        int permission1 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int permission2 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
-        int permission3 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.RECORD_AUDIO);
-        int permission4 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.VIBRATE);
-        int permission5 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.MODIFY_AUDIO_SETTINGS);
-        int permission6 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_PHONE_STATE);
-        int permission7 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_WIFI_STATE);
-        int permission8 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CHANGE_WIFI_STATE);
-        int permission9 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
-        int permission10 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION);
-        int permission11 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CHANGE_NETWORK_STATE);
-        int permission12 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WAKE_LOCK);
-
-        if (permission0 != PackageManager.PERMISSION_GRANTED
-                || permission1 != PackageManager.PERMISSION_GRANTED
-                || permission2 != PackageManager.PERMISSION_GRANTED
-                || permission3 != PackageManager.PERMISSION_GRANTED
-                || permission4 != PackageManager.PERMISSION_GRANTED
-                || permission5 != PackageManager.PERMISSION_GRANTED
-                || permission6 != PackageManager.PERMISSION_GRANTED
-                || permission7 != PackageManager.PERMISSION_GRANTED
-                || permission8 != PackageManager.PERMISSION_GRANTED
-                || permission9 != PackageManager.PERMISSION_GRANTED
-                || permission10 != PackageManager.PERMISSION_GRANTED
-                || permission11 != PackageManager.PERMISSION_GRANTED
-                || permission12 != PackageManager.PERMISSION_GRANTED
-        ) {
-            // We don't have permission so prompt the user - request basic permissions first
+        Log.d(TAG, "Starting tiered permission verification to prevent system overload");
+        
+        // Start with essential permissions only - this prevents overwhelming the system
+        requestEssentialPermissions(activity);
+    }
+    
+    /**
+     * Request only essential permissions first (Camera, Audio, Storage)
+     */
+    private void requestEssentialPermissions(Activity activity) {
+        List<String> missingEssential = new ArrayList<>();
+        
+        for (String permission : ESSENTIAL_PERMISSIONS) {
+            if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+                missingEssential.add(permission);
+            }
+        }
+        
+        if (!missingEssential.isEmpty()) {
+            Log.d(TAG, "Requesting essential permissions: " + missingEssential.size() + " permissions");
             ActivityCompat.requestPermissions(
                     activity,
-                    PERMISSIONS,
+                    missingEssential.toArray(new String[0]),
                     PERMISSION_REQUEST_CODE_FOR_PERMISSION
             );
         } else {
-            // All basic permissions granted, check other permissions
+            Log.d(TAG, "Essential permissions granted, proceeding to secondary permissions");
+            requestSecondaryPermissions(activity);
+        }
+    }
+    
+    /**
+     * Request secondary permissions after essential ones are granted
+     */
+    private void requestSecondaryPermissions(Activity activity) {
+        List<String> missingSecondary = new ArrayList<>();
+        
+        for (String permission : SECONDARY_PERMISSIONS) {
+            if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+                missingSecondary.add(permission);
+            }
+        }
+        
+        if (!missingSecondary.isEmpty()) {
+            Log.d(TAG, "Requesting secondary permissions: " + missingSecondary.size() + " permissions");
+            // Use a delay to prevent overwhelming the system
+            new Handler().postDelayed(() -> {
+                ActivityCompat.requestPermissions(
+                        activity,
+                        missingSecondary.toArray(new String[0]),
+                        PERMISSION_REQUEST_CODE_FOR_PERMISSION + 1
+                );
+            }, 2000); // 2 second delay between permission groups
+        } else {
+            Log.d(TAG, "Secondary permissions granted, proceeding to additional permissions");
             requestAdditionalPermissions(activity);
         }
     }
@@ -297,7 +328,12 @@ public class SplashActivity extends BaseActivity {
         }
 
         if (requestCode == PERMISSION_REQUEST_CODE_FOR_PERMISSION) {
-            // Basic permissions handled, now request additional permissions sequentially
+            // Essential permissions handled, now request secondary permissions
+            Log.d(TAG, "Essential permissions result received, proceeding to secondary permissions");
+            requestSecondaryPermissions(this);
+        } else if (requestCode == PERMISSION_REQUEST_CODE_FOR_PERMISSION + 1) {
+            // Secondary permissions handled, now request additional system permissions
+            Log.d(TAG, "Secondary permissions result received, proceeding to additional permissions");
             requestAdditionalPermissions(this);
         }
 
