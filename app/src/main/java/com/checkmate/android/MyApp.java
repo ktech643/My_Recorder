@@ -18,7 +18,8 @@ import com.checkmate.android.util.HttpServer.ServiceModule;
 import com.checkmate.android.util.InternalLogger;
 import com.checkmate.android.util.ANRSafeHelper;
 import com.checkmate.android.util.CriticalComponentsMonitor;
-import com.checkmate.android.util.ThreadSafetyManager;
+import com.checkmate.android.util.CrashLogger;
+import com.checkmate.android.util.DynamicSettingsManager;
 
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -68,7 +69,9 @@ public class MyApp extends Application {
             
             InternalLogger.i(TAG, "CheckMate Android App initialization completed successfully");
             
-        } catch (Exception e) {
+        
+        CrashLogger.initialize(mContext);
+        DynamicSettingsManager.initialize(this);} catch (Exception e) {
             // Even if internal logger fails, try to log to system
             Log.e(TAG, "Critical error during app initialization", e);
             

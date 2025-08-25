@@ -3398,18 +3398,6 @@ public class SharedEglManager {
      * Check if streaming is active
      * @return true if currently streaming
      */
-    public boolean isStreaming() {
-        return mStreaming;
-    }
-    
-    /**
-     * Check if recording is active
-     * @return true if currently recording
-     */
-    public boolean isRecording() {
-        return mRecording;
-    }
-    
     /**
      * Apply dynamic settings that don't require restart
      */
