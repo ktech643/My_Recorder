@@ -144,6 +144,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.checkmate.android.AppPreference.KEY.RECORD_AUDIO;
+import com.checkmate.android.service.OptimizedServiceSwitcher;
 /*  ╭──────────────────────────────────────────────────────────────────────────╮
     │  Class Declaration                                                       │
     ╰──────────────────────────────────────────────────────────────────────────╯ */
@@ -323,6 +324,9 @@ public class MainActivity extends BaseActivity
         setContentView(R.layout.activity_service);
         instance = this;
         fragmentManager = getSupportFragmentManager();
+        
+        // Initialize EGL early for faster service transitions
+        initializeEglEarly();
 
         dlg_progress = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.PIE_DETERMINATE)
@@ -344,7 +348,7 @@ public class MainActivity extends BaseActivity
     }
 
     private void showChessIfNeeded() {
-        // “Chess/PIN” screen is required only when convert-mode is ON
+        // "Chess/PIN" screen is required only when convert-mode is ON
         // and the user has not entered the pin yet (is_passed == false)
         if (AppPreference.getBool(AppPreference.KEY.UI_CONVERT_MODE, false)
                 && !is_passed) {
@@ -355,6 +359,14 @@ public class MainActivity extends BaseActivity
             overridePendingTransition(0, 0);
             startActivity(i);
         }
+    }
+    
+    /**
+     * Initialize EGL context early to reduce service transition times
+     */
+    private void initializeEglEarly() {
+        Log.d(TAG, "Initializing EGL early");
+        EglInitializer.getInstance().initializeAsync(this);
     }
     
     @Override
@@ -1999,6 +2011,9 @@ public class MainActivity extends BaseActivity
 
         if (wl != null) wl.release();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        
+        // Cleanup EGL initializer
+        EglInitializer.getInstance().cleanup();
 
         /* Unbind and stop every service instance left */
         if (mUSBService   != null && isUsbServiceBound)   { safeUnbind(mUSBConnection);   stopServiceIfRunning(mUSBService,   new Intent(this, BgUSBService.class));   isUsbServiceBound   = false; }

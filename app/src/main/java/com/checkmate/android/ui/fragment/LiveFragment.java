@@ -62,6 +62,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import com.checkmate.android.service.OptimizedServiceSwitcher;
+import com.checkmate.android.service.SharedEGL.ServiceType;
 
 @SuppressLint("NonConstantResourceId")
 public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSelectedListener - was for old spinner implementation
@@ -1351,27 +1353,36 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
         boolean wasStreaming = AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false);
         boolean wasRecording = AppPreference.getBool(AppPreference.KEY.RECORDING_STARTED, false);
         
-        try {
-            // Step 1: Stop all existing services gracefully
-            stopAllServicesGracefully();
-            
-            // Step 2: Wait for services to fully stop
-            handler.postDelayed(() -> {
-                if (activity == null || activity.isFinishing() || !isAdded()) return;
-                
-                try {
-                    // Step 3: Update state and preferences
+        // Map CameraState to ServiceType
+        ServiceType targetServiceType = mapCameraStateToServiceType(newState);
+        if (targetServiceType == null) {
+            Log.e(TAG, "Invalid camera state: " + newState);
+            return;
+        }
+        
+        // Use optimized service switcher for seamless transition
+        OptimizedServiceSwitcher.switchServiceOptimized(activity, targetServiceType, 
+            new OptimizedServiceSwitcher.ServiceSwitchCallback() {
+                @Override
+                public void onServiceSwitched(boolean success, String message) {
+                    if (!success) {
+                        Log.e(TAG, "Service switch failed: " + message);
+                        rollbackToPreviousState(previousState);
+                        return;
+                    }
+                    
+                    // Update state and preferences
                     updateStateForNewService(newState);
                     
-                    // Step 4: Initialize new service
+                    // Initialize new service configuration
                     if (serviceInitAction != null) {
                         serviceInitAction.run();
                     }
                     
-                    // Step 5: Update UI
+                    // Update UI
                     updateUIForNewService(newState);
                     
-                    // Step 6: Restart streaming/recording if needed
+                    // Restart streaming/recording if needed
                     if (wasStreaming) {
                         restartStreamingSafely();
                     }
@@ -1379,17 +1390,26 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
                     if (wasRecording) {
                         restartRecordingSafely();
                     }
-                    
-                } catch (Exception e) {
-                    Log.e(TAG, "Error during service initialization: " + e.getMessage(), e);
-                    // Fallback to previous state
-                    rollbackToPreviousState(previousState);
                 }
-            }, 500); // Wait 500ms for services to stop
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error during service switching: " + e.getMessage(), e);
-            rollbackToPreviousState(previousState);
+            });
+    }
+    
+    /**
+     * Map CameraState to ServiceType
+     */
+    private ServiceType mapCameraStateToServiceType(CameraState state) {
+        switch (state) {
+            case REAR_CAMERA:
+            case FRONT_CAMERA:
+                return ServiceType.BgCamera;
+            case USB_CAMERA:
+                return ServiceType.BgUSBCamera;
+            case SCREEN_CAST:
+                return ServiceType.BgScreenCast;
+            case AUDIO_ONLY:
+                return ServiceType.BgAudio;
+            default:
+                return null;
         }
     }
     

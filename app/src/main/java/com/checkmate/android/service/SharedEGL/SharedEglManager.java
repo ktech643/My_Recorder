@@ -3227,5 +3227,273 @@ public class SharedEglManager {
             return mRegisteredServices.keySet().toArray(new ServiceType[0]);
         }
     }
+    
+    /**
+     * Handle early EGL initialization from MainActivity
+     * @param context Early initialized EGL context
+     */
+    public void onEarlyEglInitComplete(EGLContext context) {
+        Log.d(TAG, "Early EGL initialization complete");
+        // Store the context for later use if needed
+        // This helps reduce initialization time when services start
+    }
+    
+    /**
+     * Get current active service type
+     * @return Currently active service type or null
+     */
+    public ServiceType getCurrentActiveService() {
+        synchronized (mServiceLock) {
+            return mCurrentActiveService;
+        }
+    }
+    
+    /**
+     * Switch to a new service atomically
+     * @param newServiceType The service type to switch to
+     * @return true if switch was successful
+     */
+    public boolean switchToService(ServiceType newServiceType) {
+        synchronized (mServiceLock) {
+            if (newServiceType == mCurrentActiveService) {
+                Log.d(TAG, "Already on service: " + newServiceType);
+                return true;
+            }
+            
+            BaseBackgroundService newService = getServiceInstance(newServiceType);
+            if (newService == null) {
+                Log.e(TAG, "Service not registered: " + newServiceType);
+                return false;
+            }
+            
+            Log.d(TAG, "Switching from " + mCurrentActiveService + " to " + newServiceType);
+            
+            // Perform atomic switch
+            ServiceType oldService = mCurrentActiveService;
+            mCurrentActiveService = newServiceType;
+            
+            // Update render thread to use new service
+            if (mRenderThread != null) {
+                mRenderThread.post(() -> {
+                    try {
+                        // Switch render source
+                        switchRenderSource(newServiceType);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to switch render source", e);
+                    }
+                });
+            }
+            
+            return true;
+        }
+    }
+    
+    /**
+     * Update configuration without stopping streams
+     */
+    public void updateConfiguration() {
+        if (mRenderThread != null) {
+            mRenderThread.post(() -> {
+                try {
+                    // Update encoder parameters if streaming
+                    if (isStreaming() && mStreamer != null) {
+                        updateStreamConfiguration();
+                    }
+                    
+                    // Update recorder parameters if recording
+                    if (isRecording() && mRecorder != null) {
+                        updateRecordConfiguration();
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to update configuration", e);
+                }
+            });
+        }
+    }
+    
+    /**
+     * Update stream configuration dynamically
+     */
+    private void updateStreamConfiguration() {
+        // Get current settings
+        VideoConfig videoConfig = createVideoConfig();
+        AudioConfig audioConfig = createAudioConfig(false);
+        
+        // Apply new configuration without stopping
+        if (mStreamer != null && videoConfig != null) {
+            try {
+                // Update video parameters
+                mStreamer.updateVideoConfig(videoConfig);
+                
+                // Update audio if needed
+                if (audioConfig != null && streamAudioConfigLocal != null) {
+                    mStreamer.updateAudioConfig(audioConfig);
+                }
+                
+                Log.d(TAG, "Stream configuration updated dynamically");
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to update stream config", e);
+            }
+        }
+    }
+    
+    /**
+     * Update record configuration dynamically
+     */
+    private void updateRecordConfiguration() {
+        // Similar to stream configuration update
+        VideoConfig videoConfig = createVideoConfig();
+        AudioConfig audioConfig = createAudioConfig(true);
+        
+        if (mRecorder != null && videoConfig != null) {
+            try {
+                mRecorder.updateVideoConfig(videoConfig);
+                
+                if (audioConfig != null && recordAudioConfigLocal != null) {
+                    mRecorder.updateAudioConfig(audioConfig);
+                }
+                
+                Log.d(TAG, "Record configuration updated dynamically");
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to update record config", e);
+            }
+        }
+    }
+    
+    /**
+     * Create video configuration based on current settings
+     */
+    private VideoConfig createVideoConfig() {
+        try {
+            VideoConfig.Builder builder = new VideoConfig.Builder()
+                .setSize(mSurfaceWidth, mSurfaceHeight)
+                .setBitRate(AppPreference.getInstance().getBitrate())
+                .setFrameRate(AppPreference.getInstance().getFps())
+                .setKeyFrameInterval(AppPreference.getInstance().getIFrameInterval());
+            
+            return builder.build();
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to create video config", e);
+            return null;
+        }
+    }
+    
+    /**
+     * Create audio configuration
+     */
+    private AudioConfig createAudioConfig(boolean isRecord) {
+        try {
+            int sampleRate = AppPreference.getInstance().getAudioSamplerate();
+            int channelCount = AppPreference.getInstance().getAudioChannels();
+            
+            AudioConfig.Builder builder = new AudioConfig.Builder()
+                .setSampleRate(sampleRate)
+                .setChannelCount(channelCount)
+                .setBitRate(AppPreference.getInstance().getAudioBitrate());
+            
+            return builder.build();
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to create audio config", e);
+            return null;
+        }
+    }
+    
+    /**
+     * Render a transition frame (used during service switching)
+     * @param bitmap The bitmap containing the transition overlay
+     */
+    public void renderTransitionFrame(Bitmap bitmap) {
+        if (bitmap == null || mRenderThread == null) {
+            return;
+        }
+        
+        mRenderThread.post(() -> {
+            try {
+                // Convert bitmap to texture and render
+                if (mSurfaceWindowLocal != null) {
+                    mSurfaceWindowLocal.makeCurrent();
+                    
+                    // Clear the frame
+                    GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+                    GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+                    
+                    // Load bitmap as texture
+                    int textureId = loadBitmapTexture(bitmap);
+                    if (textureId != -1) {
+                        // Draw the texture
+                        drawTexture(textureId, mSurfaceWidth, mSurfaceHeight);
+                        
+                        // Delete texture after use
+                        int[] textures = {textureId};
+                        GLES20.glDeleteTextures(1, textures, 0);
+                    }
+                    
+                    // Swap buffers to display
+                    mSurfaceWindowLocal.swapBuffers();
+                    
+                    // Send to encoders if active
+                    long timestamp = System.nanoTime();
+                    if (isStreaming() && mStreamer != null) {
+                        mStreamer.sendVideoFrame(timestamp);
+                    }
+                    if (isRecording() && mRecorder != null) {
+                        mRecorder.sendVideoFrame(timestamp);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to render transition frame", e);
+            }
+        });
+    }
+    
+    /**
+     * Load bitmap as OpenGL texture
+     */
+    private int loadBitmapTexture(Bitmap bitmap) {
+        int[] textureHandle = new int[1];
+        GLES20.glGenTextures(1, textureHandle, 0);
+        
+        if (textureHandle[0] != 0) {
+            // Bind to the texture in OpenGL
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
+            
+            // Set filtering
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+            
+            // Load the bitmap into the bound texture
+            android.opengl.GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+            
+            return textureHandle[0];
+        }
+        
+        return -1;
+    }
+    
+    /**
+     * Draw texture to surface
+     */
+    private void drawTexture(int textureId, int width, int height) {
+        // This is a simplified version - in production you'd use proper shader programs
+        // For now, we'll use the existing texture drawing infrastructure
+        if (mTexProgramNewLocal != null && mFullFrameBlit != null) {
+            Matrix.setIdentityM(mDisplayProjectionMatrix, 0);
+            mTexProgramNewLocal.draw(mDisplayProjectionMatrix, mFullFrameBlit.getVertexArray(), 0,
+                    mFullFrameBlit.getVertexCount(), mFullFrameBlit.getCoordsPerVertex(),
+                    mFullFrameBlit.getVertexStride(), mFullFrameBlit.getTexCoordArray(),
+                    textureId, mFullFrameBlit.getTexCoordStride());
+        }
+    }
+    
+    /**
+     * Get current surface dimensions
+     */
+    public int getSurfaceWidth() {
+        return mSurfaceWidth;
+    }
+    
+    public int getSurfaceHeight() {
+        return mSurfaceHeight;
+    }
 }
 
