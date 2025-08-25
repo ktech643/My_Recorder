@@ -37,6 +37,7 @@ public class SplashStorageHelper {
 
     private Activity activity;
     private StorageSelectionCallback callback;
+    private AlertDialog currentDialog; // Track current dialog to prevent window leaks
 
     public interface StorageSelectionCallback {
         void onStorageSelected(String storagePath, String storageType);
@@ -384,13 +385,13 @@ public class SplashStorageHelper {
 
             builder.setCancelable(false);
 
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            currentDialog = builder.create();
+            currentDialog.show();
 
             // Try to make buttons more visible
             try {
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(16);
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(16);
+                currentDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(16);
+                currentDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextSize(16);
             } catch (Exception e) {
                 Log.w(TAG, "Could not set button text size", e);
             }
@@ -423,5 +424,26 @@ public class SplashStorageHelper {
         }
 
         Toast.makeText(activity, "Default storage location set", Toast.LENGTH_SHORT).show();
+    }
+    
+    /**
+     * Cleanup method to prevent window leaks
+     */
+    public void cleanup() {
+        Log.d(TAG, "Cleaning up SplashStorageHelper");
+        
+        // Dismiss any current dialog to prevent window leak
+        if (currentDialog != null && currentDialog.isShowing()) {
+            try {
+                currentDialog.dismiss();
+            } catch (Exception e) {
+                Log.w(TAG, "Error dismissing dialog during cleanup", e);
+            }
+            currentDialog = null;
+        }
+        
+        // Clear references
+        activity = null;
+        callback = null;
     }
 }

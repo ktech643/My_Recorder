@@ -177,6 +177,16 @@ public class SplashActivity extends BaseActivity {
             mPermissionHandler.removeCallbacksAndMessages(null);
             mPermissionHandler = null;
         }
+        
+        // Clean up storage helper to prevent window leaks
+        if (storageHelper != null) {
+            try {
+                storageHelper.cleanup();
+            } catch (Exception e) {
+                Log.w(TAG, "Error cleaning up storage helper", e);
+            }
+            storageHelper = null;
+        }
     }
 
     private boolean mPermissionsRequested = false;
