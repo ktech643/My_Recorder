@@ -156,6 +156,9 @@ public class SplashActivity extends BaseActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+            Log.d(TAG, "Window focus gained, flags applied");
+        } else {
+            Log.d(TAG, "Window focus lost");
         }
     }
 
@@ -166,6 +169,9 @@ public class SplashActivity extends BaseActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
+    private boolean mPermissionsRequested = false;
+    private boolean mInitialResumeDone = false;
+    
     @Override
     protected void onResume() {
         super.onResume();
@@ -175,22 +181,30 @@ public class SplashActivity extends BaseActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
 
-        if (AppPreference.getBool(AppPreference.KEY.APP_FORCE_QUIT, true)) {
-            AppPreference.setBool(AppPreference.KEY.APP_FORCE_QUIT, true);
-            verifyPermissions(this);
-        } else {
-            MessageUtil.showToast(getApplicationContext(), "CheckMate! Will be closing. Please use main icon to open.");
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Intent startMain = new Intent(Intent.ACTION_MAIN);
-                    startMain.addCategory(Intent.CATEGORY_HOME);
-                    startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(startMain);
-                    AppPreference.setBool(AppPreference.KEY.APP_FORCE_QUIT, true);
-                    finish();
+        // Only execute permission logic once to prevent repeated calls
+        if (!mInitialResumeDone) {
+            mInitialResumeDone = true;
+            
+            if (AppPreference.getBool(AppPreference.KEY.APP_FORCE_QUIT, true)) {
+                AppPreference.setBool(AppPreference.KEY.APP_FORCE_QUIT, true);
+                if (!mPermissionsRequested) {
+                    mPermissionsRequested = true;
+                    verifyPermissions(this);
                 }
-            }, 2500);
+            } else {
+                MessageUtil.showToast(getApplicationContext(), "CheckMate! Will be closing. Please use main icon to open.");
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent startMain = new Intent(Intent.ACTION_MAIN);
+                        startMain.addCategory(Intent.CATEGORY_HOME);
+                        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(startMain);
+                        AppPreference.setBool(AppPreference.KEY.APP_FORCE_QUIT, true);
+                        finish();
+                    }
+                }, 2500);
+            }
         }
     }
 
@@ -204,7 +218,15 @@ public class SplashActivity extends BaseActivity {
 
     ConnectivityManager connection_manager;
 
+    private boolean mIsRequestingPermissions = false;
+    
     public void verifyPermissions(Activity activity) {
+        // Prevent multiple simultaneous permission requests
+        if (mIsRequestingPermissions) {
+            Log.d(TAG, "Permissions already being requested, skipping...");
+            return;
+        }
+        
         int permission0 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
         int permission1 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permission2 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -233,20 +255,49 @@ public class SplashActivity extends BaseActivity {
                 || permission11 != PackageManager.PERMISSION_GRANTED
                 || permission12 != PackageManager.PERMISSION_GRANTED
         ) {
-            // We don't have permission so prompt the user
+            // Set flag to prevent multiple simultaneous requests
+            mIsRequestingPermissions = true;
+            
+            // Request permissions in sequence to avoid conflicts
+            Log.d(TAG, "Requesting core permissions...");
             ActivityCompat.requestPermissions(
                     activity,
                     PERMISSIONS,
                     PERMISSION_REQUEST_CODE_FOR_PERMISSION
             );
 
-            requestDrawOverAppsPermission(activity);
-            requestIgnoreBatteryOptimizationsPermission(activity);
-            requestDoNotDisturbPermission(activity);
-            verifyStoragePermissions(activity);
-            requestModifySystemSettingsPermission(activity);
-            checkStoragePermissions();
+            // Schedule other permission requests with delays to prevent conflicts
+            new Handler().postDelayed(() -> {
+                if (!isFinishing() && !isDestroyed()) {
+                    requestDrawOverAppsPermission(activity);
+                }
+            }, 500);
+            
+            new Handler().postDelayed(() -> {
+                if (!isFinishing() && !isDestroyed()) {
+                    requestIgnoreBatteryOptimizationsPermission(activity);
+                }
+            }, 1000);
+            
+            new Handler().postDelayed(() -> {
+                if (!isFinishing() && !isDestroyed()) {
+                    requestDoNotDisturbPermission(activity);
+                }
+            }, 1500);
+            
+            new Handler().postDelayed(() -> {
+                if (!isFinishing() && !isDestroyed()) {
+                    verifyStoragePermissions(activity);
+                }
+            }, 2000);
+            
+            new Handler().postDelayed(() -> {
+                if (!isFinishing() && !isDestroyed()) {
+                    requestModifySystemSettingsPermission(activity);
+                }
+            }, 2500);
         } else {
+            Log.d(TAG, "All permissions granted, proceeding to next view");
             gotoNextView();
         }
     }
@@ -293,6 +344,30 @@ public class SplashActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Reset permission request flag when core permissions are handled
+        if (requestCode == PERMISSION_REQUEST_CODE_FOR_PERMISSION) {
+            mIsRequestingPermissions = false;
+            Log.d(TAG, "Core permissions handled, flag reset");
+            
+            // Check if we got all permissions and proceed
+            boolean allGranted = true;
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+            
+            if (allGranted) {
+                Log.d(TAG, "All core permissions granted, proceeding...");
+                gotoNextView();
+            } else {
+                Log.d(TAG, "Some permissions denied, will proceed anyway");
+                // Still proceed as some permissions are optional
+                gotoNextView();
+            }
+        }
 
         // Handle storage permissions using StoragePermissionHelper
         StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
@@ -637,8 +712,19 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
+    private boolean mIsLaunchingMainActivity = false;
+    
     void onNext() {
         runOnUiThread(() -> {
+            // Prevent multiple launches of MainActivity
+            if (mIsLaunchingMainActivity || isFinishing() || isDestroyed()) {
+                Log.d(TAG, "Skipping MainActivity launch - already launching or activity finished");
+                return;
+            }
+            
+            mIsLaunchingMainActivity = true;
+            Log.d(TAG, "Launching MainActivity...");
+            
             AppPreference.setStr(AppPreference.KEY.APP_OLD_VERSION, CommonUtil.getVersionCode(SplashActivity.this));
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
             overridePendingTransition(0, 0); // Disable transition animation

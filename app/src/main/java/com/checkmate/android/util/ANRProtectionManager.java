@@ -39,11 +39,11 @@ public class ANRProtectionManager {
     private static volatile ANRProtectionManager sInstance;
     private static final Object sLock = new Object();
     
-    // Timeout configurations (optimized for performance)
-    private static final long PREFERENCE_TIMEOUT_MS = 2000;     // Reduced from 5s to 2s
-    private static final long DATABASE_TIMEOUT_MS = 3000;      // Database operations
-    private static final long CRITICAL_TIMEOUT_MS = 1000;      // Critical path operations
-    private static final long EMERGENCY_TIMEOUT_MS = 500;      // Emergency operations
+    // Timeout configurations (optimized for performance and splash screen responsiveness)
+    private static final long PREFERENCE_TIMEOUT_MS = 1000;     // Further reduced to 1s for faster splash
+    private static final long DATABASE_TIMEOUT_MS = 2000;      // Database operations
+    private static final long CRITICAL_TIMEOUT_MS = 500;       // Critical path operations (faster)
+    private static final long EMERGENCY_TIMEOUT_MS = 250;      // Emergency operations (faster)
     
     // Thread management
     private final ExecutorService mBackgroundExecutor;
