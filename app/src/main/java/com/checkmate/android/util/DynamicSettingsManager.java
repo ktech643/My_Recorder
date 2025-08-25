@@ -66,23 +66,27 @@ public class DynamicSettingsManager implements SharedPreferences.OnSharedPrefere
         
         // Audio settings that can be dynamically adjusted
         dynamicSettings.add(AppPreference.KEY.AUDIO_OPTION_AUDIO_SETTING);
-        dynamicSettings.add(AppPreference.KEY.AUDIO_SAMPLE_RATE);
-        dynamicSettings.add(AppPreference.KEY.AUDIO_BITRATE);
+        dynamicSettings.add(AppPreference.KEY.AUDIO_OPTION_SAMPLE_RATE);
+        dynamicSettings.add(AppPreference.KEY.AUDIO_OPTION_BITRATE);
+        dynamicSettings.add(AppPreference.KEY.STREAMING_AUDIO_BITRATE);
+        dynamicSettings.add(AppPreference.KEY.USB_AUDIO_BITRATE);
         
         // Some video settings can be dynamic with proper handling
         dynamicSettings.add(AppPreference.KEY.VIDEO_BITRATE);
-        dynamicSettings.add(AppPreference.KEY.KEY_FRAME_INTERVAL);
+        dynamicSettings.add(AppPreference.KEY.STREAMING_BITRATE);
+        dynamicSettings.add(AppPreference.KEY.USB_BITRATE);
     }
     
     private void initializeCriticalSettings() {
         // Settings that require stream restart
-        criticalSettings.add(AppPreference.KEY.VIDEO_SIZE);
-        criticalSettings.add(AppPreference.KEY.FPS);
+        criticalSettings.add(AppPreference.KEY.VIDEO_RESOLUTION);
+        criticalSettings.add(AppPreference.KEY.STREAMING_RESOLUTION);
+        criticalSettings.add(AppPreference.KEY.VIDEO_FRAME);
+        criticalSettings.add(AppPreference.KEY.STREAMING_FRAME);
         criticalSettings.add(AppPreference.KEY.SELECTED_POSITION);
         criticalSettings.add(AppPreference.KEY.USB_MIN_FPS);
         criticalSettings.add(AppPreference.KEY.USB_MAX_FPS);
-        criticalSettings.add(AppPreference.KEY.VIDEO_CODEC);
-        criticalSettings.add(AppPreference.KEY.AUDIO_CODEC);
+        criticalSettings.add(AppPreference.KEY.CODEC_SRC);
     }
     
     public void registerListener(String key, SettingChangeListener listener) {
@@ -164,8 +168,10 @@ public class DynamicSettingsManager implements SharedPreferences.OnSharedPrefere
                 // Apply to next recording file
                 break;
                 
-            case AppPreference.KEY.AUDIO_BITRATE:
-            case AppPreference.KEY.AUDIO_SAMPLE_RATE:
+            case AppPreference.KEY.AUDIO_OPTION_BITRATE:
+            case AppPreference.KEY.STREAMING_AUDIO_BITRATE:
+            case AppPreference.KEY.USB_AUDIO_BITRATE:
+            case AppPreference.KEY.AUDIO_OPTION_SAMPLE_RATE:
                 if (newValue instanceof Integer) {
                     updateAudioSettingsOnTheFly(key, (Integer) newValue);
                 }
@@ -201,9 +207,9 @@ public class DynamicSettingsManager implements SharedPreferences.OnSharedPrefere
             SharedEglManager eglManager = SharedEglManager.getInstance();
             if (eglManager != null && eglManager.isStreaming()) {
                 // Update audio settings dynamically
-                if (key.equals(AppPreference.KEY.AUDIO_BITRATE)) {
+                if (key.contains("BITRATE")) {
                     eglManager.updateAudioBitrate(newValue);
-                } else if (key.equals(AppPreference.KEY.AUDIO_SAMPLE_RATE)) {
+                } else if (key.contains("SAMPLE_RATE")) {
                     // Sample rate usually requires restart
                     notifyUserAboutCriticalChange(key);
                 }
@@ -227,7 +233,18 @@ public class DynamicSettingsManager implements SharedPreferences.OnSharedPrefere
         
         // Apply all current dynamic settings
         for (String key : dynamicSettings) {
-            Object value = AppPreference.get(key);
+            // Get value based on key type
+            Object value = null;
+            if (key.equals(AppPreference.KEY.TIMESTAMP) || 
+                key.equals(AppPreference.KEY.FILE_ENCRYPTION) ||
+                key.equals(AppPreference.KEY.RECORD_BROADCAST)) {
+                value = AppPreference.getBool(key, false);
+            } else if (key.contains("BITRATE") || key.contains("TIME")) {
+                value = AppPreference.getInt(key, 0);
+            } else {
+                value = AppPreference.getStr(key, "");
+            }
+            
             if (value != null) {
                 handleDynamicSettingChange(key, value);
             }
