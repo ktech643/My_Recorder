@@ -58,6 +58,7 @@ import android.widget.Toast;
 
 import com.checkmate.android.service.BaseBackgroundService;
 import com.checkmate.android.service.SharedEGL.ServiceType;
+import com.checkmate.android.service.SharedEGL.SharedEglManager;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -178,6 +179,9 @@ public class MainActivity extends BaseActivity
         ╰──────────────────────────────────────────────────────────────────────╯ */
     public static volatile boolean isStreaming = false;
     public static volatile boolean is_passed   = false;
+    
+    // EGL initialization flag
+    private boolean isEglInitialized = false;
 
     /*  ╭──────────────────────────────────────────────────────────────────────╮
         │  Android / UI                                                        │
@@ -341,6 +345,9 @@ public class MainActivity extends BaseActivity
 
         init();
         showChessIfNeeded();
+        
+        // Initialize EGL context early
+        initializeEglContext();
     }
 
     private void showChessIfNeeded() {
@@ -364,6 +371,30 @@ public class MainActivity extends BaseActivity
         if (!isForStorgaLocation) {
             AppPreference.setBool(AppPreference.KEY.IS_FOR_STORAGE_LOCATION, false);
             showChessIfNeeded();
+        }
+    }
+    
+    /**
+     * Initialize EGL context early to ensure smooth transitions
+     */
+    private void initializeEglContext() {
+        if (!isEglInitialized) {
+            Log.d(TAG, "Initializing EGL context early...");
+            
+            // Initialize SharedEglManager with a default service type
+            SharedEglManager eglManager = SharedEglManager.getInstance();
+            eglManager.setListener(new SharedEglManager.Listener() {
+                @Override
+                public void onEglReady() {
+                    Log.d(TAG, "EGL context ready");
+                    isEglInitialized = true;
+                    // Notify fragments that EGL is ready
+                    sharedViewModel.postEvent(EventType.EGL_INITIALIZED, true);
+                }
+            });
+            
+            // Initialize with camera service as default
+            eglManager.initialize(getApplicationContext(), ServiceType.BgCamera);
         }
     }
 
@@ -807,6 +838,17 @@ public class MainActivity extends BaseActivity
 
     /* LiveFragment asks to ensure BgCameraService is running */
     void stopAllServices(){
+        // Check if streaming or recording is active
+        boolean isActiveStreaming = isStreaming() || isWifiStreaming();
+        boolean isActiveRecording = isRecordingCamera() || isRecordingUSB() || isWifiRecording() || isCastRecording() || isAudioRecording();
+        
+        if (isActiveStreaming || isActiveRecording) {
+            // Don't stop services, just switch the active service
+            Log.d(TAG, "Switching services without stopping - streaming: " + isActiveStreaming + ", recording: " + isActiveRecording);
+            return;
+        }
+        
+        // Only stop services if nothing is active
         stopService(ServiceType.BgScreenCast);
         stopService(ServiceType.BgAudio);
         stopService(ServiceType.BgCamera);
@@ -815,16 +857,73 @@ public class MainActivity extends BaseActivity
         updateStreamIcon(false);          // helper already defined earlier
     }
     @Override
-    public void fragInitBGUSBService(){stopAllServices(); initBGUSBService();}
+    public void fragInitBGUSBService(){
+        switchToService(ServiceType.BgUSBCamera);
+        initBGUSBService();
+    }
     @Override
-    public void initFragService() {stopAllServices(); initService(); }
+    public void initFragService() {
+        switchToService(ServiceType.BgCamera);
+        initService();
+    }
 
     /* LiveFragment wants screen-cast service up */
     @Override
-    public void initFragCastService() {stopAllServices(); initCastService(); }
+    public void initFragCastService() {
+        switchToService(ServiceType.BgScreenCast);
+        initCastService();
+    }
 
     /* Audio-only mode helpers (not from interface but symmetric) */
-    public void initFragAudioService() {stopAllServices(); initAudioService(); }
+    public void initFragAudioService() {
+        switchToService(ServiceType.BgAudio);
+        initAudioService();
+    }
+    
+    /**
+     * Switch to a new service seamlessly without stopping stream/recording
+     */
+    private void switchToService(ServiceType newServiceType) {
+        SharedEglManager eglManager = SharedEglManager.getInstance();
+        
+        // Check if we're actively streaming or recording
+        boolean isActiveStreaming = isStreaming() || isWifiStreaming();
+        boolean isActiveRecording = isRecordingCamera() || isRecordingUSB() || isWifiRecording() || isCastRecording() || isAudioRecording();
+        
+        if (isActiveStreaming || isActiveRecording) {
+            Log.d(TAG, "Switching to " + newServiceType + " while active - sending blank frames");
+            
+            // Register the new service with SharedEglManager
+            BaseBackgroundService newService = getServiceForType(newServiceType);
+            if (newService != null) {
+                eglManager.registerService(newServiceType, newService);
+            }
+            
+            // The SharedEglManager will handle the transition
+            sharedViewModel.postEvent(EventType.SERVICE_SWITCHING, newServiceType.name());
+        } else {
+            // Not active, can stop all services normally
+            stopAllServices();
+        }
+    }
+    
+    /**
+     * Get service instance for a given type
+     */
+    private BaseBackgroundService getServiceForType(ServiceType serviceType) {
+        switch (serviceType) {
+            case BgCamera:
+                return mCamService;
+            case BgUSBCamera:
+                return mUSBService;
+            case BgScreenCast:
+                return mCastService;
+            case BgAudio:
+                return mAudioService;
+            default:
+                return null;
+        }
+    }
 
     /* Fragment-initiated stop helpers */
     public void stopFragAudio()        { stopService(ServiceType.BgAudio);     }

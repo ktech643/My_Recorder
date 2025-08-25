@@ -30,4 +30,6 @@ public enum EventType {
     INIT_FUN_PLAY_BACK,//initialize()
     UPDATE_DEVICE_STREAMING,//updateDeviceStreaming()
     UPDATE_DEVICE_STREAMING_DOUBLE_VAL,//updateDeviceStreaming()
+    EGL_INITIALIZED,//EGL context initialized
+    SERVICE_SWITCHING,//Service switching in progress
 }

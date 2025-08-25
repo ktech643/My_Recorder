@@ -21,6 +21,26 @@ public class MicThread extends Thread {
         super();
         mConfig = config;
     }
+    
+    /**
+     * Update audio configuration dynamically
+     * @param newConfig The new audio configuration
+     */
+    public synchronized void updateConfig(AudioConfig newConfig) {
+        if (newConfig != null && !newConfig.equals(mConfig)) {
+            Log.d(TAG, "Updating audio configuration");
+            mConfig = newConfig;
+            
+            // Interrupt current thread to restart with new config
+            this.interrupt();
+            
+            // Start a new thread with updated config
+            MicThread newMicThread = new MicThread(mConfig);
+            newMicThread.mStreamer = this.mStreamer;
+            newMicThread.mRecorder = this.mRecorder;
+            newMicThread.start();
+        }
+    }
 
     @Override
     public void run() {

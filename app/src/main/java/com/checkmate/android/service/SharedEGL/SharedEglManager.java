@@ -607,6 +607,18 @@ public class SharedEglManager {
     public ServiceType getServiceType() {
         return mServiceType;
     }
+    
+    /**
+     * Get a service instance by type
+     * @param serviceType The service type
+     * @return The service instance or null if not found
+     */
+    public BaseBackgroundService getServiceInstance(ServiceType serviceType) {
+        synchronized (mServiceLock) {
+            WeakReference<BaseBackgroundService> ref = mRegisteredServices.get(serviceType);
+            return ref != null ? ref.get() : null;
+        }
+    }
 
     public void initialize(Context ctx, ServiceType serviceType) {
         synchronized (SharedEglManager.class) {
@@ -2559,6 +2571,101 @@ public class SharedEglManager {
 
     public boolean isStreaming() {
         return mStreaming;
+    }
+    
+    /**
+     * Update streaming configurations without stopping the stream
+     * This method updates video/audio settings on the fly
+     * @param videoConfig New video configuration (null to keep existing)
+     * @param audioConfig New audio configuration (null to keep existing)
+     */
+    public void updateStreamingConfigs(@Nullable VideoConfig videoConfig, @Nullable AudioConfig audioConfig) {
+        if (!mStreaming) {
+            Log.w(TAG, "Cannot update configs - not streaming");
+            return;
+        }
+        
+        mCameraHandler.post(() -> {
+            try {
+                // If we need to change video config, we'll need to send blank frames during transition
+                if (videoConfig != null && !videoConfig.equals(streamVideoConfigLocal)) {
+                    Log.d(TAG, "Updating video config while streaming");
+                    
+                    // Draw blank frames with timestamp for smooth transition
+                    drawBlankFrameWithOverlay();
+                    
+                    // Update local config
+                    streamVideoConfigLocal = videoConfig;
+                    videoSize = videoConfig.videoSize;
+                    mScreenWidth = videoSize.width;
+                    mScreenHeight = videoSize.height;
+                    
+                    // Re-initialize surfaces with new size if needed
+                    if (encoderSurface != null) {
+                        encoderSurface.release();
+                        encoderSurface = null;
+                    }
+                    
+                    if (mStreamer != null && mStreamer.getEncoderSurface() != null) {
+                        encoderSurface = new WindowSurfaceNew(eglCore, mStreamer.getEncoderSurface(), false);
+                        Log.d(TAG, "Encoder surface recreated with new config");
+                    }
+                }
+                
+                // Update audio config if provided
+                if (audioConfig != null && !audioConfig.equals(streamAudioConfigLocal)) {
+                    Log.d(TAG, "Updating audio config while streaming");
+                    streamAudioConfigLocal = audioConfig;
+                    
+                    // Restart audio capture with new config
+                    if (mMic != null) {
+                        mMic.updateConfig(audioConfig);
+                    }
+                }
+                
+                Log.d(TAG, "Configurations updated successfully");
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to update configurations", e);
+            }
+        });
+    }
+    
+    /**
+     * Update preview surface configuration without stopping services
+     * @param width New width
+     * @param height New height
+     * @param sourceType The source type (camera, usb, screencast, etc.)
+     */
+    public void updatePreviewConfig(int width, int height, ServiceType sourceType) {
+        if (!isEglReady()) {
+            Log.w(TAG, "Cannot update preview - EGL not ready");
+            return;
+        }
+        
+        mCameraHandler.post(() -> {
+            try {
+                Log.d(TAG, String.format("Updating preview config: %dx%d for %s", width, height, sourceType));
+                
+                // Draw blank frame during transition
+                drawBlankFrameWithOverlay();
+                
+                // Update source dimensions
+                setSourceSize(width, height);
+                
+                // Update display surface if needed
+                if (displaySurface != null) {
+                    displaySurface.makeCurrent();
+                    GLES20.glViewport(0, 0, width, height);
+                    GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+                    GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+                    displaySurface.swapBuffers();
+                }
+                
+                Log.d(TAG, "Preview config updated successfully");
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to update preview config", e);
+            }
+        });
     }
 
     public boolean isRecording() {
