@@ -2940,26 +2940,31 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
     public boolean statusCheck() {
         if (!isAdded() || getActivity() == null) {
             Log.e("StreamingFragment", "Fragment detached, skipping onLogin callback");
+            return false;
         }
         final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+            return false;
         }
-        
+        return true;
     }
 
     private void buildAlertMessageNoGps() {
         MessageDialog messageDialog = MessageDialog
-                .show(getString(R.string.confirmation_title), "Your GPS seems to be disabled, do you want to enable it?", "Yes","No").setCancelButton(new OnDialogButtonClickListener<MessageDialog>() {
+                .show(getString(R.string.confirmation_title), "Your GPS seems to be disabled, do you want to enable it?", "Yes","No")                .setCancelButton(new OnDialogButtonClickListener<MessageDialog>() {
                     @Override
                     public boolean onClick(MessageDialog dialog, View v) {
                         dialog.dismiss();
+                        return true;
                     }
                 }).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
                     @Override
                     public boolean onClick(MessageDialog baseDialog, View v) {
                         startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                         baseDialog.dismiss();
+                        return true;
                     }
                 });
         messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
@@ -3298,16 +3303,18 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                         AppPreference.setStr(AppPreference.KEY.APP_VERSION, response.body().version);
                         AppPreference.setStr(AppPreference.KEY.APP_URL, response.body().url);
                         MessageDialog messageDialog = MessageDialog
-                                .show(getString(R.string.update_available), getString(R.string.confirm_update), getString(R.string.update),getString(R.string.cancel)).setCancelButton(new OnDialogButtonClickListener<MessageDialog>() {
+                                .show(getString(R.string.update_available), getString(R.string.confirm_update), getString(R.string.update),getString(R.string.cancel))                                .setCancelButton(new OnDialogButtonClickListener<MessageDialog>() {
                                     @Override
                                     public boolean onClick(MessageDialog dialog, View v) {
                                         dialog.dismiss();
+                                        return true;
                                     }
                                 }).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
                                     @Override
                                     public boolean onClick(MessageDialog baseDialog, View v) {
                                         mActivity.updateApp(response.body().url);
                                         baseDialog.dismiss();
+                                        return true;
                                     }
                                 });
                         messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));
@@ -3334,10 +3341,11 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
     void onReactivate() {
         mListener.isDialog(true);
         MessageDialog messageDialog = MessageDialog
-                .show(getString(R.string.warning_new), getString(R.string.reactivate_message), getString(R.string.Okay),getString(R.string.cancel)).setCancelButton(new OnDialogButtonClickListener<MessageDialog>() {
+                .show(getString(R.string.warning_new), getString(R.string.reactivate_message), getString(R.string.Okay),getString(R.string.cancel))                .setCancelButton(new OnDialogButtonClickListener<MessageDialog>() {
                     @Override
                     public boolean onClick(MessageDialog dialog, View v) {
                         dialog.dismiss();
+                        return true;
                     }
                 }).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
                     @Override
@@ -3347,6 +3355,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                         AppPreference.removeKey(AppPreference.KEY.ACTIVATION_CODE);
                         startActivity(new Intent(requireContext(), SplashActivity.class));
                         requireActivity().finish();
+                        return true;
                     }
                 });
         messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));

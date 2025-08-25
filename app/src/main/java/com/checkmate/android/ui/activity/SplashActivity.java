@@ -233,21 +233,15 @@ public class SplashActivity extends BaseActivity {
                 || permission11 != PackageManager.PERMISSION_GRANTED
                 || permission12 != PackageManager.PERMISSION_GRANTED
         ) {
-            // We don't have permission so prompt the user
+            // We don't have permission so prompt the user - request basic permissions first
             ActivityCompat.requestPermissions(
                     activity,
                     PERMISSIONS,
                     PERMISSION_REQUEST_CODE_FOR_PERMISSION
             );
-
-            requestDrawOverAppsPermission(activity);
-            requestIgnoreBatteryOptimizationsPermission(activity);
-            requestDoNotDisturbPermission(activity);
-            verifyStoragePermissions(activity);
-            requestModifySystemSettingsPermission(activity);
-            checkStoragePermissions();
         } else {
-            gotoNextView();
+            // All basic permissions granted, check other permissions
+            requestAdditionalPermissions(activity);
         }
     }
 
@@ -302,6 +296,11 @@ public class SplashActivity extends BaseActivity {
             storageHelper.handlePermissionResult(requestCode, permissions, grantResults);
         }
 
+        if (requestCode == PERMISSION_REQUEST_CODE_FOR_PERMISSION) {
+            // Basic permissions handled, now request additional permissions sequentially
+            requestAdditionalPermissions(this);
+        }
+
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d("Camera", "Permission granted!");
@@ -321,6 +320,36 @@ public class SplashActivity extends BaseActivity {
                 navigateToNotificationSettings();
             }
         }
+    }
+
+    /**
+     * Request additional permissions sequentially to avoid "Can request only one set of permissions at a time" warning
+     */
+    private void requestAdditionalPermissions(Activity activity) {
+        // Use a handler to delay requests slightly to avoid conflicts
+        new Handler().postDelayed(() -> {
+            requestDrawOverAppsPermission(activity);
+        }, 100);
+        
+        new Handler().postDelayed(() -> {
+            requestIgnoreBatteryOptimizationsPermission(activity);
+        }, 200);
+        
+        new Handler().postDelayed(() -> {
+            requestDoNotDisturbPermission(activity);
+        }, 300);
+        
+        new Handler().postDelayed(() -> {
+            verifyStoragePermissions(activity);
+        }, 400);
+        
+        new Handler().postDelayed(() -> {
+            requestModifySystemSettingsPermission(activity);
+        }, 500);
+        
+        new Handler().postDelayed(() -> {
+            gotoNextView();
+        }, 1000);
     }
 
     public void requestDoNotDisturbPermission(Context context) {
