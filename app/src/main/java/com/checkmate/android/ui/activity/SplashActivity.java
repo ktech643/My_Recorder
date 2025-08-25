@@ -171,6 +171,7 @@ public class SplashActivity extends BaseActivity {
 
     private boolean mPermissionsRequested = false;
     private boolean mInitialResumeDone = false;
+    private boolean mActivationContinued = false; // Prevent multiple activation continuations
     
     @Override
     protected void onResume() {
@@ -370,7 +371,17 @@ public class SplashActivity extends BaseActivity {
         }
 
         // Handle storage permissions using StoragePermissionHelper
-        StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_STORAGE_PERMISSION) {
+            StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
+            
+            // If activation was started but waiting for storage permissions, continue now
+            if (mActivationContinued) {
+                Log.d(TAG, "Storage permissions handled, proceeding with activation dialog");
+                proceedWithActivationDialog();
+            }
+        } else {
+            StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
+        }
 
         // Handle storage helper permissions
         if (storageHelper != null) {
@@ -527,13 +538,34 @@ public class SplashActivity extends BaseActivity {
      * Continue with activation after storage is configured
      */
     private void continueWithActivation() {
+        // Prevent multiple calls to avoid infinite loop
+        if (mActivationContinued) {
+            Log.d(TAG, "Activation already continued, preventing recursive call");
+            return;
+        }
+        
+        mActivationContinued = true;
+        Log.d(TAG, "Starting activation continuation...");
+        
         // Validate and fix storage location if needed
         PreferenceInitializer.validateStorageLocation(this);
+        
         // Check storage permissions and request if needed using StoragePermissionHelper
         if (!StoragePermissionHelper.areStoragePermissionsGranted(this)) {
             Log.d(TAG, "Storage permissions not granted, requesting permissions");
             StoragePermissionHelper.requestStoragePermissions(this);
+            // Don't proceed with dialog until permissions are handled
+            return;
         }
+        
+        // Proceed with activation dialog
+        proceedWithActivationDialog();
+    }
+    
+    /**
+     * Proceed with showing the activation dialog
+     */
+    private void proceedWithActivationDialog() {
         should_show_complete = true;
         is_dialog_show = true;
         ActivationDialog activationDialog = new ActivationDialog(this);
