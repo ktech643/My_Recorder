@@ -54,7 +54,6 @@ android {
 	}
 	
 	// Use modern NDK configuration
-	ndkVersion '25.1.8937393'
 	
 	// Disable lint temporarily to get build working
 	lintOptions {

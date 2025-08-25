@@ -1,0 +1,132 @@
+apply from: '../constants.gradle'
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+android {
+
+    compileSdkVersion project.ext.compileSdkVersion
+
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    defaultConfig {
+        compileSdkVersion 34
+        applicationId "com.checkmate.android"
+        minSdkVersion 29
+        targetSdkVersion 33
+        versionCode 1
+        versionName "4.003"
+        setProperty("archivesBaseName", "CheckMate!_" + versionName)
+        multiDexEnabled true
+        // Removed externalNativeBuild and ndk blocks for now
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    repositories {
+        flatDir { dirs 'libs' }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs/lib']
+        }
+    }
+    // Removed externalNativeBuild block for now
+    packagingOptions {
+        pickFirst 'com/serenegiant/dialog/MessageDialogFragment$*.class'
+        exclude 'com/serenegiant/common/**'
+    }
+    
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def apkName = "CheckMateApp.apk"
+            outputFileName = apkName
+        }
+    }
+
+    // Removed ndkVersion for now
+}
+
+dependencies {
+
+    annotationProcessor 'com.github.permissions-dispatcher:permissionsdispatcher-processor:4.8.0'
+
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation(name: 'libstream-release', ext: 'aar')
+    implementation "androidx.appcompat:appcompat:1.3.0"
+    implementation 'androidx.fragment:fragment:1.5.7'  // Or latest version
+    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    implementation project(':libuvccamera')
+    implementation project(':usbCameraCommon')
+
+    implementation 'androidx.multidex:multidx:2.0.1'
+    implementation "com.google.android.material:material:1.9.0"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.github.volsahin:bottomify-navigation-view:v1.0.1'
+
+    implementation "androidx.cardview:cardview:1.0.0"
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    implementation 'com.github.shasin89:NotificationBanner:1.1.0'
+    implementation "com.github.tonyofrancis.Fetch:xfetch2:3.1.6"
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.4.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
+    implementation 'com.github.mveroukis:storage-chooser:2.0.4.4a'
+    implementation 'com.github.blikoon:QRCodeScanner:0.1.2'
+    implementation 'com.wrapp.floatlabelededittext:library:0.0.6'
+    implementation 'io.github.thanosfisherman.wifiutils:wifiutils:1.6.6'
+    implementation 'io.github.chaosleung:pinview:1.4.4'
+    implementation 'me.impa:Pinger:0.1'
+    implementation 'com.github.satyan:sugar:1.5'
+    implementation 'com.github.seancfoley:ipaddress:5.2.1'
+    //Local Dependencies
+    implementation 'com.github.permissions-dispatcher:permissionsdispatcher:4.8.0'
+    implementation("ch.acra:acra-mail:5.12.0")
+    implementation("ch.acra:acra-dialog:5.12.0")
+    implementation "com.kongzue.dialogx:DialogX:0.0.49"
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+    implementation 'com.kaopiz:kprogresshud:1.2.0'
+    implementation 'com.github.stephanenicolas.toothpick:toothpick-runtime:3.1.0'
+    annotationProcessor 'com.github.stephanenicolas.toothpick:toothpick-compiler:3.1.0'
+    
+    // Add missing dependencies
+    implementation 'com.google.guava:guava:31.1-jre'
+    
+    // Image viewing library (PhotoView for zoom/pan)
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    
+    // Video player library (ExoPlayer for in-app video playback)
+    implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
+    
+    // For better metadata extraction
+    implementation 'androidx.exifinterface:exifinterface:1.3.6'
+}
+configurations.configureEach {
+    exclude group: 'com.serenegiant', module: 'common'
+    exclude group: 'com.serenegiant', module: 'uvccamera'
+}
