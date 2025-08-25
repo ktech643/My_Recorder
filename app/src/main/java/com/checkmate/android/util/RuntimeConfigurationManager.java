@@ -316,12 +316,12 @@ public class RuntimeConfigurationManager {
             // Check if encoder supports dynamic resolution changes
             if (canChangeResolutionDynamically("streaming")) {
                 // Apply resolution change through EGL manager
-                boolean success = mEglManager.updateDynamicConfiguration("streaming_resolution", newResolution);
-                if (success) {
+                try {
+                    mEglManager.updateDynamicConfiguration("streaming_resolution", newResolution);
                     Log.d(TAG, "✅ Streaming resolution changed dynamically to: " + newResolution);
                     return true;
-                } else {
-                    Log.w(TAG, "⚠️ Dynamic streaming resolution change failed, will apply on next stream");
+                } catch (Exception e) {
+                    Log.w(TAG, "⚠️ Dynamic streaming resolution change failed, will apply on next stream", e);
                     return true; // Still successful, just delayed
                 }
             } else {
@@ -360,12 +360,12 @@ public class RuntimeConfigurationManager {
             // Check if recorder supports dynamic resolution changes
             if (canChangeResolutionDynamically("recording")) {
                 // Apply resolution change through EGL manager
-                boolean success = mEglManager.updateDynamicConfiguration("recording_resolution", newResolution);
-                if (success) {
+                try {
+                    mEglManager.updateDynamicConfiguration("recording_resolution", newResolution);
                     Log.d(TAG, "✅ Recording resolution changed dynamically to: " + newResolution);
                     return true;
-                } else {
-                    Log.w(TAG, "⚠️ Dynamic recording resolution change failed, will apply on next recording");
+                } catch (Exception e) {
+                    Log.w(TAG, "⚠️ Dynamic recording resolution change failed, will apply on next recording", e);
                     return true; // Still successful, just delayed
                 }
             } else {
@@ -400,7 +400,8 @@ public class RuntimeConfigurationManager {
             
             if (mEglManager != null) {
                 // Apply cast resolution change
-                boolean success = mEglManager.updateDynamicConfiguration("cast_resolution", newResolution);
+                try {
+                    mEglManager.updateDynamicConfiguration("cast_resolution", newResolution);
                 if (success) {
                     Log.d(TAG, "✅ Cast resolution changed to: " + newResolution);
                     return true;
