@@ -340,6 +340,7 @@ public class MainActivity extends BaseActivity
 
 
         init();
+        initializeEarlyEGL();
         showChessIfNeeded();
     }
 
