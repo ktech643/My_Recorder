@@ -55,7 +55,7 @@ public class EnhancedCameraUI {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     
     // UI Components
-    private View overlayView;
+    private FrameLayout overlayView;
     private ProgressBar progressSpinner;
     private TextView statusText;
     private ImageView cameraIcon;

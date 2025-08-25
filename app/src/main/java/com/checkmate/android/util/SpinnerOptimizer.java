@@ -357,10 +357,10 @@ public class SpinnerOptimizer {
                 rotation.setInterpolator(new AccelerateDecelerateInterpolator());
                 rotation.start();
                 
-                spinner.setTag("loading_animator", rotation);
+                spinner.setTag(rotation);
             } else {
                 // Stop loading animation
-                Object animator = spinner.getTag("loading_animator");
+                Object animator = spinner.getTag();
                 if (animator instanceof ObjectAnimator) {
                     ((ObjectAnimator) animator).cancel();
                 }

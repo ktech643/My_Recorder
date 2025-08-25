@@ -302,7 +302,8 @@ public abstract class BaseStreamConditioner implements StreamConditioner {
             
             // Apply to streamer
             if (mStreamer != null) {
-                mStreamer.setBitrate(adjustment.newBitrate);
+                // TODO: Implement setBitrate method in Streamer class
+                // mStreamer.setBitrate(adjustment.newBitrate);
                 // Note: Frame rate would typically be set during encoder initialization
                 // For runtime changes, this might require encoder restart in some implementations
             }

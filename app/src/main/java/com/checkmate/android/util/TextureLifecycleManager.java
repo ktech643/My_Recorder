@@ -286,7 +286,11 @@ public class TextureLifecycleManager {
         Log.d(TAG, "Releasing all textures to prevent abandonment");
         
         // Get snapshot of active textures
-        int[] textureIds = mActiveTextures.keySet().toArray(new Integer[0]);
+        Integer[] textureIdsArray = mActiveTextures.keySet().toArray(new Integer[0]);
+        int[] textureIds = new int[textureIdsArray.length];
+        for (int i = 0; i < textureIdsArray.length; i++) {
+            textureIds[i] = textureIdsArray[i];
+        }
         
         for (int textureId : textureIds) {
             releaseTextureSafely(textureId);

@@ -402,11 +402,10 @@ public class RuntimeConfigurationManager {
                 // Apply cast resolution change
                 try {
                     mEglManager.updateDynamicConfiguration("cast_resolution", newResolution);
-                if (success) {
                     Log.d(TAG, "✅ Cast resolution changed to: " + newResolution);
                     return true;
-                } else {
-                    Log.w(TAG, "⚠️ Cast resolution change will apply on next cast session");
+                } catch (Exception e) {
+                    Log.w(TAG, "⚠️ Cast resolution change will apply on next cast session", e);
                     return true;
                 }
             } else {
@@ -636,7 +635,8 @@ public class RuntimeConfigurationManager {
             } else if (value instanceof String) {
                 AppPreference.setStr(key, (String) value);
             } else if (value instanceof Float) {
-                AppPreference.setFloat(key, (Float) value);
+                // setFloat method not available, using setStr instead
+                AppPreference.setStr(key, String.valueOf(value));
             } else {
                 Log.w(TAG, "Unknown preference type for key: " + key);
             }

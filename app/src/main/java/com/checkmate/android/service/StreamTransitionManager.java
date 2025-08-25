@@ -195,7 +195,7 @@ public class StreamTransitionManager {
         if (mTimeOverlay != null) {
             mTimeOverlay.release();
         }
-        mTimeOverlay = new SurfaceImageNew(mEglCore);
+        mTimeOverlay = new SurfaceImageNew(); // Constructor takes no arguments
     }
     
     /**
