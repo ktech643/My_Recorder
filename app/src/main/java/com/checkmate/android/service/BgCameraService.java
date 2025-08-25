@@ -401,6 +401,13 @@ public class BgCameraService extends BaseBackgroundService {
             }
         };
 
+        } catch (Exception e) {
+            Log.e(TAG, "Error in initCamera", e);
+            if (crashLogger != null) {
+                crashLogger.logError(TAG, "initCamera", e);
+            }
+        }
+
         final CameraManager cameraManager = (CameraManager) getSystemService(CAMERA_SERVICE);
         mCameraHandler.post(() -> {
             try {

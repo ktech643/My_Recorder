@@ -125,6 +125,7 @@ public class SharedEglManager {
     private static final Object sLock = new Object();
     private static final ReentrantLock instanceLock = new ReentrantLock();
     private static final long ANR_TIMEOUT = 50; // 50ms for main thread operations
+    private final ReentrantLock drawLock = new ReentrantLock();
     
     // Service management
     private final Map<ServiceType, WeakReference<BaseBackgroundService>> mRegisteredServices = new ConcurrentHashMap<>();
