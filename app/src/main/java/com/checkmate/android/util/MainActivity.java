@@ -900,15 +900,25 @@ public class MainActivity extends BaseActivity
 
     /** Immediately stop & exit every running background capture service. */
     private void cleanupResources() {
-        if (MainActivity.getInstance() == null) return;
-
         MainActivity inst = MainActivity.getInstance();
-        inst.stopFragUSBService();
-        inst.stopFragWifiService();
-        inst.stopFragBgCast();
-        inst.stopFragBgCamera();
-        inst.stopService(ServiceType.BgAudio);
-        inst.finishAffinity();
+        if (inst == null) {
+            Log.w(TAG, "cleanupResources: MainActivity instance is null");
+            return;
+        }
+
+        try {
+            inst.stopFragUSBService();
+            inst.stopFragWifiService();
+            inst.stopFragBgCast();
+            inst.stopFragBgCamera();
+            inst.stopService(ServiceType.BgAudio);
+            inst.finishAffinity();
+        } catch (Exception e) {
+            Log.e(TAG, "Error during cleanup", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "cleanupResources error", e);
+            }
+        }
     }
 
     /* ─────────────────────────────────────────────────────────────────────────
@@ -921,19 +931,40 @@ public class MainActivity extends BaseActivity
 
         mWifiConnection = new ServiceConnection() {
             @Override public void onServiceConnected(ComponentName n, IBinder s) {
-                mWifiService     = ((BgWifiService.WifiCameraBinder) s).getService();
-                mWifiCameraIntent= mWifiService.getRunningIntent();
-                if (mWifiCameraIntent == null) startBgWifi();
+                try {
+                    if (s != null) {
+                        mWifiService = ((BgWifiService.WifiCameraBinder) s).getService();
+                        if (mWifiService != null) {
+                            mWifiCameraIntent = mWifiService.getRunningIntent();
+                            if (mWifiCameraIntent == null) startBgWifi();
 
-                if (mCamera != null && !isWifiStreaming()) mWifiService.playStreaming(mCamera);
-                isWifiServiceBound = true;
+                            if (mCamera != null && !isWifiStreaming()) {
+                                mWifiService.playStreaming(mCamera);
+                            }
+                            isWifiServiceBound = true;
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error in WiFi service connection", e);
+                    if (CrashLogger.getInstance() != null) {
+                        CrashLogger.getInstance().logError(TAG, "initBGWifiService onServiceConnected", e);
+                    }
+                }
             }
             @Override public void onServiceDisconnected(ComponentName n) {
-                mWifiService     = null;
+                mWifiService = null;
                 isWifiServiceBound = false;
             }
         };
-        bindService(new Intent(this, BgWifiService.class), mWifiConnection, BIND_AUTO_CREATE);
+        
+        try {
+            bindService(new Intent(this, BgWifiService.class), mWifiConnection, BIND_AUTO_CREATE);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to bind WiFi service", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "initBGWifiService bindService", e);
+            }
+        }
     }
 
     /* USB Camera */
@@ -942,20 +973,39 @@ public class MainActivity extends BaseActivity
 
         mUSBConnection = new ServiceConnection() {
             @Override public void onServiceConnected(ComponentName n, IBinder s) {
-                sharedViewModel.postEvent(EventType.INIT_FUN_LIVE_FRAG,"initialize");
-                mUSBService = ((BgUSBService.CameraBinder) s).getService();
-                mUSBService.setSharedViewModel(sharedViewModel);
-                mUSBService.setNotifyCallback(MainActivity.this);
-                mUSBCameraIntent = mUSBService.getRunningIntent();
-                if (mUSBCameraIntent == null) startBgUSB();
-                isUsbServiceBound = true;
+                try {
+                    if (s != null && sharedViewModel != null) {
+                        sharedViewModel.postEvent(EventType.INIT_FUN_LIVE_FRAG, "initialize");
+                        mUSBService = ((BgUSBService.CameraBinder) s).getService();
+                        if (mUSBService != null) {
+                            mUSBService.setSharedViewModel(sharedViewModel);
+                            mUSBService.setNotifyCallback(MainActivity.this);
+                            mUSBCameraIntent = mUSBService.getRunningIntent();
+                            if (mUSBCameraIntent == null) startBgUSB();
+                            isUsbServiceBound = true;
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error in USB service connection", e);
+                    if (CrashLogger.getInstance() != null) {
+                        CrashLogger.getInstance().logError(TAG, "initBGUSBService onServiceConnected", e);
+                    }
+                }
             }
             @Override public void onServiceDisconnected(ComponentName n) {
-                mUSBService     = null;
+                mUSBService = null;
                 isUsbServiceBound = false;
             }
         };
-        bindService(new Intent(this, BgUSBService.class), mUSBConnection, BIND_AUTO_CREATE);
+        
+        try {
+            bindService(new Intent(this, BgUSBService.class), mUSBConnection, BIND_AUTO_CREATE);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to bind USB service", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "initBGUSBService bindService", e);
+            }
+        }
     }
 
     /* Screen-Cast / MediaProjection */
@@ -1083,24 +1133,42 @@ public class MainActivity extends BaseActivity
     public void initService() {
         mConnection = new ServiceConnection() {
             @Override public void onServiceConnected(ComponentName name, IBinder svc) {
-                boolean is_android = TextUtils.equals(mCameraId, AppConstant.REAR_CAMERA)
-                        || TextUtils.equals(mCameraId, AppConstant.FRONT_CAMERA);
+                try {
+                    if (svc != null && sharedViewModel != null) {
+                        boolean is_android = TextUtils.equals(mCameraId, AppConstant.REAR_CAMERA)
+                                || TextUtils.equals(mCameraId, AppConstant.FRONT_CAMERA);
 
-                sharedViewModel.postEvent(EventType.INIT_FUN_LIVE_FRAG, "initialize");
-                mCamService   = ((BgCameraService.CameraBinder) svc).getService();
-                mCamService.setSharedViewModel(sharedViewModel);
-                mCamService.setNotifyCallback(MainActivity.this);
-                mBgCameraIntent = mCamService.getRunningIntent();
-                if (mBgCameraIntent == null) startBgCamera();
-                isCamServiceBond = true;
+                        sharedViewModel.postEvent(EventType.INIT_FUN_LIVE_FRAG, "initialize");
+                        mCamService = ((BgCameraService.CameraBinder) svc).getService();
+                        if (mCamService != null) {
+                            mCamService.setSharedViewModel(sharedViewModel);
+                            mCamService.setNotifyCallback(MainActivity.this);
+                            mBgCameraIntent = mCamService.getRunningIntent();
+                            if (mBgCameraIntent == null) startBgCamera();
+                            isCamServiceBond = true;
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error in camera service connection", e);
+                    if (CrashLogger.getInstance() != null) {
+                        CrashLogger.getInstance().logError(TAG, "initService onServiceConnected", e);
+                    }
+                }
             }
             @Override public void onServiceDisconnected(ComponentName name) {
-                mCamService      = null;
+                mCamService = null;
                 isCamServiceBond = false;
             }
         };
 
-        bindService(new Intent(this, BgCameraService.class), mConnection, BIND_AUTO_CREATE);
+        try {
+            bindService(new Intent(this, BgCameraService.class), mConnection, BIND_AUTO_CREATE);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to bind camera service", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "initService bindService", e);
+            }
+        }
     }
 
     /* ─────────────────────────────────────────────────────────────────────────
@@ -1109,36 +1177,64 @@ public class MainActivity extends BaseActivity
     public void initAudioService() {
         mAudioConnection = new ServiceConnection() {
             @Override public void onServiceConnected(ComponentName n, IBinder svc) {
-                sharedViewModel.postEvent(EventType.INIT_FUN_LIVE_FRAG, "initialize");
-                mAudioService = ((BgAudioService.AudioBinder) svc).getService();
-                mAudioService.setNotifyCallback(MainActivity.this);
-                mAudioService.setSharedViewModel(sharedViewModel);
-                mAudioIntent = mAudioService.getRunningIntent();
-                if (mAudioIntent == null) startBGAudio();
-                isAudioServiceBound = true;
+                try {
+                    if (svc != null && sharedViewModel != null) {
+                        sharedViewModel.postEvent(EventType.INIT_FUN_LIVE_FRAG, "initialize");
+                        mAudioService = ((BgAudioService.AudioBinder) svc).getService();
+                        if (mAudioService != null) {
+                            mAudioService.setNotifyCallback(MainActivity.this);
+                            mAudioService.setSharedViewModel(sharedViewModel);
+                            mAudioIntent = mAudioService.getRunningIntent();
+                            if (mAudioIntent == null) startBGAudio();
+                            isAudioServiceBound = true;
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error in audio service connection", e);
+                    if (CrashLogger.getInstance() != null) {
+                        CrashLogger.getInstance().logError(TAG, "initAudioService onServiceConnected", e);
+                    }
+                }
             }
             @Override public void onServiceDisconnected(ComponentName n) {
-                mAudioService      = null;
+                mAudioService = null;
                 isAudioServiceBound = false;
             }
         };
 
-        bindService(new Intent(this, BgAudioService.class), mAudioConnection, BIND_AUTO_CREATE);
+        try {
+            bindService(new Intent(this, BgAudioService.class), mAudioConnection, BIND_AUTO_CREATE);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to bind audio service", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "initAudioService bindService", e);
+            }
+        }
     }
 
     /* ─────────────────────────────────────────────────────────────────────────
      *  Snapshot helper (delegates to whichever cam is active)
      * ──────────────────────────────────────────────────────────────────────── */
     public void takeSnapshot() {
-        if (mCamService != null) {
-            mCamService.takeSnapshot();
-        } else if (mUSBService != null) {
-            mUSBService.takeSnapshot();
-        }else if (mCastService != null) {
-            mCastService.takeSnapshot();
-        }else if (mAudioService != null) {
-            if (mAudioService.isStreaming()) {
+        try {
+            if (mCamService != null) {
+                mCamService.takeSnapshot();
+            } else if (mUSBService != null) {
+                mUSBService.takeSnapshot();
+            } else if (mCastService != null) {
+                mCastService.takeSnapshot();
+            } else if (mAudioService != null && mAudioService.isStreaming()) {
                 mAudioService.takeSnapshot();
+            } else {
+                Log.w(TAG, "takeSnapshot: No active service available");
+                if (CrashLogger.getInstance() != null) {
+                    CrashLogger.getInstance().logWarning(TAG, "takeSnapshot called with no active service");
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error taking snapshot", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "takeSnapshot error", e);
             }
         }
     }
@@ -1191,13 +1287,27 @@ public class MainActivity extends BaseActivity
     }
 
     private void toggleRecordingIfNeeded(boolean start) {
-        boolean recordOn       = AppPreference.getBool(AppPreference.KEY.AUTO_RECORD,      false);
-        boolean recordBroadcast= AppPreference.getBool(AppPreference.KEY.RECORD_BROADCAST, false);
-        if (!recordOn && !recordBroadcast) return;
-        if (start) startRecord(); else stopRecord();
-        LiveFragment fragment = LiveFragment.getInstance();
-        if (fragment != null) {
-            if (start) liveFragment.ic_rec.setImageResource(R.mipmap.ic_radio_active); else liveFragment.ic_rec.setImageResource(R.mipmap.ic_radio);
+        try {
+            boolean recordOn = AppPreference.getBool(AppPreference.KEY.AUTO_RECORD, false);
+            boolean recordBroadcast = AppPreference.getBool(AppPreference.KEY.RECORD_BROADCAST, false);
+            if (!recordOn && !recordBroadcast) return;
+            
+            if (start) {
+                startRecord();
+            } else {
+                stopRecord();
+            }
+            
+            LiveFragment fragment = LiveFragment.getInstance();
+            if (fragment != null && fragment.ic_rec != null) {
+                int resourceId = start ? R.mipmap.ic_radio_active : R.mipmap.ic_radio;
+                fragment.ic_rec.setImageResource(resourceId);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error toggling recording", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "toggleRecordingIfNeeded", e);
+            }
         }
     }
 
@@ -1441,9 +1551,24 @@ public class MainActivity extends BaseActivity
     public boolean isWifiServiceRunning() { return isServiceRunning(BgWifiService.class); }
 
     private boolean isServiceRunning(Class<?> clazz) {
-        ActivityManager mgr = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo info : mgr.getRunningServices(Integer.MAX_VALUE)) {
-            if (clazz.getName().equals(info.service.getClassName())) return true;
+        try {
+            ActivityManager mgr = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            if (mgr != null) {
+                List<ActivityManager.RunningServiceInfo> services = mgr.getRunningServices(Integer.MAX_VALUE);
+                if (services != null) {
+                    for (ActivityManager.RunningServiceInfo info : services) {
+                        if (info != null && info.service != null && 
+                            clazz.getName().equals(info.service.getClassName())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking if service is running: " + clazz.getName(), e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "isServiceRunning", e);
+            }
         }
         return false;
     }
@@ -1521,8 +1646,17 @@ public class MainActivity extends BaseActivity
 
     /* notify both Playback & Settings fragments of new storage path */
     private void notifyFragments(String newPath) {
-        sharedViewModel.postEvent(EventType.STORAGE_PATH_SETTING,  newPath);
-        sharedViewModel.postEvent(EventType.STORAGE_PATH_PLAY_BACK,newPath);
+        if (sharedViewModel != null && newPath != null) {
+            try {
+                sharedViewModel.postEvent(EventType.STORAGE_PATH_SETTING, newPath);
+                sharedViewModel.postEvent(EventType.STORAGE_PATH_PLAY_BACK, newPath);
+            } catch (Exception e) {
+                Log.e(TAG, "Error notifying fragments", e);
+                if (CrashLogger.getInstance() != null) {
+                    CrashLogger.getInstance().logError(TAG, "notifyFragments", e);
+                }
+            }
+        }
     }
 
     private void handleUsbDevice(UsbDevice dev) {
@@ -1534,14 +1668,30 @@ public class MainActivity extends BaseActivity
      *  Simple timer: every few seconds LiveFragment asks for network update
      * ──────────────────────────────────────────────────────────────────────── */
     void initNetworkTimer() {
-        handler = new Handler();
-        updateTimeRunnable = () -> {
-            if (liveFragment != null && liveFragment.is_wifi_opened) {
-                sharedViewModel.postEvent(EventType.NETWORK_UPDATE_LIVE, "");
+        try {
+            handler = new Handler();
+            updateTimeRunnable = () -> {
+                try {
+                    if (liveFragment != null && liveFragment.is_wifi_opened && sharedViewModel != null) {
+                        sharedViewModel.postEvent(EventType.NETWORK_UPDATE_LIVE, "");
+                    }
+                    if (handler != null) {
+                        handler.postDelayed(updateTimeRunnable, 7000);   // keep looping
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error in network timer", e);
+                    if (CrashLogger.getInstance() != null) {
+                        CrashLogger.getInstance().logError(TAG, "initNetworkTimer runnable", e);
+                    }
+                }
+            };
+            handler.post(updateTimeRunnable);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to init network timer", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "initNetworkTimer", e);
             }
-            handler.postDelayed(updateTimeRunnable, 7000);   // keep looping
-        };
-        handler.post(updateTimeRunnable);
+        }
     }
     /* ─────────────────────────────────────────────────────────────────────────
      *  GPS Background Service helpers
@@ -1962,61 +2112,97 @@ public class MainActivity extends BaseActivity
 
     /** Called from nav "Hide" action or when focus lost. */
     public void hide_app() {
-        is_passed = false;
+        try {
+            is_passed = false;
 
-        // If *nothing* is recording / streaming, quit completely.
-        boolean anyActive =
-                isRecordingCamera() || isRecordingUSB() || isStreaming()
-                        || isWifiStreaming()  || isWifiRecording()
-                        || sharedViewModel.isUsbStreaming() || sharedViewModel.isUsbRecording();
+            // If *nothing* is recording / streaming, quit completely.
+            boolean anyActive = false;
+            try {
+                anyActive = isRecordingCamera() || isRecordingUSB() || isStreaming()
+                        || isWifiStreaming() || isWifiRecording()
+                        || (sharedViewModel != null && (sharedViewModel.isUsbStreaming() || sharedViewModel.isUsbRecording()));
+            } catch (Exception e) {
+                Log.e(TAG, "Error checking active states", e);
+            }
 
-        if (!anyActive) {
-            stopService(ServiceType.BgCamera);
-            stopService(ServiceType.BgAudio);
-            stopService(ServiceType.BgUSBCamera);
-            stopService(ServiceType.BgScreenCast);
-            stopWifiService();
-            sharedViewModel.postEvent(EventType.RELEASE_CAMERA_LIVE, "releaseCameras");
-            quitApp();
-        } else {
-            moveTaskToBack(true);   // just background the task
+            if (!anyActive) {
+                stopService(ServiceType.BgCamera);
+                stopService(ServiceType.BgAudio);
+                stopService(ServiceType.BgUSBCamera);
+                stopService(ServiceType.BgScreenCast);
+                stopWifiService();
+                if (sharedViewModel != null) {
+                    sharedViewModel.postEvent(EventType.RELEASE_CAMERA_LIVE, "releaseCameras");
+                }
+                quitApp();
+            } else {
+                moveTaskToBack(true);   // just background the task
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in hide_app", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "hide_app", e);
+            }
         }
     }
 
-    public void onStartUtility(){
-        isStreaming = true;
-        sharedViewModel.postEvent(EventType.UPDATE_DEVICE_STREAMING, false);
-        AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, true);
-        updateDeviceInfo(true);
-        toggleRecordingIfNeeded(true);
-        updateStreamIcon(true);
+    public void onStartUtility() {
+        try {
+            isStreaming = true;
+            if (sharedViewModel != null) {
+                sharedViewModel.postEvent(EventType.UPDATE_DEVICE_STREAMING, false);
+            }
+            AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, true);
+            updateDeviceInfo(true);
+            toggleRecordingIfNeeded(true);
+            updateStreamIcon(true);
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onStartUtility", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "onStartUtility", e);
+            }
+        }
     }
 
-    public void onStopUtility(){
-        sharedViewModel.postEvent(EventType.UPDATE_DEVICE_STREAMING, false);
-        updateDeviceInfo(false);
-        isStreaming = false;
-        AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, false);
-        toggleRecordingIfNeeded(false);
-        updateStreamIcon(false);
+    public void onStopUtility() {
+        try {
+            if (sharedViewModel != null) {
+                sharedViewModel.postEvent(EventType.UPDATE_DEVICE_STREAMING, false);
+            }
+            updateDeviceInfo(false);
+            isStreaming = false;
+            AppPreference.setBool(AppPreference.KEY.STREAM_STARTED, false);
+            toggleRecordingIfNeeded(false);
+            updateStreamIcon(false);
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onStopUtility", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "onStopUtility", e);
+            }
+        }
     }
     /* ─────────────────────────────────────────────────────────────────────────
      *  START / STOP primary streaming (camera or USB)
      * ──────────────────────────────────────────────────────────────────────── */
     public void startStream() {
+        try {
+            // Guard: must have an open camera
+            if (mCamService == null && mUSBService == null && mAudioService == null) {
+                Log.w(TAG, "startStream: No service available");
+                if (CrashLogger.getInstance() != null) {
+                    CrashLogger.getInstance().logWarning(TAG, "startStream called with no active service");
+                }
+                return;
+            }
 
-        // Guard: must have an open camera
-        if (mCamService == null && mUSBService == null  && mAudioService == null) return;
+            // Convenience lambdas for the two camera types
+            Runnable onStart = this::onStartUtility;
+            Runnable onStop = this::onStopUtility;
 
-        // Convenience lambdas for the two camera types
-        Runnable onStart = this::onStartUtility;
-
-        Runnable onStop = this::onStopUtility;
-
-        /* --------------------------------------------------------------------
-         *  Case 1 – Android front / rear camera
-         * ------------------------------------------------------------------ */
-        if (liveFragment.is_camera_opened && mCamService != null) {
+            /* --------------------------------------------------------------------
+             *  Case 1 – Android front / rear camera
+             * ------------------------------------------------------------------ */
+            if (liveFragment != null && liveFragment.is_camera_opened && mCamService != null) {
 
             String base = AppPreference.getStr(AppPreference.KEY.STREAM_BASE, "");
             String channel = AppPreference.getStr(AppPreference.KEY.STREAM_CHANNEL, "");
@@ -2110,17 +2296,32 @@ public class MainActivity extends BaseActivity
                 onStart.run();
             }
         }
-
+        } catch (Exception e) {
+            Log.e(TAG, "Error in startStream", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "startStream", e);
+            }
+        }
     }
 
     /* ------------------------------------------------------------------------
      *  Stop front/rear camera streaming quickly (USB handled elsewhere)
      * --------------------------------------------------------------------- */
     public void stopStream() {
-        if (mCamService == null) return;
-        stopCameraIntent();
-        if (liveFragment != null) {
-            liveFragment.forceTextureViewRefresh();
+        try {
+            if (mCamService == null) {
+                Log.w(TAG, "stopStream: Camera service is null");
+                return;
+            }
+            stopCameraIntent();
+            if (liveFragment != null) {
+                liveFragment.forceTextureViewRefresh();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error stopping stream", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "stopStream", e);
+            }
         }
     }
 
@@ -2128,9 +2329,13 @@ public class MainActivity extends BaseActivity
      *  SCREEN-CAST (MediaProjection) streaming workflow
      * ──────────────────────────────────────────────────────────────────────── */
     public void onCastStream() {
-        if (mCastService == null) { initCastService(); return; }
+        try {
+            if (mCastService == null) {
+                initCastService();
+                return;
+            }
 
-        if (!mCastService.isStreaming()) {
+            if (!mCastService.isStreaming()) {
             // prepare + request projection (permissions via NeedsPermission below)
             boolean audioAllowed = SettingsUtils.isCastAudioAllowed();
             updateDeviceInfo(true);
@@ -2174,6 +2379,15 @@ public class MainActivity extends BaseActivity
                     .setCancelTextInfo(new TextInfo().setFontColor(Color.BLACK).setBold(true));
         }
         dlg_progress.dismiss();
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onCastStream", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "onCastStream", e);
+            }
+            if (dlg_progress != null && dlg_progress.isShowing()) {
+                dlg_progress.dismiss();
+            }
+        }
     }
 
     /* ─────────────────────────────────────────────────────────────────────────
