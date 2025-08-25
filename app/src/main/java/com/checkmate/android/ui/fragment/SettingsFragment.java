@@ -1081,6 +1081,8 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             txt_video_details.setText(R.string.return_defaults);
         }
         spinner_quality.setSelection(video_quality);
+        // Initialize field enable/disable state based on current quality
+        onVideoDetails(video_quality == AppConstant.QUALITY_CUSTOM);
         spinner_quality.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
@@ -1093,23 +1095,23 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
                         onVideoDetails(false);
                         break;
-                    case 1:
+                    case 1: // medium
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
                         onVideoDetails(false);
                         break;
-                    case 2:
+                    case 2: // low
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
                         onVideoDetails(false);
                         break;
-                    case 3:
+                    case 3: // super low
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
                         onVideoDetails(false);
                         break;
-                    case 4:
+                    case 4: // USB
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
                         onVideoDetails(false);
                         break;
-                    case 5:
+                    case 5: // custom
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, false);
                         onVideoDetails(true);
                         break;
@@ -1139,12 +1141,14 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 .simple_spinner_dropdown_item);
 
         int streaming_position = AppPreference.getInt(AppPreference.KEY.STREAMING_QUALITY, 1);
+        // Streaming card is always visible by default
+        ly_streaming_settings.setVisibility(View.VISIBLE);
         if (streaming_position == AppConstant.QUALITY_CUSTOM) {
-            ly_streaming_custom.setVisibility(View.GONE);
-            txt_stream_details.setText(R.string.show_details);
-        } else {
             ly_streaming_custom.setVisibility(View.VISIBLE);
             txt_stream_details.setText(R.string.return_defaults);
+        } else {
+            ly_streaming_custom.setVisibility(View.GONE);
+            txt_stream_details.setText(R.string.show_details);
         }
         streaming_quality.setAdapter(qualityStreamingAdapter);
         streaming_quality.setOnItemSelectedEvenIfUnchangedListener(new AdapterView.OnItemSelectedListener() {
@@ -1159,24 +1163,24 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
                         onStreamDetails(false);
                         break;
-                    case 1:
+                    case 1: // medium
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
                         onStreamDetails(false);
                         break;
-                    case 2:
+                    case 2: // low
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
                         onStreamDetails(false);
                         break;
-                    case 3:
+                    case 3: // super low
                         AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
                         onStreamDetails(false);
                         break;
-                    case 4:
-                        AppPreference.getBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
+                    case 4: // USB
+                        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
                         onStreamDetails(false);
                         break;
-                    case 5:
-                        AppPreference.getBool(AppPreference.KEY.IS_NATIVE_STREAMING, false);
+                    case 5: // custom
+                        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, false);
                         onStreamDetails(true);
                         break;
                 }
@@ -1203,6 +1207,8 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             return false;
         });
         streaming_quality.setSelection(streaming_position);
+        // Initialize field enable/disable state based on current quality
+        onStreamDetails(streaming_position == AppConstant.QUALITY_CUSTOM);
 
         List<String> adaptive_modes = Arrays.asList(getResources().getStringArray(R.array.adaptive_modes));
         ArrayAdapter<String> adaptiveAdapter = new ArrayAdapter<>(
@@ -2520,10 +2526,17 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         }else {
             ly_video_custom.setVisibility(View.GONE);
         }
-        spinner_resolution.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
-        spinner_frame.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
-        edt_bitrate.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
-        edt_keyFrame.setEnabled(video_quality >= AppConstant.QUALITY_CUSTOM);
+        // Enable/disable fields based on quality selection
+        boolean isCustom = (video_quality >= AppConstant.QUALITY_CUSTOM);
+        spinner_resolution.setEnabled(isCustom);
+        spinner_frame.setEnabled(isCustom);
+        edt_bitrate.setEnabled(isCustom);
+        edt_keyFrame.setEnabled(isCustom);
+        // Also disable click listeners when not custom
+        edt_bitrate.setClickable(isCustom);
+        edt_bitrate.setFocusable(false);
+        edt_keyFrame.setClickable(isCustom);
+        edt_keyFrame.setFocusable(false);
     }
     boolean isUserInteracting = false; // Prevents unnecessary UI loopss
 
@@ -2721,17 +2734,24 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         }else {
             ly_streaming_custom.setVisibility(View.GONE);
         }
-        streaming_resolution.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
-        streaming_frame.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
-        streaming_audio_bitrate.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
-        edt_streaming_bitrate.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
-        edt_streaming_keyFrame.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
-        swt_radio_mode.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
-        swt_radio_bluetooth.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
-        spinner_audio_src.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
-        spinner_sample_rate.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
-        spinner_adaptive.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
-        swt_adaptive_fps.setEnabled(stream_quality >= AppConstant.QUALITY_CUSTOM);
+        // Enable/disable fields based on quality selection
+        boolean isCustom = (stream_quality >= AppConstant.QUALITY_CUSTOM);
+        streaming_resolution.setEnabled(isCustom);
+        streaming_frame.setEnabled(isCustom);
+        streaming_audio_bitrate.setEnabled(isCustom);
+        edt_streaming_bitrate.setEnabled(isCustom);
+        edt_streaming_keyFrame.setEnabled(isCustom);
+        swt_radio_mode.setEnabled(isCustom);
+        swt_radio_bluetooth.setEnabled(isCustom && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false));
+        spinner_audio_src.setEnabled(isCustom && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false));
+        spinner_sample_rate.setEnabled(isCustom && !AppPreference.getBool(AppPreference.KEY.BLUETOOTH_MIC, false));
+        spinner_adaptive.setEnabled(isCustom);
+        swt_adaptive_fps.setEnabled(isCustom);
+        // Also disable click listeners when not custom
+        edt_streaming_bitrate.setClickable(isCustom);
+        edt_streaming_bitrate.setFocusable(false);
+        edt_streaming_keyFrame.setClickable(isCustom);
+        edt_streaming_keyFrame.setFocusable(false);
     }
 
     void onStreamLow() {
