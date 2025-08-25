@@ -88,6 +88,8 @@ import com.checkmate.android.service.BgWifiService;
 import com.checkmate.android.service.LocationManagerService;
 import com.checkmate.android.service.MyAccessibilityService;
 import com.checkmate.android.service.PlayService;
+import com.checkmate.android.service.SharedEGL.SharedEglManager;
+import com.checkmate.android.service.SharedEGL.ServiceType;
 import com.checkmate.android.ui.activity.BaseActivity;
 import com.checkmate.android.ui.activity.ChessActivity;
 import com.checkmate.android.ui.activity.SplashActivity;
@@ -309,6 +311,8 @@ public class MainActivity extends BaseActivity
     private boolean isExit           = false;  // governs onBackPressed()
     private boolean isSnapShot       = false;  // true while waiting for SAF picker
     public  static  volatile boolean isShowingAccServiceAlert = false;
+    // Shared EGL manager for seamless preview/encoding across services
+    private SharedEglManager mSharedEgl;
 
     /*  ╭──────────────────────────────────────────────────────────────────────╮
         │  Lifecycle – onCreate (first lines)                                  │
@@ -603,10 +607,22 @@ public class MainActivity extends BaseActivity
             public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surface, int width, int height) {
                 sharedViewModel.setSurfaceModel(surface,width,height);
                 Log.e(TAG, "onSurfaceTextureAvailable (Cam)");
-
+                // If EGL is ready, immediately update active service preview surface
+                try {
+                    SharedEglManager mgr = SharedEglManager.getInstance();
+                    if (mgr != null && mgr.isEglReady()) {
+                        mgr.updateActiveServiceSurface(surface, width, height);
+                    }
+                } catch (Throwable ignored) {}
             }
             public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) {
                 sharedViewModel.setSurfaceModel(surface,width,height);
+                try {
+                    SharedEglManager mgr = SharedEglManager.getInstance();
+                    if (mgr != null && mgr.isEglReady()) {
+                        mgr.updateActiveServiceSurface(surface, width, height);
+                    }
+                } catch (Throwable ignored) {}
                 updatePreviewRatio();
             }
             public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
@@ -621,6 +637,34 @@ public class MainActivity extends BaseActivity
         setCallbacks();        // native logging hooks
         OpenLog();             // create log dir & native writer
         initNetworkTimer();    // periodic UI updates
+
+        // Initialize shared EGL once on app start with the selected source
+        try {
+            String cameraID = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
+            ServiceType serviceType;
+            if (TextUtils.equals(cameraID, AppConstant.USB_CAMERA)) {
+                serviceType = ServiceType.BgUSBCamera;
+            } else if (TextUtils.equals(cameraID, AppConstant.SCREEN_CAST)) {
+                serviceType = ServiceType.BgScreenCast;
+            } else if (TextUtils.equals(cameraID, AppConstant.AUDIO_ONLY)) {
+                serviceType = ServiceType.BgAudio;
+            } else {
+                serviceType = ServiceType.BgCamera;
+            }
+
+            mSharedEgl = SharedEglManager.getInstance();
+            mSharedEgl.initialize(getApplicationContext(), serviceType);
+            mSharedEgl.setListener(() -> {
+                try {
+                    if (sharedViewModel != null && sharedViewModel.getSurfaceModel() != null) {
+                        SurfaceModel sm = sharedViewModel.getSurfaceModel();
+                        if (sm != null && sm.getSurfaceTexture() != null && sm.getWidth() > 0 && sm.getHeight() > 0) {
+                            mSharedEgl.updateActiveServiceSurface(sm.getSurfaceTexture(), sm.getWidth(), sm.getHeight());
+                        }
+                    }
+                } catch (Throwable ignored) {}
+            });
+        } catch (Throwable ignored) {}
     } // end init()
     /* ─────────────────────────────────────────────────────────────────────────
      *  Graceful tear-down helpers

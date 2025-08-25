@@ -122,7 +122,7 @@ public final class BgCastService extends BaseBackgroundService {
         modeLocal = mode;
         fpsLocal = fps;
 
-        // Initialize EGL manager
+        // Initialize EGL manager if not already ready
         int w = videoConfig.videoSize.width;
         int h = videoConfig.videoSize.height;
         videoSize = videoConfig.videoSize;
@@ -131,10 +131,10 @@ public final class BgCastService extends BaseBackgroundService {
         if (sharedViewModel != null) {
             sharedViewModel.setScreenCastVideoConfig(videoConfig, audioConfig);
         }
-        SharedEglManager.cleanAndResetAsync(() -> {
-            mEglManager = SharedEglManager.getInstance();
+        mEglManager = SharedEglManager.getInstance();
+        if (mEglManager != null && !mEglManager.isEglReady()) {
             mEglManager.initialize(getApplicationContext(), ServiceType.BgScreenCast);
-        });
+        }
         mEglManager.setListener(new SharedEglManager.Listener() {
             @Override
             public void onEglReady() {

@@ -88,11 +88,8 @@ public class BgAudioService extends BaseBackgroundService {
 
         mCameraThread.start();
 
-        // Get the singleton instance
-        SharedEglManager.cleanAndResetAsync(() -> {
-            mEglManager = SharedEglManager.getInstance();
-            mEglManager.initialize(getApplicationContext(), ServiceType.BgAudio);
-        });
+        // Use shared EGL initialized centrally; avoid resetting/re-initializing here
+        mEglManager = SharedEglManager.getInstance();
         mEglManager.setListener(new SharedEglManager.Listener() {
             @Override
             public void onEglReady() {
@@ -158,14 +155,7 @@ public class BgAudioService extends BaseBackgroundService {
         return START_STICKY;
     }
 
-    void ckearSharedInctance() {
-        if (mEglManager != null) {
-            mEglManager.shutdown();           // frees GL/streams but leaves sInstance
-            SharedEglManager.cleanAndReset();   // synchronous
-            // SharedEglManager.cleanAndResetAsync(null); // non-blocking
-            mEglManager = null;
-        }
-    }
+    void ckearSharedInctance() { /* no-op to preserve shared EGL */ }
 
     @Override
     public void onDestroy() {

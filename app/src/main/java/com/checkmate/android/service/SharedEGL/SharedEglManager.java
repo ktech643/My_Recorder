@@ -3192,6 +3192,13 @@ public class SharedEglManager {
 
             Log.d(TAG, "Switching active service to: " + newServiceType);
             
+            // During transition, if streaming/recording is active, draw a blank frame with timestamp
+            if (mStreaming || mRecording) {
+                try {
+                    drawBlankFrameWithOverlay();
+                } catch (Throwable ignored) {}
+            }
+
             // Update the active service
             mCurrentActiveService = newServiceType;
             

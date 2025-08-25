@@ -268,21 +268,21 @@ public class BgUSBService extends BaseBackgroundService {
 
             if (!isInitEGL) {
                 isInitEGL = true;
-                // Get the singleton instance
+                // Use shared EGL; initialize only if not ready
                 mEglManager = SharedEglManager.getInstance();
-                mEglManager.initialize(getApplicationContext(), ServiceType.BgUSBCamera);
-            } else {
-                if (mEglManager != null) {
-                    LiveFragment fragment = LiveFragment.getInstance();
-                    if (fragment != null) {
-                        fragment.clearPreview();
-                    }
-                    mServiceHandler.postDelayed(() -> {
-                        if (mEglManager != null) {
-                            mEglManager.notifyEglReady();
-                        }
-                    }, 500);
+                if (mEglManager != null && !mEglManager.isEglReady()) {
+                    mEglManager.initialize(getApplicationContext(), ServiceType.BgUSBCamera);
                 }
+            } else if (mEglManager != null) {
+                LiveFragment fragment = LiveFragment.getInstance();
+                if (fragment != null) {
+                    fragment.clearPreview();
+                }
+                mServiceHandler.postDelayed(() -> {
+                    if (mEglManager != null) {
+                        mEglManager.notifyEglReady();
+                    }
+                }, 500);
             }
         } else {
             Log.e(TAG, "EGL Manager is null in setup");
