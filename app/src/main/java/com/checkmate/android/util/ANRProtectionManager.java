@@ -91,20 +91,6 @@ public class ANRProtectionManager {
     }
     
     /**
-     * Get singleton instance using double-checked locking pattern for thread safety
-     */
-    public static ANRProtectionManager getInstance() {
-        if (sInstance == null) {
-            synchronized (sLock) {
-                if (sInstance == null) {
-                    sInstance = new ANRProtectionManager();
-                }
-            }
-        }
-        return sInstance;
-    }
-    
-    /**
      * Execute preference operation with ANR protection
      */
     public <T> T executePreferenceOperation(String operationKey, PreferenceOperation<T> operation, T defaultValue) {
