@@ -82,6 +82,12 @@ public class PermissionManager {
     }
     
     public PermissionManager(Activity activity, PermissionCallback callback) {
+        if (activity == null) {
+            throw new IllegalArgumentException("Activity cannot be null");
+        }
+        if (callback == null) {
+            throw new IllegalArgumentException("PermissionCallback cannot be null");
+        }
         this.activity = activity;
         this.callback = callback;
         this.mainHandler = new Handler(Looper.getMainLooper());
@@ -271,12 +277,31 @@ public class PermissionManager {
     }
     
     private void requestNormalPermission(PermissionRequest request) {
+        if (request == null || request.permissions == null || request.permissions.length == 0) {
+            Log.e(TAG, "Invalid permission request");
+            isProcessing = false;
+            processNextPermission();
+            return;
+        }
+        
+        if (activity.isFinishing() || activity.isDestroyed()) {
+            Log.w(TAG, "Activity is not in valid state for permission request");
+            isProcessing = false;
+            return;
+        }
+        
         Log.d(TAG, "Requesting permissions: " + Arrays.toString(request.permissions));
-        ActivityCompat.requestPermissions(
-            activity,
-            request.permissions,
-            request.requestCode
-        );
+        try {
+            ActivityCompat.requestPermissions(
+                activity,
+                request.permissions,
+                request.requestCode
+            );
+        } catch (Exception e) {
+            Log.e(TAG, "Error requesting permissions", e);
+            isProcessing = false;
+            processNextPermission();
+        }
     }
     
     private void requestSpecialPermission(PermissionRequest request) {
@@ -305,16 +330,23 @@ public class PermissionManager {
         }
         
         if (intent != null) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            activity.startActivity(intent);
-            
-            // For special permissions, we can't get a direct callback
-            // So we continue after a delay
-            mainHandler.postDelayed(() -> {
+            try {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                activity.startActivity(intent);
+                
+                // For special permissions, we can't get a direct callback
+                // So we continue after a delay
+                mainHandler.postDelayed(() -> {
+                    isProcessing = false;
+                    processNextPermission();
+                }, 1000);
+            } catch (Exception e) {
+                Log.e(TAG, "Error starting special permission activity", e);
                 isProcessing = false;
                 processNextPermission();
-            }, 1000);
+            }
         } else {
+            Log.w(TAG, "No intent created for special permission: " + permission);
             isProcessing = false;
             processNextPermission();
         }

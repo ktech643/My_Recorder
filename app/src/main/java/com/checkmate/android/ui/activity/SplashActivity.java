@@ -57,7 +57,6 @@ import com.checkmate.android.ui.dialog.ActivationDialog;
 import com.checkmate.android.ui.dialog.CodeDialog;
 import com.checkmate.android.ui.dialog.MachineCodeDialog;
 import com.checkmate.android.ui.dialog.SerialDialog;
-import com.blikoon.qrcodescanner.QrCodeActivity;
 import com.checkmate.android.util.StoragePermissionHelper;
 import com.checkmate.android.util.SplashStorageHelper;
 import com.checkmate.android.util.PermissionManager;

@@ -3,6 +3,7 @@ package com.checkmate.android.util;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -48,6 +49,9 @@ public class DialogSynchronizer {
     }
     
     public DialogSynchronizer(Activity activity) {
+        if (activity == null) {
+            throw new IllegalArgumentException("Activity cannot be null");
+        }
         this.activityRef = new WeakReference<>(activity);
         this.mainHandler = new Handler(Looper.getMainLooper());
         this.dialogQueue = new LinkedList<>();
@@ -58,8 +62,13 @@ public class DialogSynchronizer {
      * Show a dialog in a synchronized manner
      */
     public void showDialog(DialogBuilder builder, DialogCallback callback, String tag) {
+        if (builder == null) {
+            Log.e(TAG, "DialogBuilder cannot be null");
+            return;
+        }
+        
         synchronized (lock) {
-            DialogRequest request = new DialogRequest(builder, callback, tag);
+            DialogRequest request = new DialogRequest(builder, callback, tag != null ? tag : "UnnamedDialog");
             dialogQueue.offer(request);
             
             if (!isShowingDialog) {
@@ -85,9 +94,10 @@ public class DialogSynchronizer {
             }
             
             final Activity activity = activityRef.get();
-            if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+            if (activity == null || activity.isFinishing() || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && activity.isDestroyed())) {
                 Log.w(TAG, "Activity is not available, clearing dialog queue");
                 dialogQueue.clear();
+                isShowingDialog = false;
                 return;
             }
             
@@ -118,7 +128,7 @@ public class DialogSynchronizer {
      */
     private void showDialogInternal(DialogRequest request) {
         final Activity activity = activityRef.get();
-        if (activity == null || activity.isFinishing() || activity.isDestroyed()) {
+        if (activity == null || activity.isFinishing() || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && activity.isDestroyed())) {
             synchronized (lock) {
                 isShowingDialog = false;
             }
