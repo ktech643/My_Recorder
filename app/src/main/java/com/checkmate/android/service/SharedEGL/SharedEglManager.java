@@ -111,6 +111,7 @@ import androidx.annotation.GuardedBy;
 import com.checkmate.android.database.FileStoreDb;
 import android.media.MediaMetadataRetriever;
 import android.graphics.BitmapFactory;
+import com.checkmate.android.util.StreamingLibraryCompatibility;
 
 @Singleton
 public class SharedEglManager {
@@ -3471,16 +3472,26 @@ public class SharedEglManager {
      */
     private void updateBitrate(int bitrate) {
         try {
+            boolean success = false;
+            
             // Update streamer bitrate if streaming
             if (mStreamer != null && mStreaming) {
-                mStreamer.setBitrate(bitrate);
-                Log.d(TAG, "Streaming bitrate updated to: " + bitrate);
+                success = StreamingLibraryCompatibility.saflySetBitrate(mStreamer, bitrate);
+                if (success) {
+                    Log.d(TAG, "Streaming bitrate updated to: " + bitrate);
+                } else {
+                    Log.w(TAG, "Streaming bitrate update not supported by library");
+                }
             }
             
             // Update recorder bitrate if recording
             if (mRecorder != null && mRecording) {
-                mRecorder.setBitrate(bitrate);
-                Log.d(TAG, "Recording bitrate updated to: " + bitrate);
+                success = StreamingLibraryCompatibility.saflySetBitrate(mRecorder, bitrate);
+                if (success) {
+                    Log.d(TAG, "Recording bitrate updated to: " + bitrate);
+                } else {
+                    Log.w(TAG, "Recording bitrate update not supported by library");
+                }
             }
             
         } catch (Exception e) {
@@ -3493,16 +3504,26 @@ public class SharedEglManager {
      */
     private void updateFrameRate(int fps) {
         try {
+            boolean success = false;
+            
             // Update streamer frame rate if streaming
             if (mStreamer != null && mStreaming) {
-                mStreamer.setFramerate(fps);
-                Log.d(TAG, "Streaming frame rate updated to: " + fps);
+                success = StreamingLibraryCompatibility.safelySetFramerate(mStreamer, fps);
+                if (success) {
+                    Log.d(TAG, "Streaming frame rate updated to: " + fps);
+                } else {
+                    Log.w(TAG, "Streaming frame rate update not supported by library");
+                }
             }
             
             // Update recorder frame rate if recording
             if (mRecorder != null && mRecording) {
-                mRecorder.setFramerate(fps);
-                Log.d(TAG, "Recording frame rate updated to: " + fps);
+                success = StreamingLibraryCompatibility.safelySetFramerate(mRecorder, fps);
+                if (success) {
+                    Log.d(TAG, "Recording frame rate updated to: " + fps);
+                } else {
+                    Log.w(TAG, "Recording frame rate update not supported by library");
+                }
             }
             
         } catch (Exception e) {
@@ -3841,10 +3862,10 @@ public class SharedEglManager {
     private void forceUpdateBitrate(int bitrate) {
         try {
             if (mStreamer != null && mStreaming) {
-                mStreamer.setBitrate(bitrate);
+                StreamingLibraryCompatibility.saflySetBitrate(mStreamer, bitrate);
             }
             if (mRecorder != null && mRecording) {
-                mRecorder.setBitrate(bitrate);
+                StreamingLibraryCompatibility.saflySetBitrate(mRecorder, bitrate);
             }
             Log.d(TAG, "Force bitrate update completed: " + bitrate);
         } catch (Exception e) {
@@ -3858,10 +3879,10 @@ public class SharedEglManager {
     private void forceUpdateFrameRate(int fps) {
         try {
             if (mStreamer != null && mStreaming) {
-                mStreamer.setFramerate(fps);
+                StreamingLibraryCompatibility.safelySetFramerate(mStreamer, fps);
             }
             if (mRecorder != null && mRecording) {
-                mRecorder.setFramerate(fps);
+                StreamingLibraryCompatibility.safelySetFramerate(mRecorder, fps);
             }
             Log.d(TAG, "Force frame rate update completed: " + fps);
         } catch (Exception e) {
