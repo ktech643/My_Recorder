@@ -3740,12 +3740,12 @@ public class SharedEglManager {
     private void renderTimeOverlay() {
         try {
             synchronized (overlayLock) {
-                if (overlay != null) {
+                if (overlay != null && overlayBmp != null) {
                     String timeText = getCurrentDateTime();
                     setTextForTime(timeText);
                     
-                    // Draw the overlay
-                    overlay.drawFrame();
+                    // Draw the overlay using the correct method
+                    overlay.draw(mScreenWidth, mScreenHeight);
                 }
             }
         } catch (Exception e) {
@@ -3874,9 +3874,11 @@ public class SharedEglManager {
      */
     private void updateSurfacesForNewResolution(int width, int height) {
         try {
-            // Update display surface
+            // Recreate display surface with new dimensions
             if (displaySurface != null) {
-                displaySurface.updateSize(width, height);
+                displaySurface.release();
+                Surface displaySurfaceSurface = new Surface(cameraTexture);
+                displaySurface = new WindowSurfaceNew(eglCore, displaySurfaceSurface, true);
             }
             
             // Recreate overlay for new dimensions

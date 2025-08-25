@@ -355,15 +355,15 @@ public class StreamTransitionManager {
     private void renderOverlayToActiveSurfaces() {
         try {
             // Update overlay texture with current bitmap
-            mTimeOverlay.updateBitmap(mOverlayBitmap);
+            mTimeOverlay.setImage(mOverlayBitmap);
             
             // Render to encoder surfaces maintained by SharedEglManager
             if (mEglManager.isStreaming()) {
-                mTimeOverlay.drawFrame();
+                mTimeOverlay.draw(mOverlayBitmap.getWidth(), mOverlayBitmap.getHeight());
             }
             
             if (mEglManager.isRecording()) {
-                mTimeOverlay.drawFrame();
+                mTimeOverlay.draw(mOverlayBitmap.getWidth(), mOverlayBitmap.getHeight());
             }
             
         } catch (Exception e) {

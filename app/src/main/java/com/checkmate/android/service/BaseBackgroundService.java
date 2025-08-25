@@ -17,6 +17,7 @@ import androidx.core.app.NotificationCompat;
 import com.checkmate.android.R;
 import com.checkmate.android.service.SharedEGL.ServiceType;
 import com.checkmate.android.service.SharedEGL.SharedEglManager;
+import com.checkmate.android.service.StreamTransitionManager;
 import com.checkmate.android.viewmodels.SharedViewModel;
 import java.lang.ref.WeakReference;
 import toothpick.Scope;
