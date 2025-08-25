@@ -146,6 +146,11 @@ import static android.content.Context.ACCESSIBILITY_SERVICE;
 import static com.checkmate.android.util.ResourceUtil.getRecordPath;
 import static com.checkmate.android.util.ResourceUtil.getSdCardPath;
 
+// ANR and Thread Safety imports
+import com.checkmate.android.util.InternalLogger;
+import com.checkmate.android.util.ANRSafeHelper;
+import com.checkmate.android.util.CriticalComponentsMonitor;
+
 public class SettingsFragment extends BaseFragment implements OnStoragePathChangeListener {
 
     private  ActivityFragmentCallbacks mListener;
@@ -346,15 +351,35 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
     }
     @Override
     public void onAttach(Context context) {
-        // TODO Auto-generated method stub
-        super.onAttach(context);
-        instance = new WeakReference<>(this);
-        mActivity = MainActivity.getInstance();
-        if (context instanceof ActivityFragmentCallbacks) {
-            mListener = (ActivityFragmentCallbacks) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
-        }
+        CriticalComponentsMonitor.executeComponentSafely("SettingsFragment.onAttach", () -> {
+            try {
+                super.onAttach(context);
+                instance = new WeakReference<>(this);
+                mActivity = ANRSafeHelper.nullSafe(MainActivity.getInstance(), null, "MainActivity.getInstance");
+                
+                if (ANRSafeHelper.isNullWithLog(context, "context")) {
+                    InternalLogger.e("SettingsFragment", "Context is null in onAttach");
+                    return false;
+                }
+                
+                if (context instanceof ActivityFragmentCallbacks) {
+                    mListener = (ActivityFragmentCallbacks) context;
+                } else {
+                    InternalLogger.e("SettingsFragment", context.toString() + " must implement OnFragmentInteractionListener");
+                    throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+                }
+                
+                InternalLogger.d("SettingsFragment", "onAttach completed successfully");
+                return true;
+                
+            } catch (Exception e) {
+                InternalLogger.e("SettingsFragment", "Error in onAttach", e);
+                return false;
+            }
+        }, () -> {
+            InternalLogger.e("SettingsFragment", "Failed to attach SettingsFragment");
+            return false;
+        });
     }
 
     @Override

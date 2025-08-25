@@ -710,7 +710,7 @@ public class BgCameraService extends BaseBackgroundService {
             mBinderRef.clear();
             mBinderRef = null;
         }
-        ckearSharedInctance();
+        clearSharedInstance();
         if (mCameraThread != null) {
             mCameraThread.quitSafely();
             try {
@@ -721,7 +721,7 @@ public class BgCameraService extends BaseBackgroundService {
         }
     }
 
-    void ckearSharedInctance() {
+    void clearSharedInstance() {
         if (mEglManager != null) {
             mEglManager.shutdown();           // frees GL/streams but leaves sInstance
             SharedEglManager.cleanAndReset();   // synchronous

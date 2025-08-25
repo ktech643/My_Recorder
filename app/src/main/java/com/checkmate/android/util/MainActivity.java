@@ -594,16 +594,21 @@ public class MainActivity extends BaseActivity
                 }
                 
                 CameraInfo cameraInfo = null;
-        }
-
-        for (CameraInfo info : mCameraList) {
-            if (cameraId.equals(info.cameraId)) {
-                cameraInfo = info;
-                break;
+                
+                for (CameraInfo info : mCameraList) {
+                    if (cameraId.equals(info.cameraId)) {
+                        cameraInfo = info;
+                        break;
+                    }
+                }
+                
+                return cameraInfo != null ? cameraInfo : mCameraList.get(0);
+                
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error finding camera info", e);
+                return null;
             }
-        }
-
-        return cameraInfo != null ? cameraInfo : mCameraList.get(0);
+        }, null, "findCameraInfo");
     }
 
 
