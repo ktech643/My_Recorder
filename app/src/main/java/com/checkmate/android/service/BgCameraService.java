@@ -670,55 +670,6 @@ public class BgCameraService extends BaseBackgroundService {
                 return false;
             }
         }, false, 3); // 3 second timeout for cleanup
-        }
-
-        if (isConfigChangeReceiverRegistered && configChangeReceiver != null) {
-            try {
-                unregisterReceiver(configChangeReceiver);
-            } catch (IllegalArgumentException e) {
-                Log.e(TAG, "ConfigChangeReceiver not registered", e);
-            } finally {
-                isConfigChangeReceiverRegistered = false;
-                configChangeReceiver = null;
-            }
-        }
-
-        mCameraHandler.removeCallbacks(reopenRunnable);
-
-        try {
-            if (mCaptureSession != null) {
-                mCaptureSession.stopRepeating();
-                mCaptureSession.abortCaptures();
-                mCaptureSession.close();
-                mCaptureSession = null;
-            }
-        } catch (CameraAccessException e) {
-            Log.e(TAG, "Error stopping capture session", e);
-        }
-
-        if (mCamera2 != null) {
-            mCamera2.close();
-            mCamera2 = null;
-        }
-
-        if (mNotifyCallback != null) {
-            mNotifyCallback.stopService(ServiceType.BgCamera);
-            mNotifyCallback = null;
-        }
-
-        if (mBinderRef != null) {
-            mBinderRef.clear();
-            mBinderRef = null;
-        }
-        clearSharedInstance();
-        if (mCameraThread != null) {
-            mCameraThread.quitSafely();
-            try {
-                mCameraThread.join();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
     }
 
     void clearSharedInstance() {
