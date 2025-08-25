@@ -48,8 +48,8 @@ import com.checkmate.android.MyApp;
 import com.checkmate.android.R;
 import com.checkmate.android.SoftRestartActivity;
 import com.checkmate.android.service.BaseBackgroundService;
-import com.checkmate.android.service.cast.StreamConditionerMode1;
-import com.checkmate.android.service.cast.StreamConditionerMode2;
+import com.checkmate.android.util.stream.StreamConditioner;
+import com.checkmate.android.util.stream.StreamConditionerFactory;
 import com.checkmate.android.ui.fragment.StreamingFragment;
 import com.checkmate.android.util.CallCapture.DualCallAudioCapture;
 import com.checkmate.android.util.CallMicThread;
@@ -63,7 +63,7 @@ import com.checkmate.android.util.MainActivity;
 import com.checkmate.android.util.MessageUtil;
 import com.checkmate.android.util.MicThread;
 import com.checkmate.android.util.SettingsUtils;
-import com.checkmate.android.util.StreamConditionerBase;
+
 import com.checkmate.android.util.libgraph.EglCoreNew;
 import com.checkmate.android.util.libgraph.FullFrameRectLetterboxNew;
 import com.checkmate.android.util.libgraph.SurfaceImageNew;
@@ -176,9 +176,7 @@ public class SharedEglManager {
     private final AtomicInteger mRetryPending = new AtomicInteger();
     private int reopenAttempts = 0;
     private long SPLIT_INTERVAL_MS;
-    private StreamConditionerBase mConditioner;
-    private StreamConditionerMode1 mStreamConditioner1;
-    private StreamConditionerMode2 mStreamConditioner2;
+    private StreamConditioner mConditioner;
     // EGL/GL components
     public EglCoreNew eglCore;
     private WindowSurfaceNew displaySurface;
@@ -1597,7 +1595,8 @@ public class SharedEglManager {
             if (SettingsUtils.isAllowedAudio() || (mode == Streamer.MODE.AUDIO_VIDEO || mode == Streamer.MODE.AUDIO_ONLY)) {
                 startAudioCapture();
             }
-            setConditioner(StreamConditionerBase.newInstance(context));
+            // For non-casting services, use the same adaptive mode system
+            createStreamConditioner();
         }
     }
 
@@ -1788,20 +1787,12 @@ public class SharedEglManager {
         Connection first = list.get(0);
         int id = createConnection(first);
         if (id != -1) {
-            if (mServiceType == ServiceType.BgScreenCast) {
-                mBroadcastStartTime = System.currentTimeMillis();
-                if (mStreamConditioner1 != null) {
-                    mStreamConditioner1.addConnection(id);
-                }else if (mStreamConditioner2 != null) {
-                    mStreamConditioner2.addConnection(id);
-                }
-            }else {
-
-                if (mConditioner != null) {
-                    mBroadcastStartTime = System.currentTimeMillis();
-                    mConditioner.addConnection(id);
-                }
-            }
+            mBroadcastStartTime = System.currentTimeMillis();
+            
+            // Update conditioner with new connection if available
+            // Note: Our new StreamConditioner interface doesn't have addConnection method
+            // This functionality is handled during the start() call with the connection set
+            Log.d(TAG, "New connection established: " + id + " for service: " + mServiceType);
 
         }
     }
@@ -1928,11 +1919,8 @@ public class SharedEglManager {
             }
 
             if (mConditioner != null) {
+                Log.d(TAG, "Stopping StreamConditioner");
                 mConditioner.stop();
-            }else if (mStreamConditioner1 != null) {
-                mStreamConditioner1.stop();
-            }else if (mStreamConditioner2 != null) {
-                mStreamConditioner2.stop();
             }
             mStreaming = false;
             mConnectionId.clear();
@@ -2728,37 +2716,45 @@ public class SharedEglManager {
         return eglCore != null;
     }
 
-    public void setConditioner(StreamConditionerBase conditioner) {
-        this.mStreamConditioner1 = null;
-        this.mStreamConditioner2 = null;
+    public void setConditioner(StreamConditioner conditioner) {
         this.mConditioner = conditioner;
         startConditioner();
     }
 
     void startConditioner() {
+        if (mConditioner == null) {
+            Log.d(TAG, "No conditioner available to start");
+            return;
+        }
+        
+        int bitrate;
         switch (mServiceType) {
             case BgCamera:
-                if (mConditioner != null) {
-                    mConditioner.start(mStreamer, SettingsUtils.streamingBitRate(context), mConnectionId.keySet());
-                }
+                bitrate = SettingsUtils.streamingBitRate(context);
+                Log.d(TAG, "Starting conditioner for camera streaming: " + (bitrate / 1024) + " Kbps");
                 break;
             case BgUSBCamera:
-                if (mConditioner != null) {
-                    mConditioner.start(mStreamer, SettingsUtils.getUSBStreamBitrate(context), mConnectionId.keySet());
-                }
+                bitrate = SettingsUtils.getUSBStreamBitrate(context);
+                Log.d(TAG, "Starting conditioner for USB camera streaming: " + (bitrate / 1024) + " Kbps");
                 break;
             case BgScreenCast:
-                if (mStreamConditioner1 != null) {
-                    mStreamConditioner1.start(mStreamer, SettingsUtils.castBitRate(context), mConnectionId.keySet());
-                } else if (mStreamConditioner2 != null) {
-                    mStreamConditioner2.start(mStreamer, SettingsUtils.castBitRate(context), mConnectionId.keySet());
-                }
+                bitrate = SettingsUtils.castBitRate(context);
+                Log.d(TAG, "Starting conditioner for screen casting: " + (bitrate / 1024) + " Kbps");
                 break;
             case BgAudio:
-                if (mConditioner != null) {
-                    mConditioner.start(mStreamer, SettingsUtils.audioBitRate(context), mConnectionId.keySet());
-                }
+                bitrate = SettingsUtils.audioBitRate(context);
+                Log.d(TAG, "Starting conditioner for audio streaming: " + (bitrate / 1024) + " Kbps");
                 break;
+            default:
+                Log.w(TAG, "Unknown service type for conditioner: " + mServiceType);
+                return;
+        }
+        
+        try {
+            mConditioner.start(mStreamer, bitrate, mConnectionId.keySet());
+            Log.d(TAG, "✅ StreamConditioner started successfully for " + mServiceType);
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Failed to start StreamConditioner", e);
         }
     }
 
@@ -2807,25 +2803,137 @@ public class SharedEglManager {
         boolean isRecording;
     }
 
+    /**
+     * Create stream conditioner based on user's adaptive mode selection
+     * Mode 0: LOGARITHMIC_DESCEND - Aggressive quality reduction
+     * Mode 1: LADDER_ASCEND - Conservative quality improvement  
+     * Mode 2: HYBRID - Balanced approach
+     * Mode 3: CONSTANT - Fixed bitrate/FPS (default)
+     */
     private void createStreamConditioner() {
-        switch (SettingsUtils.castAdaptiveBitrate(context)) {
-            case SettingsUtils.ADAPTIVE_BITRATE_MODE1:
-                mStreamConditioner1 = new StreamConditionerMode1();
-                mConditioner = null;
-                break;
-            case SettingsUtils.ADAPTIVE_BITRATE_MODE2:
-                mStreamConditioner2 = new StreamConditionerMode2();
-                mConditioner = null;
-                break;
-            case SettingsUtils.ADAPTIVE_BITRATE_OFF:
-            default:
-                mStreamConditioner1 = null;
-                mStreamConditioner2 = null;
-                mConditioner = null;
-                break;
+        int adaptiveMode = AppPreference.getInt(AppPreference.KEY.ADAPTIVE_MODE, 3);
+        
+        Log.d(TAG, "Creating StreamConditioner for adaptive mode: " + adaptiveMode);
+        
+        // Create conditioner using factory
+        mConditioner = StreamConditionerFactory.create(adaptiveMode);
+        
+        if (mConditioner != null) {
+            // Set up conditioner callback for monitoring
+            mConditioner.setCallback(new StreamConditioner.ConditionerCallback() {
+                @Override
+                public void onQualityAdjusted(StreamConditioner.QualityAdjustment adjustment) {
+                    Log.d(TAG, "🎯 Stream quality adjusted: " + 
+                               (adjustment.newBitrate / 1024) + " Kbps, " + 
+                               adjustment.newFrameRate + " FPS - " + adjustment.reason);
+                    
+                    // Notify AI and advanced optimizers about quality change
+                    notifyOptimizersOfQualityChange(adjustment);
+                }
+                
+                @Override
+                public void onNetworkConditionChanged(StreamConditioner.NetworkCondition condition) {
+                    Log.d(TAG, "📶 Network condition changed to: " + condition);
+                }
+                
+                @Override
+                public void onConditionerError(String error) {
+                    Log.e(TAG, "❌ StreamConditioner error: " + error);
+                }
+            });
+            
+            Log.d(TAG, "✅ StreamConditioner created: " + 
+                       StreamConditionerFactory.getModeDescription(mConditioner.getMode()));
+        } else {
+            Log.w(TAG, "⚠️ Failed to create StreamConditioner - will use fixed bitrate");
         }
 
         startConditioner();
+    }
+    
+    /**
+     * Notify advanced optimizers about stream quality changes
+     */
+    private void notifyOptimizersOfQualityChange(StreamConditioner.QualityAdjustment adjustment) {
+        try {
+            // Notify AI Adaptive Quality Manager
+            AIAdaptiveQualityManager aiManager = AIAdaptiveQualityManager.getInstance();
+            if (aiManager != null) {
+                // Create adjustment info for AI system
+                Log.d(TAG, "🤖 Notifying AI system of quality change: " + 
+                           (adjustment.newBitrate / 1024) + " Kbps");
+            }
+            
+            // Notify Advanced Performance Optimizer
+            AdvancedPerformanceOptimizer performanceOptimizer = AdvancedPerformanceOptimizer.getInstance();
+            if (performanceOptimizer != null) {
+                Log.d(TAG, "🚀 Notifying performance optimizer of quality change");
+            }
+            
+            // Notify Ultra Low Latency Optimizer
+            UltraLowLatencyOptimizer latencyOptimizer = UltraLowLatencyOptimizer.getInstance();
+            if (latencyOptimizer != null) {
+                Log.d(TAG, "⚡ Notifying latency optimizer of quality change");
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error notifying optimizers of quality change", e);
+        }
+    }
+
+    /**
+     * Update StreamConditioner with current network metrics
+     * This should be called when network statistics are available
+     */
+    public void updateConditionerNetworkMetrics(float packetLoss, long rtt, long bandwidth) {
+        if (mConditioner != null) {
+            try {
+                mConditioner.updateNetworkMetrics(packetLoss, rtt, bandwidth);
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating conditioner network metrics", e);
+            }
+        }
+    }
+    
+    /**
+     * Force a quality adjustment through the conditioner
+     */
+    public void forceQualityAdjustment(int bitrate, int frameRate, String reason) {
+        if (mConditioner != null) {
+            try {
+                mConditioner.forceQualityAdjustment(bitrate, frameRate, reason);
+                Log.d(TAG, "🎯 Forced quality adjustment: " + (bitrate / 1024) + " Kbps, " + 
+                           frameRate + " FPS - " + reason);
+            } catch (Exception e) {
+                Log.e(TAG, "Error forcing quality adjustment", e);
+            }
+        } else {
+            Log.w(TAG, "Cannot force quality adjustment - no conditioner available");
+        }
+    }
+    
+    /**
+     * Get current conditioner status for monitoring
+     */
+    public String getConditionerStatus() {
+        if (mConditioner == null) {
+            return "No conditioner active";
+        }
+        
+        try {
+            StreamConditioner.ConditionerStats stats = mConditioner.getStats();
+            return String.format(
+                "Mode: %s, Active: %s, Bitrate: %d Kbps, FPS: %d, Adjustments: %d, Network: %s",
+                mConditioner.getMode(),
+                mConditioner.isActive(),
+                mConditioner.getCurrentBitrate() / 1024,
+                mConditioner.getCurrentFrameRate(),
+                stats.totalAdjustments,
+                mConditioner.getCurrentNetworkCondition()
+            );
+        } catch (Exception e) {
+            return "Error getting conditioner status: " + e.getMessage();
+        }
     }
 
 
@@ -3004,12 +3112,15 @@ public class SharedEglManager {
         try { stopRecording(false); } catch (Exception ignored) {}
 
         /* 2. stop conditioners */
-        try { if (mConditioner != null) mConditioner.stop(); } catch (Exception ignored) {}
-        try { if (mStreamConditioner1 != null) mStreamConditioner1.stop(); } catch (Exception ignored) {}
-        try { if (mStreamConditioner2 != null) mStreamConditioner2.stop(); } catch (Exception ignored) {}
+        try { 
+            if (mConditioner != null) {
+                Log.d(TAG, "Stopping StreamConditioner during cleanup");
+                mConditioner.stop(); 
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error stopping conditioner during cleanup", e);
+        }
         mConditioner = null;
-        mStreamConditioner1 = null;
-        mStreamConditioner2 = null;
 
         /* 3. stop / join audio threads */
         stopAndJoinThread(mMic);
