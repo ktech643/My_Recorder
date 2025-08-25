@@ -1,9 +1,28 @@
 package com.checkmate.android;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+
+import com.checkmate.android.logging.InternalLogger;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class AppPreference {
-    private static SharedPreferences instance = null;
+    private static final String TAG = "AppPreference";
+    private static volatile SharedPreferences instance = null;
+    private static final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final ConcurrentHashMap<String, Object> cache = new ConcurrentHashMap<>();
+    private static Handler backgroundHandler;
+    private static HandlerThread handlerThread;
+    private static final int TIMEOUT_MS = 3000; // 3 seconds timeout for operations
+    private static volatile boolean isInitialized = false;
 
     public static class KEY {
         // settings
@@ -177,63 +196,301 @@ public class AppPreference {
     }
 
     public static void initialize(SharedPreferences pref) {
-        instance = pref;
+        if (pref == null) {
+            InternalLogger.e(TAG, "Cannot initialize with null SharedPreferences");
+            return;
+        }
+        
+        lock.writeLock().lock();
+        try {
+            instance = pref;
+            
+            // Initialize background handler for async operations
+            if (handlerThread == null) {
+                handlerThread = new HandlerThread("AppPreferenceThread");
+                handlerThread.start();
+                backgroundHandler = new Handler(handlerThread.getLooper());
+            }
+            
+            isInitialized = true;
+            InternalLogger.i(TAG, "AppPreference initialized successfully");
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     // check contain
     public static boolean contains(String key) {
-        return instance.contains(key);
+        if (!checkInitialized() || key == null) {
+            return false;
+        }
+        
+        lock.readLock().lock();
+        try {
+            // Check cache first
+            if (cache.containsKey(key)) {
+                return true;
+            }
+            
+            // Fallback to SharedPreferences with timeout
+            return executeWithTimeout(() -> instance.contains(key), false);
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     // boolean
     public static boolean getBool(String key, boolean def) {
-        return instance.getBoolean(key, def);
+        if (!checkInitialized() || key == null) {
+            InternalLogger.w(TAG, "getBool called with invalid state, key: " + key);
+            return def;
+        }
+        
+        lock.readLock().lock();
+        try {
+            // Check cache first
+            Object cached = cache.get(key);
+            if (cached instanceof Boolean) {
+                return (Boolean) cached;
+            }
+            
+            // Read from SharedPreferences with timeout
+            boolean value = executeWithTimeout(() -> instance.getBoolean(key, def), def);
+            cache.put(key, value);
+            return value;
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error getting boolean value for key: " + key, e);
+            return def;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public static void setBool(String key, boolean value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putBoolean(key, value);
-        editor.commit();
+        if (!checkInitialized() || key == null) {
+            InternalLogger.e(TAG, "setBool called with invalid state, key: " + key);
+            return;
+        }
+        
+        lock.writeLock().lock();
+        try {
+            // Update cache immediately
+            cache.put(key, value);
+            
+            // Async write to SharedPreferences
+            backgroundHandler.post(() -> {
+                try {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putBoolean(key, value);
+                    editor.apply(); // Use apply for async write
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error setting boolean value for key: " + key, e);
+                    // Remove from cache on error
+                    cache.remove(key);
+                }
+            });
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     // int
     public static int getInt(String key, int def) {
-        return instance.getInt(key, def);
+        if (!checkInitialized() || key == null) {
+            InternalLogger.w(TAG, "getInt called with invalid state, key: " + key);
+            return def;
+        }
+        
+        lock.readLock().lock();
+        try {
+            // Check cache first
+            Object cached = cache.get(key);
+            if (cached instanceof Integer) {
+                return (Integer) cached;
+            }
+            
+            // Read from SharedPreferences with timeout
+            int value = executeWithTimeout(() -> instance.getInt(key, def), def);
+            cache.put(key, value);
+            return value;
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error getting int value for key: " + key, e);
+            return def;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public static void setInt(String key, int value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putInt(key, value);
-        editor.commit();
+        if (!checkInitialized() || key == null) {
+            InternalLogger.e(TAG, "setInt called with invalid state, key: " + key);
+            return;
+        }
+        
+        lock.writeLock().lock();
+        try {
+            // Update cache immediately
+            cache.put(key, value);
+            
+            // Async write to SharedPreferences
+            backgroundHandler.post(() -> {
+                try {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putInt(key, value);
+                    editor.apply();
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error setting int value for key: " + key, e);
+                    cache.remove(key);
+                }
+            });
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     // long
     public static long getLong(String key, long def) {
-        return instance.getLong(key, def);
+        if (!checkInitialized() || key == null) {
+            InternalLogger.w(TAG, "getLong called with invalid state, key: " + key);
+            return def;
+        }
+        
+        lock.readLock().lock();
+        try {
+            // Check cache first
+            Object cached = cache.get(key);
+            if (cached instanceof Long) {
+                return (Long) cached;
+            }
+            
+            // Read from SharedPreferences with timeout
+            long value = executeWithTimeout(() -> instance.getLong(key, def), def);
+            cache.put(key, value);
+            return value;
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error getting long value for key: " + key, e);
+            return def;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public static void setLong(String key, long value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putLong(key, value);
-        editor.apply();
+        if (!checkInitialized() || key == null) {
+            InternalLogger.e(TAG, "setLong called with invalid state, key: " + key);
+            return;
+        }
+        
+        lock.writeLock().lock();
+        try {
+            // Update cache immediately
+            cache.put(key, value);
+            
+            // Async write to SharedPreferences
+            backgroundHandler.post(() -> {
+                try {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putLong(key, value);
+                    editor.apply();
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error setting long value for key: " + key, e);
+                    cache.remove(key);
+                }
+            });
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     // string
     public static String getStr(String key, String def) {
-        return instance.getString(key, def);
+        if (!checkInitialized() || key == null) {
+            InternalLogger.w(TAG, "getStr called with invalid state, key: " + key);
+            return def;
+        }
+        
+        lock.readLock().lock();
+        try {
+            // Check cache first
+            Object cached = cache.get(key);
+            if (cached instanceof String) {
+                return (String) cached;
+            }
+            
+            // Read from SharedPreferences with timeout
+            String value = executeWithTimeout(() -> instance.getString(key, def), def);
+            if (value != null) {
+                cache.put(key, value);
+            }
+            return value;
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error getting string value for key: " + key, e);
+            return def;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public static void setStr(String key, String value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putString(key, value);
-        editor.apply();
+        if (!checkInitialized() || key == null) {
+            InternalLogger.e(TAG, "setStr called with invalid state, key: " + key);
+            return;
+        }
+        
+        lock.writeLock().lock();
+        try {
+            // Update cache immediately
+            if (value != null) {
+                cache.put(key, value);
+            } else {
+                cache.remove(key);
+            }
+            
+            // Async write to SharedPreferences
+            backgroundHandler.post(() -> {
+                try {
+                    SharedPreferences.Editor editor = instance.edit();
+                    if (value != null) {
+                        editor.putString(key, value);
+                    } else {
+                        editor.remove(key);
+                    }
+                    editor.apply();
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error setting string value for key: " + key, e);
+                    cache.remove(key);
+                }
+            });
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     // remove
     public static void removeKey(String key) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.remove(key);
-        editor.apply();
+        if (!checkInitialized() || key == null) {
+            InternalLogger.e(TAG, "removeKey called with invalid state, key: " + key);
+            return;
+        }
+        
+        lock.writeLock().lock();
+        try {
+            // Remove from cache immediately
+            cache.remove(key);
+            
+            // Async remove from SharedPreferences
+            backgroundHandler.post(() -> {
+                try {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.remove(key);
+                    editor.apply();
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error removing key: " + key, e);
+                }
+            });
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
     
     // Rotation settings methods
@@ -257,6 +514,109 @@ public class AppPreference {
     
     public static void resetRotationSettings() {
         saveRotationSettings(0, false, false);
+    }
+    
+    // Helper methods for thread-safe operations
+    private static boolean checkInitialized() {
+        if (!isInitialized) {
+            InternalLogger.e(TAG, "AppPreference not initialized. Call initialize() first.");
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Execute an operation with timeout to prevent ANR
+     */
+    private static <T> T executeWithTimeout(java.util.concurrent.Callable<T> task, T defaultValue) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            // We're on the main thread, execute asynchronously
+            return executeAsync(task, defaultValue);
+        } else {
+            // We're on a background thread, execute directly
+            try {
+                return task.call();
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error executing task", e);
+                return defaultValue;
+            }
+        }
+    }
+    
+    /**
+     * Execute task asynchronously to avoid blocking main thread
+     */
+    private static <T> T executeAsync(java.util.concurrent.Callable<T> task, T defaultValue) {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final Object[] result = new Object[1];
+        
+        backgroundHandler.post(() -> {
+            try {
+                result[0] = task.call();
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in async task", e);
+                result[0] = defaultValue;
+            } finally {
+                latch.countDown();
+            }
+        });
+        
+        try {
+            if (latch.await(TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+                return (T) result[0];
+            } else {
+                InternalLogger.w(TAG, "Operation timed out, returning default value");
+                return defaultValue;
+            }
+        } catch (InterruptedException e) {
+            InternalLogger.e(TAG, "Operation interrupted", e);
+            return defaultValue;
+        }
+    }
+    
+    /**
+     * Clear all cached values
+     */
+    public static void clearCache() {
+        lock.writeLock().lock();
+        try {
+            cache.clear();
+            InternalLogger.i(TAG, "Cache cleared");
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+    
+    /**
+     * Force synchronize cache with SharedPreferences
+     */
+    public static void syncCache() {
+        if (!checkInitialized()) {
+            return;
+        }
+        
+        backgroundHandler.post(() -> {
+            lock.writeLock().lock();
+            try {
+                cache.clear();
+                InternalLogger.i(TAG, "Cache synchronized with SharedPreferences");
+            } finally {
+                lock.writeLock().unlock();
+            }
+        });
+    }
+    
+    /**
+     * Shutdown the background handler
+     */
+    public static void shutdown() {
+        if (handlerThread != null) {
+            handlerThread.quitSafely();
+            handlerThread = null;
+            backgroundHandler = null;
+        }
+        clearCache();
+        isInitialized = false;
     }
 
 }

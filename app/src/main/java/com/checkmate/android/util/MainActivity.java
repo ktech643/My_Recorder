@@ -144,6 +144,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.checkmate.android.AppPreference.KEY.RECORD_AUDIO;
+
+import com.checkmate.android.logging.InternalLogger;
+import com.checkmate.android.util.ThreadSafetyUtils;
 /*  ╭──────────────────────────────────────────────────────────────────────────╮
     │  Class Declaration                                                       │
     ╰──────────────────────────────────────────────────────────────────────────╯ */
@@ -317,12 +320,15 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,WindowManager.LayoutParams.FLAG_SECURE);
+        InternalLogger.i(TAG, "MainActivity onCreate started");
+        
+        try {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,WindowManager.LayoutParams.FLAG_SECURE);
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // kept once
-        setContentView(R.layout.activity_service);
-        instance = this;
-        fragmentManager = getSupportFragmentManager();
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // kept once
+            setContentView(R.layout.activity_service);
+            instance = this;
+            fragmentManager = getSupportFragmentManager();
 
         dlg_progress = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.PIE_DETERMINATE)
@@ -341,6 +347,12 @@ public class MainActivity extends BaseActivity
 
         init();
         showChessIfNeeded();
+        
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in onCreate", e);
+            // Try to recover from critical errors
+            finish();
+        }
     }
 
     private void showChessIfNeeded() {
@@ -415,27 +427,44 @@ public class MainActivity extends BaseActivity
      *  Camera-selection pop-up for USB list
      * ──────────────────────────────────────────────────────────────────────── */
     public void showCamerasList(String[] names) {
-        Log.e(TAG, "showCamerasList triggered");
-        boolean isChessPin = AppPreference.getBool(AppPreference.KEY.CHESS_MODE_PIN, false);
-
-        if (!isChessPin) {
-            // show popup activity after a short delay to let UI settle
-            handler.postDelayed(() -> {
-                Intent i = new Intent(MainActivity.this, UsbPopupActivity.class);
-                i.putExtra("list", names);
-                startActivityForResult(i, REQUEST_CODE_INTENT);
-            }, 500);
-        } else {
-            // default to first index when PIN-locked chess mode is active
-            int selectedIndex = 0;
-            if (liveFragment != null && liveFragment.is_usb_opened) {
-                if (mUSBService != null) {
-                    mUSBService.selectedPositionForCameraList(selectedIndex);
-                } else {
-                    startBgUSB();     // kick service if not yet running
-                }
-            }
+        InternalLogger.d(TAG, "showCamerasList triggered");
+        
+        // Null safety check
+        if (names == null || names.length == 0) {
+            InternalLogger.w(TAG, "showCamerasList called with null or empty names");
+            return;
         }
+        
+        ThreadSafetyUtils.runOnMainThread(() -> {
+            try {
+                boolean isChessPin = AppPreference.getBool(AppPreference.KEY.CHESS_MODE_PIN, false);
+
+                if (!isChessPin) {
+                    // show popup activity after a short delay to let UI settle
+                    if (handler != null) {
+                        handler.postDelayed(() -> {
+                            if (!isFinishing() && !isDestroyed()) {
+                                Intent i = new Intent(MainActivity.this, UsbPopupActivity.class);
+                                i.putExtra("list", names);
+                                startActivityForResult(i, REQUEST_CODE_INTENT);
+                            }
+                        }, 500);
+                    }
+                } else {
+                    // default to first index when PIN-locked chess mode is active
+                    int selectedIndex = 0;
+                    if (liveFragment != null && liveFragment.is_usb_opened) {
+                        if (mUSBService != null) {
+                            mUSBService.selectedPositionForCameraList(selectedIndex);
+                        } else {
+                            startBgUSB();     // kick service if not yet running
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in showCamerasList", e);
+            }
+        });
     }
 
     /* ─────────────────────────────────────────────────────────────────────────
@@ -496,25 +525,29 @@ public class MainActivity extends BaseActivity
      * ──────────────────────────────────────────────────────────────────────── */
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     void init() {
-
-        /* Battery-optimisation & WRITE_SETTINGS prompts */
-        requestIgnoreBatteryOptimizationsPermission(this);
-        if (!Settings.System.canWrite(this)) {
-            Intent i = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                    .setData(Uri.parse("package:" + getPackageName()));
-            startActivityForResult(i, REQUEST_CODE_Write);
-        }
-
-       // checkAccessService();                              // ensure accessibility service
-        sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        // Initialize views
-        bottom_tab = findViewById(R.id.bottom_tab);
-        txt_record = findViewById(R.id.txt_record);
-        flImages = findViewById(R.id.flImages);
+        InternalLogger.i(TAG, "Initializing MainActivity");
         
-        flImages.setVisibility(View.GONE);
+        try {
+            /* Battery-optimisation & WRITE_SETTINGS prompts */
+            requestIgnoreBatteryOptimizationsPermission(this);
+            if (!Settings.System.canWrite(this)) {
+                Intent i = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+                        .setData(Uri.parse("package:" + getPackageName()));
+                startActivityForResult(i, REQUEST_CODE_Write);
+            }
+
+           // checkAccessService();                              // ensure accessibility service
+            sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
+
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            // Initialize views
+            bottom_tab = findViewById(R.id.bottom_tab);
+            txt_record = findViewById(R.id.txt_record);
+            flImages = findViewById(R.id.flImages);
+            
+            if (flImages != null) {
+                flImages.setVisibility(View.GONE);
+            }
 
         /* ── USB permission handling ─────────────────────────────────────── */
         usbManager       = (UsbManager) getSystemService(USB_SERVICE);
@@ -621,6 +654,18 @@ public class MainActivity extends BaseActivity
         setCallbacks();        // native logging hooks
         OpenLog();             // create log dir & native writer
         initNetworkTimer();    // periodic UI updates
+        
+        InternalLogger.i(TAG, "MainActivity initialization completed successfully");
+        
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error during initialization", e);
+            // Show error to user
+            ThreadSafetyUtils.runOnMainThread(() -> {
+                if (!isFinishing()) {
+                    Toast.makeText(this, "Initialization error. Please restart the app.", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     } // end init()
     /* ─────────────────────────────────────────────────────────────────────────
      *  Graceful tear-down helpers
@@ -680,19 +725,35 @@ public class MainActivity extends BaseActivity
      *  Audio callback from BgAudioService
      * ──────────────────────────────────────────────────────────────────────── */
     public void onAudioDelivered(byte[] data, int chanCnt, int sampleRate) {
-        runOnUiThread(() -> {
-            if (!AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false)) {
-                sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, false);
-                return;
-            }
+        // Null safety check
+        if (data == null || data.length == 0) {
+            InternalLogger.w(TAG, "onAudioDelivered called with null or empty data");
+            return;
+        }
+        
+        ThreadSafetyUtils.runOnMainThread(() -> {
+            try {
+                if (!AppPreference.getBool(AppPreference.KEY.RECORD_AUDIO, false)) {
+                    if (sharedViewModel != null) {
+                        sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, false);
+                    }
+                    return;
+                }
 
-            boolean vuVisible = AppPreference.getBool(AppPreference.KEY.VU_METER, true);
-            LiveFragment live = LiveFragment.getInstance();
-            if (vuVisible && live != null && live.mVuMeter != null) {
-                live.mVuMeter.putBuffer(data, chanCnt, sampleRate);
-                sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, true);
-            } else {
-                sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, false);
+                boolean vuVisible = AppPreference.getBool(AppPreference.KEY.VU_METER, true);
+                LiveFragment live = LiveFragment.getInstance();
+                if (vuVisible && live != null && live.mVuMeter != null) {
+                    live.mVuMeter.putBuffer(data, chanCnt, sampleRate);
+                    if (sharedViewModel != null) {
+                        sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, true);
+                    }
+                } else {
+                    if (sharedViewModel != null) {
+                        sharedViewModel.postEvent(EventType.VU_METER_VISIBLE, false);
+                    }
+                }
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in onAudioDelivered", e);
             }
         });
     }

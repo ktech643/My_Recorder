@@ -63,6 +63,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.checkmate.android.logging.InternalLogger;
+import com.checkmate.android.util.ThreadSafetyUtils;
+
 @SuppressLint("NonConstantResourceId")
 public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSelectedListener - was for old spinner implementation
     private static final String TAG = "LiveFragment";
@@ -187,18 +190,21 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View mView = inflater.inflate(R.layout.fragment_live, container, false);
+        InternalLogger.i(TAG, "onCreateView called");
         
-        // Initialize UI components
-        frame_camera = mView.findViewById(R.id.frame_camera);
-        ly_cast = mView.findViewById(R.id.ly_cast);
-        ly_audio = mView.findViewById(R.id.ly_audio);
-        ly_menu = mView.findViewById(R.id.ly_menu);
-        ly_stream = mView.findViewById(R.id.ly_stream);
-        ly_rotate = mView.findViewById(R.id.ly_rotate);
-        ly_camera_type = mView.findViewById(R.id.ly_camera_type);
-        ly_rec = mView.findViewById(R.id.ly_rec);
-        ly_snap = mView.findViewById(R.id.ly_snap);
+        try {
+            View mView = inflater.inflate(R.layout.fragment_live, container, false);
+            
+            // Initialize UI components with null checks
+            frame_camera = mView.findViewById(R.id.frame_camera);
+            ly_cast = mView.findViewById(R.id.ly_cast);
+            ly_audio = mView.findViewById(R.id.ly_audio);
+            ly_menu = mView.findViewById(R.id.ly_menu);
+            ly_stream = mView.findViewById(R.id.ly_stream);
+            ly_rotate = mView.findViewById(R.id.ly_rotate);
+            ly_camera_type = mView.findViewById(R.id.ly_camera_type);
+            ly_rec = mView.findViewById(R.id.ly_rec);
+            ly_snap = mView.findViewById(R.id.ly_snap);
         
         ic_stream = mView.findViewById(R.id.ic_stream);
         ic_rotate = mView.findViewById(R.id.ic_rotate);
@@ -234,10 +240,23 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
         instance = new WeakReference<>(this);
 
         if (AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false)) {
-            ic_stream.setImageResource(R.mipmap.ic_stream_active);
+            if (ic_stream != null) {
+                ic_stream.setImageResource(R.mipmap.ic_stream_active);
+            }
         }
         initializeServices();
+        
+        InternalLogger.i(TAG, "onCreateView completed successfully");
         return mView;
+        
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in onCreateView", e);
+            // Return a basic error view if initialization fails
+            TextView errorView = new TextView(getContext());
+            errorView.setText("Error loading fragment");
+            errorView.setTextColor(Color.RED);
+            return errorView;
+        }
     }
 
     @Override
@@ -685,30 +704,54 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
     }
 
     public void OnClick(View view) {
-        switch (view.getId()) {
-            case R.id.ly_camera_type:
-                showCameraSelectionBottomSheet();
-                break;
-            case R.id.ly_rotate:
-                if (mActivityRef != null && mActivityRef.get() != null && (is_rec || mActivityRef.get().isWifiRecording())) {
-                    return;
-                }
-                showRotationBottomSheet();
-                break;
-            case R.id.btn_refresh:
-                if (streaming_camera != null) playStream(streaming_camera);
-                break;
-            case R.id.ly_stream:
-                is_streaming = true;
-                onStream();
-                break;
-            case R.id.ly_rec:
-                onRec();
-                break;
-            case R.id.ly_snap:
-                onSnapshot();
-                break;
+        if (view == null) {
+            InternalLogger.w(TAG, "OnClick called with null view");
+            return;
         }
+        
+        ThreadSafetyUtils.runOnMainThread(() -> {
+            try {
+                int viewId = view.getId();
+                InternalLogger.d(TAG, "OnClick called for view id: " + viewId);
+                
+                switch (viewId) {
+                    case R.id.ly_camera_type:
+                        showCameraSelectionBottomSheet();
+                        break;
+                    case R.id.ly_rotate:
+                        MainActivity activity = ThreadSafetyUtils.getOrDefault(
+                            mActivityRef != null ? mActivityRef.get() : null, null);
+                        if (activity != null && (is_rec || activity.isWifiRecording())) {
+                            InternalLogger.d(TAG, "Cannot rotate while recording");
+                            return;
+                        }
+                        showRotationBottomSheet();
+                        break;
+                    case R.id.btn_refresh:
+                        if (streaming_camera != null) {
+                            playStream(streaming_camera);
+                        } else {
+                            InternalLogger.w(TAG, "Cannot refresh - streaming_camera is null");
+                        }
+                        break;
+                    case R.id.ly_stream:
+                        is_streaming = true;
+                        onStream();
+                        break;
+                    case R.id.ly_rec:
+                        onRec();
+                        break;
+                    case R.id.ly_snap:
+                        onSnapshot();
+                        break;
+                    default:
+                        InternalLogger.w(TAG, "Unknown view clicked: " + viewId);
+                        break;
+                }
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in OnClick", e);
+            }
+        });
     }
 
     // Removed onItemSelected and onNothingSelected - was for old spinner implementation
@@ -1802,107 +1845,188 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
 
     // Add missing methods that were accidentally removed
     private void onStream() {
-        if (mActivityRef == null || mActivityRef.get() == null) return;
+        InternalLogger.d(TAG, "onStream called");
         
-        MainActivity activity = mActivityRef.get();
-        if (is_camera_opened) {
-            if (activity.isCamStreaming()) {
-                activity.stopCamStream();
-                ic_stream.setImageResource(R.mipmap.ic_stream);
-            } else {
-                activity.startStream();
-                ic_stream.setImageResource(R.mipmap.ic_stream_active);
-            }
-        } else if (is_usb_opened) {
-            if (activity.isUSBStreaming()) {
-                activity.stopUsbStream();
-                ic_stream.setImageResource(R.mipmap.ic_stream);
-            } else {
-                activity.startStream();
-                ic_stream.setImageResource(R.mipmap.ic_stream_active);
-            }
-        } else if (is_cast_opened) {
-            if (activity.isCastStreaming()) {
-                activity.stopCastStream();
-                ic_stream.setImageResource(R.mipmap.ic_stream);
-            } else {
-                activity.onCastStream();
-                ic_stream.setImageResource(R.mipmap.ic_stream_active);
-            }
-        } else if (is_audio_only) {
-            if (activity.isAudioStreaming()) {
-                activity.stopAudioStream();
-                ic_stream.setImageResource(R.mipmap.ic_stream);
-            } else {
-                activity.startStream();
-                ic_stream.setImageResource(R.mipmap.ic_stream_active);
-            }
-        } else if (is_wifi_opened && AppConstant.is_library_use && activity.mWifiService != null) {
-            if (activity.isWifiStreaming()) {
-                activity.stopWifiStreaming();
-                ic_stream.setImageResource(R.mipmap.ic_stream);
-            } else {
-                activity.startWifiStreaming();
-                ic_stream.setImageResource(R.mipmap.ic_stream_active);
-            }
+        MainActivity activity = ThreadSafetyUtils.getOrDefault(
+            mActivityRef != null ? mActivityRef.get() : null, null);
+        if (activity == null) {
+            InternalLogger.w(TAG, "Cannot stream - activity is null");
+            return;
         }
+        
+        ThreadSafetyUtils.runOnMainThread(() -> {
+            try {
+                if (is_camera_opened) {
+                    if (activity.isCamStreaming()) {
+                        activity.stopCamStream();
+                        if (ic_stream != null) {
+                            ic_stream.setImageResource(R.mipmap.ic_stream);
+                        }
+                    } else {
+                        activity.startStream();
+                        if (ic_stream != null) {
+                            ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                        }
+                    }
+                } else if (is_usb_opened) {
+                    if (activity.isUSBStreaming()) {
+                        activity.stopUsbStream();
+                        if (ic_stream != null) {
+                            ic_stream.setImageResource(R.mipmap.ic_stream);
+                        }
+                    } else {
+                        activity.startStream();
+                        if (ic_stream != null) {
+                            ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                        }
+                    }
+                } else if (is_cast_opened) {
+                    if (activity.isCastStreaming()) {
+                        activity.stopCastStream();
+                        if (ic_stream != null) {
+                            ic_stream.setImageResource(R.mipmap.ic_stream);
+                        }
+                    } else {
+                        activity.onCastStream();
+                        if (ic_stream != null) {
+                            ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                        }
+                    }
+                } else if (is_audio_only) {
+                    if (activity.isAudioStreaming()) {
+                        activity.stopAudioStream();
+                        if (ic_stream != null) {
+                            ic_stream.setImageResource(R.mipmap.ic_stream);
+                        }
+                    } else {
+                        activity.startStream();
+                        if (ic_stream != null) {
+                            ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                        }
+                    }
+                } else if (is_wifi_opened && AppConstant.is_library_use && activity.mWifiService != null) {
+                    if (activity.isWifiStreaming()) {
+                        activity.stopWifiStreaming();
+                        if (ic_stream != null) {
+                            ic_stream.setImageResource(R.mipmap.ic_stream);
+                        }
+                    } else {
+                        activity.startWifiStreaming();
+                        if (ic_stream != null) {
+                            ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in onStream", e);
+            }
+        });
     }
 
     private void onRec() {
-        if (mActivityRef == null || mActivityRef.get() == null) return;
+        InternalLogger.d(TAG, "onRec called");
         
-        MainActivity activity = mActivityRef.get();
-        if (is_camera_opened) {
-            if (activity.isRecordingCamera()) {
-                activity.stopRecord();
-                ic_rec.setImageResource(R.mipmap.ic_radio);
-            } else {
-                activity.startRecord();
-                ic_rec.setImageResource(R.mipmap.ic_radio_active);
-            }
-        } else if (is_usb_opened) {
-            if (activity.isRecordingUSB()) {
-                activity.stopRecord();
-                ic_rec.setImageResource(R.mipmap.ic_radio);
-            } else {
-                activity.startRecord();
-                ic_rec.setImageResource(R.mipmap.ic_radio_active);
-            }
-        } else if (is_cast_opened) {
-            if (activity.isCastRecording()) {
-                mListener.stopFragBgCast();
-                ic_rec.setImageResource(R.mipmap.ic_radio);
-            } else {
-                mListener.startCastRecording();
-                ic_rec.setImageResource(R.mipmap.ic_radio_active);
-            }
-        } else if (is_audio_only) {
-            if (activity.isAudioRecording()) {
-                activity.stopRecord();
-                ic_rec.setImageResource(R.mipmap.ic_radio);
-            } else {
-                activity.startRecord();
-                ic_rec.setImageResource(R.mipmap.ic_radio_active);
-            }
+        MainActivity activity = ThreadSafetyUtils.getOrDefault(
+            mActivityRef != null ? mActivityRef.get() : null, null);
+        if (activity == null) {
+            InternalLogger.w(TAG, "Cannot record - activity is null");
+            return;
         }
+        
+        ThreadSafetyUtils.runOnMainThread(() -> {
+            try {
+                if (is_camera_opened) {
+                    if (activity.isRecordingCamera()) {
+                        activity.stopRecord();
+                        if (ic_rec != null) {
+                            ic_rec.setImageResource(R.mipmap.ic_radio);
+                        }
+                    } else {
+                        activity.startRecord();
+                        if (ic_rec != null) {
+                            ic_rec.setImageResource(R.mipmap.ic_radio_active);
+                        }
+                    }
+                } else if (is_usb_opened) {
+                    if (activity.isRecordingUSB()) {
+                        activity.stopRecord();
+                        if (ic_rec != null) {
+                            ic_rec.setImageResource(R.mipmap.ic_radio);
+                        }
+                    } else {
+                        activity.startRecord();
+                        if (ic_rec != null) {
+                            ic_rec.setImageResource(R.mipmap.ic_radio_active);
+                        }
+                    }
+                } else if (is_cast_opened) {
+                    if (activity.isCastRecording()) {
+                        if (mListener != null) {
+                            mListener.stopFragBgCast();
+                        }
+                        if (ic_rec != null) {
+                            ic_rec.setImageResource(R.mipmap.ic_radio);
+                        }
+                    } else {
+                        if (mListener != null) {
+                            mListener.startCastRecording();
+                        }
+                        if (ic_rec != null) {
+                            ic_rec.setImageResource(R.mipmap.ic_radio_active);
+                        }
+                    }
+                } else if (is_audio_only) {
+                    if (activity.isAudioRecording()) {
+                        activity.stopRecord();
+                        if (ic_rec != null) {
+                            ic_rec.setImageResource(R.mipmap.ic_radio);
+                        }
+                    } else {
+                        activity.startRecord();
+                        if (ic_rec != null) {
+                            ic_rec.setImageResource(R.mipmap.ic_radio_active);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in onRec", e);
+            }
+        });
     }
 
     private void onSnapshot() {
-        if (mActivityRef == null || mActivityRef.get() == null) return;
+        InternalLogger.d(TAG, "onSnapshot called");
         
-        MainActivity activity = mActivityRef.get();
-        if (is_camera_opened) {
-            activity.takeSnapshot();
-        } else if (is_usb_opened) {
-            activity.takeSnapshot();
-        } else if (is_cast_opened) {
-            activity.takeSnapshot();
-        } else if (is_audio_only) {
-            // Audio only doesn't support snapshots
-            Toast.makeText(getContext(), "Snapshots not available for audio only", Toast.LENGTH_SHORT).show();
-        } else if (is_wifi_opened && AppConstant.is_library_use && activity.mWifiService != null) {
-            activity.takeSnapshot();
+        MainActivity activity = ThreadSafetyUtils.getOrDefault(
+            mActivityRef != null ? mActivityRef.get() : null, null);
+        if (activity == null) {
+            InternalLogger.w(TAG, "Cannot take snapshot - activity is null");
+            return;
         }
+        
+        ThreadSafetyUtils.runOnMainThread(() -> {
+            try {
+                if (is_camera_opened) {
+                    activity.takeSnapshot();
+                } else if (is_usb_opened) {
+                    activity.takeSnapshot();
+                } else if (is_cast_opened) {
+                    activity.takeSnapshot();
+                } else if (is_audio_only) {
+                    // Audio only doesn't support snapshots
+                    Context context = getContext();
+                    if (context != null) {
+                        Toast.makeText(context, "Snapshots not available for audio only", Toast.LENGTH_SHORT).show();
+                    }
+                } else if (is_wifi_opened && AppConstant.is_library_use && activity.mWifiService != null) {
+                    activity.takeSnapshot();
+                } else {
+                    InternalLogger.w(TAG, "No camera opened for snapshot");
+                }
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in onSnapshot", e);
+            }
+        });
     }
 
     private void handleError(String message, Exception e) {

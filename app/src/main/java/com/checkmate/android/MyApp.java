@@ -12,7 +12,9 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 
+import com.checkmate.android.anr.ANRWatchdog;
 import com.checkmate.android.database.DBManager;
+import com.checkmate.android.logging.InternalLogger;
 import com.checkmate.android.service.SharedEGL.GraphicsModule;
 import com.checkmate.android.util.HttpServer.ServiceModule;
 
@@ -21,6 +23,7 @@ import toothpick.Toothpick;
 import toothpick.configuration.Configuration;
 
 public class MyApp extends Application {
+    private static final String TAG = "MyApp";
     public static Context mContext;
     Activity currentActivity;
     public static int mScreenWidth;
@@ -33,6 +36,30 @@ public class MyApp extends Application {
         super.onCreate();
 
         mContext = getApplicationContext();
+        
+        // Initialize logging first
+        InternalLogger.initialize(this);
+        InternalLogger.i(TAG, "Application starting");
+        
+        // Initialize ANR watchdog
+        ANRWatchdog.initialize();
+        ANRWatchdog.getInstance().setANRListener(new ANRWatchdog.ANRListener() {
+            @Override
+            public void onAppNotResponding(ANRWatchdog.ANRError error) {
+                InternalLogger.e(TAG, "ANR detected", error);
+                // You can add custom recovery logic here
+                // For example, restart problematic services or clear certain states
+            }
+            
+            @Override
+            public void onANRRecovered() {
+                InternalLogger.i(TAG, "ANR recovered");
+            }
+        });
+        ANRWatchdog.getInstance().startWatching();
+        
+        // Set up crash handler
+        setupCrashHandler();
 
 
         // Configure Toothpick
@@ -73,7 +100,7 @@ public class MyApp extends Application {
                 if (++activityReferences == 1 && !isActivityChangingConfigurations) {
                     // App enters foreground
                     AppPreference.setBool(AppPreference.KEY.IS_APP_BACKGROUND, false);
-                    Log.d("AppState", "App in FOREGROUND");
+                    InternalLogger.d(TAG, "App in FOREGROUND");
                 }
             }
 
@@ -89,7 +116,7 @@ public class MyApp extends Application {
                 if (--activityReferences == 0 && !isActivityChangingConfigurations) {
                     // App enters background
                     AppPreference.setBool(AppPreference.KEY.IS_APP_BACKGROUND, true);
-                    Log.d("AppState", "App in BACKGROUND");
+                    InternalLogger.d(TAG, "App in BACKGROUND");
                 }
             }
 
@@ -105,5 +132,39 @@ public class MyApp extends Application {
     }
     public Activity getCurrentActivity() {
         return currentActivity;
+    }
+    
+    private void setupCrashHandler() {
+        Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
+        
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            InternalLogger.e(TAG, "Uncaught exception in thread: " + thread.getName(), throwable);
+            
+            // Try to save critical state before crashing
+            try {
+                AppPreference.setBool(AppPreference.KEY.APP_FORCE_QUIT, true);
+            } catch (Exception e) {
+                // Ignore errors during crash handling
+            }
+            
+            // Call default handler
+            if (defaultHandler != null) {
+                defaultHandler.uncaughtException(thread, throwable);
+            }
+        });
+    }
+    
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        
+        // Stop ANR watchdog
+        ANRWatchdog.getInstance().stopWatching();
+        
+        // Shutdown logging
+        InternalLogger.getInstance().shutdown();
+        
+        // Shutdown preferences
+        AppPreference.shutdown();
     }
 }
