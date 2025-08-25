@@ -62,6 +62,12 @@
 <!--        <item name="android:fontFamily">@font/font_sfcompacttext_regular</item>-->
         <item name="android:padding">@dimen/image_very_small</item>
     </style>
+    
+    <style name="normalTextFixed" parent="normalText">
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+    </style>
 
     <style name="normalEdit" parent="android:Widget.EditText">
         <item name="android:textColor">@color/text_normal</item>

@@ -1626,6 +1626,18 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             }
         });
         edt_cloud.setText(AppPreference.getStr(AppPreference.KEY.BETA_URL, RestApiService.DNS));
+        
+        // Add focus change listener to update server when leaving the field
+        edt_cloud.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String cloudUrl = edt_cloud.getText().toString().trim();
+                if (!TextUtils.isEmpty(cloudUrl)) {
+                    AppPreference.setStr(AppPreference.KEY.BETA_URL, cloudUrl);
+                    // Trigger server update request
+                    updateCloudServer(cloudUrl);
+                }
+            }
+        });
 
         String pin = AppPreference.getStr(AppPreference.KEY.PIN_NUMBER, "");
         edt_pin.setText(pin);
@@ -2307,7 +2319,8 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 }).show();
     }
 
-    public void OnClick(View view) {
+    @Override
+    public void onClick(View view) {
         switch (view.getId()) {
             case R.id.txt_camera:
                 onAddCamera();
@@ -2343,6 +2356,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     // Show custom streaming fields
                     ly_streaming_custom.setVisibility(View.VISIBLE);
                     txt_stream_details.setText(R.string.return_defaults);
+                    // Set to custom quality when showing details
+                    AppPreference.setInt(AppPreference.KEY.STREAMING_QUALITY, 5);
+                    streaming_quality.setSelection(5);
                     // Enable all streaming fields
                     enableStreamingFields(true);
                 } else {
@@ -2352,9 +2368,11 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     // Set default streaming values (Medium - index 1)
                     AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
                     AppPreference.setInt(AppPreference.KEY.STREAMING_QUALITY, 1);
+                    streaming_quality.setSelection(1);
                     // Reset spinners to default values
                     resetStreamingToDefaults();
                     onStreamDetails(false);
+                    mListener.fragCameraRestart(true);
                 }
                 break;
             case R.id.txt_video_details:
@@ -2362,6 +2380,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     // Show custom video fields
                     ly_video_custom.setVisibility(View.VISIBLE);
                     txt_video_details.setText(R.string.return_defaults);
+                    // Set to custom quality when showing details
+                    AppPreference.setInt(AppPreference.KEY.VIDEO_QUALITY, 5);
+                    spinner_quality.setSelection(5);
                     // Enable all video fields
                     enableVideoFields(true);
                 } else {
@@ -2371,9 +2392,11 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     // Set default video values (High - index 0)
                     AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
                     AppPreference.setInt(AppPreference.KEY.VIDEO_QUALITY, 0);
+                    spinner_quality.setSelection(0);
                     // Reset spinners to default values
                     resetVideoToDefaults();
                     onVideoDetails(false);
+                    mListener.fragCameraRestart(true);
                 }
                 break;
             case R.id.txt_transcode:
@@ -2387,6 +2410,19 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     }
                 });
                 dlg.show();
+                break;
+            case R.id.txt_cast_video_details:
+                if (txt_cast_video_details.getText().equals(getString(R.string.show_details))) {
+                    // Show cast video settings
+                    ly_cast_video_settings.setVisibility(View.VISIBLE);
+                    txt_cast_video_details.setText(R.string.return_defaults);
+                } else {
+                    // Hide cast video settings and reset to defaults
+                    ly_cast_video_settings.setVisibility(View.GONE);
+                    txt_cast_video_details.setText(R.string.show_details);
+                    // Reset cast video settings to defaults
+                    resetCastVideoToDefaults();
+                }
                 break;
         }
     }
@@ -3177,7 +3213,11 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     Log.e("StreamingFragment", "Fragment detached, skipping onLogin callback");
                     return;
                 }
-                getActivity().finish();
+                // Move app to background instead of finishing
+                Intent startMain = new Intent(Intent.ACTION_MAIN);
+                startMain.addCategory(Intent.CATEGORY_HOME);
+                startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(startMain);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -3201,6 +3241,21 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         if (negativeButton != null) {
             negativeButton.setTextColor(Color.BLACK); // Set negative button text color to black
         }
+    }
+
+    private void updateCloudServer(String cloudUrl) {
+        // Make API call to update cloud server
+        if (!DeviceUtils.isNetworkAvailable(requireContext())) {
+            MessageUtil.showToast(requireContext(), "No internet connection");
+            return;
+        }
+        
+        // Update the RestApiService base URL
+        RestApiService.DNS = cloudUrl;
+        AppPreference.setStr(AppPreference.KEY.BETA_URL, cloudUrl);
+        
+        // Show success message
+        MessageUtil.showToast(requireContext(), "Cloud server updated successfully");
     }
 
     void checkUpdate() {
@@ -3544,6 +3599,23 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         }
         if (spinner_frame != null) {
             spinner_frame.setSelection(0);
+        }
+    }
+    
+    private void resetCastVideoToDefaults() {
+        // Reset cast video settings to defaults
+        AppPreference.setInt(AppPreference.KEY.CAST_RESOLUTION, 0);
+        AppPreference.setInt(AppPreference.KEY.CAST_BITRATE, 2048);
+        AppPreference.setInt(AppPreference.KEY.CAST_FRAME, 1);
+        // Update UI
+        if (spinner_cast_resolution != null) {
+            spinner_cast_resolution.setSelection(0);
+        }
+        if (edt_cast_bitrate != null) {
+            edt_cast_bitrate.setText("2048");
+        }
+        if (edt_cast_keyFrame != null) {
+            edt_cast_keyFrame.setText("1");
         }
     }
 }

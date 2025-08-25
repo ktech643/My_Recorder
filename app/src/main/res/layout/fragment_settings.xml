@@ -81,7 +81,7 @@
 
                         <TextView
                             android:id="@+id/txt_beta_update"
-                            style="@style/normalText"
+                            style="@style/normalTextFixed"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/update"
@@ -207,7 +207,7 @@
 
                         <TextView
                             android:id="@+id/txt_camera"
-                            style="@style/normalText"
+                            style="@style/normalTextFixed"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="right"
@@ -565,6 +565,7 @@
 
                         <TextView
                             android:id="@+id/txt_storage"
+                            style="@style/normalTextFixed"
                             android:text="Select storage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -663,7 +664,7 @@
 
                         <TextView
                             android:id="@+id/txt_video_details"
-                            style="@style/normalText"
+                            style="@style/normalTextFixed"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -824,7 +825,7 @@
 
                         <TextView
                             android:id="@+id/txt_stream_details"
-                            style="@style/normalText"
+                            style="@style/normalTextFixed"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -1137,7 +1138,7 @@
 
                         <TextView
                             android:id="@+id/txt_cast_video_details"
-                            style="@style/normalText"
+                            style="@style/normalTextFixed"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -1731,7 +1732,7 @@
 
                         <TextView
                             android:id="@+id/txt_reactivate"
-                            style="@style/normalText"
+                            style="@style/normalTextFixed"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="right"
@@ -1872,7 +1873,7 @@
 
                         <TextView
                             android:id="@+id/txt_update"
-                            style="@style/normalText"
+                            style="@style/normalTextFixed"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="right"
@@ -1895,7 +1896,7 @@
 
                         <TextView
                             android:id="@+id/txt_update"
-                            style="@style/normalText"
+                            style="@style/normalTextFixed"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="right"
@@ -1918,7 +1919,7 @@
 
                         <TextView
                             android:id="@+id/txt_check_update"
-                            style="@style/normalText"
+                            style="@style/normalTextFixed"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="right"
@@ -2012,7 +2013,7 @@
 
                 <TextView
                     android:id="@+id/txt_exit"
-                    style="@style/normalText"
+                    style="@style/normalTextFixed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
