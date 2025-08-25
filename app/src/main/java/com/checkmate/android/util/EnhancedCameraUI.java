@@ -181,7 +181,7 @@ public class EnhancedCameraUI {
             contentLayout.addView(statusText);
             
             transitionContainer.addView(contentLayout);
-            overlayView.addView(transitionContainer);
+            ((FrameLayout) overlayView).addView(transitionContainer);
             
             // Add to parent view
             FrameLayout.LayoutParams overlayParams = new FrameLayout.LayoutParams(
