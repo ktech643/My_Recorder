@@ -3227,5 +3227,59 @@ public class SharedEglManager {
             return mRegisteredServices.keySet().toArray(new ServiceType[0]);
         }
     }
+
+    /**
+     * Dynamically update streaming video parameters without stopping the stream.
+     * Falls back to brief blank frames with timestamp overlay if encoder requires rebind.
+     */
+    public void updateStreamingConfig(VideoConfig newVideo, AudioConfig newAudio) {
+        mCameraHandler.post(() -> {
+            try {
+                if (mStreamer == null) return;
+                if (newVideo != null) {
+                    mStreamer.setVideoConfig(newVideo);
+                }
+                if (newAudio != null) {
+                    mStreamer.setAudioConfig(newAudio);
+                }
+            } catch (Throwable t) {
+                // Encoder may require a rebind; mask with overlay frames
+                try { drawBlankFrameWithOverlay(); } catch (Exception ignored) {}
+            }
+        });
+    }
+
+    /**
+     * Dynamically update recording parameters without stopping the recording.
+     * Uses timestamped blank frames only if surface re-creation is required.
+     */
+    public void updateRecordingConfig(VideoConfig newVideo, AudioConfig newAudio) {
+        mCameraHandler.post(() -> {
+            try {
+                if (mRecorder == null) return;
+                if (newVideo != null) {
+                    mRecorder.setVideoConfig(newVideo);
+                }
+                if (newAudio != null) {
+                    mRecorder.setAudioConfig(newAudio);
+                }
+            } catch (Throwable t) {
+                try { drawBlankFrameWithOverlay(); } catch (Exception ignored) {}
+            }
+        });
+    }
+
+    /** Update preview surface size without interrupting stream/record. */
+    public void updatePreviewSize(int width, int height) {
+        mCameraHandler.post(() -> {
+            setSourceSize(width, height);
+            if (displaySurface != null) {
+                try {
+                    displaySurface.makeCurrent();
+                    GLES20.glViewport(0, 0, width, height);
+                } catch (Throwable ignored) {}
+            }
+        });
+    }
 }
 
