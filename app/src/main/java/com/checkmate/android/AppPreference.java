@@ -1,6 +1,8 @@
 package com.checkmate.android;
 
 import android.content.SharedPreferences;
+import android.util.Log;
+import com.checkmate.android.util.ANRProtectionManager;
 
 public class AppPreference {
     private static SharedPreferences instance = null;
@@ -180,42 +182,111 @@ public class AppPreference {
         instance = pref;
     }
 
-    // check contain
+    // check contain - ANR Protected
     public static boolean contains(String key) {
-        return instance.contains(key);
+        try {
+            return ANRProtectionManager.getInstance().executePreferenceOperation(
+                "contains_" + key,
+                () -> instance.contains(key),
+                false
+            );
+        } catch (Exception e) {
+            Log.e("AppPreference", "Error checking contains for key: " + key, e);
+            return false;
+        }
     }
 
-    // boolean
+    // boolean - ANR Protected
     public static boolean getBool(String key, boolean def) {
-        return instance.getBoolean(key, def);
+        try {
+            return ANRProtectionManager.getInstance().executePreferenceOperation(
+                "getBool_" + key,
+                () -> instance.getBoolean(key, def),
+                def
+            );
+        } catch (Exception e) {
+            Log.e("AppPreference", "Error getting boolean for key: " + key, e);
+            return def;
+        }
     }
 
     public static void setBool(String key, boolean value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putBoolean(key, value);
-        editor.commit();
+        try {
+            ANRProtectionManager.getInstance().executePreferenceOperation(
+                "setBool_" + key,
+                () -> {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putBoolean(key, value);
+                    editor.apply(); // Use apply instead of commit for better performance
+                    return null;
+                },
+                null
+            );
+        } catch (Exception e) {
+            Log.e("AppPreference", "Error setting boolean for key: " + key, e);
+        }
     }
 
-    // int
+    // int - ANR Protected
     public static int getInt(String key, int def) {
-        return instance.getInt(key, def);
+        try {
+            return ANRProtectionManager.getInstance().executePreferenceOperation(
+                "getInt_" + key,
+                () -> instance.getInt(key, def),
+                def
+            );
+        } catch (Exception e) {
+            Log.e("AppPreference", "Error getting int for key: " + key, e);
+            return def;
+        }
     }
 
     public static void setInt(String key, int value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putInt(key, value);
-        editor.commit();
+        try {
+            ANRProtectionManager.getInstance().executePreferenceOperation(
+                "setInt_" + key,
+                () -> {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putInt(key, value);
+                    editor.apply(); // Use apply instead of commit for better performance
+                    return null;
+                },
+                null
+            );
+        } catch (Exception e) {
+            Log.e("AppPreference", "Error setting int for key: " + key, e);
+        }
     }
 
-    // long
+    // long - ANR Protected
     public static long getLong(String key, long def) {
-        return instance.getLong(key, def);
+        try {
+            return ANRProtectionManager.getInstance().executePreferenceOperation(
+                "getLong_" + key,
+                () -> instance.getLong(key, def),
+                def
+            );
+        } catch (Exception e) {
+            Log.e("AppPreference", "Error getting long for key: " + key, e);
+            return def;
+        }
     }
 
     public static void setLong(String key, long value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putLong(key, value);
-        editor.apply();
+        try {
+            ANRProtectionManager.getInstance().executePreferenceOperation(
+                "setLong_" + key,
+                () -> {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putLong(key, value);
+                    editor.apply();
+                    return null;
+                },
+                null
+            );
+        } catch (Exception e) {
+            Log.e("AppPreference", "Error setting long for key: " + key, e);
+        }
     }
 
     // string
