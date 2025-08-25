@@ -17,6 +17,8 @@ import com.checkmate.android.service.SharedEGL.GraphicsModule;
 import com.checkmate.android.util.HttpServer.ServiceModule;
 import com.checkmate.android.util.InternalLogger;
 import com.checkmate.android.util.ANRSafeHelper;
+import com.checkmate.android.util.CriticalComponentsMonitor;
+import com.checkmate.android.util.ThreadSafetyManager;
 
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -395,5 +397,26 @@ public class MyApp extends Application {
      */
     public static boolean isAppInForeground() {
         return activityReferences > 0;
+    }
+    
+    /**
+     * Initialize monitoring systems for thread safety and ANR detection
+     */
+    private void initializeMonitoringSystems() {
+        try {
+            InternalLogger.i(TAG, "Initializing monitoring systems");
+            
+            // Initialize Critical Components Monitor
+            CriticalComponentsMonitor.init(this);
+            
+            // Initialize Thread Safety Manager
+            ThreadSafetyManager.getInstance().init();
+            
+            InternalLogger.i(TAG, "Monitoring systems initialized successfully");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error initializing monitoring systems", e);
+            // Continue app startup even if monitoring fails
+        }
     }
 }
