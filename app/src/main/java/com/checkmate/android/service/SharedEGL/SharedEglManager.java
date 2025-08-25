@@ -115,6 +115,7 @@ import com.checkmate.android.util.StreamingLibraryCompatibility;
 import com.checkmate.android.util.AdvancedPerformanceOptimizer;
 import com.checkmate.android.util.AIAdaptiveQualityManager;
 import com.checkmate.android.util.UltraLowLatencyOptimizer;
+import com.checkmate.android.util.EglSurfaceManager;
 
 @Singleton
 public class SharedEglManager {
@@ -851,52 +852,103 @@ public class SharedEglManager {
 
     private void initializeEGL() {
         try {
-            Log.d(TAG, "Starting EGL initialization...");
+            Log.d(TAG, "🚀 Starting ADVANCED EGL initialization with surface management...");
+            
+            // Initialize EGL Surface Manager
+            EglSurfaceManager surfaceManager = EglSurfaceManager.getInstance();
+            surfaceManager.initialize();
+            
             float scaleFactor = Math.max(1.0f, mScreenHeight / BASE_HEIGHT);
             textSize = TEXT_SIZE_DP * scaleFactor;
             overlayPadding = (int) (PADDING_DP * scaleFactor);
 
+            // Create EGL core with advanced error handling
             try {
-                Log.d(TAG, "Creating EGL core with FLAG_RECORDABLE...");
+                Log.d(TAG, "🔧 Creating EGL core with FLAG_RECORDABLE...");
                 eglCore = new EglCoreNew(sharedContext, EglCoreNew.FLAG_RECORDABLE);
-                Log.d(TAG, "EGL core created successfully with FLAG_RECORDABLE");
+                Log.d(TAG, "✅ EGL core created successfully with FLAG_RECORDABLE");
             } catch (RuntimeException e) {
-                Log.w(TAG, "FLAG_RECORDABLE not supported — retrying without it", e);
-                eglCore = new EglCoreNew(sharedContext, 0);
-                Log.d(TAG, "EGL core created successfully without FLAG_RECORDABLE");
+                Log.w(TAG, "⚠️ FLAG_RECORDABLE not supported — retrying without it", e);
+                try {
+                    eglCore = new EglCoreNew(sharedContext, 0);
+                    Log.d(TAG, "✅ EGL core created successfully without FLAG_RECORDABLE");
+                } catch (RuntimeException e2) {
+                    Log.e(TAG, "💥 EGL core creation failed completely", e2);
+                    throw new RuntimeException("Failed to create EGL core", e2);
+                }
             }
 
+            // Create temporary surface with advanced management
+            WindowSurfaceNew tempSurface = null;
             try {
-                Log.d(TAG, "Creating temporary surface for texture program setup...");
-                WindowSurfaceNew tempSurface = new WindowSurfaceNew(eglCore, new SurfaceTexture(0));
+                Log.d(TAG, "⚡ Creating temporary surface for texture program setup...");
+                tempSurface = surfaceManager.createTempSurface(eglCore);
+                
+                if (tempSurface == null) {
+                    throw new RuntimeException("Failed to create temporary surface");
+                }
+                
                 tempSurface.makeCurrent();
 
-                fullFrameBlit = new FullFrameRectLetterboxNew(
-                        new Texture2dProgramNew(Texture2dProgramNew.ProgramType.TEXTURE_EXT));
-                Log.d(TAG, "TEXTURE_EXT program created successfully");
-
-                tempSurface.release();
-            } catch (RuntimeException e) {
-                Log.e(TAG, "TEXTURE_EXT failed, trying TEXTURE_2D", e);
-                fullFrameBlit = new FullFrameRectLetterboxNew(
-                        new Texture2dProgramNew(Texture2dProgramNew.ProgramType.TEXTURE_2D));
-                Log.d(TAG, "TEXTURE_2D program created successfully");
+                // Try TEXTURE_EXT first (for camera)
+                try {
+                    fullFrameBlit = new FullFrameRectLetterboxNew(
+                            new Texture2dProgramNew(Texture2dProgramNew.ProgramType.TEXTURE_EXT));
+                    Log.d(TAG, "✅ TEXTURE_EXT program created successfully");
+                } catch (RuntimeException e) {
+                    Log.w(TAG, "⚠️ TEXTURE_EXT failed, trying TEXTURE_2D", e);
+                    fullFrameBlit = new FullFrameRectLetterboxNew(
+                            new Texture2dProgramNew(Texture2dProgramNew.ProgramType.TEXTURE_2D));
+                    Log.d(TAG, "✅ TEXTURE_2D program created successfully");
+                }
+                
+            } finally {
+                // Always release temp surface
+                if (tempSurface != null) {
+                    surfaceManager.releaseSurface(tempSurface);
+                    Log.d(TAG, "🧹 Temporary surface released");
+                }
             }
             
+            // Create texture and camera texture
             textureId = fullFrameBlit.createTextureObject();
             cameraTexture = new SurfaceTexture(textureId);
             cameraTexture.setDefaultBufferSize(srcW, srcH); // Use source dimensions
-            Log.d(TAG, "Camera texture created with ID: " + textureId);
+            Log.d(TAG, "🎬 Camera texture created with ID: " + textureId);
 
-            Surface displaySurfaceSurface = new Surface(cameraTexture);
-            displaySurface = new WindowSurfaceNew(eglCore, displaySurfaceSurface, true);
-            Log.d(TAG, "Display surface created successfully");
+            // Create display surface with advanced management
+            try {
+                Log.d(TAG, "📱 Creating display surface...");
+                displaySurface = surfaceManager.createDisplaySurface(eglCore, textureId);
+                
+                if (displaySurface == null) {
+                    throw new RuntimeException("Failed to create display surface");
+                }
+                
+                Log.d(TAG, "✅ Display surface created successfully");
+            } catch (Exception e) {
+                Log.e(TAG, "❌ Display surface creation failed", e);
+                throw new RuntimeException("Failed to create display surface", e);
+            }
 
-            if (mStreamer != null && mStreamer.getEncoderSurface() != null) {
-                encoderSurface = new WindowSurfaceNew(eglCore, mStreamer.getEncoderSurface(), false);
-                Log.d(TAG, "Encoder surface created successfully");
-            } else {
-                Log.w(TAG, "Streamer encoder surface is null");
+            // Create encoder surface with advanced management
+            try {
+                if (mStreamer != null && mStreamer.getEncoderSurface() != null) {
+                    Log.d(TAG, "🎯 Creating encoder surface...");
+                    encoderSurface = surfaceManager.createEncoderSurface(eglCore, mStreamer.getEncoderSurface());
+                    
+                    if (encoderSurface == null) {
+                        Log.w(TAG, "⚠️ Encoder surface creation failed, will retry later");
+                    } else {
+                        Log.d(TAG, "✅ Encoder surface created successfully");
+                    }
+                } else {
+                    Log.w(TAG, "⚠️ Streamer encoder surface is null - skipping encoder surface creation");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "❌ Encoder surface creation failed", e);
+                // Don't throw here - encoder surface can be created later
+                Log.w(TAG, "⚠️ Continuing without encoder surface, will retry later");
             }
 
             if (mRecorder != null && mRecorder.getEncoderSurface() != null) {
