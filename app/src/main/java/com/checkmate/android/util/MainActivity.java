@@ -59,6 +59,9 @@ import android.widget.Toast;
 import com.checkmate.android.service.BaseBackgroundService;
 import com.checkmate.android.service.SharedEGL.ServiceType;
 import com.checkmate.android.service.SharedEGL.SharedEglManager;
+import com.checkmate.android.service.EglInitializer;
+import com.checkmate.android.service.ServiceTransitionManager;
+import com.checkmate.android.service.DynamicConfigManager;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -182,6 +185,11 @@ public class MainActivity extends BaseActivity
     
     // EGL initialization flag
     private boolean isEglInitialized = false;
+    
+    // Service management
+    private EglInitializer eglInitializer;
+    private ServiceTransitionManager transitionManager;
+    private DynamicConfigManager configManager;
 
     /*  ╭──────────────────────────────────────────────────────────────────────╮
         │  Android / UI                                                        │
@@ -381,21 +389,50 @@ public class MainActivity extends BaseActivity
         if (!isEglInitialized) {
             Log.d(TAG, "Initializing EGL context early...");
             
-            // Initialize SharedEglManager with a default service type
-            SharedEglManager eglManager = SharedEglManager.getInstance();
-            eglManager.setListener(new SharedEglManager.Listener() {
+            // Initialize service managers
+            eglInitializer = new EglInitializer(this);
+            transitionManager = new ServiceTransitionManager(this);
+            configManager = new DynamicConfigManager();
+            
+            // Initialize EGL with proper callbacks
+            eglInitializer.initialize(new EglInitializer.EglInitCallback() {
                 @Override
                 public void onEglReady() {
-                    Log.d(TAG, "EGL context ready");
+                    Log.d(TAG, "EGL context ready - initializing service managers");
                     isEglInitialized = true;
+                    
                     // Notify fragments that EGL is ready
                     sharedViewModel.postEvent(EventType.EGL_INITIALIZED, true);
+                    
+                    // Pre-warm the default service
+                    preWarmDefaultService();
+                }
+                
+                @Override
+                public void onEglError(String error) {
+                    Log.e(TAG, "EGL initialization failed: " + error);
+                    // Retry after a delay
+                    handler.postDelayed(() -> initializeEglContext(), 1000);
                 }
             });
-            
-            // Initialize with camera service as default
-            eglManager.initialize(getApplicationContext(), ServiceType.BgCamera);
         }
+    }
+    
+    /**
+     * Pre-warm the default service for faster initial start
+     */
+    private void preWarmDefaultService() {
+        String defaultCamera = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
+        ServiceType defaultService = ServiceType.BgCamera;
+        
+        if (AppConstant.USB_CAMERA.equals(defaultCamera)) {
+            defaultService = ServiceType.BgUSBCamera;
+        } else if (AppConstant.SCREEN_CAST.equals(defaultCamera)) {
+            defaultService = ServiceType.BgScreenCast;
+        }
+        
+        Log.d(TAG, "Pre-warming default service: " + defaultService);
+        // The service will be started but not activated until needed
     }
 
 
