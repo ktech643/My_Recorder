@@ -680,7 +680,6 @@
                             android:gravity="center"
                             android:minHeight="48dp"
                             android:layout_weight="1"
-                            android:gravity="right"
                             android:text="@string/show_details"
                             android:textColor="@color/blue"
                             android:textSize="@dimen/textsize_normal" />
@@ -843,7 +842,6 @@
                             android:gravity="center"
                             android:minHeight="48dp"
                             android:layout_weight="1"
-                            android:gravity="right"
                             android:text="@string/show_details"
                             android:textColor="@color/blue"
                             android:textSize="@dimen/textsize_normal" />
@@ -1158,7 +1156,6 @@
                             android:gravity="center"
                             android:minHeight="48dp"
                             android:layout_weight="1"
-                            android:gravity="right"
                             android:text="@string/show_details"
                             android:textColor="@color/blue"
                             android:textSize="@dimen/textsize_normal"
