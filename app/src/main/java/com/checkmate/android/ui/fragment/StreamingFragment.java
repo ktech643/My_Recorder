@@ -326,6 +326,12 @@ public class StreamingFragment extends BaseFragment {
             // Initialize UI components safely
             initializeStreamingUIComponentsSafely();
             
+            // Initialize additional UI components
+            initializeRestOfUIComponents();
+            
+            // Complete additional initialization
+            completeOnCreateViewInitialization();
+            
             InternalLogger.d(TAG, "StreamingFragment onCreateView completed successfully");
             return mView;
             
@@ -373,8 +379,9 @@ public class StreamingFragment extends BaseFragment {
             InternalLogger.e(TAG, "Failed to create fallback view", e);
             return null;
         }
+    }
     
-    // Continue with existing initialization  
+    // Initialize remaining UI components
     private void initializeRestOfUIComponents() {
             btn_local_update = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_local_update), null, "btn_local_update");
             txt_status = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_status), null, "txt_status");
@@ -417,11 +424,11 @@ public class StreamingFragment extends BaseFragment {
             spinner_mode = ANRSafeHelper.nullSafe(mView.findViewById(R.id.button_mode), null, "spinner_mode");
             
             rootView = mView;
-        }
-        
+    }
+    
+    private void completeOnCreateViewInitialization() {
         // Complete the onCreateView method by calling the rest of initialization
         try {
-            initializeRestOfUIComponents();
             showInitialLogin();
             
             String login_email = AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, "");
@@ -503,7 +510,6 @@ public class StreamingFragment extends BaseFragment {
         setupViewsForConfigs();
         setupStreamingModeSpinner();
         setupLocalStreaming();
-        return mView;
     }
 
     private void showFrequencySelectionDialog() {
