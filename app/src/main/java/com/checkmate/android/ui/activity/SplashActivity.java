@@ -57,9 +57,9 @@ import com.checkmate.android.ui.dialog.ActivationDialog;
 import com.checkmate.android.ui.dialog.CodeDialog;
 import com.checkmate.android.ui.dialog.MachineCodeDialog;
 import com.checkmate.android.ui.dialog.SerialDialog;
-import com.blikoon.qrcodescanner.QrCodeActivity;
 import com.checkmate.android.util.StoragePermissionHelper;
 import com.checkmate.android.util.SplashStorageHelper;
+import com.checkmate.android.util.PermissionManager;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -106,6 +106,10 @@ public class SplashActivity extends BaseActivity {
             Manifest.permission.CAPTURE_AUDIO_OUTPUT
     };
 
+    private PermissionManager permissionManager;
+    private volatile boolean isPermissionFlowActive = false;
+    private final Object permissionLock = new Object();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,18 +118,29 @@ public class SplashActivity extends BaseActivity {
         // Create notification channels for Android 14 compatibility
         createNotificationChannels();
 
-        // Remove notification permission request from onCreate - will be requested after activation
+        // Initialize permission manager
+        initializePermissionManager();
 
         // Prevent screen blinking when notifications appear
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        setupWindowFlags();
 
-        // Additional flags to prevent blinking and ensure stable display
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+        runADBCommands();
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // Set window to be stable and prevent focus changes from causing blinking
+        connection_manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    }
+
+    private void setupWindowFlags() {
+        // Prevent screen blinking and ensure stable window
+        getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
+                        WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS |
+                        WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+        );
+
+        // Set stable window flags
         getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
                         WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
@@ -139,11 +154,37 @@ public class SplashActivity extends BaseActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.blue_dark));
         }
+    }
 
-        runADBCommands();
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    private void initializePermissionManager() {
+        permissionManager = new PermissionManager(this, new PermissionManager.PermissionCallback() {
+            @Override
+            public void onAllPermissionsGranted() {
+                Log.d(TAG, "All permissions granted");
+                synchronized (permissionLock) {
+                    isPermissionFlowActive = false;
+                }
+                runOnUiThread(() -> gotoNextView());
+            }
 
-        connection_manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            @Override
+            public void onPermissionsDenied(List<String> deniedPermissions) {
+                Log.w(TAG, "Some permissions denied: " + deniedPermissions);
+                synchronized (permissionLock) {
+                    isPermissionFlowActive = false;
+                }
+                runOnUiThread(() -> gotoNextView());
+            }
+
+            @Override
+            public void onPermissionRequestCancelled() {
+                Log.w(TAG, "Permission request cancelled");
+                synchronized (permissionLock) {
+                    isPermissionFlowActive = false;
+                }
+                finish();
+            }
+        });
     }
 
     @Override
@@ -167,17 +208,38 @@ public class SplashActivity extends BaseActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Cancel any pending permission requests
+        if (permissionManager != null) {
+            permissionManager.cancelPermissionFlow();
+        }
+        // Clear dialog state
+        synchronized (dialogLock) {
+            is_dialog_show = false;
+        }
+        synchronized (permissionLock) {
+            isPermissionFlowActive = false;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Ensure window stability
+        setupWindowFlags();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
         // Ensure window stability when resuming
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+        setupWindowFlags();
 
         if (AppPreference.getBool(AppPreference.KEY.APP_FORCE_QUIT, true)) {
             AppPreference.setBool(AppPreference.KEY.APP_FORCE_QUIT, true);
-            verifyPermissions(this);
+            startPermissionFlow();
         } else {
             MessageUtil.showToast(getApplicationContext(), "CheckMate! Will be closing. Please use main icon to open.");
             new Handler().postDelayed(new Runnable() {
@@ -194,6 +256,24 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
+    private void startPermissionFlow() {
+        synchronized (permissionLock) {
+            if (isPermissionFlowActive) {
+                Log.w(TAG, "Permission flow already active, skipping");
+                return;
+            }
+            isPermissionFlowActive = true;
+        }
+
+        // Start synchronized permission flow
+        if (permissionManager != null) {
+            permissionManager.requestAllPermissions();
+        } else {
+            Log.e(TAG, "PermissionManager not initialized");
+            gotoNextView();
+        }
+    }
+
     void runADBCommands(){
         int capOut = ActivityCompat.checkSelfPermission(getApplicationContext(), "android.permission.CAPTURE_AUDIO_OUTPUT");
         if (capOut == PackageManager.PERMISSION_GRANTED) {
@@ -204,51 +284,12 @@ public class SplashActivity extends BaseActivity {
 
     ConnectivityManager connection_manager;
 
+    // Deprecated - now using PermissionManager
+    @Deprecated
     public void verifyPermissions(Activity activity) {
-        int permission0 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
-        int permission1 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int permission2 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
-        int permission3 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.RECORD_AUDIO);
-        int permission4 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.VIBRATE);
-        int permission5 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.MODIFY_AUDIO_SETTINGS);
-        int permission6 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_PHONE_STATE);
-        int permission7 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_WIFI_STATE);
-        int permission8 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CHANGE_WIFI_STATE);
-        int permission9 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
-        int permission10 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION);
-        int permission11 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CHANGE_NETWORK_STATE);
-        int permission12 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WAKE_LOCK);
-
-        if (permission0 != PackageManager.PERMISSION_GRANTED
-                || permission1 != PackageManager.PERMISSION_GRANTED
-                || permission2 != PackageManager.PERMISSION_GRANTED
-                || permission3 != PackageManager.PERMISSION_GRANTED
-                || permission4 != PackageManager.PERMISSION_GRANTED
-                || permission5 != PackageManager.PERMISSION_GRANTED
-                || permission6 != PackageManager.PERMISSION_GRANTED
-                || permission7 != PackageManager.PERMISSION_GRANTED
-                || permission8 != PackageManager.PERMISSION_GRANTED
-                || permission9 != PackageManager.PERMISSION_GRANTED
-                || permission10 != PackageManager.PERMISSION_GRANTED
-                || permission11 != PackageManager.PERMISSION_GRANTED
-                || permission12 != PackageManager.PERMISSION_GRANTED
-        ) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS,
-                    PERMISSION_REQUEST_CODE_FOR_PERMISSION
-            );
-
-            requestDrawOverAppsPermission(activity);
-            requestIgnoreBatteryOptimizationsPermission(activity);
-            requestDoNotDisturbPermission(activity);
-            verifyStoragePermissions(activity);
-            requestModifySystemSettingsPermission(activity);
-            checkStoragePermissions();
-        } else {
-            gotoNextView();
-        }
+        // This method is replaced by PermissionManager.requestAllPermissions()
+        // Keeping for backward compatibility but redirecting to new flow
+        startPermissionFlow();
     }
 
     public void verifyStoragePermissions(Activity activity) {
@@ -292,49 +333,29 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        try {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-            // Prevent multiple callbacks
-            if (requestCode == StoragePermissionHelper.REQUEST_STORAGE_PERMISSION && hasRequestedStoragePermission) {
-                hasRequestedStoragePermission = false; // Reset flag to prevent re-entry
-                
-                // Handle storage permissions using StoragePermissionHelper
-                StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
-                
-                // Continue with activation regardless of permission result
-                // The app will use default storage if permission is denied
-                continueWithActivation();
-                return;
-            }
-            
-            // Handle storage helper permissions only if not already handled
-            if (storageHelper != null && requestCode != StoragePermissionHelper.REQUEST_STORAGE_PERMISSION) {
-                storageHelper.handlePermissionResult(requestCode, permissions, grantResults);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error in onRequestPermissionsResult", e);
-            // Continue with default behavior on error
-            gotoNextView();
+        // Let PermissionManager handle the result
+        if (permissionManager != null) {
+            permissionManager.handlePermissionResult(requestCode, permissions, grantResults);
         }
 
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("Camera", "Permission granted!");
-            } else {
-                Log.d("Camera", "Permission denied!");
-            }
+        // Handle storage permissions using StoragePermissionHelper
+        StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
+
+        // Handle storage helper permissions
+        if (storageHelper != null) {
+            storageHelper.handlePermissionResult(requestCode, permissions, grantResults);
         }
 
+        // Handle specific permission results if needed
         if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d("Notification", "Notification permission granted!");
                 Toast.makeText(this, "Notifications enabled successfully!", Toast.LENGTH_SHORT).show();
-                openMainScreen();
             } else {
                 Log.d("Notification", "Notification permission denied!");
-                // Show dialog to guide user to settings
-                navigateToNotificationSettings();
+                // Continue without notification permission
             }
         }
     }
@@ -396,10 +417,10 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
-    boolean is_dialog_show = false;
-    boolean should_show_complete = false;
+    private volatile boolean is_dialog_show = false;
+    private volatile boolean should_show_complete = false;
     private SplashStorageHelper storageHelper;
-    private boolean hasRequestedStoragePermission = false;
+    private final Object dialogLock = new Object();
 
     public synchronized String getUniqueChannelName(Context context) {
         SharedPreferences sharedPrefs = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
@@ -411,40 +432,41 @@ public class SplashActivity extends BaseActivity {
         return uniqueID;
     }
     void gotoNextView() {
-        if (is_dialog_show) {
-            return;
+        synchronized (dialogLock) {
+            if (is_dialog_show) {
+                return;
+            }
         }
         // check activation
         String activation = AppPreference.getStr(AppPreference.KEY.ACTIVATION_CODE, "");
         if (TextUtils.isEmpty(activation)) {
-            @SuppressLint("HardwareIds") String androidId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-            if (androidId == null || androidId.isEmpty()) {
-                // Fallback: Use a random UUID if ANDROID_ID is not available.
-                androidId = java.util.UUID.randomUUID().toString();
-            }
-            // Initialize activation-specific defaults using PreferenceInitializer
-            PreferenceInitializer.initActivationDefaults(this);
-            // Initialize storage helper
-            storageHelper = new SplashStorageHelper(this, new SplashStorageHelper.StorageSelectionCallback() {
-                @Override
-                public void onStorageSelected(String storagePath, String storageType) {
-                    Log.d(TAG, "Storage selected: " + storagePath + " (" + storageType + ")");
-                    // After storage is selected, continue with activation
-                    continueWithActivation();
+            synchronized (dialogLock) {
+                @SuppressLint("HardwareIds") String androidId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+                if (androidId == null || androidId.isEmpty()) {
+                    // Fallback: Use a random UUID if ANDROID_ID is not available.
+                    androidId = java.util.UUID.randomUUID().toString();
                 }
-                @Override
-                public void onStorageSelectionCancelled() {
-                    Log.w(TAG, "Storage selection cancelled");
-                    // Use default storage and continue
-                    PreferenceInitializer.validateStorageLocation(SplashActivity.this);
-                    // Only continue if we haven't already shown the activation dialog
-                    if (!is_dialog_show) {
-                        continueWithActivation();
+                // Initialize activation-specific defaults using PreferenceInitializer
+                PreferenceInitializer.initActivationDefaults(this);
+                // Initialize storage helper
+                storageHelper = new SplashStorageHelper(this, new SplashStorageHelper.StorageSelectionCallback() {
+                    @Override
+                    public void onStorageSelected(String storagePath, String storageType) {
+                        Log.d(TAG, "Storage selected: " + storagePath + " (" + storageType + ")");
+                        // After storage is selected, continue with activation
+                        runOnUiThread(() -> continueWithActivation());
                     }
-                }
-            });
-            // Show storage selection dialog and wait for user selection
-            storageHelper.showCustomStorageDialog();
+                    @Override
+                    public void onStorageSelectionCancelled() {
+                        Log.w(TAG, "Storage selection cancelled");
+                        // Use default storage and continue
+                        PreferenceInitializer.validateStorageLocation(SplashActivity.this);
+                        runOnUiThread(() -> continueWithActivation());
+                    }
+                });
+                // Show storage selection dialog and wait for user selection
+                storageHelper.showCustomStorageDialog();
+            }
             return;
         } else { // check
             if (!isValidActivation(activation)) {
@@ -453,18 +475,22 @@ public class SplashActivity extends BaseActivity {
             }
         }
         // After activation and storage selection, ask for notification permission before main
-        if (should_show_complete) {
-            should_show_complete = false;
-            is_dialog_show = true;
-            ActivationCompleteDialog com_dialog = new ActivationCompleteDialog(this);
-            com_dialog.setOkListener(view -> {
-                is_dialog_show = false;
-                com_dialog.dismiss();
+        synchronized (dialogLock) {
+            if (should_show_complete) {
+                should_show_complete = false;
+                is_dialog_show = true;
+                ActivationCompleteDialog com_dialog = new ActivationCompleteDialog(this);
+                com_dialog.setOkListener(view -> {
+                    synchronized (dialogLock) {
+                        is_dialog_show = false;
+                    }
+                    com_dialog.dismiss();
+                    maybeAskNotificationThenMain();
+                });
+                com_dialog.show();
+            } else {
                 maybeAskNotificationThenMain();
-            });
-            com_dialog.show();
-        } else {
-            maybeAskNotificationThenMain();
+            }
         }
     }
 
@@ -472,56 +498,33 @@ public class SplashActivity extends BaseActivity {
      * Continue with activation after storage is configured
      */
     private void continueWithActivation() {
-        try {
-            // Validate and fix storage location if needed
-            PreferenceInitializer.validateStorageLocation(this);
-            
-            // Check if we're already showing a dialog
-            if (is_dialog_show) {
-                Log.d(TAG, "Dialog already showing, skipping");
-                return;
-            }
-            
-            // Check storage permissions and request if needed using StoragePermissionHelper
-            if (!StoragePermissionHelper.areStoragePermissionsGranted(this) && !hasRequestedStoragePermission) {
-                Log.d(TAG, "Storage permissions not granted, requesting permissions");
-                hasRequestedStoragePermission = true;
-                StoragePermissionHelper.requestStoragePermissions(this);
-                return; // Exit here and wait for permission result
-            }
-            
-            // Reset permission flag if we reach here
-            hasRequestedStoragePermission = false;
-            
-            // Continue with activation dialog
+        // Validate and fix storage location if needed
+        PreferenceInitializer.validateStorageLocation(this);
+        // Check storage permissions and request if needed using StoragePermissionHelper
+        if (!StoragePermissionHelper.areStoragePermissionsGranted(this)) {
+            Log.d(TAG, "Storage permissions not granted, requesting permissions");
+            StoragePermissionHelper.requestStoragePermissions(this);
+        }
+
+        synchronized (dialogLock) {
             should_show_complete = true;
             is_dialog_show = true;
-            
-            // Run on UI thread to ensure proper dialog display
-            runOnUiThread(() -> {
-                try {
-                    ActivationDialog activationDialog = new ActivationDialog(this);
-                    activationDialog.setOkListener(view -> {
-                        activationDialog.dismiss();
-                        is_dialog_show = false;
-                        setSerialNumber();
-                    });
-                    activationDialog.setCloseListener(view -> {
-                        is_dialog_show = false;
-                        activationDialog.dismiss();
-                        finish();
-                    });
-                    activationDialog.show();
-                } catch (Exception e) {
-                    Log.e(TAG, "Error showing activation dialog", e);
+            ActivationDialog activationDialog = new ActivationDialog(this);
+            activationDialog.setOkListener(view -> {
+                activationDialog.dismiss();
+                synchronized (dialogLock) {
                     is_dialog_show = false;
-                    gotoNextView();
                 }
+                runOnUiThread(() -> setSerialNumber());
             });
-        } catch (Exception e) {
-            Log.e(TAG, "Error in continueWithActivation", e);
-            is_dialog_show = false;
-            gotoNextView();
+            activationDialog.setCloseListener(view -> {
+                synchronized (dialogLock) {
+                    is_dialog_show = false;
+                }
+                activationDialog.dismiss();
+                finish();
+            });
+            activationDialog.show();
         }
     }
 
@@ -722,29 +725,37 @@ public class SplashActivity extends BaseActivity {
     }
 
     void setSerialNumber() {
-        if (is_dialog_show) {
-            return;
+        synchronized (dialogLock) {
+            if (is_dialog_show) {
+                return;
+            }
+            is_dialog_show = true;
         }
-        is_dialog_show = true;
 
         SerialDialog serialDialog = new SerialDialog(this);
         serialDialog.setOkListener(view -> {
-            is_dialog_show = false;
+            synchronized (dialogLock) {
+                is_dialog_show = false;
+            }
             serialDialog.dismiss();
             String serial_number = serialDialog.edt_serial.getText().toString();
             if (isValidSerial(serial_number)) {
-                displayID();
+                runOnUiThread(() -> displayID());
             } else {
-                gotoNextView();
+                runOnUiThread(() -> gotoNextView());
             }
         });
         serialDialog.setCloseListener(view -> {
             serialDialog.dismiss();
-            is_dialog_show = false;
-            gotoNextView();
+            synchronized (dialogLock) {
+                is_dialog_show = false;
+            }
+            runOnUiThread(() -> gotoNextView());
         });
         serialDialog.setScanListener(view -> {
-            is_dialog_show = false;
+            synchronized (dialogLock) {
+                is_dialog_show = false;
+            }
             serialDialog.dismiss();
             Intent i = new Intent(SplashActivity.this, QrCodeActivity.class);
             startActivityForResult(i, REQUEST_CODE_QR_SCAN_SERIAL_NUMBER);
@@ -755,8 +766,10 @@ public class SplashActivity extends BaseActivity {
                 @Override
                 public void onClick(View view) {
                     serialDialog.dismiss();
-                    is_dialog_show = false;
-                    setSerialNumber();
+                    synchronized (dialogLock) {
+                        is_dialog_show = false;
+                    }
+                    runOnUiThread(() -> setSerialNumber());
                 }
             });
         });
@@ -764,50 +777,64 @@ public class SplashActivity extends BaseActivity {
     }
 
     void setActivationCode() {
-        if (is_dialog_show) {
-            return;
+        synchronized (dialogLock) {
+            if (is_dialog_show) {
+                return;
+            }
+            is_dialog_show = true;
         }
-        is_dialog_show = true;
 
         CodeDialog codeDialog = new CodeDialog(this);
         codeDialog.setCloseListener(view -> {
             codeDialog.dismiss();
-            is_dialog_show = false;
-            gotoNextView();
+            synchronized (dialogLock) {
+                is_dialog_show = false;
+            }
+            runOnUiThread(() -> gotoNextView());
         });
         codeDialog.setOkListener(view -> {
             codeDialog.dismiss();
             String activation_code = codeDialog.edt_code.getText().toString();
             isValidActivation(activation_code);
-            is_dialog_show = false;
-            gotoNextView();
+            synchronized (dialogLock) {
+                is_dialog_show = false;
+            }
+            runOnUiThread(() -> gotoNextView());
         });
         codeDialog.setScanListener(view -> {
             codeDialog.dismiss();
             Intent i = new Intent(SplashActivity.this, QrCodeActivity.class);
             startActivityForResult(i, REQUEST_CODE_QR_SCAN_ACTIVATION);
-            is_dialog_show = false;
+            synchronized (dialogLock) {
+                is_dialog_show = false;
+            }
         });
         codeDialog.show();
     }
 
     void displayID() {
-        if (is_dialog_show) {
-            return;
+        synchronized (dialogLock) {
+            if (is_dialog_show) {
+                return;
+            }
+            is_dialog_show = true;
         }
-        is_dialog_show = true;
         String machine_code = CommonUtil.getDeviceID(this);
         MachineCodeDialog machineCodeDialog = new MachineCodeDialog(this);
         machineCodeDialog.setMachineCode(machine_code);
         machineCodeDialog.setOkListener(view -> {
             machineCodeDialog.dismiss();
-            is_dialog_show = false;
-            setActivationCode();
+            synchronized (dialogLock) {
+                is_dialog_show = false;
+            }
+            runOnUiThread(() -> setActivationCode());
         });
         machineCodeDialog.setCloseListener(view -> {
             machineCodeDialog.dismiss();
-            is_dialog_show = false;
-            gotoNextView();
+            synchronized (dialogLock) {
+                is_dialog_show = false;
+            }
+            runOnUiThread(() -> gotoNextView());
         });
         machineCodeDialog.setOnlineListener(view -> {
             // online activation
@@ -821,7 +848,9 @@ public class SplashActivity extends BaseActivity {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
                     machineCodeDialog.dismiss();
-                    is_dialog_show = false;
+                    synchronized (dialogLock) {
+                        is_dialog_show = false;
+                    }
                     dlg_progress.dismiss();
                     if (response.code() == 404) { // invalid serial
                         MessageUtil.showToast(getApplicationContext(), R.string.invalid_serial);
@@ -835,7 +864,7 @@ public class SplashActivity extends BaseActivity {
                                 .setPositiveButton(android.R.string.ok, null)
                                 .setCancelable(true)
                                 .setOnDismissListener(dialog -> {
-                                    gotoNextView();
+                                    runOnUiThread(() -> gotoNextView());
                                 });
                         aboutDialog.show();
                         return;
@@ -844,16 +873,18 @@ public class SplashActivity extends BaseActivity {
                     } else {
                         MessageUtil.showToast(getApplicationContext(), R.string.unknown_error);
                     }
-                    gotoNextView();
+                    runOnUiThread(() -> gotoNextView());
                 }
 
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
                     machineCodeDialog.dismiss();
-                    is_dialog_show = false;
+                    synchronized (dialogLock) {
+                        is_dialog_show = false;
+                    }
                     dlg_progress.dismiss();
                     MessageUtil.showToast(getApplicationContext(), t.getLocalizedMessage());
-                    gotoNextView();
+                    runOnUiThread(() -> gotoNextView());
                 }
             });
         });
@@ -863,10 +894,12 @@ public class SplashActivity extends BaseActivity {
 
 
     void setPinCode() {
-        if (is_dialog_show) {
-            return;
+        synchronized (dialogLock) {
+            if (is_dialog_show) {
+                return;
+            }
+            is_dialog_show = true;
         }
-        is_dialog_show = true;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View customTitleView = inflater.inflate(R.layout.dialog_title, null);
         View rootview = findViewById(android.R.id.content);
@@ -880,16 +913,18 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                is_dialog_show = false;
+                synchronized (dialogLock) {
+                    is_dialog_show = false;
+                }
                 String pin = input.getText().toString();
                 if (TextUtils.isEmpty(pin) || pin.length() != 4) {
                     MessageUtil.showToast(getApplicationContext(), R.string.invalid_pin);
-                    gotoNextView();
+                    runOnUiThread(() -> gotoNextView());
                 } else {
                     AppPreference.setStr(AppPreference.KEY.PIN_NUMBER, pin);
                     AppPreference.setBool(AppPreference.KEY.APP_FIRST_LAUNCH, false);
                     AppPreference.setBool(AppPreference.KEY.UI_CONVERT_MODE, true);
-                    chooseAudioOption();
+                    runOnUiThread(() -> chooseAudioOption());
                 }
             }
         });
@@ -897,8 +932,10 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
-                is_dialog_show = false;
-                gotoNextView();
+                synchronized (dialogLock) {
+                    is_dialog_show = false;
+                }
+                runOnUiThread(() -> gotoNextView());
             }
         });
 
@@ -918,15 +955,15 @@ public class SplashActivity extends BaseActivity {
             if (requestCode == REQUEST_CODE_QR_SCAN_SERIAL_NUMBER) {
                 String result = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
                 if (isValidSerial(result)) {
-                    displayID();
+                    runOnUiThread(() -> displayID());
                 } else {
-                    gotoNextView();
+                    runOnUiThread(() -> gotoNextView());
                 }
             } else if (requestCode == REQUEST_CODE_QR_SCAN_ACTIVATION) {
                 String result = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
                 if (!isValidActivation(result)) {
                 }
-                gotoNextView();
+                runOnUiThread(() -> gotoNextView());
             }
         }
     }
