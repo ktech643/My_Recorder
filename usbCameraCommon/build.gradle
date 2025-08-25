@@ -24,9 +24,8 @@
 apply plugin: 'com.android.library'
 
 android {
+    namespace 'com.serenegiant.usbcameracommon'
     compileSdk 34
-
-namespace 'com.serenegiant.usbcameracommon'
 
    	compileOptions {
    		sourceCompatibility JavaVersion.VERSION_11
@@ -36,7 +35,10 @@ namespace 'com.serenegiant.usbcameracommon'
     defaultConfig {
         minSdkVersion 26
         targetSdkVersion 33
-
+    }
+    
+    buildFeatures {
+        buildConfig = true
     }
     buildTypes {
         release {
@@ -55,13 +57,13 @@ namespace 'com.serenegiant.usbcameracommon'
 dependencies {
 	api fileTree(dir: 'libs', include: ['*.jar'])
 
-	implementation "com.android.support:support-annotations:27.1.1"
+	implementation "androidx.annotation:annotation:1.7.1"
 
 	implementation("com.serenegiant:common:2.12.4") {
    		exclude module: 'support-v4'
    	}
 	implementation project(':libuvccamera')
-    implementation 'androidx.fragment:fragment:1.0.0'
+    implementation 'androidx.fragment:fragment:1.6.2'
 }
 android {
     packagingOptions {

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- USB camera device filter configuration -->
+    <usb-device vendor-id="1133" product-id="2085" />
+    <usb-device vendor-id="1133" product-id="2093" />
+    <usb-device vendor-id="1133" product-id="2085" />
+    <usb-device vendor-id="1452" product-id="34304" />
+    <usb-device vendor-id="3141" product-id="25344" />
+</resources>

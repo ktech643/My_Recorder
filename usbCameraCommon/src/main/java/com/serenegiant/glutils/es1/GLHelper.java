@@ -17,7 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.serenegiant.utils.BuildCheck;
-import com.serenegiant.uvccamera.BuildConfig;
+import com.serenegiant.usbcameracommon.BuildConfig;
 
 import javax.microedition.khronos.opengles.GL10;
 

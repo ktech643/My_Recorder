@@ -32,7 +32,8 @@ android {
         targetSdk project.ext.targetSdkVersion
         versionCode 1
         versionName "4.003"
-        setProperty("archivesBaseName", "CheckMate!_" + versionName)
+        // Replaced deprecated setProperty with modern approach
+        archivesBaseName = "CheckMate_${versionName}"
         multiDexEnabled true
         
         // Native builds temporarily disabled for build testing
@@ -82,7 +83,10 @@ android {
 
 
     repositories {
-        flatDir { dirs 'libs' }
+        flatDir { 
+            dirs 'libs'
+            // Note: flatDir should eventually be replaced with proper artifact repositories
+        }
     }
     sourceSets {
         main {
@@ -139,7 +143,7 @@ android {
     // Configure build features properly
     buildFeatures {
         buildConfig = true
-        viewBinding = true
+        viewBinding = false  // Temporarily disabled
     }
 }
 
