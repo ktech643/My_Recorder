@@ -98,6 +98,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.ReentrantLock;
+import com.checkmate.android.util.CrashLogger;
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.SecretKey;
@@ -118,6 +123,8 @@ public class SharedEglManager {
     // Singleton instance management
     private static volatile SharedEglManager sInstance;
     private static final Object sLock = new Object();
+    private static final ReentrantLock instanceLock = new ReentrantLock();
+    private static final long ANR_TIMEOUT = 50; // 50ms for main thread operations
     
     // Service management
     private final Map<ServiceType, WeakReference<BaseBackgroundService>> mRegisteredServices = new ConcurrentHashMap<>();
@@ -395,10 +402,19 @@ public class SharedEglManager {
      */
     public static SharedEglManager getInstance() {
         if (sInstance == null) {
-            synchronized (sLock) {
+            instanceLock.lock();
+            try {
                 if (sInstance == null) {
                     sInstance = new SharedEglManager();
+                    Log.d(TAG, "SharedEglManager instance created");
                 }
+            } catch (Exception e) {
+                Log.e(TAG, "Error creating SharedEglManager instance", e);
+                if (CrashLogger.getInstance() != null) {
+                    CrashLogger.getInstance().logError(TAG, "getInstance", e);
+                }
+            } finally {
+                instanceLock.unlock();
             }
         }
         return sInstance;
