@@ -72,6 +72,8 @@ import com.checkmate.android.AppConstant;
 import com.checkmate.android.AppPreference;
 import com.checkmate.android.BuildConfig;
 import com.checkmate.android.R;
+import com.checkmate.android.util.InternalLogger;
+import com.checkmate.android.util.ANRSafeHelper;
 
 import com.checkmate.android.model.Camera;
 import com.checkmate.android.networking.HttpApiService;
@@ -316,54 +318,208 @@ public class MainActivity extends BaseActivity
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,WindowManager.LayoutParams.FLAG_SECURE);
+        try {
+            InternalLogger.i(TAG, "MainActivity onCreate starting");
+            
+            super.onCreate(savedInstanceState);
+            
+            // Initialize InternalLogger if not already done
+            if (!AppPreference.isInitialized()) {
+                InternalLogger.w(TAG, "AppPreference not initialized in onCreate");
+            }
+            
+            ANRSafeHelper.executeIfContextValid(this, () -> {
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                setContentView(R.layout.activity_service);
+            });
+            
+            instance = this;
+            
+            // Null-safe fragment manager initialization
+            fragmentManager = ANRSafeHelper.nullSafe(getSupportFragmentManager(), null, "FragmentManager");
+            if (fragmentManager == null) {
+                InternalLogger.e(TAG, "Failed to get FragmentManager, app may not function properly");
+                // Continue with degraded functionality
+            }
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // kept once
-        setContentView(R.layout.activity_service);
-        instance = this;
-        fragmentManager = getSupportFragmentManager();
-
-        dlg_progress = KProgressHUD.create(this)
-                .setStyle(KProgressHUD.Style.PIE_DETERMINATE)
-                .setLabel("Processing")
-                .setDetailsLabel("Please Wait...")
-                .setCancellable(false)
-                .setAnimationSpeed(3)
-                .setDimAmount(0.6f)
-                .setBackgroundColor(Color.parseColor("#000000"))
-                .setWindowColor(Color.parseColor("#0D0D0D"))
-                .setCornerRadius(18f)
-                .setMaxProgress(100)
-                .setCancellable(true);
-                //.show();
-
-
-        init();
-        showChessIfNeeded();
+            // Initialize progress dialog with null safety
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                try {
+                    dlg_progress = KProgressHUD.create(this)
+                            .setStyle(KProgressHUD.Style.PIE_DETERMINATE)
+                            .setLabel("Processing")
+                            .setDetailsLabel("Please Wait...")
+                            .setCancellable(false)
+                            .setAnimationSpeed(3)
+                            .setDimAmount(0.6f)
+                            .setBackgroundColor(Color.parseColor("#000000"))
+                            .setWindowColor(Color.parseColor("#0D0D0D"))
+                            .setCornerRadius(18f)
+                            .setMaxProgress(100)
+                            .setCancellable(true);
+                    
+                    InternalLogger.d(TAG, "Progress dialog initialized successfully");
+                    return true;
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Failed to initialize progress dialog", e);
+                    return false;
+                }
+            }, false);
+            
+            // Initialize core components with error recovery
+            initializeWithRecovery();
+            
+            InternalLogger.i(TAG, "MainActivity onCreate completed successfully");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Critical error in MainActivity onCreate", e);
+            // Attempt recovery
+            handleCriticalError(e);
+        }
+    }
+    
+    /**
+     * Initialize core components with ANR protection and error recovery
+     */
+    private void initializeWithRecovery() {
+        ANRSafeHelper.getInstance().executeWithFallback(new ANRSafeHelper.FallbackOperation<Boolean>() {
+            @Override
+            public Boolean executeEssential() throws Exception {
+                init();
+                showChessIfNeeded();
+                return true;
+            }
+            
+            @Override
+            public Boolean executeFallback() throws Exception {
+                InternalLogger.w(TAG, "Using fallback initialization");
+                // Minimal initialization for basic functionality
+                initEssentialComponents();
+                return true;
+            }
+        }, false);
+    }
+    
+    /**
+     * Essential components initialization for fallback mode
+     */
+    private void initEssentialComponents() {
+        try {
+            // Initialize only critical components
+            if (fragmentManager != null) {
+                // Ensure fragments are properly initialized
+                if (liveFragment == null) liveFragment = LiveFragment.newInstance();
+                if (playbackFragment == null) playbackFragment = PlaybackFragment.newInstance();
+                if (streamingFragment == null) streamingFragment = StreamingFragment.newInstance();
+                if (settingsFragment == null) settingsFragment = SettingsFragment.newInstance();
+            }
+            
+            InternalLogger.i(TAG, "Essential components initialized");
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Failed to initialize essential components", e);
+        }
+    }
+    
+    /**
+     * Handle critical errors with recovery strategies
+     */
+    private void handleCriticalError(Exception e) {
+        InternalLogger.e(TAG, "Handling critical error in MainActivity", e);
+        
+        // Check if we're in ANR recovery mode
+        if (AppPreference.isInAnrRecoveryMode()) {
+            InternalLogger.w(TAG, "App is in ANR recovery mode, attempting minimal startup");
+            
+            try {
+                // Minimal initialization
+                setContentView(R.layout.activity_service);
+                initEssentialComponents();
+            } catch (Exception recoveryEx) {
+                InternalLogger.e(TAG, "Recovery attempt failed", recoveryEx);
+                // At this point, consider showing a user-friendly error message
+                showErrorToUser("App startup failed. Please restart the app.");
+            }
+        } else {
+            // Mark for restart and increment restart count
+            AppPreference.incrementRestartCount();
+            
+            // Show error to user and potentially restart
+            showErrorToUser("App encountered an error. Restarting...");
+            
+            // Delayed restart
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                try {
+                    recreate();
+                } catch (Exception recreateEx) {
+                    InternalLogger.e(TAG, "Failed to recreate activity", recreateEx);
+                    // Final fallback - finish activity
+                    finish();
+                }
+            }, 2000);
+        }
+    }
+    
+    /**
+     * Show error message to user safely
+     */
+    private void showErrorToUser(String message) {
+        ANRSafeHelper.getInstance().postToMainThreadSafely(() -> {
+            try {
+                if (!isFinishing() && !isDestroyed()) {
+                    Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                }
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Failed to show error toast", e);
+            }
+        });
     }
 
     private void showChessIfNeeded() {
-        // “Chess/PIN” screen is required only when convert-mode is ON
-        // and the user has not entered the pin yet (is_passed == false)
-        if (AppPreference.getBool(AppPreference.KEY.UI_CONVERT_MODE, false)
-                && !is_passed) {
-
-            Intent i = new Intent(this, ChessActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            overridePendingTransition(0, 0);
-            startActivity(i);
-        }
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                // Null-safe preference check
+                boolean convertMode = AppPreference.getBool(AppPreference.KEY.UI_CONVERT_MODE, false);
+                
+                if (convertMode && !is_passed) {
+                    if (ANRSafeHelper.isContextValid(this) && !isFinishing() && !isDestroyed()) {
+                        Intent i = new Intent(this, ChessActivity.class);
+                        if (i.resolveActivity(getPackageManager()) != null) {
+                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            overridePendingTransition(0, 0);
+                            startActivity(i);
+                            InternalLogger.d(TAG, "Chess activity started successfully");
+                        } else {
+                            InternalLogger.w(TAG, "ChessActivity not found, skipping");
+                        }
+                    } else {
+                        InternalLogger.w(TAG, "Context invalid or activity finishing, skipping chess activity");
+                    }
+                }
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in showChessIfNeeded", e);
+                return false;
+            }
+        }, false);
     }
     
     @Override
     protected void onRestart() {
-        super.onRestart();
-        boolean isForStorgaLocation = AppPreference.getBool(AppPreference.KEY.IS_FOR_STORAGE_LOCATION, false);
-        if (!isForStorgaLocation) {
-            AppPreference.setBool(AppPreference.KEY.IS_FOR_STORAGE_LOCATION, false);
-            showChessIfNeeded();
+        try {
+            InternalLogger.d(TAG, "MainActivity onRestart");
+            super.onRestart();
+            
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                boolean isForStorageLocation = AppPreference.getBool(AppPreference.KEY.IS_FOR_STORAGE_LOCATION, false);
+                if (!isForStorageLocation) {
+                    AppPreference.setBool(AppPreference.KEY.IS_FOR_STORAGE_LOCATION, false);
+                    showChessIfNeeded();
+                }
+                return true;
+            }, false);
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in onRestart", e);
         }
     }
 
@@ -372,12 +528,47 @@ public class MainActivity extends BaseActivity
      *  HTTP-server helpers
      * ──────────────────────────────────────────────────────────────────────── */
     void startHTTPServer() {
-        server = new MyHttpServer(SERVER_PORT, getApplicationContext(), serviceManager);
-        server.startServer();
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                if (!ANRSafeHelper.isContextValid(this)) {
+                    InternalLogger.w(TAG, "Invalid context, cannot start HTTP server");
+                    return false;
+                }
+                
+                if (server == null) {
+                    server = new MyHttpServer(SERVER_PORT, getApplicationContext(), serviceManager);
+                }
+                
+                if (server != null) {
+                    server.startServer();
+                    InternalLogger.i(TAG, "HTTP server started successfully");
+                } else {
+                    InternalLogger.e(TAG, "Failed to create HTTP server instance");
+                }
+                
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error starting HTTP server", e);
+                return false;
+            }
+        }, false);
     }
-
+    
     void stopHTTPServer() {
-        if (server != null) server.stopServer();
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                if (server != null) {
+                    server.stopServer();
+                    InternalLogger.i(TAG, "HTTP server stopped successfully");
+                } else {
+                    InternalLogger.d(TAG, "HTTP server was null, nothing to stop");
+                }
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error stopping HTTP server", e);
+                return false;
+            }
+        }, false);
     }
 
     /** Resize the preview TextureView after any surface-change. */
@@ -387,17 +578,22 @@ public class MainActivity extends BaseActivity
 
     /** Exposes the active camera's static info to SettingsFragment. */
     public CameraInfo findCameraInfo() {
-        CameraInfo cameraInfo = null;
-        List<CameraInfo> mCameraList = CameraManager.getCameraList(this, true);
-
-        if (mCameraList == null || mCameraList.isEmpty()) {
-            Log.e(TAG, "No cameras found");
-            return null;
-        }
-
-        String cameraId = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
-        if (TextUtils.isEmpty(cameraId)) {
-            cameraId = AppConstant.REAR_CAMERA;
+        return ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                List<CameraInfo> mCameraList = CameraManager.getCameraList(this, true);
+                
+                if (ANRSafeHelper.isNullWithLog(mCameraList, "mCameraList") || mCameraList.isEmpty()) {
+                    InternalLogger.e(TAG, "No cameras found or camera list is null");
+                    return null;
+                }
+                
+                String cameraId = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
+                if (TextUtils.isEmpty(cameraId)) {
+                    cameraId = AppConstant.REAR_CAMERA;
+                    InternalLogger.w(TAG, "Camera ID was empty, using default: " + cameraId);
+                }
+                
+                CameraInfo cameraInfo = null;
         }
 
         for (CameraInfo info : mCameraList) {
@@ -1662,31 +1858,75 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onPause() {
-        super.onPause();
-        // Show flImages when app goes to background
-        is_passed = false;
-        showTaskListPreview();
+        try {
+            InternalLogger.d(TAG, "MainActivity onPause");
+            super.onPause();
+            
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                // Show flImages when app goes to background
+                is_passed = false;
+                showTaskListPreview();
+                return true;
+            }, false);
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in onPause", e);
+        }
     }
 
     @Override
     protected void onResume() {
-        super.onResume();
-        // Hide flImages when app becomes active again
-        hideTaskListPreview();
+        try {
+            InternalLogger.d(TAG, "MainActivity onResume");
+            super.onResume();
+            
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                // Hide flImages when app becomes active again
+                hideTaskListPreview();
+                
+                // Reset restart count on successful resume if in recovery mode
+                if (AppPreference.isInAnrRecoveryMode()) {
+                    ANRSafeHelper.getInstance().exitRecoveryMode();
+                    AppPreference.resetRestartCount();
+                    InternalLogger.i(TAG, "Successfully exited ANR recovery mode");
+                }
+                
+                return true;
+            }, false);
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in onResume", e);
+        }
     }
 
     @Override
     protected void onStop() {
-        super.onStop();
-        // Show flImages when app goes to background (task list)
-        showTaskListPreview();
+        try {
+            InternalLogger.d(TAG, "MainActivity onStop");
+            super.onStop();
+            
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                // Show flImages when app goes to background (task list)
+                showTaskListPreview();
+                return true;
+            }, false);
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in onStop", e);
+        }
     }
 
     @Override
     protected void onStart() {
-        super.onStart();
-        // Hide flImages when app becomes active again
-        showChessIfNeeded();
+        try {
+            InternalLogger.d(TAG, "MainActivity onStart");
+            super.onStart();
+            
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                // Hide flImages when app becomes active again
+                showChessIfNeeded();
+                return true;
+            }, false);
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in onStart", e);
+        }
     }
 
     @Override
@@ -1981,42 +2221,245 @@ public class MainActivity extends BaseActivity
      * ──────────────────────────────────────────────────────────────────────── */
     @Override
     protected void onDestroy() {
-
-        // stopHTTPServer();   // still optional – uncomment if you use HTTP server
-
-        unregisterReceiverSafe(usbReceiver);
-        unregisterReceiverSafe(myReceiver);
-        unregisterReceiverSafe(powerReceiver);
-        unregisterReceiverSafe(wifiReceiver);
-
-        if (handler != null) handler.removeCallbacks(updateTimeRunnable);
-        stopLocationService();
-
-        // Stop per-device services if not recording / streaming
-        if (!isRecordingCamera() && !isStreaming()) stopService(ServiceType.BgCamera);
-        if (!isRecordingUSB()   && !isStreaming()) stopService(ServiceType.BgUSBCamera);
-        if (!isWifiRecording()  && !isWifiStreaming()) stopWifiService();
-
-        if (wl != null) wl.release();
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        /* Unbind and stop every service instance left */
-        if (mUSBService   != null && isUsbServiceBound)   { safeUnbind(mUSBConnection);   stopServiceIfRunning(mUSBService,   new Intent(this, BgUSBService.class));   isUsbServiceBound   = false; }
-        if (mWifiService  != null && isWifiServiceBound)  { safeUnbind(mWifiConnection);  stopServiceIfRunning(mWifiService,  new Intent(this, BgWifiService.class));  isWifiServiceBound  = false; }
-        if (mCamService   != null && isCamServiceBond)    { safeUnbind(mConnection);      stopServiceIfRunning(mCamService,   new Intent(this, BgCameraService.class)); isCamServiceBond    = false; }
-        if (mCastService  != null && isCastServiceBound)  { safeUnbind(mCastConnection);  stopServiceIfRunning(mCastService,  new Intent(this, BgCastService.class));  isCastServiceBound  = false; }
-        if (mAudioService != null && isAudioServiceBound) { safeUnbind(mAudioConnection); stopServiceIfRunning(mAudioService, new Intent(this, BgAudioService.class)); isAudioServiceBound = false; }
-
-        if (mSurfaceTextureListener != null) {
-            mSurfaceTextureListener.onSurfaceTextureDestroyed(null);
-            mSurfaceTextureListener = null;
+        try {
+            InternalLogger.i(TAG, "MainActivity onDestroy starting");
+            
+            // Critical cleanup operations with timeout protection
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                try {
+                    // Cleanup receivers safely
+                    safeUnregisterReceiver("usbReceiver", () -> unregisterReceiverSafe(usbReceiver));
+                    safeUnregisterReceiver("myReceiver", () -> unregisterReceiverSafe(myReceiver));
+                    safeUnregisterReceiver("powerReceiver", () -> unregisterReceiverSafe(powerReceiver));
+                    safeUnregisterReceiver("wifiReceiver", () -> unregisterReceiverSafe(wifiReceiver));
+                    
+                    // Cleanup handlers
+                    if (handler != null && updateTimeRunnable != null) {
+                        handler.removeCallbacks(updateTimeRunnable);
+                    }
+                    
+                    // Stop location service safely
+                    stopLocationServiceSafely();
+                    
+                    return true;
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error in receiver cleanup", e);
+                    return false;
+                }
+            }, false, 3); // 3 second timeout for critical cleanup
+            
+            // Service cleanup with fallback
+            cleanupServicesWithFallback();
+            
+            // UI cleanup
+            cleanupUIComponents();
+            
+            // Final cleanup
+            performFinalCleanup();
+            
+            InternalLogger.i(TAG, "MainActivity onDestroy completed");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Critical error in onDestroy", e);
+        } finally {
+            // Ensure super.onDestroy() is always called
+            try {
+                super.onDestroy();
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in super.onDestroy()", e);
+            }
         }
-
-        if (alertDialog != null && alertDialog.isShowing()) { alertDialog.dismiss(); alertDialog = null; }
-
-        instance         = null;
-        mCurrentFragment = null;
-        super.onDestroy();
+    }
+    
+    /**
+     * Safely unregister broadcast receiver
+     */
+    private void safeUnregisterReceiver(String receiverName, Runnable unregisterAction) {
+        try {
+            if (unregisterAction != null) {
+                unregisterAction.run();
+                InternalLogger.d(TAG, receiverName + " unregistered successfully");
+            }
+        } catch (Exception e) {
+            InternalLogger.w(TAG, "Failed to unregister " + receiverName, e);
+        }
+    }
+    
+    /**
+     * Stop location service safely
+     */
+    private void stopLocationServiceSafely() {
+        try {
+            stopLocationService();
+            InternalLogger.d(TAG, "Location service stopped successfully");
+        } catch (Exception e) {
+            InternalLogger.w(TAG, "Failed to stop location service", e);
+        }
+    }
+    
+    /**
+     * Cleanup services with fallback strategies
+     */
+    private void cleanupServicesWithFallback() {
+        ANRSafeHelper.getInstance().executeWithFallback(new ANRSafeHelper.FallbackOperation<Boolean>() {
+            @Override
+            public Boolean executeEssential() throws Exception {
+                // Stop per-device services if not recording/streaming
+                if (!isRecordingCamera() && !isStreaming()) stopService(ServiceType.BgCamera);
+                if (!isRecordingUSB() && !isStreaming()) stopService(ServiceType.BgUSBCamera);
+                if (!isWifiRecording() && !isWifiStreaming()) stopWifiService();
+                
+                // Release wake lock
+                if (wl != null && wl.isHeld()) {
+                    wl.release();
+                    InternalLogger.d(TAG, "Wake lock released");
+                }
+                
+                // Clear screen flags
+                if (!isFinishing()) {
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                }
+                
+                return true;
+            }
+            
+            @Override
+            public Boolean executeFallback() throws Exception {
+                InternalLogger.w(TAG, "Using fallback service cleanup");
+                
+                // Force release wake lock
+                try {
+                    if (wl != null && wl.isHeld()) {
+                        wl.release();
+                    }
+                } catch (Exception e) {
+                    InternalLogger.w(TAG, "Failed to release wake lock in fallback", e);
+                }
+                
+                return true;
+            }
+        }, false);
+        
+        // Unbind services safely
+        unbindServicesWithTimeout();
+    }
+    
+    /**
+     * Unbind all services with timeout protection
+     */
+    private void unbindServicesWithTimeout() {
+        // Each service unbinding with individual timeout
+        if (mUSBService != null && isUsbServiceBound) {
+            safeUnbindService("USB", mUSBConnection, new Intent(this, BgUSBService.class), () -> isUsbServiceBound = false);
+        }
+        
+        if (mWifiService != null && isWifiServiceBound) {
+            safeUnbindService("Wifi", mWifiConnection, new Intent(this, BgWifiService.class), () -> isWifiServiceBound = false);
+        }
+        
+        if (mCamService != null && isCamServiceBond) {
+            safeUnbindService("Camera", mConnection, new Intent(this, BgCameraService.class), () -> isCamServiceBond = false);
+        }
+        
+        if (mCastService != null && isCastServiceBound) {
+            safeUnbindService("Cast", mCastConnection, new Intent(this, BgCastService.class), () -> isCastServiceBound = false);
+        }
+        
+        if (mAudioService != null && isAudioServiceBound) {
+            safeUnbindService("Audio", mAudioConnection, new Intent(this, BgAudioService.class), () -> isAudioServiceBound = false);
+        }
+    }
+    
+    /**
+     * Safely unbind a service with timeout
+     */
+    private void safeUnbindService(String serviceName, ServiceConnection connection, Intent serviceIntent, Runnable flagSetter) {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                safeUnbind(connection);
+                stopServiceIfRunning(null, serviceIntent); // Pass null for service instance to avoid issues
+                if (flagSetter != null) {
+                    flagSetter.run();
+                }
+                InternalLogger.d(TAG, serviceName + " service unbound successfully");
+                return true;
+            } catch (Exception e) {
+                InternalLogger.w(TAG, "Failed to unbind " + serviceName + " service", e);
+                if (flagSetter != null) {
+                    flagSetter.run(); // Still update flag to prevent repeated attempts
+                }
+                return false;
+            }
+        }, false, 2); // 2 second timeout per service
+    }
+    
+    /**
+     * Cleanup UI components safely
+     */
+    private void cleanupUIComponents() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                // Cleanup surface texture listener
+                if (mSurfaceTextureListener != null) {
+                    try {
+                        mSurfaceTextureListener.onSurfaceTextureDestroyed(null);
+                    } catch (Exception e) {
+                        InternalLogger.w(TAG, "Error destroying surface texture", e);
+                    }
+                    mSurfaceTextureListener = null;
+                }
+                
+                // Cleanup alert dialog
+                if (alertDialog != null) {
+                    try {
+                        if (alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+                        }
+                    } catch (Exception e) {
+                        InternalLogger.w(TAG, "Error dismissing alert dialog", e);
+                    }
+                    alertDialog = null;
+                }
+                
+                // Cleanup progress dialog
+                if (dlg_progress != null) {
+                    try {
+                        if (dlg_progress.isShowing()) {
+                            dlg_progress.dismiss();
+                        }
+                    } catch (Exception e) {
+                        InternalLogger.w(TAG, "Error dismissing progress dialog", e);
+                    }
+                    dlg_progress = null;
+                }
+                
+                InternalLogger.d(TAG, "UI components cleaned up successfully");
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in UI cleanup", e);
+                return false;
+            }
+        }, false, 2); // 2 second timeout for UI cleanup
+    }
+    
+    /**
+     * Perform final cleanup operations
+     */
+    private void performFinalCleanup() {
+        try {
+            // Clear references
+            instance = null;
+            mCurrentFragment = null;
+            
+            // Cleanup ANR helper if this is the last activity
+            if (isTaskRoot()) {
+                ANRSafeHelper.getInstance().shutdown();
+            }
+            
+            InternalLogger.i(TAG, "Final cleanup completed");
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in final cleanup", e);
+        }
     }
 
     /** Call this if you ever need to force destruction programmatically. */

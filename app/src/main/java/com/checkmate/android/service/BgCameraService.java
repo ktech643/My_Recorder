@@ -29,6 +29,8 @@ import com.checkmate.android.model.SurfaceModel;
 import com.checkmate.android.service.SharedEGL.ServiceType;
 import com.checkmate.android.service.SharedEGL.SharedEglManager;
 import com.checkmate.android.util.SettingsUtils;
+import com.checkmate.android.util.InternalLogger;
+import com.checkmate.android.util.ANRSafeHelper;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -65,10 +67,27 @@ public class BgCameraService extends BaseBackgroundService {
             super(service);
         }
     }
+    
     private WeakReference<CameraBinder> mBinderRef = new WeakReference<>(new CameraBinder(this));
+    
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinderRef.get();
+        try {
+            InternalLogger.d(TAG, "BgCameraService onBind called");
+            
+            CameraBinder binder = mBinderRef.get();
+            if (binder == null) {
+                InternalLogger.w(TAG, "Binder reference was null, creating new one");
+                binder = new CameraBinder(this);
+                mBinderRef = new WeakReference<>(binder);
+            }
+            
+            return binder;
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in onBind", e);
+            // Return a new binder as fallback
+            return new CameraBinder(this);
+        }
     }
 
     @Inject
@@ -83,21 +102,361 @@ public class BgCameraService extends BaseBackgroundService {
 
     @Override
     public void onCreate() {
-        super.onCreate();
-        mCurrentStatus = BackgroundNotification.NOTIFICATION_STATUS.CREATED;
-
-        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        String wakeLockTag = "CheckMate:CameraLock";
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockTag);
-        wakeLock.acquire(60 * 60 * 2000);
-
-        mCameraThread.start();
-
-        // Get the singleton instance
-        SharedEglManager.cleanAndResetAsync(() -> {
-            mEglManager = SharedEglManager.getInstance();
-            mEglManager.initialize(getApplicationContext(), ServiceType.BgCamera);
-        });
+        try {
+            InternalLogger.i(TAG, "BgCameraService onCreate starting");
+            
+            super.onCreate();
+            mCurrentStatus = BackgroundNotification.NOTIFICATION_STATUS.CREATED;
+            
+            // Initialize wake lock with error handling
+            initializeWakeLockSafely();
+            
+            // Start camera thread safely
+            initializeCameraThreadSafely();
+            
+            // Initialize EGL manager with error recovery
+            initializeEglManagerSafely();
+            
+            InternalLogger.i(TAG, "BgCameraService onCreate completed successfully");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Critical error in BgCameraService onCreate", e);
+            handleServiceStartupError(e);
+        }
+    }
+    
+    /**
+     * Initialize wake lock with error handling
+     */
+    private void initializeWakeLockSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+                if (ANRSafeHelper.isNullWithLog(pm, "PowerManager")) {
+                    InternalLogger.e(TAG, "PowerManager is null, cannot create wake lock");
+                    return false;
+                }
+                
+                String wakeLockTag = "CheckMate:CameraLock";
+                wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockTag);
+                
+                if (wakeLock != null) {
+                    wakeLock.acquire(60 * 60 * 2000); // 2 hours max
+                    InternalLogger.d(TAG, "Wake lock acquired successfully");
+                } else {
+                    InternalLogger.e(TAG, "Failed to create wake lock");
+                }
+                
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error initializing wake lock", e);
+                return false;
+            }
+        }, false);
+    }
+    
+    /**
+     * Initialize camera thread safely
+     */
+    private void initializeCameraThreadSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                if (mCameraThread != null && !mCameraThread.isAlive()) {
+                    mCameraThread.start();
+                    InternalLogger.d(TAG, "Camera thread started successfully");
+                } else {
+                    InternalLogger.w(TAG, "Camera thread already running or null");
+                }
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error starting camera thread", e);
+                return false;
+            }
+        }, false);
+    }
+    
+    /**
+     * Initialize EGL manager with comprehensive error handling
+     */
+    private void initializeEglManagerSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                // Clean and reset EGL manager asynchronously
+                SharedEglManager.cleanAndResetAsync(() -> {
+                    ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                        try {
+                            mEglManager = SharedEglManager.getInstance();
+                            if (mEglManager != null) {
+                                Context appContext = getApplicationContext();
+                                if (ANRSafeHelper.isContextValid(appContext)) {
+                                    mEglManager.initialize(appContext, ServiceType.BgCamera);
+                                    InternalLogger.d(TAG, "EGL manager initialized successfully");
+                                } else {
+                                    InternalLogger.e(TAG, "Invalid application context for EGL initialization");
+                                }
+                            } else {
+                                InternalLogger.e(TAG, "Failed to get EGL manager instance");
+                            }
+                            return true;
+                        } catch (Exception e) {
+                            InternalLogger.e(TAG, "Error in EGL manager initialization callback", e);
+                            return false;
+                        }
+                    }, false);
+                });
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error setting up EGL manager initialization", e);
+                return false;
+            }
+        }, false);
+        
+        // Set up EGL listener safely
+        setupEglListenerSafely();
+    }
+    
+    /**
+     * Set up EGL listener with comprehensive error handling
+     */
+    private void setupEglListenerSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                if (mEglManager != null) {
+                    mEglManager.setListener(new SharedEglManager.Listener() {
+                        @Override
+                        public void onEglReady() {
+                            handleEglReadySafely();
+                        }
+                        
+                        private void drawFrame() {
+                            drawFrameSafely();
+                        }
+                    });
+                    InternalLogger.d(TAG, "EGL listener set successfully");
+                } else {
+                    InternalLogger.w(TAG, "EGL manager is null, cannot set listener");
+                }
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error setting up EGL listener", e);
+                return false;
+            }
+        }, false);
+    }
+    
+    /**
+     * Handle EGL ready event with comprehensive error handling
+     */
+    private void handleEglReadySafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                if (ANRSafeHelper.isNullWithLog(mEglManager, "mEglManager in onEglReady")) {
+                    return false;
+                }
+                
+                // Check if preview texture already exists
+                if (mPreviewTexture != null) {
+                    InternalLogger.d(TAG, "Preview texture already exists, skipping creation");
+                    return true;
+                }
+                
+                // Get camera texture safely
+                mPreviewTexture = mEglManager.getCameraTexture();
+                if (ANRSafeHelper.isNullWithLog(mPreviewTexture, "Camera texture from EglManager")) {
+                    InternalLogger.e(TAG, "Failed to get camera texture from EglManager");
+                    return false;
+                }
+                
+                // Create preview surface
+                mPreviewSurface = new Surface(mPreviewTexture);
+                mPreviewTexture.setDefaultBufferSize(1280, 720);
+                InternalLogger.d(TAG, "Preview surface created and buffer size set");
+                
+                // Set up shared view model safely
+                setupSharedViewModelSafely();
+                
+                // Set up frame available listener
+                setupFrameAvailableListenerSafely();
+                
+                // Initialize camera
+                ANRSafeHelper.getInstance().postToMainThreadSafely(() -> {
+                    initCameraSafely();
+                });
+                
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in handleEglReadySafely", e);
+                return false;
+            }
+        }, false);
+    }
+    
+    /**
+     * Set up shared view model safely
+     */
+    private void setupSharedViewModelSafely() {
+        try {
+            if (sharedViewModel != null) {
+                SurfaceModel surfaceModel = sharedViewModel.getSurfaceModel();
+                if (surfaceModel != null) {
+                    SurfaceTexture dsurfaceTexture = surfaceModel.getSurfaceTexture();
+                    if (dsurfaceTexture != null) {
+                        int dwidth = surfaceModel.getWidth();
+                        int dheight = surfaceModel.getHeight();
+                        mEglManager.setPreviewSurface(dsurfaceTexture, dwidth, dheight);
+                        InternalLogger.d(TAG, "Preview surface set in EGL manager");
+                    } else {
+                        InternalLogger.w(TAG, "SurfaceTexture not created yet, skipping preview surface setup");
+                    }
+                } else {
+                    InternalLogger.w(TAG, "SurfaceModel is null");
+                }
+            } else {
+                InternalLogger.w(TAG, "SharedViewModel is null");
+            }
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error setting up shared view model", e);
+        }
+    }
+    
+    /**
+     * Set up frame available listener safely
+     */
+    private void setupFrameAvailableListenerSafely() {
+        try {
+            mFrameAvailableListener = surfaceTexture -> {
+                ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                    try {
+                        if (mEglManager != null && mEglManager.getHandler() != null) {
+                            mEglManager.getHandler().post(this::drawFrameSafely);
+                        }
+                        return true;
+                    } catch (Exception e) {
+                        InternalLogger.e(TAG, "Error in frame available listener", e);
+                        return false;
+                    }
+                }, false);
+            };
+            
+            if (mPreviewTexture != null) {
+                mPreviewTexture.setOnFrameAvailableListener(mFrameAvailableListener);
+                InternalLogger.d(TAG, "Frame available listener set successfully");
+            }
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error setting up frame available listener", e);
+        }
+    }
+    
+    /**
+     * Draw frame safely with error handling
+     */
+    private void drawFrameSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                if (mPreviewTexture != null) {
+                    try {
+                        mPreviewTexture.updateTexImage();
+                        float[] tx = new float[16];
+                        mPreviewTexture.getTransformMatrix(tx);
+                    } catch (Exception e) {
+                        InternalLogger.e(TAG, "Failed to updateTexImage()", e);
+                        return false;
+                    }
+                }
+                
+                if (mEglManager != null) {
+                    mEglManager.drawFrame();
+                }
+                
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in drawFrameSafely", e);
+                return false;
+            }
+        }, false);
+    }
+    
+    /**
+     * Initialize camera safely
+     */
+    private void initCameraSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                initCamera();
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in initCameraSafely", e);
+                // Attempt recovery
+                handleCameraInitError(e);
+                return false;
+            }
+        }, false);
+    }
+    
+    /**
+     * Handle camera initialization errors with recovery strategies
+     */
+    private void handleCameraInitError(Exception error) {
+        InternalLogger.w(TAG, "Attempting camera initialization recovery");
+        
+        // Increment retry count and check if we should retry
+        reopenAttempts++;
+        if (reopenAttempts < MAX_RETRIES) {
+            InternalLogger.i(TAG, "Scheduling camera init retry, attempt: " + reopenAttempts);
+            mCameraHandler.postDelayed(() -> {
+                initCameraSafely();
+            }, REOPEN_DELAY_MS * reopenAttempts); // Progressive delay
+        } else {
+            InternalLogger.e(TAG, "Max camera init retries reached, giving up");
+            reopenAttempts = 0;
+        }
+    }
+    
+    /**
+     * Handle service startup errors
+     */
+    private void handleServiceStartupError(Exception error) {
+        InternalLogger.e(TAG, "Service startup failed, attempting graceful degradation");
+        
+        try {
+            // Update status to indicate error
+            setStatus(BackgroundNotification.NOTIFICATION_STATUS.ERROR);
+            
+            // Try to clean up any partially initialized components
+            cleanupPartialInitialization();
+            
+        } catch (Exception cleanupError) {
+            InternalLogger.e(TAG, "Error during startup error cleanup", cleanupError);
+        }
+    }
+    
+    /**
+     * Clean up partially initialized components
+     */
+    private void cleanupPartialInitialization() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                if (wakeLock != null && wakeLock.isHeld()) {
+                    wakeLock.release();
+                    wakeLock = null;
+                }
+                
+                if (mPreviewSurface != null) {
+                    mPreviewSurface.release();
+                    mPreviewSurface = null;
+                }
+                
+                if (mPreviewTexture != null) {
+                    mPreviewTexture.release();
+                    mPreviewTexture = null;
+                }
+                
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in cleanup", e);
+                return false;
+            }
+        }, false);
 
         mEglManager.setListener(new SharedEglManager.Listener() {
             @Override
@@ -157,27 +516,160 @@ public class BgCameraService extends BaseBackgroundService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        mRunningIntent = intent;
-        setStatus(BackgroundNotification.NOTIFICATION_STATUS.SERVICE_STARTED);
-        return START_STICKY;
+        try {
+            InternalLogger.d(TAG, "BgCameraService onStartCommand, flags: " + flags + ", startId: " + startId);
+            
+            super.onStartCommand(intent, flags, startId);
+            mRunningIntent = intent;
+            
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                try {
+                    setStatus(BackgroundNotification.NOTIFICATION_STATUS.SERVICE_STARTED);
+                    return true;
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error setting service status", e);
+                    return false;
+                }
+            }, false);
+            
+            InternalLogger.d(TAG, "BgCameraService onStartCommand completed");
+            return START_STICKY;
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in BgCameraService onStartCommand", e);
+            return START_NOT_STICKY; // Don't restart if there's a critical error
+        }
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-
-        // Camera-specific cleanup
-        safeCloseSessionAndDevice(mCamera2);
-
-        if (mPreviewSurface != null) {
-            mPreviewSurface.release();
-            mPreviewSurface = null;
+        try {
+            InternalLogger.i(TAG, "BgCameraService onDestroy starting");
+            
+            // Stop any pending retry attempts
+            mCameraHandler.removeCallbacks(reopenRunnable);
+            
+            // Mark as closing to prevent new operations
+            mClosing = true;
+            
+            // Cleanup camera resources safely
+            cleanupCameraResourcesSafely();
+            
+            // Cleanup other resources
+            cleanupServiceResourcesSafely();
+            
+            // Call super last
+            super.onDestroy();
+            
+            InternalLogger.i(TAG, "BgCameraService onDestroy completed successfully");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in BgCameraService onDestroy", e);
         }
-
-        if (mPreviewTexture != null) {
-            mPreviewTexture.release();
-            mPreviewTexture = null;
+    }
+    
+    /**
+     * Cleanup camera resources safely
+     */
+    private void cleanupCameraResourcesSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                // Close camera session and device
+                safeCloseSessionAndDevice(mCamera2);
+                
+                // Release preview surface
+                if (mPreviewSurface != null) {
+                    try {
+                        mPreviewSurface.release();
+                        InternalLogger.d(TAG, "Preview surface released");
+                    } catch (Exception e) {
+                        InternalLogger.w(TAG, "Error releasing preview surface", e);
+                    }
+                    mPreviewSurface = null;
+                }
+                
+                // Release preview texture
+                if (mPreviewTexture != null) {
+                    try {
+                        mPreviewTexture.release();
+                        InternalLogger.d(TAG, "Preview texture released");
+                    } catch (Exception e) {
+                        InternalLogger.w(TAG, "Error releasing preview texture", e);
+                    }
+                    mPreviewTexture = null;
+                }
+                
+                InternalLogger.d(TAG, "Camera resources cleaned up successfully");
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error cleaning up camera resources", e);
+                return false;
+            }
+        }, false, 3); // 3 second timeout for cleanup
+    }
+    
+    /**
+     * Cleanup service resources safely
+     */
+    private void cleanupServiceResourcesSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                // Quit camera thread
+                if (mCameraThread != null && mCameraThread.isAlive()) {
+                    try {
+                        mCameraThread.quitSafely();
+                        mCameraThread.join(2000); // Wait up to 2 seconds
+                        InternalLogger.d(TAG, "Camera thread stopped");
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        InternalLogger.w(TAG, "Interrupted while stopping camera thread", e);
+                    } catch (Exception e) {
+                        InternalLogger.w(TAG, "Error stopping camera thread", e);
+                    }
+                }
+                
+                // Unregister receiver if registered
+                if (isConfigChangeReceiverRegistered && configChangeReceiver != null) {
+                    try {
+                        unregisterReceiver(configChangeReceiver);
+                        isConfigChangeReceiverRegistered = false;
+                        InternalLogger.d(TAG, "Config change receiver unregistered");
+                    } catch (Exception e) {
+                        InternalLogger.w(TAG, "Error unregistering config change receiver", e);
+                    }
+                }
+                
+                // Release wake lock
+                if (wakeLock != null && wakeLock.isHeld()) {
+                    try {
+                        wakeLock.release();
+                        InternalLogger.d(TAG, "Wake lock released");
+                    } catch (Exception e) {
+                        InternalLogger.w(TAG, "Error releasing wake lock", e);
+                    }
+                    wakeLock = null;
+                }
+                
+                // Clear frame available listener
+                mFrameAvailableListener = null;
+                
+                // Clear callbacks
+                mSessionStateCallback = null;
+                mCameraStateCallback = null;
+                
+                // Clear binder reference
+                if (mBinderRef != null) {
+                    mBinderRef.clear();
+                    mBinderRef = null;
+                }
+                
+                InternalLogger.d(TAG, "Service resources cleaned up successfully");
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error cleaning up service resources", e);
+                return false;
+            }
+        }, false, 3); // 3 second timeout for cleanup
         }
 
         if (isConfigChangeReceiverRegistered && configChangeReceiver != null) {

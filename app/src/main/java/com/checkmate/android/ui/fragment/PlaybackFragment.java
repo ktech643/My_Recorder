@@ -37,6 +37,8 @@ import com.checkmate.android.ui.activity.ImageViewerActivity;
 import com.checkmate.android.ui.activity.VideoPlayerActivity;
 import com.checkmate.android.util.MessageUtil;
 import com.checkmate.android.util.ResourceUtil;
+import com.checkmate.android.util.InternalLogger;
+import com.checkmate.android.util.ANRSafeHelper;
 import com.checkmate.android.viewmodels.EventType;
 import com.checkmate.android.viewmodels.SharedViewModel;
 import com.kongzue.dialogx.dialogs.MessageDialog;
@@ -74,6 +76,8 @@ import javax.crypto.spec.SecretKeySpec;
 public class PlaybackFragment extends BaseFragment
         implements DragListView.OnRefreshLoadingMoreListener {
 
+    private static final String TAG = "PlaybackFragment";
+
     public static final String ARG_TREE_URI = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
     public static WeakReference<PlaybackFragment> instance;
 
@@ -97,32 +101,101 @@ public class PlaybackFragment extends BaseFragment
     TextView tv_refresh_hint;
 
     public static PlaybackFragment newInstance() {
-        PlaybackFragment fragment = new PlaybackFragment();
-        Bundle args = new Bundle();
-        String storage_location = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
-        
-        // Only set treeUri if it's a valid content URI
-        if (storage_location.startsWith("content://")) {
-            Uri treeUri = Uri.parse(storage_location);
-            args.putParcelable(ARG_TREE_URI, treeUri);
-        }
-        
-        fragment.setArguments(args);
-        return fragment;
+        return ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                PlaybackFragment fragment = new PlaybackFragment();
+                Bundle args = new Bundle();
+                
+                String storage_location = AppPreference.getStr(AppPreference.KEY.STORAGE_LOCATION, "");
+                
+                // Only set treeUri if it's a valid content URI
+                if (!TextUtils.isEmpty(storage_location) && storage_location.startsWith("content://")) {
+                    try {
+                        Uri treeUri = Uri.parse(storage_location);
+                        if (treeUri != null) {
+                            args.putParcelable(ARG_TREE_URI, treeUri);
+                            InternalLogger.d(TAG, "TreeUri set successfully");
+                        }
+                    } catch (Exception e) {
+                        InternalLogger.w(TAG, "Failed to parse storage location URI: " + storage_location, e);
+                    }
+                }
+                
+                fragment.setArguments(args);
+                InternalLogger.d(TAG, "PlaybackFragment instance created successfully");
+                return fragment;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error creating PlaybackFragment instance", e);
+                // Return basic fragment without arguments as fallback
+                return new PlaybackFragment();
+            }
+        }, new PlaybackFragment());
     }
 
     @Override
     public void onAttach(Context context) {
-        super.onAttach(context);
-        instance = new WeakReference<>(this);
-        fileStoreDb = new FileStoreDb(context);
+        try {
+            InternalLogger.d(TAG, "PlaybackFragment onAttach starting");
+            
+            if (ANRSafeHelper.isNullWithLog(context, "Context in onAttach")) {
+                InternalLogger.e(TAG, "Context is null in onAttach");
+                return;
+            }
+            
+            super.onAttach(context);
+            instance = new WeakReference<>(this);
+            
+            // Initialize database with error handling
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                try {
+                    fileStoreDb = new FileStoreDb(context);
+                    InternalLogger.d(TAG, "FileStoreDb initialized successfully");
+                    return true;
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Failed to initialize FileStoreDb", e);
+                    fileStoreDb = null;
+                    return false;
+                }
+            }, false);
+            
+            InternalLogger.d(TAG, "PlaybackFragment onAttach completed");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in PlaybackFragment onAttach", e);
+        }
     }
 
     @Override
     public void onDetach() {
-        super.onDetach();
-        if (fileStoreDb != null) {
-            fileStoreDb.close();
+        try {
+            InternalLogger.d(TAG, "PlaybackFragment onDetach starting");
+            
+            // Cleanup database connection safely
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                try {
+                    if (fileStoreDb != null) {
+                        fileStoreDb.close();
+                        fileStoreDb = null;
+                        InternalLogger.d(TAG, "FileStoreDb closed successfully");
+                    }
+                    return true;
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error closing FileStoreDb", e);
+                    return false;
+                }
+            }, false);
+            
+            // Clear instance reference
+            if (instance != null && instance.get() == this) {
+                instance.clear();
+                instance = null;
+            }
+            
+            super.onDetach();
+            InternalLogger.d(TAG, "PlaybackFragment onDetach completed");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in PlaybackFragment onDetach", e);
         }
     }
 
@@ -130,23 +203,111 @@ public class PlaybackFragment extends BaseFragment
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_playback, container, false);
-        updateUI();
-        return mView;
+        try {
+            InternalLogger.d(TAG, "PlaybackFragment onCreateView starting");
+            
+            if (ANRSafeHelper.isNullWithLog(inflater, "LayoutInflater")) {
+                InternalLogger.e(TAG, "LayoutInflater is null in onCreateView");
+                return createFallbackView();
+            }
+            
+            // Inflate layout with error handling
+            mView = ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                return inflater.inflate(R.layout.fragment_playback, container, false);
+            }, null);
+            
+            if (ANRSafeHelper.isNullWithLog(mView, "Inflated view")) {
+                InternalLogger.e(TAG, "Failed to inflate fragment_playback layout");
+                return createFallbackView();
+            }
+            
+            // Update UI with error handling
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                try {
+                    updateUI();
+                    return true;
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error in updateUI during onCreateView", e);
+                    return false;
+                }
+            }, false);
+            
+            InternalLogger.d(TAG, "PlaybackFragment onCreateView completed successfully");
+            return mView;
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Critical error in PlaybackFragment onCreateView", e);
+            return createFallbackView();
+        }
+    }
+    
+    /**
+     * Create a fallback view when normal view creation fails
+     */
+    private View createFallbackView() {
+        try {
+            InternalLogger.w(TAG, "Creating fallback view for PlaybackFragment");
+            Context context = getContext();
+            if (context != null) {
+                TextView errorView = new TextView(context);
+                errorView.setText("Playback view temporarily unavailable");
+                errorView.setTextColor(Color.WHITE);
+                errorView.setBackgroundColor(Color.BLACK);
+                errorView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                return errorView;
+            }
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Failed to create fallback view", e);
+        }
+        return null;
     }
 
     @Override
     public void onResume() {
-        super.onResume();
-        updateUI();
+        try {
+            InternalLogger.d(TAG, "PlaybackFragment onResume starting");
+            super.onResume();
+            
+            // Update UI with error handling and timeout protection
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                try {
+                    updateUI();
+                    return true;
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error updating UI in onResume", e);
+                    return false;
+                }
+            }, false);
+            
+            InternalLogger.d(TAG, "PlaybackFragment onResume completed successfully");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in PlaybackFragment onResume", e);
+        }
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && isResumed()) {
-            loadMediaFromAllSources();
-            updateUI();
+        try {
+            InternalLogger.d(TAG, "PlaybackFragment setUserVisibleHint: " + isVisibleToUser);
+            super.setUserVisibleHint(isVisibleToUser);
+            
+            if (isVisibleToUser && isResumed()) {
+                // Load media and update UI with ANR protection
+                ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                    try {
+                        loadMediaFromAllSources();
+                        updateUI();
+                        return true;
+                    } catch (Exception e) {
+                        InternalLogger.e(TAG, "Error loading media when fragment becomes visible", e);
+                        return false;
+                    }
+                }, false);
+            }
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in setUserVisibleHint", e);
         }
     }
 

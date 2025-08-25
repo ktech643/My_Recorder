@@ -46,6 +46,8 @@ import com.checkmate.android.util.CommonUtil;
 import com.checkmate.android.util.DeviceUtils;
 import com.checkmate.android.util.MainActivity;
 import com.checkmate.android.util.MessageUtil;
+import com.checkmate.android.util.InternalLogger;
+import com.checkmate.android.util.ANRSafeHelper;
 import com.checkmate.android.ui.dialog.CameraSelectionBottomSheet;
 import com.checkmate.android.ui.dialog.RotationBottomSheet;
 import com.checkmate.android.viewmodels.EventType;
@@ -150,13 +152,16 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
 
     // Static Methods
     public static LiveFragment getInstance() {
-        if (instance != null) {
-            LiveFragment fragment = instance.get();
-            if (fragment != null && fragment.isAdded()) {
-                return fragment;
+        return ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            if (instance != null) {
+                LiveFragment fragment = instance.get();
+                if (fragment != null && fragment.isAdded()) {
+                    return fragment;
+                }
             }
-        }
-        return null;
+            InternalLogger.d(TAG, "No valid LiveFragment instance found");
+            return null;
+        }, null);
     }
 
     public static LiveFragment newInstance() {
@@ -166,118 +171,442 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
     // Lifecycle Methods
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        try {
+            InternalLogger.d(TAG, "LiveFragment onCreate starting");
+            super.onCreate(savedInstanceState);
+            setRetainInstance(true);
+            InternalLogger.d(TAG, "LiveFragment onCreate completed");
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in LiveFragment onCreate", e);
+        }
     }
 
     @Override
     public void onAttach(Context context) {
-        super.onAttach(context);
-        instance = new WeakReference<>(this);
-        if (context instanceof MainActivity) {
-            mActivityRef = new WeakReference<>((MainActivity) context);
+        try {
+            InternalLogger.d(TAG, "LiveFragment onAttach starting");
+            
+            if (ANRSafeHelper.isNullWithLog(context, "Context in onAttach")) {
+                InternalLogger.e(TAG, "Context is null in onAttach");
+                return;
+            }
+            
+            super.onAttach(context);
+            instance = new WeakReference<>(this);
+            
+            // Null-safe activity reference setup
+            if (context instanceof MainActivity) {
+                mActivityRef = new WeakReference<>((MainActivity) context);
+                InternalLogger.d(TAG, "MainActivity reference established");
+            } else {
+                InternalLogger.w(TAG, "Context is not MainActivity instance");
+            }
+            
+            // Null-safe callback setup
+            if (context instanceof ActivityFragmentCallbacks) {
+                mListener = (ActivityFragmentCallbacks) context;
+                InternalLogger.d(TAG, "Fragment callbacks established");
+            } else {
+                InternalLogger.e(TAG, "Context does not implement ActivityFragmentCallbacks: " + context.getClass().getSimpleName());
+                throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+            }
+            
+            // Initialize ViewModel with error handling
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                try {
+                    if (getActivity() != null) {
+                        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+                        InternalLogger.d(TAG, "SharedViewModel initialized successfully");
+                    } else {
+                        InternalLogger.w(TAG, "Activity is null, deferring ViewModel initialization");
+                    }
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Failed to initialize SharedViewModel", e);
+                }
+                return true;
+            }, false);
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Critical error in LiveFragment onAttach", e);
+            throw e; // Re-throw as this is a critical error
         }
-        if (context instanceof ActivityFragmentCallbacks) {
-            mListener = (ActivityFragmentCallbacks) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
-        }
-        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View mView = inflater.inflate(R.layout.fragment_live, container, false);
-        
-        // Initialize UI components
-        frame_camera = mView.findViewById(R.id.frame_camera);
-        ly_cast = mView.findViewById(R.id.ly_cast);
-        ly_audio = mView.findViewById(R.id.ly_audio);
-        ly_menu = mView.findViewById(R.id.ly_menu);
-        ly_stream = mView.findViewById(R.id.ly_stream);
-        ly_rotate = mView.findViewById(R.id.ly_rotate);
-        ly_camera_type = mView.findViewById(R.id.ly_camera_type);
-        ly_rec = mView.findViewById(R.id.ly_rec);
-        ly_snap = mView.findViewById(R.id.ly_snap);
-        
-        ic_stream = mView.findViewById(R.id.ic_stream);
-        ic_rotate = mView.findViewById(R.id.ic_rotate);
-        ic_sel = mView.findViewById(R.id.ic_sel);
-        ic_rec = mView.findViewById(R.id.ic_rec);
-        ic_snapshot = mView.findViewById(R.id.ic_snapshot);
-        
-        txt_speed = mView.findViewById(R.id.txt_speed);
-        txt_network = mView.findViewById(R.id.txt_network);
-        txt_gps = mView.findViewById(R.id.txt_gps);
-        txt_stream = mView.findViewById(R.id.txt_stream);
-        txt_rotate = mView.findViewById(R.id.txt_rotate);
-        txt_sel = mView.findViewById(R.id.txt_sel);
-        txt_rec = mView.findViewById(R.id.txt_rec);
-        txt_snapshot = mView.findViewById(R.id.txt_snapshot);
-        
-        // spinner_camera = mView.findViewById(R.id.spinner_camera); // Removed - was for old spinner implementation
-        // spinner_rotate = mView.findViewById(R.id.spinner_rotate); // Removed - was for old spinner implementation
-        
-        // TextureView is in the included layout
-        textureView = mView.findViewById(R.id.preview_afl);
-        
-        // Initialize AudioLevelMeter (may not be in this layout, check if exists)
-        mVuMeter = mView.findViewById(R.id.audio_level_meter);
-
-        // Set up click listeners for buttons
-        ly_stream.setOnClickListener(this::OnClick);
-        ly_rotate.setOnClickListener(this::OnClick);
-        ly_camera_type.setOnClickListener(this::OnClick);
-        ly_rec.setOnClickListener(this::OnClick);
-        ly_snap.setOnClickListener(this::OnClick);
-
-        instance = new WeakReference<>(this);
-
-        if (AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false)) {
-            ic_stream.setImageResource(R.mipmap.ic_stream_active);
+        try {
+            InternalLogger.d(TAG, "LiveFragment onCreateView starting");
+            
+            if (ANRSafeHelper.isNullWithLog(inflater, "LayoutInflater")) {
+                InternalLogger.e(TAG, "LayoutInflater is null in onCreateView");
+                return null;
+            }
+            
+            View mView = inflater.inflate(R.layout.fragment_live, container, false);
+            if (ANRSafeHelper.isNullWithLog(mView, "Inflated view")) {
+                InternalLogger.e(TAG, "Failed to inflate fragment_live layout");
+                return null;
+            }
+            
+            // Initialize UI components with null safety
+            initializeUIComponentsSafely(mView);
+            
+            // Set up click listeners safely
+            setupClickListenersSafely();
+            
+            // Update instance reference
+            instance = new WeakReference<>(this);
+            
+            // Initialize stream state safely
+            initializeStreamStateSafely();
+            
+            // Initialize services with error handling
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                initializeServices();
+                return true;
+            }, false);
+            
+            InternalLogger.d(TAG, "LiveFragment onCreateView completed successfully");
+            return mView;
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Critical error in LiveFragment onCreateView", e);
+            // Return a minimal view to prevent crash
+            return createFallbackView(inflater, container);
         }
-        initializeServices();
-        return mView;
+    }
+    
+    /**
+     * Initialize UI components with comprehensive null safety checks
+     */
+    private void initializeUIComponentsSafely(View mView) {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                // Initialize layout components
+                frame_camera = ANRSafeHelper.nullSafe(mView.findViewById(R.id.frame_camera), null, "frame_camera");
+                ly_cast = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ly_cast), null, "ly_cast");
+                ly_audio = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ly_audio), null, "ly_audio");
+                ly_menu = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ly_menu), null, "ly_menu");
+                ly_stream = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ly_stream), null, "ly_stream");
+                ly_rotate = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ly_rotate), null, "ly_rotate");
+                ly_camera_type = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ly_camera_type), null, "ly_camera_type");
+                ly_rec = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ly_rec), null, "ly_rec");
+                ly_snap = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ly_snap), null, "ly_snap");
+                
+                // Initialize image views
+                ic_stream = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ic_stream), null, "ic_stream");
+                ic_rotate = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ic_rotate), null, "ic_rotate");
+                ic_sel = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ic_sel), null, "ic_sel");
+                ic_rec = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ic_rec), null, "ic_rec");
+                ic_snapshot = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ic_snapshot), null, "ic_snapshot");
+                
+                // Initialize text views
+                txt_speed = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_speed), null, "txt_speed");
+                txt_network = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_network), null, "txt_network");
+                txt_gps = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_gps), null, "txt_gps");
+                txt_stream = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_stream), null, "txt_stream");
+                txt_rotate = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_rotate), null, "txt_rotate");
+                txt_sel = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_sel), null, "txt_sel");
+                txt_rec = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_rec), null, "txt_rec");
+                txt_snapshot = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_snapshot), null, "txt_snapshot");
+                
+                // Initialize texture view (critical component)
+                textureView = ANRSafeHelper.nullSafe(mView.findViewById(R.id.preview_afl), null, "textureView");
+                if (textureView == null) {
+                    InternalLogger.e(TAG, "TextureView is null - camera preview will not work");
+                }
+                
+                // Initialize audio level meter (optional component)
+                mVuMeter = mView.findViewById(R.id.audio_level_meter);
+                if (mVuMeter == null) {
+                    InternalLogger.d(TAG, "AudioLevelMeter not found in layout (optional)");
+                }
+                
+                InternalLogger.d(TAG, "UI components initialized successfully");
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error initializing UI components", e);
+                return false;
+            }
+        }, false);
+    }
+    
+    /**
+     * Set up click listeners with null safety checks
+     */
+    private void setupClickListenersSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                if (ly_stream != null) ly_stream.setOnClickListener(this::OnClick);
+                if (ly_rotate != null) ly_rotate.setOnClickListener(this::OnClick);
+                if (ly_camera_type != null) ly_camera_type.setOnClickListener(this::OnClick);
+                if (ly_rec != null) ly_rec.setOnClickListener(this::OnClick);
+                if (ly_snap != null) ly_snap.setOnClickListener(this::OnClick);
+                
+                InternalLogger.d(TAG, "Click listeners set up successfully");
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error setting up click listeners", e);
+                return false;
+            }
+        }, false);
+    }
+    
+    /**
+     * Initialize stream state safely
+     */
+    private void initializeStreamStateSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                boolean streamStarted = AppPreference.getBool(AppPreference.KEY.STREAM_STARTED, false);
+                if (streamStarted && ic_stream != null) {
+                    ic_stream.setImageResource(R.mipmap.ic_stream_active);
+                    InternalLogger.d(TAG, "Stream state initialized - stream is active");
+                }
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error initializing stream state", e);
+                return false;
+            }
+        }, false);
+    }
+    
+    /**
+     * Create a minimal fallback view in case of critical errors
+     */
+    private View createFallbackView(LayoutInflater inflater, ViewGroup container) {
+        try {
+            InternalLogger.w(TAG, "Creating fallback view due to initialization errors");
+            // Create a simple TextView with error message
+            TextView errorView = new TextView(getContext());
+            errorView.setText("Camera view temporarily unavailable");
+            errorView.setTextColor(Color.WHITE);
+            errorView.setBackgroundColor(Color.BLACK);
+            errorView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            return errorView;
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Failed to create fallback view", e);
+            return null;
+        }
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        if (isAdded() && getActivity() != null) {
-            sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-            sharedViewModel.getEventLiveData().observe(getViewLifecycleOwner(), event -> {
-                if (event != null) {
-                    SharedViewModel.EventPayload payload = event.getContentIfNotHandled();
-                    if (payload != null) {
-                        handleEvent(payload);
-                    }
-                }
-            });
-            sharedViewModel.setTextureView(textureView);
-            sharedViewModel.setCameraOpened(is_camera_opened);
-            forceTextureViewRefresh();
+        try {
+            InternalLogger.d(TAG, "LiveFragment onViewCreated starting");
+            
+            if (ANRSafeHelper.isNullWithLog(view, "View in onViewCreated")) {
+                InternalLogger.e(TAG, "View is null in onViewCreated");
+                return;
+            }
+            
+            super.onViewCreated(view, savedInstanceState);
+            
+            // Null-safe activity and lifecycle checks
+            if (!isAdded()) {
+                InternalLogger.w(TAG, "Fragment not added, skipping onViewCreated setup");
+                return;
+            }
+            
+            if (getActivity() == null) {
+                InternalLogger.w(TAG, "Activity is null, skipping onViewCreated setup");
+                return;
+            }
+            
+            // Initialize ViewModel and observe events safely
+            setupViewModelSafely();
+            
+            InternalLogger.d(TAG, "LiveFragment onViewCreated completed successfully");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in LiveFragment onViewCreated", e);
         }
+    }
+    
+    /**
+     * Set up ViewModel and observers with comprehensive error handling
+     */
+    private void setupViewModelSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                // Initialize or get existing ViewModel
+                if (sharedViewModel == null) {
+                    sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+                    InternalLogger.d(TAG, "SharedViewModel initialized in onViewCreated");
+                }
+                
+                // Set up event observation with null safety
+                if (sharedViewModel != null && getViewLifecycleOwner() != null) {
+                    sharedViewModel.getEventLiveData().observe(getViewLifecycleOwner(), event -> {
+                        try {
+                            if (event != null) {
+                                SharedViewModel.EventPayload payload = event.getContentIfNotHandled();
+                                if (payload != null) {
+                                    handleEventSafely(payload);
+                                } else {
+                                    InternalLogger.d(TAG, "Event payload already handled or null");
+                                }
+                            }
+                        } catch (Exception e) {
+                            InternalLogger.e(TAG, "Error handling event in observer", e);
+                        }
+                    });
+                    
+                    // Set texture view and camera state safely
+                    if (textureView != null) {
+                        sharedViewModel.setTextureView(textureView);
+                        InternalLogger.d(TAG, "TextureView set in SharedViewModel");
+                    } else {
+                        InternalLogger.w(TAG, "TextureView is null, cannot set in SharedViewModel");
+                    }
+                    
+                    sharedViewModel.setCameraOpened(is_camera_opened);
+                    
+                    // Force texture view refresh safely
+                    ANRSafeHelper.getInstance().postToMainThreadSafely(() -> {
+                        try {
+                            forceTextureViewRefresh();
+                        } catch (Exception e) {
+                            InternalLogger.e(TAG, "Error in forceTextureViewRefresh", e);
+                        }
+                    });
+                    
+                } else {
+                    InternalLogger.e(TAG, "SharedViewModel or ViewLifecycleOwner is null");
+                }
+                
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error setting up ViewModel", e);
+                return false;
+            }
+        }, false);
+    }
+    
+    /**
+     * Handle events with comprehensive error handling and null safety
+     */
+    private void handleEventSafely(SharedViewModel.EventPayload payload) {
+        if (payload == null) {
+            InternalLogger.w(TAG, "Event payload is null");
+            return;
+        }
+        
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                handleEvent(payload);
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error handling event payload", e);
+                return false;
+            }
+        }, false);
     }
 
     @Override
     public void onResume() {
-        super.onResume();
-        handleCameraView();
-        setNetworkText("", "");
+        try {
+            InternalLogger.d(TAG, "LiveFragment onResume starting");
+            super.onResume();
+            
+            // Handle camera view with error protection
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                try {
+                    handleCameraView();
+                    return true;
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error in handleCameraView", e);
+                    return false;
+                }
+            }, false);
+            
+            // Set network text safely
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                try {
+                    setNetworkText("", "");
+                    return true;
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error setting network text", e);
+                    return false;
+                }
+            }, false);
+            
+            InternalLogger.d(TAG, "LiveFragment onResume completed successfully");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in LiveFragment onResume", e);
+        }
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-        Log.e(TAG, "onDestroy: isRetry:" + isRetry);
-        // Cancel any pending auto-start operations
-        cancelAutoStart();
-        mListener = null;
-        if (instance != null && instance.get() == this) {
-            instance.clear();
-            instance = null;
+        try {
+            InternalLogger.i(TAG, "LiveFragment onDestroy starting, isRetry: " + isRetry);
+            
+            // Cancel auto-start operations safely
+            ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                try {
+                    cancelAutoStart();
+                    return true;
+                } catch (Exception e) {
+                    InternalLogger.e(TAG, "Error cancelling auto-start", e);
+                    return false;
+                }
+            }, false);
+            
+            // Cleanup references safely
+            cleanupReferencesSafely();
+            
+            // Call super.onDestroy() last
+            super.onDestroy();
+            
+            InternalLogger.i(TAG, "LiveFragment onDestroy completed successfully");
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in LiveFragment onDestroy", e);
         }
-        mActivityRef = null;
+    }
+    
+    /**
+     * Safely cleanup all references to prevent memory leaks
+     */
+    private void cleanupReferencesSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                // Clear listener reference
+                mListener = null;
+                
+                // Clear instance reference if it points to this fragment
+                if (instance != null && instance.get() == this) {
+                    instance.clear();
+                    instance = null;
+                    InternalLogger.d(TAG, "Instance reference cleared");
+                }
+                
+                // Clear activity reference
+                if (mActivityRef != null) {
+                    mActivityRef.clear();
+                    mActivityRef = null;
+                    InternalLogger.d(TAG, "Activity reference cleared");
+                }
+                
+                // Clear handler callbacks
+                if (handler != null) {
+                    handler.removeCallbacksAndMessages(null);
+                    InternalLogger.d(TAG, "Handler callbacks cleared");
+                }
+                
+                // Clear other potential memory leaks
+                streaming_camera = null;
+                db_cams = null;
+                
+                InternalLogger.d(TAG, "References cleaned up successfully");
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error during reference cleanup", e);
+                return false;
+            }
+        }, false);
     }
 
     /**
