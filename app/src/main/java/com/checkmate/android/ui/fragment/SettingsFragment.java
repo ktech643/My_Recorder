@@ -1625,6 +1625,21 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
             }
         });
+
+        // Add OnFocusChangeListener to trigger update request when leaving the field
+        edt_cloud.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    // Field lost focus - trigger update request
+                    String cloudUrl = edt_cloud.getText().toString().trim();
+                    if (!TextUtils.isEmpty(cloudUrl) && !cloudUrl.equals(RestApiService.DNS)) {
+                        // Send update request to server with new cloud URL
+                        updateCloudServerUrl(cloudUrl);
+                    }
+                }
+            }
+        });
         edt_cloud.setText(AppPreference.getStr(AppPreference.KEY.BETA_URL, RestApiService.DNS));
 
         String pin = AppPreference.getStr(AppPreference.KEY.PIN_NUMBER, "");
@@ -2317,10 +2332,18 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 break;
             case R.id.txt_storage:
                 mListener.isDialog(true);
-                if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.Q) {
-                    checkStoragePermissions();
-                } else {
-                    openDirectory();
+                try {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                        // For Android 10+ use Storage Access Framework directly
+                        openDirectory();
+                    } else {
+                        // For older versions, check permissions first
+                        checkStoragePermissions();
+                    }
+                } catch (Exception e) {
+                    Log.e("SettingsFragment", "Error opening storage selector", e);
+                    MessageUtil.showToast(requireContext(), "Unable to open storage selector. Please try again.");
+                    mListener.isDialog(false);
                 }
                 break;
             case R.id.txt_reactivate:
@@ -2420,11 +2443,25 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
     private static final int REQUEST_CODE_PICK_FOLDER = 100;
 
     private void openDirectory() {
-        AppPreference.setBool(AppPreference.KEY.IS_FOR_STORAGE_LOCATION,true);
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        // Request read and write permission on the tree URI.
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        startActivityForResult(intent, REQUEST_CODE_PICK_FOLDER);
+        try {
+            AppPreference.setBool(AppPreference.KEY.IS_FOR_STORAGE_LOCATION, true);
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+            // Request read and write permission on the tree URI.
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+            
+            // Check if there's an app that can handle this intent
+            if (intent.resolveActivity(requireContext().getPackageManager()) != null) {
+                startActivityForResult(intent, REQUEST_CODE_PICK_FOLDER);
+            } else {
+                // Fallback for devices without proper document provider support
+                MessageUtil.showToast(requireContext(), "Storage access not available on this device");
+                mListener.isDialog(false);
+            }
+        } catch (Exception e) {
+            Log.e("SettingsFragment", "Error opening directory picker", e);
+            MessageUtil.showToast(requireContext(), "Unable to open storage selector");
+            mListener.isDialog(false);
+        }
     }
 
     public static String saveImageFromUrl(Context context, String imageUrl) {
@@ -3174,10 +3211,20 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(false);
                 dialog.dismiss();
                 if (!isAdded() || getActivity() == null) {
-                    Log.e("StreamingFragment", "Fragment detached, skipping onLogin callback");
+                    Log.e("SettingsFragment", "Fragment detached, skipping exit callback");
                     return;
                 }
-                getActivity().finish();
+                
+                // Properly exit the application instead of just finishing the activity
+                Activity activity = getActivity();
+                if (activity != null) {
+                    // Clear all activities from the task stack
+                    activity.finishAffinity();
+                    
+                    // Force exit the application process
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(0);
+                }
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -3255,6 +3302,41 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(false);
                 MessageUtil.showToast(requireContext(), R.string.no_update);
                 AppPreference.removeKey(AppPreference.KEY.APP_VERSION);
+            }
+        });
+    }
+
+    void updateCloudServerUrl(String cloudUrl) {
+        if (!DeviceUtils.isNetworkAvailable(requireContext())) {
+            MessageUtil.showToast(requireContext(), "No network connection available");
+            return;
+        }
+        
+        mListener.showDialog();
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("cloudUrl", cloudUrl);
+        hashMap.put("deviceId", AppPreference.getStr(AppPreference.KEY.DEVICE_ID, ""));
+        
+        HttpApiService.getHttpApiEndPoint().updateCloudServer(hashMap).enqueue(new Callback<Responses.BaseResponse>() {
+            @Override
+            public void onResponse(Call<Responses.BaseResponse> call, Response<Responses.BaseResponse> response) {
+                mListener.dismissDialog();
+                if (response.isSuccessful() && response.body() != null) {
+                    if (response.body().success) {
+                        MessageUtil.showToast(requireContext(), "Cloud server URL updated successfully");
+                        AppPreference.setStr(AppPreference.KEY.BETA_URL, cloudUrl);
+                    } else {
+                        MessageUtil.showToast(requireContext(), "Failed to update cloud server URL: " + response.body().error);
+                    }
+                } else {
+                    MessageUtil.showToast(requireContext(), "Failed to update cloud server URL");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Responses.BaseResponse> call, Throwable t) {
+                mListener.dismissDialog();
+                MessageUtil.showToast(requireContext(), "Network error while updating cloud server URL");
             }
         });
     }

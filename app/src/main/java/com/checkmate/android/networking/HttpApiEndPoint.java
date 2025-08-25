@@ -32,4 +32,12 @@ public interface HttpApiEndPoint {
             @Field("SerialNumber") String serial_number,
             @Field("MachineCode") String machine_code
     );
+
+    /*
+       Update cloud server URL
+    */
+    @POST("Settings/UpdateCloudServer")
+    Call<Responses.BaseResponse> updateCloudServer(
+            @Body HashMap<String, String> body
+    );
 }
