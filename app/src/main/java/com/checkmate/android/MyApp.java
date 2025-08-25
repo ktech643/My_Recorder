@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import com.checkmate.android.database.DBManager;
 import com.checkmate.android.service.SharedEGL.GraphicsModule;
 import com.checkmate.android.util.HttpServer.ServiceModule;
+import com.checkmate.android.util.CrashLogger;
 
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -48,6 +49,9 @@ public class MyApp extends Application {
         appScope.installModules(new ServiceModule());
 
 
+        // Initialize CrashLogger first
+        CrashLogger.initialize(mContext);
+        
         // initialize
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
         AppPreference.initialize(pref);
