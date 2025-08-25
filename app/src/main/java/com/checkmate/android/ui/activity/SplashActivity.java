@@ -60,6 +60,7 @@ import com.checkmate.android.ui.dialog.SerialDialog;
 import com.blikoon.qrcodescanner.QrCodeActivity;
 import com.checkmate.android.util.StoragePermissionHelper;
 import com.checkmate.android.util.SplashStorageHelper;
+import com.checkmate.android.service.SharedEGL.EarlyEglInitializer;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -144,6 +145,39 @@ public class SplashActivity extends BaseActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         connection_manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        
+        // Initialize EGL early for optimized streaming performance
+        initializeEarlyEGL();
+    }
+
+    /**
+     * Initialize EGL early in the application lifecycle for optimized streaming performance
+     */
+    private void initializeEarlyEGL() {
+        try {
+            EarlyEglInitializer eglInitializer = EarlyEglInitializer.getInstance();
+            eglInitializer.initializeEarly(this, new EarlyEglInitializer.EglLifecycleCallback() {
+                @Override
+                public void onEglInitialized(android.opengl.EGLContext sharedContext) {
+                    Log.d(TAG, "Early EGL initialization completed in SplashActivity");
+                    // EGL is now ready for use by streaming services
+                }
+                
+                @Override
+                public void onEglDestroyed() {
+                    Log.d(TAG, "Early EGL context destroyed in SplashActivity");
+                }
+                
+                @Override
+                public void onEglError(String error, Exception e) {
+                    Log.e(TAG, "Early EGL initialization error in SplashActivity: " + error, e);
+                    // Continue without early EGL - services will initialize EGL normally
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize early EGL", e);
+            // Continue without early EGL - not critical for app functionality
+        }
     }
 
     @Override

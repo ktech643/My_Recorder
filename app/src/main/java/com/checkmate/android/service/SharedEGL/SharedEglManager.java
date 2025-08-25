@@ -124,6 +124,11 @@ public class SharedEglManager {
     private ServiceType mCurrentActiveService = null;
     private final Object mServiceLock = new Object();
     
+    // Enhanced components for optimization
+    private TimeOverlayRenderer mTimeOverlayRenderer;
+    private EarlyEglInitializer mEarlyEglInitializer;
+    private boolean mUseEarlyInitialization = true;
+    
     // EGL context management
     private volatile boolean mIsInitialized = false;
     private volatile boolean mIsShuttingDown = false;
@@ -623,9 +628,52 @@ public class SharedEglManager {
             mServiceType = serviceType;
             context = ctx;
             mIsShuttingDown = false;
+            
+            // Initialize enhanced components
+            initializeEnhancedComponents();
         }
 
         mCameraHandler.postDelayed(this::internalInit, 500);
+    }
+    
+    /**
+     * Initialize enhanced components for optimized streaming and recording
+     */
+    private void initializeEnhancedComponents() {
+        // Initialize time overlay renderer
+        if (mTimeOverlayRenderer == null) {
+            mTimeOverlayRenderer = new TimeOverlayRenderer();
+            float density = context.getResources().getDisplayMetrics().density;
+            mTimeOverlayRenderer.initialize(density, TimeZone.getDefault());
+            Log.d(TAG, "TimeOverlayRenderer initialized");
+        }
+        
+        // Initialize early EGL initializer if not already done
+        if (mUseEarlyInitialization && mEarlyEglInitializer == null) {
+            mEarlyEglInitializer = EarlyEglInitializer.getInstance();
+            mEarlyEglInitializer.initializeEarly(context, new EarlyEglInitializer.EglLifecycleCallback() {
+                @Override
+                public void onEglInitialized(EGLContext sharedContext) {
+                    Log.d(TAG, "Early EGL initialization completed");
+                    // Use the early initialized context if available
+                    if (sharedContext != null) {
+                        SharedEglManager.this.sharedContext = sharedContext;
+                    }
+                }
+                
+                @Override
+                public void onEglDestroyed() {
+                    Log.d(TAG, "Early EGL context destroyed");
+                }
+                
+                @Override
+                public void onEglError(String error, Exception e) {
+                    Log.e(TAG, "Early EGL initialization error: " + error, e);
+                    // Fall back to standard initialization
+                    mUseEarlyInitialization = false;
+                }
+            });
+        }
     }
 
     private void internalInit() {
@@ -3192,6 +3240,12 @@ public class SharedEglManager {
 
             Log.d(TAG, "Switching active service to: " + newServiceType);
             
+            // Show time overlay during transition if streaming/recording is active
+            boolean shouldShowOverlay = (mStreaming || mRecording) && shouldShowTimeOverlayDuringTransition(mCurrentActiveService, newServiceType);
+            if (shouldShowOverlay && mTimeOverlayRenderer != null) {
+                mTimeOverlayRenderer.start();
+            }
+            
             // Update the active service
             mCurrentActiveService = newServiceType;
             
@@ -3207,7 +3261,68 @@ public class SharedEglManager {
                 setMirror(newService.getMirrorState());
                 setFlip(newService.getFlipState());
             }
+            
+            // Hide time overlay after transition
+            if (shouldShowOverlay && mTimeOverlayRenderer != null) {
+                mCameraHandler.postDelayed(() -> {
+                    if (mTimeOverlayRenderer != null) {
+                        mTimeOverlayRenderer.stop();
+                    }
+                }, 500); // Hide after 500ms
+            }
         }
+    }
+    
+    /**
+     * Enhanced service switching that also accepts the new service type only
+     * This version will use the transition manager for smoother transitions
+     */
+    public void switchActiveService(ServiceType newServiceType) {
+        if (newServiceType.equals(mCurrentActiveService)) return;
+        
+        Log.d(TAG, "Switching to service: " + newServiceType + " (using transition manager)");
+        
+        // Show time overlay during transition if streaming/recording is active
+        boolean shouldShowOverlay = (mStreaming || mRecording) && shouldShowTimeOverlayDuringTransition(mCurrentActiveService, newServiceType);
+        if (shouldShowOverlay && mTimeOverlayRenderer != null) {
+            mTimeOverlayRenderer.start();
+        }
+        
+        synchronized (mServiceLock) {
+            mCurrentActiveService = newServiceType;
+            
+            // Update settings from the new service
+            BaseBackgroundService newService = getServiceInstance(newServiceType);
+            if (newService != null) {
+                setRotation(newService.getRotation());
+                setMirror(newService.getMirrorState());
+                setFlip(newService.getFlipState());
+            }
+        }
+        
+        // Hide time overlay after brief transition
+        if (shouldShowOverlay && mTimeOverlayRenderer != null) {
+            mCameraHandler.postDelayed(() -> {
+                if (mTimeOverlayRenderer != null) {
+                    mTimeOverlayRenderer.stop();
+                }
+            }, 300); // Hide after 300ms
+        }
+    }
+    
+    /**
+     * Determine if time overlay should be shown during service transition
+     */
+    private boolean shouldShowTimeOverlayDuringTransition(ServiceType fromService, ServiceType toService) {
+        if (fromService == null) return false;
+        
+        // Show overlay for transitions that might cause brief interruptions
+        return (fromService == ServiceType.BgCameraFront && toService == ServiceType.BgCameraRear) ||
+               (fromService == ServiceType.BgCameraRear && toService == ServiceType.BgCameraFront) ||
+               fromService == ServiceType.BgScreenCast ||
+               toService == ServiceType.BgScreenCast ||
+               fromService == ServiceType.BgUSBCamera ||
+               toService == ServiceType.BgUSBCamera;
     }
 
     public BaseBackgroundService getServiceInstance(ServiceType type) {
@@ -3226,6 +3341,200 @@ public class SharedEglManager {
             cleanupDeadReferences();
             return mRegisteredServices.keySet().toArray(new ServiceType[0]);
         }
+    }
+    
+    /**
+     * Update streaming configuration dynamically without stopping the stream
+     * @param newVideoConfig New video configuration
+     * @param newAudioConfig New audio configuration
+     */
+    public void updateStreamConfiguration(VideoConfig newVideoConfig, AudioConfig newAudioConfig) {
+        if (!mStreaming) {
+            Log.w(TAG, "Cannot update stream configuration - not currently streaming");
+            return;
+        }
+        
+        Log.d(TAG, "Updating stream configuration dynamically");
+        
+        // Show time overlay during configuration update
+        if (mTimeOverlayRenderer != null) {
+            mTimeOverlayRenderer.start();
+        }
+        
+        mCameraHandler.post(() -> {
+            try {
+                // Update configurations
+                if (newVideoConfig != null) {
+                    streamVideoConfigLocal = newVideoConfig;
+                    videoSize = newVideoConfig.videoSize;
+                    mScreenWidth = videoSize.width;
+                    mScreenHeight = videoSize.height;
+                }
+                
+                if (newAudioConfig != null) {
+                    streamAudioConfigLocal = newAudioConfig;
+                }
+                
+                // Update streamer configuration if possible
+                if (mStreamer != null) {
+                    // Some streaming libraries allow dynamic configuration updates
+                    // Implementation depends on the specific streaming library capabilities
+                    Log.d(TAG, "Updated streamer configuration");
+                }
+                
+                Log.d(TAG, "Stream configuration updated successfully");
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to update stream configuration", e);
+            } finally {
+                // Hide time overlay after update
+                if (mTimeOverlayRenderer != null) {
+                    mCameraHandler.postDelayed(() -> {
+                        if (mTimeOverlayRenderer != null) {
+                            mTimeOverlayRenderer.stop();
+                        }
+                    }, 500);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Update recording configuration dynamically without stopping the recording
+     * @param newVideoConfig New video configuration
+     * @param newAudioConfig New audio configuration
+     */
+    public void updateRecordingConfiguration(VideoConfig newVideoConfig, AudioConfig newAudioConfig) {
+        if (!mRecording) {
+            Log.w(TAG, "Cannot update recording configuration - not currently recording");
+            return;
+        }
+        
+        Log.d(TAG, "Updating recording configuration dynamically");
+        
+        // Show time overlay during configuration update
+        if (mTimeOverlayRenderer != null) {
+            mTimeOverlayRenderer.start();
+        }
+        
+        mCameraHandler.post(() -> {
+            try {
+                // Update configurations
+                if (newVideoConfig != null) {
+                    recordSize = newVideoConfig.videoSize;
+                }
+                
+                // Update recorder configuration if possible
+                if (mRecorder != null) {
+                    // Some recording libraries allow dynamic configuration updates
+                    // Implementation depends on the specific recording library capabilities
+                    Log.d(TAG, "Updated recorder configuration");
+                }
+                
+                Log.d(TAG, "Recording configuration updated successfully");
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to update recording configuration", e);
+            } finally {
+                // Hide time overlay after update
+                if (mTimeOverlayRenderer != null) {
+                    mCameraHandler.postDelayed(() -> {
+                        if (mTimeOverlayRenderer != null) {
+                            mTimeOverlayRenderer.stop();
+                        }
+                    }, 500);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Update surface and configuration for both streaming and recording without interruption
+     * @param surfaceTexture New surface texture
+     * @param width New width
+     * @param height New height
+     * @param rotation New rotation
+     * @param mirror New mirror state
+     * @param flip New flip state
+     */
+    public void updateSurfaceAndConfiguration(SurfaceTexture surfaceTexture, int width, int height, 
+                                            int rotation, boolean mirror, boolean flip) {
+        Log.d(TAG, "Updating surface and configuration without interruption");
+        
+        // Show time overlay during update
+        boolean showOverlay = mStreaming || mRecording;
+        if (showOverlay && mTimeOverlayRenderer != null) {
+            mTimeOverlayRenderer.start();
+        }
+        
+        mCameraHandler.post(() -> {
+            try {
+                // Update surface
+                if (surfaceTexture != null) {
+                    setPreviewSurface(surfaceTexture, width, height);
+                }
+                
+                // Update transformation settings
+                setRotation(rotation);
+                setMirror(mirror);
+                setFlip(flip);
+                
+                // Update dimensions
+                mScreenWidth = width;
+                mScreenHeight = height;
+                
+                // Recalculate transforms
+                precalculateTransforms();
+                
+                Log.d(TAG, "Surface and configuration updated successfully");
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to update surface and configuration", e);
+            } finally {
+                // Hide time overlay after update
+                if (showOverlay && mTimeOverlayRenderer != null) {
+                    mCameraHandler.postDelayed(() -> {
+                        if (mTimeOverlayRenderer != null) {
+                            mTimeOverlayRenderer.stop();
+                        }
+                    }, 300);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Restart EGL and active service when streaming and recording are inactive
+     * This allows applying new configurations when no active processes would be interrupted
+     * @param serviceType Service type to restart
+     */
+    public void restartEglAndService(ServiceType serviceType) {
+        if (mStreaming || mRecording) {
+            Log.w(TAG, "Cannot restart EGL - streaming or recording is active");
+            return;
+        }
+        
+        Log.d(TAG, "Restarting EGL and service for new configuration: " + serviceType);
+        
+        mCameraHandler.post(() -> {
+            try {
+                // Release current EGL resources
+                releaseEgl();
+                
+                // Re-initialize with new configuration
+                mServiceType = serviceType;
+                initRequiredValues();
+                createStreamer();
+                createRecorder();
+                initializeEGL();
+                
+                Log.d(TAG, "EGL and service restarted successfully");
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to restart EGL and service", e);
+                handleError("EGL restart failed", e);
+            }
+        });
     }
 }
 

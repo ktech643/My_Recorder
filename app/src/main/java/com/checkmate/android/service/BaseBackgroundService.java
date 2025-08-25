@@ -17,6 +17,7 @@ import androidx.core.app.NotificationCompat;
 import com.checkmate.android.R;
 import com.checkmate.android.service.SharedEGL.ServiceType;
 import com.checkmate.android.service.SharedEGL.SharedEglManager;
+import com.checkmate.android.service.ServiceTransitionManager;
 import com.checkmate.android.viewmodels.SharedViewModel;
 import java.lang.ref.WeakReference;
 import toothpick.Scope;
@@ -34,6 +35,9 @@ public abstract class BaseBackgroundService extends Service {
     protected boolean isRunning = false;
     protected PowerManager.WakeLock wakeLock;
     protected SharedViewModel sharedViewModel;
+    
+    // Enhanced components for optimized transitions
+    protected ServiceTransitionManager mTransitionManager;
 
     // Service state fields
     protected int mRotation = 0;
@@ -100,8 +104,13 @@ public abstract class BaseBackgroundService extends Service {
         // Get the singleton instance and register this service
         mEglManager = SharedEglManager.getInstance();
         
-        // Register this service with the shared EGL manager
+        // Initialize transition manager
+        mTransitionManager = ServiceTransitionManager.getInstance();
+        mTransitionManager.initialize(this, mEglManager);
+        
+        // Register this service with both the shared EGL manager and transition manager
         mEglManager.registerService(getServiceType(), this);
+        mTransitionManager.registerService(getServiceType(), this);
     }
 
     // Add this method to provide common streaming status check
@@ -122,6 +131,61 @@ public abstract class BaseBackgroundService extends Service {
     // Add this getter method
     public Intent getRunningIntent() {
         return mRunningIntent;
+    }
+    
+    // Enhanced methods for optimized transitions
+    
+    /**
+     * Get current rotation setting
+     */
+    public int getRotation() {
+        return mRotation;
+    }
+    
+    /**
+     * Get current mirror state
+     */
+    public boolean getMirrorState() {
+        return mMirror;
+    }
+    
+    /**
+     * Get current flip state
+     */
+    public boolean getFlipState() {
+        return mFlip;
+    }
+    
+    /**
+     * Update surface configuration for this service
+     */
+    public void updateSurfaceConfiguration(SurfaceTexture surfaceTexture, int width, int height) {
+        mPreviewTexture = surfaceTexture;
+        mSurfaceWidth = width;
+        mSurfaceHeight = height;
+        
+        // Update the transition manager with the new surface configuration
+        if (mTransitionManager != null) {
+            mTransitionManager.updateServiceSurface(getServiceType(), surfaceTexture, width, height);
+        }
+    }
+    
+    /**
+     * Mark this service as ready for transitions
+     */
+    protected void markServiceReady() {
+        if (mTransitionManager != null) {
+            mTransitionManager.markServiceReady(getServiceType());
+        }
+    }
+    
+    /**
+     * Perform seamless transition to another service
+     */
+    public void transitionToService(ServiceType targetService) {
+        if (mTransitionManager != null) {
+            mTransitionManager.transitionToService(targetService);
+        }
     }
     // Common notification setup
     @SuppressLint("WrongConstant")
@@ -168,6 +232,11 @@ public abstract class BaseBackgroundService extends Service {
         // Unregister without affecting stream
         if (mEglManager != null) {
             mEglManager.unregisterService(getServiceType());
+        }
+        
+        // Unregister from transition manager
+        if (mTransitionManager != null) {
+            mTransitionManager.unregisterService(getServiceType());
         }
         
         Toothpick.closeScope(this);
