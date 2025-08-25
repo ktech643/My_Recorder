@@ -20,6 +20,8 @@ import com.checkmate.android.util.ANRSafeHelper;
 import com.checkmate.android.util.CriticalComponentsMonitor;
 import com.checkmate.android.util.CrashLogger;
 import com.checkmate.android.util.DynamicSettingsManager;
+import com.checkmate.android.startup.StartupOptimizer;
+import com.checkmate.android.util.PerformanceMonitor;
 
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -42,38 +44,47 @@ public class MyApp extends Application {
             
             mContext = getApplicationContext();
             
-            // Initialize logging system first
+            // Initialize logging system first (critical)
             initializeLoggingSystem();
             
             InternalLogger.i(TAG, "CheckMate Android App starting up");
             InternalLogger.i(TAG, "App Version: " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
             InternalLogger.i(TAG, "Debug Mode: " + BuildConfig.DEBUG);
             
-            // Initialize preferences early
+            // Use StartupOptimizer for optimized initialization
+            StartupOptimizer startupOptimizer = StartupOptimizer.getInstance(this);
+            
+            // Quick init for immediate UI
+            startupOptimizer.quickInitForUI();
+            
+            // Start optimized initialization in background
+            startupOptimizer.startOptimizedInitialization(new StartupOptimizer.StartupCallback() {
+                @Override
+                public void onPhaseCompleted(String phaseName, long duration) {
+                    InternalLogger.d(TAG, "Startup phase completed: " + phaseName + " (" + duration + "ms)");
+                }
+                
+                @Override
+                public void onStartupCompleted(long totalDuration) {
+                    InternalLogger.i(TAG, "Optimized startup completed in " + totalDuration + "ms");
+                    // Perform any post-initialization tasks
+                    onOptimizedStartupComplete();
+                }
+                
+                @Override
+                public void onStartupError(String phase, Exception error) {
+                    InternalLogger.e(TAG, "Startup error in phase: " + phase, error);
+                }
+            });
+            
+            // Initialize critical components synchronously
             initializePreferencesSafely();
-            
-            // Configure Toothpick dependency injection
             configureToothpickSafely();
-            
-            // Initialize database
             initializeDatabaseSafely();
-            
-            // Get screen dimensions
             initializeScreenDimensionsSafely();
-            
-            // Set up lifecycle callbacks
             setupActivityLifecycleCallbacks();
             
-            // Initialize monitoring systems
-            initializeMonitoringSystems();
-            
-            InternalLogger.i(TAG, "CheckMate Android App initialization completed successfully");
-            
-        
-        CrashLogger.initialize(mContext);
-        DynamicSettingsManager.getInstance(this);
-            
-            InternalLogger.i(TAG, "Monitoring systems initialized successfully");
+            InternalLogger.i(TAG, "Critical initialization completed");
             
         } catch (Exception e) {
             // Even if internal logger fails, try to log to system
