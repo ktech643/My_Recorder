@@ -41,6 +41,9 @@ public class DynamicSettingsManager implements SharedPreferences.OnSharedPrefere
         this.mainHandler = new Handler(Looper.getMainLooper());
         initializeDynamicSettings();
         initializeCriticalSettings();
+        
+        // Initialize performance monitoring for settings changes
+        PerformanceMonitor.getInstance().startMonitoring();
     }
     
     /**
