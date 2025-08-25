@@ -252,8 +252,8 @@ public class ServiceTransitionManager {
         }
         
         // Show blank frame for camera switches or cast transitions
-        return (fromService == ServiceType.BgCameraFront && toService == ServiceType.BgCameraRear) ||
-               (fromService == ServiceType.BgCameraRear && toService == ServiceType.BgCameraFront) ||
+        return (fromService == ServiceType.BgCamera && toService == ServiceType.BgCamera) ||
+               (fromService == ServiceType.BgCamera && toService == ServiceType.BgCamera) ||
                (fromService == ServiceType.BgScreenCast) ||
                (toService == ServiceType.BgScreenCast);
     }

@@ -3317,8 +3317,8 @@ public class SharedEglManager {
         if (fromService == null) return false;
         
         // Show overlay for transitions that might cause brief interruptions
-        return (fromService == ServiceType.BgCameraFront && toService == ServiceType.BgCameraRear) ||
-               (fromService == ServiceType.BgCameraRear && toService == ServiceType.BgCameraFront) ||
+        return fromService == ServiceType.BgCamera ||
+               toService == ServiceType.BgCamera ||
                fromService == ServiceType.BgScreenCast ||
                toService == ServiceType.BgScreenCast ||
                fromService == ServiceType.BgUSBCamera ||

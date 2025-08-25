@@ -136,27 +136,6 @@ public abstract class BaseBackgroundService extends Service {
     // Enhanced methods for optimized transitions
     
     /**
-     * Get current rotation setting
-     */
-    public int getRotation() {
-        return mRotation;
-    }
-    
-    /**
-     * Get current mirror state
-     */
-    public boolean getMirrorState() {
-        return mMirror;
-    }
-    
-    /**
-     * Get current flip state
-     */
-    public boolean getFlipState() {
-        return mFlip;
-    }
-    
-    /**
      * Update surface configuration for this service
      */
     public void updateSurfaceConfiguration(SurfaceTexture surfaceTexture, int width, int height) {

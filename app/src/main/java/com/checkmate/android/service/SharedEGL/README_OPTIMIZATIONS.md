@@ -26,7 +26,7 @@ This document describes the implementation of live streaming and recording optim
 **Usage Example:**
 ```java
 ServiceTransitionManager transitionManager = ServiceTransitionManager.getInstance();
-transitionManager.transitionToService(ServiceType.BgCameraRear);
+transitionManager.transitionToService(ServiceType.BgCamera);
 ```
 
 ### 3. Time Overlay System
@@ -69,7 +69,7 @@ transitionManager.transitionToService(ServiceType.BgCameraRear);
 ### Service Transitions
 ```java
 // Switch between camera services
-baseService.transitionToService(ServiceType.BgCameraFront);
+baseService.transitionToService(ServiceType.BgCamera);
 
 // Switch to screen casting
 baseService.transitionToService(ServiceType.BgScreenCast);

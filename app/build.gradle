@@ -23,22 +23,23 @@ android {
     }
 
     defaultConfig {
-        compileSdkVersion 34
         applicationId "com.checkmate.android"
-        minSdkVersion 29
+        minSdkVersion 26
         targetSdkVersion 33
         versionCode 1
         versionName "4.003"
         setProperty("archivesBaseName", "CheckMate!_" + versionName)
         multiDexEnabled true
-        externalNativeBuild {
+        // Temporarily disable native build
+        /* externalNativeBuild {
             cmake {
                 arguments '-DANDROID_STL=c++_shared'
             }
-        }
-        ndk {
+        } */
+        // Temporarily disable NDK filters
+        /* ndk {
             abiFilters "armeabi-v7a", "arm64-v8a"
-        }
+        } */
 
     }
     buildTypes {
@@ -56,12 +57,13 @@ android {
             jniLibs.srcDirs = ['src/main/jniLibs/lib']
         }
     }
-    externalNativeBuild {
+    // Temporarily disable native build
+    /* externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
             version "3.10.2"
         }
-    }
+    } */
     packagingOptions {
         pickFirst 'com/serenegiant/dialog/MessageDialogFragment$*.class'
         exclude 'com/serenegiant/common/**'
