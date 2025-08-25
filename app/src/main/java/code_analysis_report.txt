@@ -1,0 +1,1437 @@
+DETAILED CODE ANALYSIS REPORT
+============================================================
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/MyApp.java:24
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/MyApp.java:103
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/listener/OnSwipeTouchListener.java:142
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/listener/OnSwipeTouchListener.java:144
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/listener/OnSwipeTouchListener.java:145
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/listener/OnSwipeTouchListener.java:150
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/listener/OnSwipeTouchListener.java:151
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/service/ServiceSwitcher.java:21
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/service/ServiceSwitcher.java:52
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/service/ServiceSwitcher.java:63
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/service/BgUSBService.java:452
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/service/BgUSBService.java:454
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/service/BgWifiService.java:235
+Issue: Non-static inner class holds implicit reference to outer class
+Fix: Make inner class static if possible
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CameraListUtils.java:32
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CameraListUtils.java:62
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CameraListUtils.java:103
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CameraListUtils.java:166
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/RootCommandExecutor.java:179
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/util/RootCommandExecutor.java:190
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/OptimizedMainActivity.java:16
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/OptimizedMainActivity.java:27
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/DeepLink.java:317
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/DeepLink.java:977
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CameraManager.java:14
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/EncryptDecryptUtils.java:42
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/FileUtils.java:69
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/FileUtils.java:78
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/FileUtils.java:84
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/FileUtils.java:90
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/FileUtils.java:94
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/FileUtils.java:98
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/ResourceUtil.java:90
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/ResourceUtil.java:231
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StreamConditionerBase.java:233
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/ActionSheet.java:409
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:91
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:109
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:124
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:135
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:145
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:156
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:164
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:187
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:192
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:229
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:240
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:252
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:270
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:283
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:328
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:340
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:368
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:400
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:435
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:455
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:532
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:597
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:449
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:568
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/util/StorageUtils.java:606
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/DeviceUtils.java:14
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/DeviceUtils.java:36
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/PreferenceInitializer.java:24
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/PreferenceInitializer.java:120
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/PreferenceInitializer.java:156
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/PreferenceInitializer.java:167
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/PreferenceInitializer.java:182
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/util/MainActivityBase.java:772
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/PermissionTestActivity.java:96
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/TelephonyInfo.java:55
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/TelephonyInfo.java:104
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/TelephonyInfo.java:134
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:19
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:23
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:27
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:34
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:38
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:45
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:63
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:88
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:108
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:112
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:116
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MessageUtil.java:124
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MediaMetadataUtils.java:82
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MediaMetadataUtils.java:169
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/AudioUtils.java:24
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:206
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:221
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:230
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:680
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:719
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:750
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:770
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:826
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:835
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:845
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:853
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:863
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:872
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:882
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:892
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:902
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:911
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:920
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:924
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:928
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:942
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:956
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:970
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:975
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:980
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:985
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:990
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:998
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1006
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1016
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1026
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1038
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1050
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1057
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1064
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1069
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1074
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1080
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1092
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1096
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1111
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1115
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1119
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1123
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1127
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1131
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1144
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1151
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1163
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1175
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1204
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1210
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1215
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1316
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1436
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1447
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1459
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1464
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1472
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1483
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1493
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1503
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1512
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1534
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1556
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1566
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1697
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1701
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1710
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1718
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1726
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1731
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1767
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1823
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:1846
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:711
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:800
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:803
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:806
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/SettingsUtils.java:809
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CommonUtil.java:43
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CommonUtil.java:66
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CommonUtil.java:71
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CommonUtil.java:78
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CommonUtil.java:126
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CommonUtil.java:137
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CommonUtil.java:229
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/CommonUtil.java:314
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/util/CommonUtil.java:214
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/ErrorMessage.java:12
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StoragePermissionHelper.java:24
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StoragePermissionHelper.java:81
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StoragePermissionHelper.java:94
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/StoragePermissionHelper.java:120
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MainActivity.java:173
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/MainActivity.java:174
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/util/MainActivity.java:672
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/util/MainActivity.java:1462
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/util/MainActivity.java:1479
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/util/MainActivity.java:2057
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/model/RotateModel.java:22
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/database/DBOpenHelper.java:27
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/networking/RestApiService.java:75
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/libgraph/Texture2dProgramNew.java:75
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/libgraph/Texture2dProgramNew.java:76
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/libgraph/Texture2dProgramNew.java:77
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/libgraph/GlUtilNew.java:110
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/util/HttpServer/ServiceModule.java:8
+Issue: Non-static inner class holds implicit reference to outer class
+Fix: Make inner class static if possible
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/util/libgraph/gl/GlUtil.java:134
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/util/libgraph/gl/GlUtil.java:158
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:1694
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:1973
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:1980
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:2083
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:279
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: performance
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:456
+Issue: String concatenation in loop
+Fix: Use StringBuilder for string operations in loops
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:1720
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:2389
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:2412
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:2849
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:2915
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+MEDIUM: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManager.java:2933
+Issue: Empty catch block
+Fix: Handle or log exceptions properly
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManagerTest.java:42
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManagerTest.java:99
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/service/SharedEGL/SharedEglManagerTest.java:133
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/PlaybackFragment.java:99
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/PlaybackFragment.java:279
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/SettingsFragment.java:152
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/SettingsFragment.java:339
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/SettingsFragment.java:2475
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/SettingsFragment.java:1642
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/SettingsFragment.java:3215
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/SettingsFragment.java:3514
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/HideFragment.java:14
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/HideFragment.java:17
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:92
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:94
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:186
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:464
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:465
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:466
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:467
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:468
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:729
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:813
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:829
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:854
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1241
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1242
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1355
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1356
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1424
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1556
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1629
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1686
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1747
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1811
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1812
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1833
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1900
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1901
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:1924
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:2074
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:2075
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:2076
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:2077
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:2102
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:2107
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/StreamingFragment.java:2112
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/HomeFragment.java:20
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/HomeFragment.java:27
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/FrequencySelectionDialogFragment.java:46
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/LiveFragment.java:152
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/fragment/LiveFragment.java:162
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/CameraDialog.java:351
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/CameraDialog.java:352
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/CameraDialog.java:353
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/CameraDialog.java:356
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/CameraDialog.java:364
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/CameraDialog.java:365
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/GeneralDialog.java:143
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/WifiDialog.java:72
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/TranscodeDialog.java:198
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/TranscodeDialog.java:203
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/TranscodeDialog.java:208
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/TranscodeDialog.java:209
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/TranscodeDialog.java:210
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/TranscodeDialog.java:211
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/TranscodeDialog.java:216
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/TranscodeDialog.java:221
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/TranscodeDialog.java:226
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/TranscodeDialog.java:231
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/dialog/TranscodeDialog.java:232
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/activity/SplashActivity.java:741
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/activity/SplashActivity.java:797
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/activity/SplashActivity.java:919
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/activity/CameraActivity.java:63
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/activity/CameraActivity.java:64
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+LOW: code_quality
+File: /workspace/app/src/main/java/com/checkmate/android/ui/activity/CameraActivity.java:65
+Issue: Potential null pointer exception
+Fix: Add null check before method call
+
+HIGH: memory_leak
+File: /workspace/app/src/main/java/com/checkmate/android/ui/activity/HomeActivity.java:14
+Issue: Static reference to UI component can cause memory leak
+Fix: Use WeakReference for static UI references
