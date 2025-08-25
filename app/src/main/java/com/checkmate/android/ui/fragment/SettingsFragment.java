@@ -355,7 +355,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             try {
                 super.onAttach(context);
                 instance = new WeakReference<>(this);
-                mActivity = ANRSafeHelper.nullSafe(MainActivity.getInstance(), null);
+                mActivity = ANRSafeHelper.nullSafe(MainActivity.getInstance(), null, "MainActivity.getInstance()");
                 
                 if (ANRSafeHelper.isNullWithLog(context, "context")) {
                     InternalLogger.e("SettingsFragment", "Context is null in onAttach");
@@ -1827,10 +1827,11 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         if (enabledServices != null) {
             for (AccessibilityServiceInfo service1 : enabledServices) {
                 if (service1.getId().equals(serviceName)) {
-                    
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -3460,6 +3461,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                                 @Override
                                 public boolean onClick(MessageDialog dialog, View v) {
                                     dialog.dismiss();
+                                    return true;
                                 }
                             }).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
                                 @Override
@@ -3470,6 +3472,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                                     initialize();
                                     mListener.fragUpdateMenu(true);
                                     baseDialog.dismiss();
+                                    return true;
                                 }
                             });
                     messageDialog.setOkTextInfo(new TextInfo().setFontColor(Color.parseColor("#000000")).setBold(true));

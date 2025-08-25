@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import com.checkmate.android.AppPreference;
 
 /**
  * ThreadSafetyManager - Comprehensive ANR and thread safety monitoring system

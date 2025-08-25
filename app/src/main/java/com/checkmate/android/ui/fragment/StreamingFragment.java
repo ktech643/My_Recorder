@@ -251,9 +251,6 @@ public class StreamingFragment extends BaseFragment {
     }
 
     @Override
-
-
-    @Override
     public void onDestroyView() {
         try {
             InternalLogger.d(TAG, "StreamingFragment onDestroyView starting");
