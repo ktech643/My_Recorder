@@ -158,6 +158,14 @@ public class SharedEglManager {
     private boolean mUseBluetooth = false;
     private boolean isBlueToothReceiverRegistered = false;
     public boolean mStreaming = false;
+    
+    // ADVANCED OPTIMIZATION COMPONENTS - Latest implementations
+    private AdvancedPerformanceOptimizer mAdvancedOptimizer;
+    private AIAdaptiveQualityManager mAIQualityManager;
+    private UltraLowLatencyOptimizer mLatencyOptimizer;
+    private boolean mAdvancedOptimizationsEnabled = true;
+    private boolean mAIOptimizationEnabled = true;
+    private boolean mUltraLowLatencyEnabled = true;
     public boolean mRecording = false;
     public Streamer.Size videoSize, recordSize;
 
