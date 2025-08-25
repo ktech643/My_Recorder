@@ -23,6 +23,9 @@ import android.view.Surface;
 import androidx.core.content.ContextCompat;
 import com.checkmate.android.AppConstant;
 import com.checkmate.android.AppPreference;
+import com.checkmate.android.util.InternalLogger;
+import com.checkmate.android.util.ANRSafeHelper;
+import com.checkmate.android.util.CriticalComponentsMonitor;
 import com.checkmate.android.model.SurfaceModel;
 import com.checkmate.android.service.SharedEGL.ServiceType;
 import com.checkmate.android.service.SharedEGL.SharedEglManager;
@@ -78,7 +81,10 @@ public class BgAudioService extends BaseBackgroundService {
 
     @Override
     public void onCreate() {
-        super.onCreate();
+        try {
+            InternalLogger.i(TAG, "BgAudioService onCreate starting");
+            CriticalComponentsMonitor.executeComponentSafely("BgAudioService", () -> {
+                super.onCreate();
         mCurrentStatus = BackgroundNotification.NOTIFICATION_STATUS.CREATED;
 
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
@@ -147,7 +153,12 @@ public class BgAudioService extends BaseBackgroundService {
                 }
             }
         });
-
+                InternalLogger.i(TAG, "BgAudioService onCreate completed successfully");
+            });
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in BgAudioService onCreate", e);
+            CriticalComponentsMonitor.recordComponentError("BgAudioService", "onCreate failed", e);
+        }
     }
 
     @Override

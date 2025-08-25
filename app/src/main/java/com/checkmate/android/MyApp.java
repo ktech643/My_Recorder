@@ -61,6 +61,9 @@ public class MyApp extends Application {
             // Set up lifecycle callbacks
             setupActivityLifecycleCallbacks();
             
+            // Initialize monitoring systems
+            initializeMonitoringSystems();
+            
             InternalLogger.i(TAG, "CheckMate Android App initialization completed successfully");
             
         } catch (Exception e) {

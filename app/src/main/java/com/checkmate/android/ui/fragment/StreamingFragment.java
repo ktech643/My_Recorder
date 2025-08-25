@@ -63,6 +63,9 @@ import com.checkmate.android.util.DateTimeUtils;
 import com.checkmate.android.util.DeviceUtils;
 import com.checkmate.android.util.MainActivity;
 import com.checkmate.android.util.MessageUtil;
+import com.checkmate.android.util.InternalLogger;
+import com.checkmate.android.util.ANRSafeHelper;
+import com.checkmate.android.util.CriticalComponentsMonitor;
 import com.checkmate.android.viewmodels.EventType;
 import com.checkmate.android.viewmodels.SharedViewModel;
 import com.kongzue.dialogx.dialogs.MessageDialog;
@@ -88,11 +91,14 @@ import static android.app.Activity.RESULT_OK;
 
 public class StreamingFragment extends BaseFragment {
 
+    private static final String TAG = "StreamingFragment";
     private final int REQUEST_CODE_QR_SCAN = 101;
     public static StreamingFragment instance;
 
     public static StreamingFragment getInstance() {
-        return instance;
+        return ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            return instance;
+        }, null);
     }
 
     MainActivity mActivity;
@@ -253,74 +259,127 @@ public class StreamingFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        mView = inflater.inflate(R.layout.fragment_streaming, container, false);
+        try {
+            InternalLogger.d(TAG, "StreamingFragment onCreateView starting");
+            
+            if (ANRSafeHelper.isNullWithLog(inflater, "LayoutInflater in StreamingFragment")) {
+                return createFallbackView();
+            }
+            
+            mView = CriticalComponentsMonitor.executeComponentSafely("StreamingFragment", () -> {
+                return inflater.inflate(R.layout.fragment_streaming, container, false);
+            }, null);
+            
+            if (ANRSafeHelper.isNullWithLog(mView, "Inflated view in StreamingFragment")) {
+                return createFallbackView();
+            }
         
-        // Ensure mActivity is initialized
-        if (mActivity == null) {
-            mActivity = MainActivity.instance;
+            // Ensure mActivity is initialized safely
+            if (mActivity == null) {
+                mActivity = ANRSafeHelper.nullSafe(MainActivity.instance, null, "MainActivity.instance");
+                if (mActivity == null) {
+                    InternalLogger.w(TAG, "MainActivity instance is null in StreamingFragment");
+                }
+            }
+            
+            // Initialize UI components safely
+            initializeStreamingUIComponentsSafely();
+            
+            InternalLogger.d(TAG, "StreamingFragment onCreateView completed successfully");
+            return mView;
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Critical error in StreamingFragment onCreateView", e);
+            CriticalComponentsMonitor.recordComponentError("StreamingFragment", "onCreateView failed", e);
+            return createFallbackView();
+        }
+    }
+    
+    private void initializeStreamingUIComponentsSafely() {
+        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                // Initialize UI components with null safety
+                if (mView != null) {
+                    swipe_refresh = ANRSafeHelper.nullSafe(mView.findViewById(R.id.swipe_refresh), null, "swipe_refresh");
+                    view_stream = ANRSafeHelper.nullSafe(mView.findViewById(R.id.view_stream), null, "view_stream");
+                    button_mode = ANRSafeHelper.nullSafe(mView.findViewById(R.id.button_mode), null, "button_mode");
+                    txt_speed_test = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_speed_test), null, "txt_speed_test");
+                    edt_name = ANRSafeHelper.nullSafe(mView.findViewById(R.id.edt_name), null, "edt_name");
+                    txt_update = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_update), null, "txt_update");
+                    swt_streaming = ANRSafeHelper.nullSafe(mView.findViewById(R.id.swt_streaming), null, "swt_streaming");
+                    swt_recording = ANRSafeHelper.nullSafe(mView.findViewById(R.id.swt_recording), null, "swt_recording");
+                    
+                    InternalLogger.d(TAG, "Streaming UI components initialized successfully");
+                }
+                return true;
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error initializing streaming UI components", e);
+                return false;
+            }
+        }, false);
+    }
+    
+    private View createFallbackView() {
+        try {
+            InternalLogger.w(TAG, "Creating fallback view for StreamingFragment");
+            android.widget.TextView errorView = new android.widget.TextView(getContext());
+            errorView.setText("Streaming view temporarily unavailable");
+            errorView.setTextColor(android.graphics.Color.WHITE);
+            errorView.setBackgroundColor(android.graphics.Color.BLACK);
+            errorView.setTextAlignment(android.view.View.TEXT_ALIGNMENT_CENTER);
+            return errorView;
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Failed to create fallback view", e);
+            return null;
+        }
+    
+    // Continue with existing initialization  
+    private void initializeRestOfUIComponents() {
+            btn_local_update = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_local_update), null, "btn_local_update");
+            txt_status = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_status), null, "txt_status");
+            txt_account_type = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_account_type), null, "txt_account_type");
+            txt_licenses = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_licenses), null, "txt_licenses");
+            txt_user = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_user), null, "txt_user");
+            txt_change_password = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_change_password), null, "txt_change_password");
+            btn_refresh = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_refresh), null, "btn_refresh");
+            btn_logout = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_logout), null, "btn_logout");
+            view_share = ANRSafeHelper.nullSafe(mView.findViewById(R.id.view_share), null, "view_share");
+            list_share = ANRSafeHelper.nullSafe(mView.findViewById(R.id.list_share), null, "list_share");
+            ly_share = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ly_share), null, "ly_share");
+            edt_url = ANRSafeHelper.nullSafe(mView.findViewById(R.id.edt_url), null, "edt_url");
+            txt_qr = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_qr), null, "txt_qr");
+            edt_channel = ANRSafeHelper.nullSafe(mView.findViewById(R.id.edt_channel), null, "edt_channel");
+            btn_start = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_start), null, "btn_start");
+            txt_speed = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_speed), null, "txt_speed");
+            btn_share = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_share), null, "btn_share");
+            view_login = ANRSafeHelper.nullSafe(mView.findViewById(R.id.view_login), null, "view_login");
+            btn_back = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_back), null, "btn_back");
+            
+            // Ensure back button is properly visible
+            if (btn_back != null) {
+                btn_back.setVisibility(View.VISIBLE);
+                btn_back.setClickable(true);
+                btn_back.setFocusable(true);
+            }
+            
+            txt_login = ANRSafeHelper.nullSafe(mView.findViewById(R.id.txt_login), null, "txt_login");
+            ly_username = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ly_username), null, "ly_username");
+            edt_username = ANRSafeHelper.nullSafe(mView.findViewById(R.id.edt_username), null, "edt_username");
+            ly_password = ANRSafeHelper.nullSafe(mView.findViewById(R.id.ly_password), null, "ly_password");
+            edt_password = ANRSafeHelper.nullSafe(mView.findViewById(R.id.edt_password), null, "edt_password");
+            btn_login = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_login), null, "btn_login");
+            btn_code = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_code), null, "btn_code");
+            btn_send = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_send), null, "btn_send");
+            btn_password = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_password), null, "btn_password");
+            btn_new_user = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_new_user), null, "btn_new_user");
+            btn_reset_password = ANRSafeHelper.nullSafe(mView.findViewById(R.id.btn_reset_password), null, "btn_reset_password");
+            spinner_mode = ANRSafeHelper.nullSafe(mView.findViewById(R.id.button_mode), null, "spinner_mode");
+            
+            rootView = mView;
         }
         
-        // Initialize UI components
-        swipe_refresh = mView.findViewById(R.id.swipe_refresh);
-        view_stream = mView.findViewById(R.id.view_stream);
-        button_mode = mView.findViewById(R.id.button_mode);
-        txt_speed_test = mView.findViewById(R.id.txt_speed_test);
-        edt_name = mView.findViewById(R.id.edt_name);
-        txt_update = mView.findViewById(R.id.txt_update);
-        swt_streaming = mView.findViewById(R.id.swt_streaming);
-        swt_recording = mView.findViewById(R.id.swt_recording);
-        row_gps = mView.findViewById(R.id.row_gps);
-        swt_gps = mView.findViewById(R.id.swt_gps);
-        row_frequency = mView.findViewById(R.id.row_frequency);
-        button_frequency = mView.findViewById(R.id.button_frequency);
-        local_fields_container = mView.findViewById(R.id.local_fields_container);
-        edt_server_ip = mView.findViewById(R.id.edt_server_ip);
-        edt_port = mView.findViewById(R.id.edt_port);
-        edt_local_user = mView.findViewById(R.id.edt_local_user);
-        edt_local_password = mView.findViewById(R.id.edt_local_password);
-        edt_local_channel = mView.findViewById(R.id.edt_local_channel);
-        local_path_value = mView.findViewById(R.id.local_path_value);
-        btn_local_update = mView.findViewById(R.id.btn_local_update);
-        txt_status = mView.findViewById(R.id.txt_status);
-        txt_account_type = mView.findViewById(R.id.txt_account_type);
-        txt_licenses = mView.findViewById(R.id.txt_licenses);
-        txt_user = mView.findViewById(R.id.txt_user);
-        txt_change_password = mView.findViewById(R.id.txt_change_password);
-        btn_refresh = mView.findViewById(R.id.btn_refresh);
-        btn_logout = mView.findViewById(R.id.btn_logout);
-        view_share = mView.findViewById(R.id.view_share);
-        list_share = mView.findViewById(R.id.list_share);
-        ly_share = mView.findViewById(R.id.ly_share);
-        edt_url = mView.findViewById(R.id.edt_url);
-        txt_qr = mView.findViewById(R.id.txt_qr);
-        edt_channel = mView.findViewById(R.id.edt_channel);
-        btn_start = mView.findViewById(R.id.btn_start);
-        txt_speed = mView.findViewById(R.id.txt_speed);
-        btn_share = mView.findViewById(R.id.btn_share);
-        view_login = mView.findViewById(R.id.view_login);
-        btn_back = mView.findViewById(R.id.btn_back);
-        // Ensure back button is properly visible
-        if (btn_back != null) {
-            btn_back.setVisibility(View.VISIBLE);
-            btn_back.setClickable(true);
-            btn_back.setFocusable(true);
-        }
-        txt_login = mView.findViewById(R.id.txt_login);
-        ly_username = mView.findViewById(R.id.ly_username);
-        edt_username = mView.findViewById(R.id.edt_username);
-        ly_password = mView.findViewById(R.id.ly_password);
-        edt_password = mView.findViewById(R.id.edt_password);
-        btn_login = mView.findViewById(R.id.btn_login);
-        btn_code = mView.findViewById(R.id.btn_code);
-        btn_send = mView.findViewById(R.id.btn_send);
-        btn_password = mView.findViewById(R.id.btn_password);
-        btn_new_user = mView.findViewById(R.id.btn_new_user);
-        btn_reset_password = mView.findViewById(R.id.btn_reset_password);
-        spinner_mode = mView.findViewById(R.id.button_mode);
-        
-        rootView = mView;
-
+        // Call the rest of initialization
+        initializeRestOfUIComponents();
         showInitialLogin();
         String login_email = AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, "");
         String login_password = AppPreference.getStr(AppPreference.KEY.LOGIN_PASSWORD, "");
@@ -451,11 +510,24 @@ public class StreamingFragment extends BaseFragment {
 
     @Override
     public void onResume() {
-        super.onResume();
-        if (getActivity() instanceof ActivityFragmentCallbacks) {
-            mListener = (ActivityFragmentCallbacks) getActivity();
-        } else {
-            Log.e("StreamingFragment", "Activity does not implement ActivityFragmentCallbacks");
+        try {
+            InternalLogger.d(TAG, "StreamingFragment onResume starting");
+            
+            CriticalComponentsMonitor.executeComponentSafely("StreamingFragment", () -> {
+                super.onResume();
+                
+                // Safe callback assignment
+                if (getActivity() instanceof ActivityFragmentCallbacks) {
+                    mListener = (ActivityFragmentCallbacks) getActivity();
+                } else {
+                    InternalLogger.e(TAG, "Activity does not implement ActivityFragmentCallbacks");
+                }
+                
+                InternalLogger.d(TAG, "StreamingFragment onResume completed successfully");
+            });
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in StreamingFragment onResume", e);
+            CriticalComponentsMonitor.recordComponentError("StreamingFragment", "onResume failed", e);
         }
     }
 
