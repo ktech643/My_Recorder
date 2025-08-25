@@ -61,6 +61,9 @@
         <item name="android:textSize">@dimen/textsize_normal</item>
 <!--        <item name="android:fontFamily">@font/font_sfcompacttext_regular</item>-->
         <item name="android:padding">@dimen/image_very_small</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
     </style>
 
     <style name="normalEdit" parent="android:Widget.EditText">
@@ -69,6 +72,12 @@
         <item name="android:textSize">@dimen/textsize_normal</item>
         <item name="android:padding">@dimen/margin_normal</item>
         <item name="android:inputType">textCapWords</item>
+    </style>
+    
+    <style name="fixedHeightLabel" parent="normalText">
+        <item name="android:maxLines">2</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:gravity">center_vertical</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

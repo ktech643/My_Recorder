@@ -146,7 +146,7 @@ import static android.content.Context.ACCESSIBILITY_SERVICE;
 import static com.checkmate.android.util.ResourceUtil.getRecordPath;
 import static com.checkmate.android.util.ResourceUtil.getSdCardPath;
 
-public class SettingsFragment extends BaseFragment implements OnStoragePathChangeListener {
+public class SettingsFragment extends BaseFragment implements OnStoragePathChangeListener, View.OnClickListener {
 
     private  ActivityFragmentCallbacks mListener;
     //    public static SettingsFragment instance;
@@ -1625,6 +1625,22 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
             }
         });
+        
+        // Add focus change listener to trigger update when field loses focus
+        edt_cloud.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    String newUrl = edt_cloud.getText().toString().trim();
+                    if (!TextUtils.isEmpty(newUrl) && !newUrl.equals(RestApiService.DNS)) {
+                        // Update the API service with new URL
+                        RestApiService.updateBaseUrl(newUrl);
+                        // Notify user that server URL has been updated
+                        MessageUtil.showToast(requireContext(), "Cloud server URL updated");
+                    }
+                }
+            }
+        });
         edt_cloud.setText(AppPreference.getStr(AppPreference.KEY.BETA_URL, RestApiService.DNS));
 
         String pin = AppPreference.getStr(AppPreference.KEY.PIN_NUMBER, "");
@@ -2307,20 +2323,35 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 }).show();
     }
 
-    public void OnClick(View view) {
+    @Override
+    public void onClick(View view) {
         switch (view.getId()) {
             case R.id.txt_camera:
                 onAddCamera();
                 break;
             case R.id.txt_update:
-                mListener.fragUpdateApp("");
+                // Check if we have a stored update URL first
+                String updateUrl = AppPreference.getStr(AppPreference.KEY.APP_URL, "");
+                if (TextUtils.isEmpty(updateUrl)) {
+                    // No stored update available, check for updates first
+                    checkUpdate();
+                } else {
+                    // Proceed with update using stored URL
+                    mListener.fragUpdateApp(updateUrl);
+                }
                 break;
             case R.id.txt_storage:
-                mListener.isDialog(true);
-                if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.Q) {
-                    checkStoragePermissions();
-                } else {
-                    openDirectory();
+                try {
+                    mListener.isDialog(true);
+                    if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.Q) {
+                        checkStoragePermissions();
+                    } else {
+                        openDirectory();
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error opening storage selection: " + e.getMessage());
+                    mListener.isDialog(false);
+                    MessageUtil.showToast(requireContext(), "Unable to open storage selection");
                 }
                 break;
             case R.id.txt_reactivate:
@@ -3177,7 +3208,20 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     Log.e("StreamingFragment", "Fragment detached, skipping onLogin callback");
                     return;
                 }
-                getActivity().finish();
+                // Properly exit the application
+                if (getActivity() != null) {
+                    // First stop all services
+                    if (mActivity != null) {
+                        mActivity.stopFragWifiService();
+                        mActivity.stopFragBgCast();
+                        mActivity.stopFragBgCamera();
+                        mActivity.stopService(ServiceType.BgAudio);
+                    }
+                    // Then finish all activities
+                    getActivity().finishAffinity();
+                    // Finally kill the process
+                    System.exit(0);
+                }
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -3206,6 +3250,8 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
     void checkUpdate() {
         mListener.isDialog(true);
         if (!DeviceUtils.isNetworkAvailable(requireContext())) {
+            mListener.isDialog(false);
+            MessageUtil.showToast(requireContext(), "No network connection available");
             return;
         }
         mListener.showDialog();
@@ -3265,12 +3311,14 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 .show(getString(R.string.warning_new), getString(R.string.reactivate_message), getString(R.string.Okay),getString(R.string.cancel)).setCancelButton(new OnDialogButtonClickListener<MessageDialog>() {
                     @Override
                     public boolean onClick(MessageDialog dialog, View v) {
+                        mListener.isDialog(false);
                         dialog.dismiss();
                         return false;
                     }
                 }).setOkButton(new OnDialogButtonClickListener<MessageDialog>() {
                     @Override
                     public boolean onClick(MessageDialog baseDialog, View v) {
+                        mListener.isDialog(false);
                         baseDialog.dismiss();
                         AppPreference.removeKey(AppPreference.KEY.ACTIVATION_SERIAL);
                         AppPreference.removeKey(AppPreference.KEY.ACTIVATION_CODE);

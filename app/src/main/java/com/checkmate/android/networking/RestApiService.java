@@ -219,4 +219,15 @@ public class RestApiService {
         mRestApiService = retrofit.create(RestApiEndPoint.class);
         Log.d("RestApiService", "Retrofit and RestApiEndPoint initialized successfully");
     }
+    
+    /**
+     * Update the base URL and reinitialize the API service
+     * @param newDns The new DNS/URL to use
+     */
+    public static void updateBaseUrl(String newDns) {
+        DNS = newDns;
+        BASE_URL = "https://" + newDns + ":6010/v1/";
+        // Reinitialize the API service with the new URL
+        initialize(MyApp.getInstance());
+    }
 }
