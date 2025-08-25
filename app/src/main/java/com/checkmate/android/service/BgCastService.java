@@ -29,6 +29,11 @@ import toothpick.Scope;
 import toothpick.Toothpick;
 import toothpick.config.Module;
 
+// ANR and Thread Safety imports
+import com.checkmate.android.util.InternalLogger;
+import com.checkmate.android.util.ANRSafeHelper;
+import com.checkmate.android.util.CriticalComponentsMonitor;
+
 public final class BgCastService extends BaseBackgroundService {
     private final String TAG = "BgCastService";
     // Screen-casting-specific fields
@@ -79,29 +84,99 @@ public final class BgCastService extends BaseBackgroundService {
 
     @Override
     public void onCreate() {
-        super.onCreate();
-        instance = this;
-        mCurrentStatus = BackgroundNotification.NOTIFICATION_STATUS.CREATED;
+        CriticalComponentsMonitor.executeComponentSafely("BgCastService.onCreate", () -> {
+            try {
+                InternalLogger.i(TAG, "BgCastService onCreate starting");
+                
+                super.onCreate();
+                instance = this;
+                mCurrentStatus = BackgroundNotification.NOTIFICATION_STATUS.CREATED;
 
-        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        String wakeLockTag = "CheckMate:CastLock";
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockTag);
-        wakeLock.acquire(60 * 60 * 2000);
+                PowerManager pm = ANRSafeHelper.nullSafe(
+                    (PowerManager) getSystemService(POWER_SERVICE), 
+                    null, 
+                    "PowerManager"
+                );
+                
+                if (pm != null) {
+                    String wakeLockTag = "CheckMate:CastLock";
+                    wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockTag);
+                    if (wakeLock != null) {
+                        wakeLock.acquire(60 * 60 * 2000);
+                    } else {
+                        InternalLogger.w(TAG, "Failed to create wake lock");
+                    }
+                } else {
+                    InternalLogger.e(TAG, "PowerManager is null in onCreate");
+                }
+                
+                InternalLogger.i(TAG, "BgCastService onCreate completed successfully");
+                return true;
+                
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in BgCastService onCreate", e);
+                CriticalComponentsMonitor.recordComponentError("BgCastService", "onCreate failed", e);
+                return false;
+            }
+        }, () -> {
+            InternalLogger.e(TAG, "Failed to create BgCastService");
+            return false;
+        });
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        mRunningIntent = intent;
-        return START_STICKY;
+        return ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+            try {
+                InternalLogger.i(TAG, "BgCastService onStartCommand");
+                
+                super.onStartCommand(intent, flags, startId);
+                mRunningIntent = intent;
+                
+                InternalLogger.d(TAG, "BgCastService onStartCommand completed successfully");
+                return START_STICKY;
+                
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in BgCastService onStartCommand", e);
+                CriticalComponentsMonitor.recordComponentError("BgCastService", "onStartCommand failed", e);
+                return START_NOT_STICKY;
+            }
+        }, START_NOT_STICKY, "BgCastService.onStartCommand");
     }
 
     @Override
     public void onDestroy() {
-        stopScreenCast();
-        super.onDestroy();
-        instance = null;
-        stopSafe();
+        CriticalComponentsMonitor.executeComponentSafely("BgCastService.onDestroy", () -> {
+            try {
+                InternalLogger.i(TAG, "BgCastService onDestroy starting");
+                
+                // Stop screen casting safely
+                ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                    stopScreenCast();
+                    return true;
+                }, false, "stopScreenCast");
+                
+                super.onDestroy();
+                instance = null;
+                
+                // Stop additional resources safely
+                ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                    stopSafe();
+                    return true;
+                }, false, "stopSafe");
+                
+                InternalLogger.i(TAG, "BgCastService onDestroy completed successfully");
+                return true;
+                
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error in BgCastService onDestroy", e);
+                CriticalComponentsMonitor.recordComponentError("BgCastService", "onDestroy failed", e);
+                return false;
+            }
+        }, () -> {
+            InternalLogger.e(TAG, "Failed to destroy BgCastService properly");
+            return false;
+        });
     }
 
     // Screen-casting specific methods

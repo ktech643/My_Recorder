@@ -2225,21 +2225,43 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
     @Override
     public void onResume() {
-        super.onResume();
+        CriticalComponentsMonitor.executeComponentSafely("SettingsFragment.onResume", () -> {
+            try {
+                super.onResume();
 
-        updateLocation();
-        String usbCamName= AppPreference.getStr(AppPreference.KEY.USB_CAMERA_NAME, "");
-        txt_usb_cam.setText(usbCamName);
-        boolean isEnabledNew = isAccessibilityServiceEnabled(getContext(), MyAccessibilityService.class);
-        swt_radio_accessbility.setChecked(isEnabledNew);
-        // Accessibility status display removed - element not in layout
-        // if (isEnabledNew) {
-        //     txt_acc_status.setText("On");
-        //     txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
-        // }else {
-        //     txt_acc_status.setText("Off");
-        //     txt_acc_status.setTextColor(ContextCompat.getColor(getContext(), R.color.RED));
-        // }
+                // Update location with null safety
+                updateLocation();
+                
+                String usbCamName = ANRSafeHelper.nullSafe(
+                    AppPreference.getStr(AppPreference.KEY.USB_CAMERA_NAME, ""), 
+                    "", 
+                    "USB_CAMERA_NAME preference"
+                );
+                
+                if (txt_usb_cam != null) {
+                    txt_usb_cam.setText(usbCamName);
+                } else {
+                    InternalLogger.w("SettingsFragment", "txt_usb_cam is null in onResume");
+                }
+                
+                boolean isEnabledNew = isAccessibilityServiceEnabled(getContext(), MyAccessibilityService.class);
+                if (swt_radio_accessbility != null) {
+                    swt_radio_accessbility.setChecked(isEnabledNew);
+                } else {
+                    InternalLogger.w("SettingsFragment", "swt_radio_accessbility is null in onResume");
+                }
+                
+                InternalLogger.d("SettingsFragment", "onResume completed successfully");
+                return true;
+                
+            } catch (Exception e) {
+                InternalLogger.e("SettingsFragment", "Error in onResume", e);
+                return false;
+            }
+        }, () -> {
+            InternalLogger.e("SettingsFragment", "Failed to resume SettingsFragment");
+            return false;
+        });
     }
 
     public void setCameraname(String name ){
@@ -2249,12 +2271,33 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
     @Override
     public void onDestroy() {
-
-        if (instance != null) {
-            instance.clear();
-            instance = null;
-        }
-        super.onDestroy();
+        CriticalComponentsMonitor.executeComponentSafely("SettingsFragment.onDestroy", () -> {
+            try {
+                InternalLogger.i("SettingsFragment", "onDestroy starting");
+                
+                // Clean up instance reference
+                if (instance != null) {
+                    instance.clear();
+                    instance = null;
+                }
+                
+                // Clean up other references
+                mListener = null;
+                mActivity = null;
+                
+                super.onDestroy();
+                
+                InternalLogger.d("SettingsFragment", "onDestroy completed successfully");
+                return true;
+                
+            } catch (Exception e) {
+                InternalLogger.e("SettingsFragment", "Error in onDestroy", e);
+                return false;
+            }
+        }, () -> {
+            InternalLogger.e("SettingsFragment", "Failed to destroy SettingsFragment properly");
+            return false;
+        });
     }
 
     void onAddCamera() {
