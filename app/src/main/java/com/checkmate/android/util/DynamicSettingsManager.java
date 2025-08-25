@@ -278,4 +278,21 @@ public class DynamicSettingsManager implements SharedPreferences.OnSharedPrefere
         // This would require storing the values at stream start
         return pending;
     }
+
+    /**
+     * Notify all listeners about a setting change
+     */
+    public void notifyListeners(String key, Object value) {
+        if (listeners.isEmpty()) return;
+        
+        mainHandler.post(() -> {
+            for (SettingChangeListener listener : listeners.values()) {
+                try {
+                    listener.onSettingChanged(key, value);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error notifying listener", e);
+                }
+            }
+        });
+    }
 }

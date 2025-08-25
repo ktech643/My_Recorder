@@ -1,4 +1,7 @@
 package com.checkmate.android.util;
+import android.app.ActivityManager;
+import android.content.Context;
+import java.io.FileNotFoundException;
 
 import android.os.Debug;
 import android.os.Handler;
@@ -20,6 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class PerformanceMonitor {
     private static final String TAG = "PerformanceMonitor";
     private static PerformanceMonitor instance;
+    private final Context context;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
     private final ConcurrentHashMap<String, PerformanceMetric> metrics = new ConcurrentHashMap<>();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -66,13 +70,21 @@ public class PerformanceMonitor {
         }
     }
     
-    private PerformanceMonitor() {
+    private PerformanceMonitor(Context context) {
+        this.context = context.getApplicationContext();
         // Private constructor
     }
     
+    public static synchronized PerformanceMonitor getInstance(Context context) {
+        if (instance == null) {
+            instance = new PerformanceMonitor(context);
+        }
+        return instance;
+    }
+
     public static synchronized PerformanceMonitor getInstance() {
         if (instance == null) {
-            instance = new PerformanceMonitor();
+            throw new IllegalStateException("PerformanceMonitor not initialized. Call getInstance(Context) first.");
         }
         return instance;
     }

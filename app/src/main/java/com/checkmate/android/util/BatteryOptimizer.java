@@ -260,7 +260,7 @@ public class BatteryOptimizer {
         manager.notifyListeners(AppPreference.KEY.AUDIO_OPTION_BITRATE, 64000); // 64 kbps
         
         // Disable non-essential features
-        manager.notifyListeners(AppPreference.KEY.TIMESTAMP_OVERLAY, false);
+        manager.notifyListeners(AppPreference.KEY.TIMESTAMP, false);
     }
     
     /**

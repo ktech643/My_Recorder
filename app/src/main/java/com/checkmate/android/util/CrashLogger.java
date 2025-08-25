@@ -416,4 +416,18 @@ public class CrashLogger implements Thread.UncaughtExceptionHandler {
         
         logExecutor.shutdown();
     }
+
+    /**
+     * Log ANR event
+     */
+    private String formatLog(String level, String tag, String message) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
+        String timestamp = sdf.format(new Date());
+        return timestamp + " " + level + "/" + tag + ": " + message + "\n";
+    }
+
+    public void logANR(String tag, String message) {
+        String log = formatLog("ANR", tag, message);
+        executor.execute(() -> writeLogToFile(log));
+    }
 }

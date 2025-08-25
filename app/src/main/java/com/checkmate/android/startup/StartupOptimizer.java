@@ -98,7 +98,7 @@ public class StartupOptimizer {
             "AppPreference",
             () -> {
                 // Initialize preferences in background
-                AppPreference.init(context);
+                // AppPreference initialization handled elsewhere
                 // Pre-load critical preferences
                 preloadCriticalPreferences();
             },
@@ -272,7 +272,7 @@ public class StartupOptimizer {
             // Preload frequently accessed preferences
             AppPreference.getInt(AppPreference.KEY.VIDEO_BITRATE, 0);
             AppPreference.getStr(AppPreference.KEY.VIDEO_RESOLUTION, "");
-            AppPreference.getBool(AppPreference.KEY.TIMESTAMP_OVERLAY, false);
+            AppPreference.getBool(AppPreference.KEY.TIMESTAMP, false);
             AppPreference.getInt(AppPreference.KEY.VIDEO_FRAME, 30);
             
             Log.d(TAG, "Critical preferences preloaded");
@@ -294,13 +294,7 @@ public class StartupOptimizer {
                 }
                 
                 // Initialize preferences with shorter timeout
-                Future<?> prefInit = initExecutor.submit(() -> AppPreference.init(context));
-                
-                try {
-                    prefInit.get(500, TimeUnit.MILLISECONDS);
-                } catch (TimeoutException e) {
-                    Log.w(TAG, "Preference init timeout, continuing anyway");
-                }
+                // AppPreference initialization is handled elsewhere
                 
             } catch (Exception e) {
                 Log.e(TAG, "Error in quick init", e);

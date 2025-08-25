@@ -435,4 +435,19 @@ public class MyApp extends Application {
             // Continue app startup even if monitoring fails
         }
     }
+
+    /**
+     * Called when optimized startup is complete
+     */
+    private void onOptimizedStartupComplete() {
+        try {
+            InternalLogger.i(TAG, "Optimized startup complete, performing post-initialization tasks");
+            
+            // Initialize any remaining non-critical components
+            initializeMonitoringSystems();
+            
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in post-initialization", e);
+        }
+    }
 }
