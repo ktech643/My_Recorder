@@ -465,6 +465,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         txt_reactivate = mView.findViewById(R.id.txt_reactivate);
         txt_exit = mView.findViewById(R.id.txt_exit);
         txt_cast_video_details = mView.findViewById(R.id.txt_cast_video_details);
+        txt_wifi_camera = mView.findViewById(R.id.txt_wifi_camera);
 
         // Remove invalid findViewById calls for non-existent UI elements
 
@@ -2346,7 +2347,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 exitApp();
                 break;
             case R.id.txt_wifi_camera:
-//                onAddWifiCamera();
+                onAddCamera();
                 break;
             case R.id.txt_beta_update:
                 mListener.fragUpdateApp(AppConstant.BETA_UPDATE);
