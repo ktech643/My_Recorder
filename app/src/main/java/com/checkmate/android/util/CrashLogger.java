@@ -59,11 +59,21 @@ public class CrashLogger implements Thread.UncaughtExceptionHandler {
         Thread.setDefaultUncaughtExceptionHandler(this);
     }
     
+    public static void initialize(Context context) {
+        if (instance == null) {
+            synchronized (lock) {
+                if (instance == null && context != null) {
+                    instance = new CrashLogger(context);
+                }
+            }
+        }
+    }
+    
     public static CrashLogger getInstance() {
         if (instance == null) {
             synchronized (lock) {
-                if (instance == null && MyApp.getInstance() != null) {
-                    instance = new CrashLogger(MyApp.getInstance());
+                if (instance == null) {
+                    Log.w(TAG, "CrashLogger not initialized. Call initialize() first.");
                 }
             }
         }
@@ -108,7 +118,7 @@ public class CrashLogger implements Thread.UncaughtExceptionHandler {
         logWriter.write("=== CheckMate App Log ===\n");
         logWriter.write("Device: " + Build.MANUFACTURER + " " + Build.MODEL + "\n");
         logWriter.write("Android: " + Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + ")\n");
-        logWriter.write("App Version: " + AppConstant.VERSION_NAME + "\n");
+        logWriter.write("App Version: 1.0.0\n");
         logWriter.write("Session Start: " + dateFormat.format(new Date()) + "\n");
         logWriter.write("================================\n\n");
         logWriter.flush();

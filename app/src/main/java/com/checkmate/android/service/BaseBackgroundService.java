@@ -11,6 +11,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.util.Log;
 import android.view.Surface;
 import android.widget.Toast;
 import androidx.core.app.NotificationCompat;

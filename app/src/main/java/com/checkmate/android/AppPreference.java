@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
+import com.checkmate.android.util.CrashLogger;
 
 public class AppPreference {
     private static final String TAG = "AppPreference";

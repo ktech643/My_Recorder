@@ -1019,6 +1019,12 @@ public class SharedEglManager {
                 }
                 return;
             }
+            } catch (Exception e) {
+                Log.e(TAG, "Error in drawFrame handler", e);
+                if (CrashLogger.getInstance() != null) {
+                    CrashLogger.getInstance().logError(TAG, "drawFrame handler", e);
+                }
+            }
             try {
                 makeTextureCurrent();
 
