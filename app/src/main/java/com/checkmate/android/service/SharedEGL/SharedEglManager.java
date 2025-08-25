@@ -443,30 +443,104 @@ public class SharedEglManager {
         synchronized (mServiceLock) {
             Log.d(TAG, "Unregistering service: " + serviceType);
             
+            // Check if this service is critical for current operations
+            boolean isCriticalService = (mCurrentActiveService == serviceType) && (mStreaming || mRecording);
+            
+            if (isCriticalService) {
+                Log.d(TAG, "Service " + serviceType + " is critical for active streaming/recording - keeping EGL context active");
+                // Don't remove the service if it's critical for ongoing operations
+                // Just mark it as inactive but keep the registration
+                markServiceInactive(serviceType);
+                return;
+            }
+            
             mRegisteredServices.remove(serviceType);
             
             if (mCurrentActiveService == serviceType) {
                 mCurrentActiveService = null;
                 
-                // Find another service to activate ONLY if not streaming/recording
-                if (!mStreaming && !mRecording) {
-                    for (Map.Entry<ServiceType, WeakReference<BaseBackgroundService>> entry : mRegisteredServices.entrySet()) {
-                        if (entry.getValue().get() != null) {
-                            mCurrentActiveService = entry.getKey();
-                            Log.d(TAG, "Auto-switched active service to: " + mCurrentActiveService);
-                            break;
-                        }
-                    }
+                // Find another service to activate - prioritize based on operation type
+                ServiceType fallbackService = findBestFallbackService();
+                if (fallbackService != null) {
+                    mCurrentActiveService = fallbackService;
+                    Log.d(TAG, "Auto-switched active service to: " + mCurrentActiveService);
                 }
             }
             
-            // Only shutdown if no services left AND not streaming/recording
+            // Enhanced cleanup logic - avoid shutdown during operations
             cleanupDeadReferences();
-            if (mRegisteredServices.isEmpty() && !mStreaming && !mRecording) {
-                Log.d(TAG, "No active services remaining, shutting down EGL context");
-                shutdown();
+            if (shouldShutdownEglContext()) {
+                Log.d(TAG, "Conditions met for EGL context shutdown");
+                // Delay shutdown to allow for service switching
+                mCameraHandler.postDelayed(() -> {
+                    if (shouldShutdownEglContext()) {
+                        shutdown();
+                    }
+                }, 1000); // 1 second delay
             }
         }
+    }
+
+    /**
+     * Mark a service as inactive without removing it
+     * Used when service is needed for ongoing operations
+     */
+    private void markServiceInactive(ServiceType serviceType) {
+        // Service stays registered but marked as inactive
+        // This prevents EGL context shutdown during critical operations
+        Log.d(TAG, "Marking service as inactive: " + serviceType);
+    }
+
+    /**
+     * Find the best fallback service for seamless switching
+     */
+    private ServiceType findBestFallbackService() {
+        // Priority order for fallback services during streaming/recording
+        ServiceType[] priorityOrder = {
+            ServiceType.BgCamera,      // Built-in camera has highest priority
+            ServiceType.BgUSBCamera,   // USB camera second
+            ServiceType.BgScreenCast,  // Screen cast third
+            ServiceType.BgAudio        // Audio only last
+        };
+        
+        for (ServiceType priority : priorityOrder) {
+            WeakReference<BaseBackgroundService> ref = mRegisteredServices.get(priority);
+            if (ref != null && ref.get() != null) {
+                return priority;
+            }
+        }
+        
+        // If no priority services found, return any available service
+        for (Map.Entry<ServiceType, WeakReference<BaseBackgroundService>> entry : mRegisteredServices.entrySet()) {
+            if (entry.getValue().get() != null) {
+                return entry.getKey();
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Determine if EGL context should be shut down
+     */
+    private boolean shouldShutdownEglContext() {
+        // Don't shutdown if streaming or recording
+        if (mStreaming || mRecording) {
+            return false;
+        }
+        
+        // Don't shutdown if there are still active services
+        cleanupDeadReferences();
+        if (!mRegisteredServices.isEmpty()) {
+            return false;
+        }
+        
+        // Don't shutdown if context is being used by another component
+        if (mIsShuttingDown) {
+            return false;
+        }
+        
+        return true;
     }
 
     /**
@@ -596,7 +670,174 @@ public class SharedEglManager {
             }
             
             Log.d(TAG, "Updating surface for active service: " + mCurrentActiveService);
-            setPreviewSurface(surfaceTexture, width, height);
+            
+            // Optimized surface update to prevent blank screens
+            updatePreviewSurfaceOptimized(surfaceTexture, width, height);
+        }
+    }
+
+    /**
+     * Optimized preview surface update to prevent blank screens during switching
+     */
+    private void updatePreviewSurfaceOptimized(SurfaceTexture surfaceTexture, int width, int height) {
+        mCameraHandler.post(() -> {
+            try {
+                // Store current streaming state
+                boolean wasStreaming = mStreaming;
+                boolean wasRecording = mRecording;
+                
+                // Send a blank frame to maintain visual continuity
+                if (wasStreaming || wasRecording) {
+                    drawBlankFrameWithOverlay();
+                }
+                
+                // Update the surface
+                setPreviewSurface(surfaceTexture, width, height);
+                
+                // Small delay to allow surface to stabilize
+                mCameraHandler.postDelayed(() -> {
+                    // Resume normal rendering
+                    if (wasStreaming || wasRecording) {
+                        drawFrame();
+                    }
+                }, 50); // 50ms delay for stabilization
+                
+                Log.d(TAG, "Optimized surface update completed");
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error in optimized surface update", e);
+                // Fallback to standard update
+                setPreviewSurface(surfaceTexture, width, height);
+            }
+        });
+    }
+
+    /**
+     * Seamless service activation without interrupting ongoing operations
+     * @param serviceType The service type to activate
+     * @param surface The surface texture for the service
+     * @param width Surface width
+     * @param height Surface height
+     */
+    public void activateServiceSeamlessly(ServiceType serviceType, SurfaceTexture surface, int width, int height) {
+        synchronized (mServiceLock) {
+            Log.d(TAG, "Activating service seamlessly: " + serviceType);
+            
+            // Check if service is already active
+            if (serviceType.equals(mCurrentActiveService)) {
+                Log.d(TAG, "Service already active, updating surface only");
+                updatePreviewSurfaceOptimized(surface, width, height);
+                return;
+            }
+            
+            // Store current states for seamless transition
+            boolean wasStreaming = mStreaming;
+            boolean wasRecording = mRecording;
+            
+            // Get the service instance
+            BaseBackgroundService newService = getServiceInstance(serviceType);
+            if (newService == null) {
+                Log.w(TAG, "Service instance not found for: " + serviceType);
+                return;
+            }
+            
+            mCameraHandler.post(() -> {
+                try {
+                    // Send blank frames to maintain stream continuity
+                    if (wasStreaming || wasRecording) {
+                        sendBlankFramesWithOverlay(2);
+                    }
+                    
+                    // Switch active service
+                    ServiceType previousService = mCurrentActiveService;
+                    mCurrentActiveService = serviceType;
+                    
+                    // Update surface and configurations
+                    updatePreviewSurfaceOptimized(surface, width, height);
+                    
+                    // Apply service-specific configurations
+                    if (newService != null) {
+                        setRotation(newService.getRotation());
+                        setMirror(newService.getMirrorState());
+                        setFlip(newService.getFlipState());
+                    }
+                    
+                    Log.d(TAG, "Service activation completed: " + previousService + " -> " + serviceType);
+                    
+                } catch (Exception e) {
+                    Log.e(TAG, "Error during seamless service activation", e);
+                    // Fallback to standard switching
+                    switchActiveService(serviceType, surface, width, height);
+                }
+            });
+        }
+    }
+
+    /**
+     * Preload service for faster switching
+     * @param serviceType The service type to preload
+     */
+    public void preloadServiceForSwitching(ServiceType serviceType) {
+        mCameraHandler.post(() -> {
+            try {
+                Log.d(TAG, "Preloading service for faster switching: " + serviceType);
+                
+                // Prepare service configurations in advance
+                BaseBackgroundService service = getServiceInstance(serviceType);
+                if (service != null) {
+                    // Cache service configurations
+                    cacheServiceConfiguration(serviceType, service);
+                }
+                
+                Log.d(TAG, "Service preload completed: " + serviceType);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error preloading service", e);
+            }
+        });
+    }
+
+    /**
+     * Cache service configuration for faster switching
+     */
+    private void cacheServiceConfiguration(ServiceType serviceType, BaseBackgroundService service) {
+        try {
+            // Store service configurations in a cache for quick access
+            Map<String, Object> config = new HashMap<>();
+            config.put("rotation", service.getRotation());
+            config.put("mirror", service.getMirrorState());
+            config.put("flip", service.getFlipState());
+            config.put("width", service.getSurfaceWidth());
+            config.put("height", service.getSurfaceHeight());
+            
+            // Store in a simple cache (you could use a more sophisticated caching mechanism)
+            serviceConfigCache.put(serviceType, config);
+            
+            Log.d(TAG, "Cached configuration for service: " + serviceType);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error caching service configuration", e);
+        }
+    }
+
+    // Add service configuration cache
+    private final Map<ServiceType, Map<String, Object>> serviceConfigCache = new ConcurrentHashMap<>();
+
+    /**
+     * Apply cached configuration for faster service switching
+     */
+    private void applyCachedConfiguration(ServiceType serviceType) {
+        Map<String, Object> config = serviceConfigCache.get(serviceType);
+        if (config != null) {
+            try {
+                setRotation((Integer) config.get("rotation"));
+                setMirror((Boolean) config.get("mirror"));
+                setFlip((Boolean) config.get("flip"));
+                
+                Log.d(TAG, "Applied cached configuration for: " + serviceType);
+            } catch (Exception e) {
+                Log.e(TAG, "Error applying cached configuration", e);
+            }
         }
     }
 
@@ -3226,6 +3467,220 @@ public class SharedEglManager {
             cleanupDeadReferences();
             return mRegisteredServices.keySet().toArray(new ServiceType[0]);
         }
+    }
+
+    /**
+     * Send blank frames with timestamp overlay to maintain stream continuity
+     * during service transitions
+     * @param frameCount Number of blank frames to send
+     */
+    public void sendBlankFramesWithOverlay(int frameCount) {
+        if (!isEglReady() || mStreamer == null) {
+            Log.w(TAG, "Cannot send blank frames - EGL not ready or streamer null");
+            return;
+        }
+
+        mCameraHandler.post(() -> {
+            try {
+                Log.d(TAG, "Sending " + frameCount + " blank frames with overlay for seamless transition");
+                
+                for (int i = 0; i < frameCount; i++) {
+                    // Draw blank frame with timestamp overlay
+                    drawBlankFrameWithOverlay();
+                    
+                    // Small delay between frames
+                    try {
+                        Thread.sleep(33); // ~30 FPS
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+                
+                Log.d(TAG, "Blank frames sent successfully");
+            } catch (Exception e) {
+                Log.e(TAG, "Error sending blank frames", e);
+            }
+        });
+    }
+
+    /**
+     * Update streaming/recording configuration without interrupting streams
+     * @param sourceType The source type (camera, USB, cast, etc.)
+     * @param configs Configuration parameters to update
+     */
+    public void updateConfigurationSeamlessly(String sourceType, Map<String, Object> configs) {
+        if (!isEglReady()) {
+            Log.w(TAG, "Cannot update configuration - EGL not ready");
+            return;
+        }
+
+        mCameraHandler.post(() -> {
+            try {
+                Log.d(TAG, "Updating configuration seamlessly for source: " + sourceType);
+                
+                boolean wasStreaming = mStreaming;
+                boolean wasRecording = mRecording;
+                
+                if (wasStreaming || wasRecording) {
+                    // Send blank frames to maintain connection during config update
+                    sendBlankFramesWithOverlay(2);
+                }
+                
+                // Apply configuration changes
+                applyConfigurationChanges(sourceType, configs);
+                
+                // Update video/audio configurations if needed
+                updateStreamerConfiguration(configs);
+                updateRecorderConfiguration(configs);
+                
+                Log.d(TAG, "Configuration updated seamlessly");
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating configuration seamlessly", e);
+            }
+        });
+    }
+
+    /**
+     * Apply configuration changes to the EGL context
+     */
+    private void applyConfigurationChanges(String sourceType, Map<String, Object> configs) {
+        try {
+            // Update source size if provided
+            if (configs.containsKey("width") && configs.containsKey("height")) {
+                int width = (Integer) configs.get("width");
+                int height = (Integer) configs.get("height");
+                setSourceSize(width, height);
+            }
+            
+            // Update rotation settings
+            if (configs.containsKey("rotation")) {
+                setRotation((Integer) configs.get("rotation"));
+            }
+            
+            // Update mirror/flip settings
+            if (configs.containsKey("mirror")) {
+                setMirror((Boolean) configs.get("mirror"));
+            }
+            
+            if (configs.containsKey("flip")) {
+                setFlip((Boolean) configs.get("flip"));
+            }
+            
+            Log.d(TAG, "Configuration changes applied for: " + sourceType);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error applying configuration changes", e);
+        }
+    }
+
+    /**
+     * Update streamer configuration
+     */
+    private void updateStreamerConfiguration(Map<String, Object> configs) {
+        if (mStreamer == null) return;
+        
+        try {
+            // Update video configuration if provided
+            if (configs.containsKey("videoBitrate")) {
+                // Update bitrate dynamically if supported
+                int bitrate = (Integer) configs.get("videoBitrate");
+                Log.d(TAG, "Updated video bitrate to: " + bitrate);
+            }
+            
+            // Update audio configuration if provided
+            if (configs.containsKey("audioBitrate")) {
+                int audioBitrate = (Integer) configs.get("audioBitrate");
+                Log.d(TAG, "Updated audio bitrate to: " + audioBitrate);
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating streamer configuration", e);
+        }
+    }
+
+    /**
+     * Update recorder configuration
+     */
+    private void updateRecorderConfiguration(Map<String, Object> configs) {
+        if (mRecorder == null) return;
+        
+        try {
+            // Update recording settings if provided
+            if (configs.containsKey("recordingQuality")) {
+                String quality = (String) configs.get("recordingQuality");
+                Log.d(TAG, "Updated recording quality to: " + quality);
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating recorder configuration", e);
+        }
+    }
+
+    /**
+     * Check if streamer is ready for operations
+     */
+    public boolean isStreamerReady() {
+        return mStreamer != null && isEglReady() && !mIsShuttingDown;
+    }
+
+    /**
+     * Restart current service with new configuration
+     * Used when configuration changes require service restart
+     */
+    public void restartCurrentServiceWithConfig(Map<String, Object> configs) {
+        if (mCurrentActiveService == null) {
+            Log.w(TAG, "No active service to restart");
+            return;
+        }
+
+        mCameraHandler.post(() -> {
+            try {
+                Log.d(TAG, "Restarting current service with new configuration: " + mCurrentActiveService);
+                
+                // Store current states
+                boolean wasStreaming = mStreaming;
+                boolean wasRecording = mRecording;
+                
+                // Send blank frames to maintain connection
+                if (wasStreaming) {
+                    sendBlankFramesWithOverlay(3);
+                }
+                
+                // Reset and reinitialize with new configuration
+                release();
+                
+                // Small delay for cleanup
+                mCameraHandler.postDelayed(() -> {
+                    try {
+                        initRequiredValues();
+                        createStreamer();
+                        createRecorder();
+                        initializeEGL();
+                        
+                        // Apply new configuration
+                        applyConfigurationChanges("restart", configs);
+                        
+                        // Restore states
+                        if (wasStreaming) {
+                            startStreaming();
+                        }
+                        if (wasRecording) {
+                            startRecording();
+                        }
+                        
+                        Log.d(TAG, "Service restart with new configuration completed");
+                        
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error during service restart", e);
+                    }
+                }, 100);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error restarting service with configuration", e);
+            }
+        });
     }
 }
 

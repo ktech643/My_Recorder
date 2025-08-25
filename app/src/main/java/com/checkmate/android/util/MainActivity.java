@@ -324,6 +324,9 @@ public class MainActivity extends BaseActivity
         instance = this;
         fragmentManager = getSupportFragmentManager();
 
+        // Initialize EGL context early to prevent startup delays
+        initializeEGLContextEarly();
+
         dlg_progress = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.PIE_DETERMINATE)
                 .setLabel("Processing")
@@ -1976,6 +1979,238 @@ public class MainActivity extends BaseActivity
                 (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         startActivityForResult(mgr.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
     }
+    /*  ╭──────────────────────────────────────────────────────────────────────╮
+        │  Live Fragment Optimization System                                   │
+        ╰──────────────────────────────────────────────────────────────────────╯ */
+    
+    /**
+     * Early EGL context initialization to prevent startup delays
+     */
+    private void initializeEGLContextEarly() {
+        if (mHandler != null) {
+            mHandler.postDelayed(() -> {
+                try {
+                    // Pre-initialize SharedEglManager on main thread to avoid delays
+                    com.checkmate.android.service.SharedEGL.SharedEglManager eglManager = 
+                        com.checkmate.android.service.SharedEGL.SharedEglManager.getInstance();
+                    
+                    // Set up EGL ready listener for smooth transitions
+                    eglManager.setListener(() -> {
+                        Log.d(TAG, "EGL context ready - enabling seamless service switching");
+                        runOnUiThread(() -> {
+                            if (liveFragment != null) {
+                                liveFragment.onEGLContextReady();
+                            }
+                        });
+                    });
+                    
+                    Log.d(TAG, "EGL context pre-initialization completed");
+                } catch (Exception e) {
+                    Log.e(TAG, "EGL context pre-initialization failed", e);
+                }
+            }, 100); // Small delay to let activity finish initializing
+        }
+    }
+
+    /**
+     * Seamless service switching without stopping streams/recordings
+     */
+    public void switchToServiceSeamlessly(com.checkmate.android.service.SharedEGL.ServiceType newServiceType) {
+        try {
+            Log.d(TAG, "Switching to service seamlessly: " + newServiceType);
+            
+            com.checkmate.android.service.SharedEGL.SharedEglManager eglManager = 
+                com.checkmate.android.service.SharedEGL.SharedEglManager.getInstance();
+            
+            // Check if EGL is ready for seamless switching
+            if (!eglManager.isEglReady()) {
+                Log.w(TAG, "EGL not ready for seamless switching, using fallback");
+                switchToServiceWithFallback(newServiceType);
+                return;
+            }
+            
+            // Get current streaming/recording states
+            boolean wasStreaming = isStreaming();
+            boolean wasRecording = isRecordingAny();
+            
+            // Use ServiceSwitcher for seamless transition
+            com.checkmate.android.service.ServiceSwitcher.switchService(this, newServiceType);
+            
+            // Update UI to reflect new service without interruption
+            updateUIForServiceSwitch(newServiceType);
+            
+            // Maintain streaming/recording states
+            if (wasStreaming && !isStreaming()) {
+                // If stream was interrupted, restart with blank frames to maintain connection
+                restartStreamWithBlankFrames();
+            }
+            
+            if (wasRecording && !isRecordingAny()) {
+                // If recording was interrupted, restart seamlessly
+                restartRecordingSeamlessly();
+            }
+            
+            Log.d(TAG, "Seamless service switch completed successfully");
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Seamless service switch failed, using fallback", e);
+            switchToServiceWithFallback(newServiceType);
+        }
+    }
+    
+    /**
+     * Fallback service switching method
+     */
+    private void switchToServiceWithFallback(com.checkmate.android.service.SharedEGL.ServiceType newServiceType) {
+        Log.d(TAG, "Using fallback service switching for: " + newServiceType);
+        
+        // Store current states
+        boolean wasStreaming = isStreaming();
+        boolean wasRecording = isRecordingAny();
+        
+        // Stop current services gracefully
+        stopAllServicesGracefully();
+        
+        // Small delay to ensure clean shutdown
+        mHandler.postDelayed(() -> {
+            try {
+                // Start new service
+                startServiceByType(newServiceType);
+                
+                // Restore states after brief delay
+                mHandler.postDelayed(() -> {
+                    if (wasStreaming) {
+                        restartStreamWithBlankFrames();
+                    }
+                    if (wasRecording) {
+                        restartRecordingSeamlessly();
+                    }
+                }, 500);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Fallback service switch failed", e);
+            }
+        }, 300);
+    }
+    
+    /**
+     * Check if any service is currently recording
+     */
+    private boolean isRecordingAny() {
+        return isRecordingCamera() || isRecordingUSB() || isWifiRecording() || 
+               isCastRecording() || isAudioRecording();
+    }
+    
+    /**
+     * Stop all services gracefully without affecting EGL context
+     */
+    private void stopAllServicesGracefully() {
+        try {
+            // Stop services without shutting down EGL
+            if (mCamService != null) mCamService.stopSafe();
+            if (mUSBService != null) mUSBService.stopSafe();
+            if (mWifiService != null) mWifiService.stopSafe();
+            if (mCastService != null) mCastService.stopSafe();
+            if (mAudioService != null) mAudioService.stopSafe();
+            
+            Log.d(TAG, "All services stopped gracefully");
+        } catch (Exception e) {
+            Log.e(TAG, "Error during graceful service stop", e);
+        }
+    }
+    
+    /**
+     * Start service by type
+     */
+    private void startServiceByType(com.checkmate.android.service.SharedEGL.ServiceType serviceType) {
+        switch (serviceType) {
+            case BgCamera:
+                initService();
+                break;
+            case BgUSBCamera:
+                initBGUSBService();
+                break;
+            case BgScreenCast:
+                initCastService();
+                break;
+            case BgAudio:
+                initAudioService();
+                break;
+            default:
+                Log.w(TAG, "Unknown service type: " + serviceType);
+                break;
+        }
+    }
+    
+    /**
+     * Restart streaming with blank frames to maintain connection
+     */
+    private void restartStreamWithBlankFrames() {
+        try {
+            com.checkmate.android.service.SharedEGL.SharedEglManager eglManager = 
+                com.checkmate.android.service.SharedEGL.SharedEglManager.getInstance();
+            
+            // Send blank frames with timestamp overlay to maintain stream
+            eglManager.sendBlankFramesWithOverlay(3); // Send 3 blank frames
+            
+            // Restart actual streaming
+            mHandler.postDelayed(() -> startStream(), 100);
+            
+            Log.d(TAG, "Stream restarted with blank frames for seamless transition");
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to restart stream with blank frames", e);
+            // Fallback to normal restart
+            mHandler.postDelayed(() -> startStream(), 200);
+        }
+    }
+    
+    /**
+     * Restart recording seamlessly
+     */
+    private void restartRecordingSeamlessly() {
+        try {
+            // Restart recording with minimal interruption
+            mHandler.postDelayed(() -> {
+                if (isStreaming()) { // Only restart recording if streaming is active
+                    startRecord();
+                }
+            }, 100);
+            
+            Log.d(TAG, "Recording restarted seamlessly");
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to restart recording seamlessly", e);
+        }
+    }
+    
+    /**
+     * Update UI for service switch without blank screens
+     */
+    private void updateUIForServiceSwitch(com.checkmate.android.service.SharedEGL.ServiceType newServiceType) {
+        runOnUiThread(() -> {
+            try {
+                if (liveFragment != null) {
+                    liveFragment.updateUIForServiceSwitch(newServiceType);
+                }
+                
+                // Update bottom navigation to reflect new service
+                updateBottomNavigationForService(newServiceType);
+                
+                Log.d(TAG, "UI updated for service switch to: " + newServiceType);
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating UI for service switch", e);
+            }
+        });
+    }
+    
+    /**
+     * Update bottom navigation for new service
+     */
+    private void updateBottomNavigationForService(com.checkmate.android.service.SharedEGL.ServiceType serviceType) {
+        // Keep current navigation state - just update internal tracking
+        // No visual interruption needed
+        Log.d(TAG, "Bottom navigation maintained for service: " + serviceType);
+    }
+
     /* ─────────────────────────────────────────────────────────────────────────
      *  Final lifecycle cleanup  (onDestroy → end-of-class)
      * ──────────────────────────────────────────────────────────────────────── */

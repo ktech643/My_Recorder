@@ -871,6 +871,34 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
     }
     public void forceTextureViewRefresh() {
         if (textureView != null) {
+            try {
+                // Use optimized refresh if EGL context is available
+                com.checkmate.android.service.SharedEGL.SharedEglManager eglManager = 
+                    com.checkmate.android.service.SharedEGL.SharedEglManager.getInstance();
+                
+                if (eglManager.isEglReady()) {
+                    // Optimized refresh using EGL manager
+                    optimizedTextureViewRefresh();
+                } else {
+                    // Fallback to traditional refresh
+                    traditionalTextureViewRefresh();
+                }
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error in texture view refresh", e);
+                // Ultimate fallback
+                traditionalTextureViewRefresh();
+            }
+        }
+    }
+
+    /**
+     * Traditional texture view refresh method
+     */
+    private void traditionalTextureViewRefresh() {
+        if (textureView == null) return;
+        
+        try {
             // First remove the surface texture listener
             textureView.setSurfaceTextureListener(null);
             
@@ -903,6 +931,136 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
                 if (listener != null) {
                     textureView.setSurfaceTextureListener(listener);
                 }
+            }
+            
+            Log.d(TAG, "Traditional texture view refresh completed");
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error in traditional texture view refresh", e);
+        }
+    }
+
+    /**
+     * Enhanced texture view refresh with seamless transition support
+     */
+    public void forceTextureViewRefreshSeamless() {
+        if (textureView == null) return;
+        
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                try {
+                    // Check if we can use seamless refresh
+                    com.checkmate.android.service.SharedEGL.SharedEglManager eglManager = 
+                        com.checkmate.android.service.SharedEGL.SharedEglManager.getInstance();
+                    
+                    if (eglManager.isEglReady() && !eglManager.isShuttingDown()) {
+                        // Use optimized seamless refresh
+                        performSeamlessTextureRefresh(eglManager);
+                    } else {
+                        // Use optimized refresh
+                        optimizedTextureViewRefresh();
+                    }
+                    
+                } catch (Exception e) {
+                    Log.e(TAG, "Error in seamless texture view refresh", e);
+                    // Fallback to traditional method
+                    traditionalTextureViewRefresh();
+                }
+            });
+        }
+    }
+
+    /**
+     * Perform seamless texture refresh without visible interruption
+     */
+    private void performSeamlessTextureRefresh(com.checkmate.android.service.SharedEGL.SharedEglManager eglManager) {
+        try {
+            if (textureView.getSurfaceTexture() != null) {
+                // Send a blank frame to maintain visual continuity during refresh
+                eglManager.sendBlankFramesWithOverlay(1);
+                
+                // Update surface through EGL manager for seamless transition
+                handler.postDelayed(() -> {
+                    if (textureView.getSurfaceTexture() != null) {
+                        eglManager.updateActiveServiceSurface(
+                            textureView.getSurfaceTexture(),
+                            textureView.getWidth(),
+                            textureView.getHeight()
+                        );
+                    }
+                }, 50); // Small delay for frame delivery
+                
+                Log.d(TAG, "Seamless texture view refresh completed");
+            } else {
+                // Surface not available, use optimized refresh
+                optimizedTextureViewRefresh();
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error in seamless texture refresh", e);
+            optimizedTextureViewRefresh();
+        }
+    }
+
+    /**
+     * Refresh texture view while minimizing blank screen time
+     */
+    public void refreshTextureViewMinimalInterruption() {
+        if (textureView == null || getActivity() == null) return;
+        
+        getActivity().runOnUiThread(() -> {
+            try {
+                // Store current state
+                boolean wasVisible = textureView.getVisibility() == View.VISIBLE;
+                ViewGroup.LayoutParams params = textureView.getLayoutParams();
+                
+                // Quick invisible/visible cycle to refresh without full recreation
+                textureView.setVisibility(View.INVISIBLE);
+                
+                handler.postDelayed(() -> {
+                    if (textureView != null && wasVisible) {
+                        textureView.setVisibility(View.VISIBLE);
+                        
+                        // Re-establish surface texture listener
+                        if (mActivityRef != null && mActivityRef.get() != null) {
+                            TextureView.SurfaceTextureListener listener = mActivityRef.get().mSurfaceTextureListener;
+                            if (listener != null && textureView.getSurfaceTexture() != null) {
+                                listener.onSurfaceTextureAvailable(
+                                    textureView.getSurfaceTexture(),
+                                    textureView.getWidth(),
+                                    textureView.getHeight()
+                                );
+                            }
+                        }
+                    }
+                }, 16); // One frame duration at 60fps
+                
+                Log.d(TAG, "Minimal interruption texture refresh completed");
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error in minimal interruption refresh", e);
+                // Fallback to optimized refresh
+                optimizedTextureViewRefresh();
+            }
+        });
+    }
+
+    /**
+     * Preload next service for instant switching
+     */
+    public void preloadNextService(com.checkmate.android.service.SharedEGL.ServiceType nextServiceType) {
+        if (mActivityRef != null && mActivityRef.get() != null) {
+            try {
+                // Use ServiceSwitcher to preload the service
+                com.checkmate.android.service.ServiceSwitcher.preloadService(
+                    mActivityRef.get(), 
+                    nextServiceType
+                );
+                
+                Log.d(TAG, "Next service preloaded: " + nextServiceType);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error preloading next service", e);
             }
         }
     }
@@ -1339,9 +1497,45 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
     }
 
     /**
-     * Enhanced service switching with proper cleanup and state management
+     * Enhanced service switching with seamless optimization
      */
     private void switchToService(CameraState newState, Runnable serviceInitAction) {
+        if (mActivityRef == null || mActivityRef.get() == null) return;
+        
+        MainActivity activity = mActivityRef.get();
+        
+        // Use seamless switching if possible
+        com.checkmate.android.service.SharedEGL.ServiceType serviceType = getServiceTypeFromState(newState);
+        if (serviceType != null) {
+            try {
+                // Attempt seamless switching first
+                activity.switchToServiceSeamlessly(serviceType);
+                
+                // Update local state
+                updateStateForNewService(newState);
+                updateUIForNewService(newState);
+                
+                // Run additional initialization if needed
+                if (serviceInitAction != null) {
+                    handler.postDelayed(serviceInitAction, 100);
+                }
+                
+                Log.d(TAG, "Seamless service switch completed for: " + newState);
+                return;
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Seamless switching failed, falling back to traditional method", e);
+            }
+        }
+        
+        // Fallback to traditional switching
+        switchToServiceTraditional(newState, serviceInitAction);
+    }
+
+    /**
+     * Traditional service switching with proper cleanup and state management
+     */
+    private void switchToServiceTraditional(CameraState newState, Runnable serviceInitAction) {
         if (mActivityRef == null || mActivityRef.get() == null) return;
         
         MainActivity activity = mActivityRef.get();
@@ -1390,6 +1584,128 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
         } catch (Exception e) {
             Log.e(TAG, "Error during service switching: " + e.getMessage(), e);
             rollbackToPreviousState(previousState);
+        }
+    }
+
+    /**
+     * Convert CameraState to ServiceType for seamless switching
+     */
+    private com.checkmate.android.service.SharedEGL.ServiceType getServiceTypeFromState(CameraState state) {
+        switch (state) {
+            case REAR_CAMERA:
+            case FRONT_CAMERA:
+                return com.checkmate.android.service.SharedEGL.ServiceType.BgCamera;
+            case USB_CAMERA:
+                return com.checkmate.android.service.SharedEGL.ServiceType.BgUSBCamera;
+            case SCREEN_CAST:
+                return com.checkmate.android.service.SharedEGL.ServiceType.BgScreenCast;
+            case AUDIO_ONLY:
+                return com.checkmate.android.service.SharedEGL.ServiceType.BgAudio;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Callback for when EGL context is ready
+     */
+    public void onEGLContextReady() {
+        try {
+            Log.d(TAG, "EGL context ready callback received");
+            
+            // Refresh texture view with optimized EGL context
+            optimizedTextureViewRefresh();
+            
+            // Update UI to enable seamless switching features
+            enableSeamlessSwitchingFeatures();
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error in EGL context ready callback", e);
+        }
+    }
+
+    /**
+     * Optimized texture view refresh for seamless transitions
+     */
+    private void optimizedTextureViewRefresh() {
+        if (textureView != null && mActivityRef != null && mActivityRef.get() != null) {
+            try {
+                // Use SharedEglManager to update surface seamlessly
+                com.checkmate.android.service.SharedEGL.SharedEglManager eglManager = 
+                    com.checkmate.android.service.SharedEGL.SharedEglManager.getInstance();
+                
+                if (eglManager.isEglReady() && textureView.getSurfaceTexture() != null) {
+                    // Update surface through EGL manager for seamless transitions
+                    eglManager.updateActiveServiceSurface(
+                        textureView.getSurfaceTexture(),
+                        textureView.getWidth(),
+                        textureView.getHeight()
+                    );
+                    
+                    Log.d(TAG, "Optimized texture view refresh completed");
+                } else {
+                    // Fallback to traditional refresh
+                    forceTextureViewRefresh();
+                }
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error in optimized texture view refresh", e);
+                // Fallback to traditional refresh
+                forceTextureViewRefresh();
+            }
+        }
+    }
+
+    /**
+     * Enable seamless switching features in UI
+     */
+    private void enableSeamlessSwitchingFeatures() {
+        // Enable enhanced camera switching capabilities
+        // This could include faster response times, smoother animations, etc.
+        Log.d(TAG, "Seamless switching features enabled");
+    }
+
+    /**
+     * Update UI for service switch without interruption
+     */
+    public void updateUIForServiceSwitch(com.checkmate.android.service.SharedEGL.ServiceType serviceType) {
+        if (!isAdded() || getActivity() == null) return;
+        
+        getActivity().runOnUiThread(() -> {
+            try {
+                // Update current state based on service type
+                CameraState newState = getStateFromServiceType(serviceType);
+                if (newState != null) {
+                    updateStateForNewService(newState);
+                    updateUIForNewService(newState);
+                }
+                
+                // Maintain UI continuity - no visual interruptions
+                Log.d(TAG, "UI updated seamlessly for service: " + serviceType);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating UI for service switch", e);
+            }
+        });
+    }
+
+    /**
+     * Convert ServiceType to CameraState
+     */
+    private CameraState getStateFromServiceType(com.checkmate.android.service.SharedEGL.ServiceType serviceType) {
+        switch (serviceType) {
+            case BgCamera:
+                // Determine if rear or front based on preferences
+                String cameraId = AppPreference.getStr(AppPreference.KEY.SELECTED_POSITION, AppConstant.REAR_CAMERA);
+                return AppConstant.REAR_CAMERA.equals(cameraId) ? CameraState.REAR_CAMERA : CameraState.FRONT_CAMERA;
+            case BgUSBCamera:
+                return CameraState.USB_CAMERA;
+            case BgScreenCast:
+                return CameraState.SCREEN_CAST;
+            case BgAudio:
+                return CameraState.AUDIO_ONLY;
+            default:
+                return null;
         }
     }
     

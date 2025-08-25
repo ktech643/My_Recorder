@@ -15,11 +15,63 @@ public class ServiceSwitcher {
 
     /**
      * Switch to a new service without stopping current streams/recordings
+     * Uses optimized seamless switching for better user experience
      * @param context Application context
      * @param newServiceType The new service type to switch to
      */
     public static void switchService(Context context, ServiceType newServiceType) {
-        Log.d(TAG, "Switching to service: " + newServiceType);
+        Log.d(TAG, "Switching to service seamlessly: " + newServiceType);
+        
+        SharedEglManager eglManager = SharedEglManager.getInstance();
+        
+        // Check if EGL is ready for seamless switching
+        if (!eglManager.isEglReady()) {
+            Log.w(TAG, "EGL not ready, using traditional switching");
+            switchServiceTraditional(context, newServiceType);
+            return;
+        }
+        
+        // Start new service if not already running
+        if (!isServiceRunning(context, newServiceType)) {
+            startService(context, newServiceType);
+            
+            // Small delay to allow service to initialize
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        
+        // Get new service instance and activate it seamlessly
+        BaseBackgroundService newService = getRunningService(newServiceType);
+        
+        if (newService != null) {
+            // Use seamless activation to prevent interruptions
+            eglManager.activateServiceSeamlessly(
+                newServiceType,
+                newService.getSurfaceTexture(), 
+                newService.getSurfaceWidth(),
+                newService.getSurfaceHeight()
+            );
+            
+            // Update UI controls for the new service
+            updateControlsForService(newServiceType);
+            
+            Log.d(TAG, "Successfully switched to service seamlessly: " + newServiceType);
+        } else {
+            Log.w(TAG, "Failed to get running service instance, using traditional switching");
+            switchServiceTraditional(context, newServiceType);
+        }
+    }
+
+    /**
+     * Traditional service switching fallback method
+     * @param context Application context
+     * @param newServiceType The new service type to switch to
+     */
+    private static void switchServiceTraditional(Context context, ServiceType newServiceType) {
+        Log.d(TAG, "Using traditional service switching for: " + newServiceType);
         
         // Start new service if not already running
         if (!isServiceRunning(context, newServiceType)) {
@@ -30,16 +82,35 @@ public class ServiceSwitcher {
         BaseBackgroundService newService = getRunningService(newServiceType);
         
         if (newService != null) {
-            // Activate the new service with its surface
+            // Use traditional activation method
             newService.activateService(
                 newService.getSurfaceTexture(), 
                 newService.getSurfaceWidth(),
                 newService.getSurfaceHeight()
             );
             
-            Log.d(TAG, "Successfully switched to service: " + newServiceType);
+            Log.d(TAG, "Successfully switched to service traditionally: " + newServiceType);
         } else {
             Log.w(TAG, "Failed to get running service instance for: " + newServiceType);
+        }
+    }
+
+    /**
+     * Preload a service for faster switching
+     * @param context Application context
+     * @param serviceType The service type to preload
+     */
+    public static void preloadService(Context context, ServiceType serviceType) {
+        Log.d(TAG, "Preloading service for faster switching: " + serviceType);
+        
+        SharedEglManager eglManager = SharedEglManager.getInstance();
+        if (eglManager.isEglReady()) {
+            eglManager.preloadServiceForSwitching(serviceType);
+        }
+        
+        // Start the service if not running
+        if (!isServiceRunning(context, serviceType)) {
+            startService(context, serviceType);
         }
     }
 
