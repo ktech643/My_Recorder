@@ -420,7 +420,7 @@ public class BgCameraService extends BaseBackgroundService {
         
         try {
             // Update status to indicate error
-            setStatus(BackgroundNotification.NOTIFICATION_STATUS.ERROR);
+            setStatus(BackgroundNotification.NOTIFICATION_STATUS.SERVICE_CLOSED);
             
             // Try to clean up any partially initialized components
             cleanupPartialInitialization();

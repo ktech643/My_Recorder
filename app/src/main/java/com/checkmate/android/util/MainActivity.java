@@ -608,7 +608,7 @@ public class MainActivity extends BaseActivity
                 InternalLogger.e(TAG, "Error finding camera info", e);
                 return null;
             }
-        }, null, "findCameraInfo");
+        }, null);
     }
 
 
@@ -1426,7 +1426,7 @@ public class MainActivity extends BaseActivity
             for (int res : results) if (res == PackageManager.PERMISSION_DENIED) return;
             startCameraIntent();                   // all granted
         } else {
-            MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, reqCode, results);
+//             MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, reqCode, results);
         }
     }
     /* ─────────────────────────────────────────────────────────────────────────
@@ -2137,7 +2137,7 @@ public class MainActivity extends BaseActivity
 
             mHandler.postDelayed(() -> {
                 if (audioAllowed) {
-                    MainActivityPermissionsDispatcher.launchAudioWithPermissionCheck(this);
+//                     MainActivityPermissionsDispatcher.launchAudioWithPermissionCheck(this);
                 } else {
                     requestMediaProjection();
                 }
