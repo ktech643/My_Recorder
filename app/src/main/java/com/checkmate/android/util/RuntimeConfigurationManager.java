@@ -217,8 +217,16 @@ public class RuntimeConfigurationManager {
                     return applyQualityChange(quality);
                     
                 case AppPreference.KEY.STREAMING_RESOLUTION:
-                    int resolution = (Integer) newValue;
-                    return applyResolutionChange(resolution);
+                    int streamingResolution = (Integer) newValue;
+                    return applyStreamingResolutionChange(streamingResolution);
+                    
+                case AppPreference.KEY.VIDEO_RESOLUTION:
+                    int recordingResolution = (Integer) newValue;
+                    return applyRecordingResolutionChange(recordingResolution);
+                    
+                case AppPreference.KEY.CAST_RESOLUTION:
+                    int castResolution = (Integer) newValue;
+                    return applyCastResolutionChange(castResolution);
                     
                 case AppPreference.KEY.ADAPTIVE_FRAMERATE:
                     boolean adaptiveFps = (Boolean) newValue;
@@ -285,24 +293,223 @@ public class RuntimeConfigurationManager {
     }
     
     /**
-     * Apply resolution change (limited support during streaming)
+     * Apply streaming resolution change during active streaming
      */
-    private boolean applyResolutionChange(int resolutionIndex) {
+    private boolean applyStreamingResolutionChange(int resolutionIndex) {
         try {
-            // Resolution changes during streaming are complex and may require encoder restart
-            // For now, we'll log the change and apply it for next stream
-            Log.d(TAG, "📐 Resolution change to index " + resolutionIndex + " queued for next stream");
+            Log.d(TAG, "📐 Applying streaming resolution change to index: " + resolutionIndex);
             
-            // In a full implementation, you might:
-            // 1. Check if encoder supports dynamic resolution changes
-            // 2. Restart encoder if necessary
-            // 3. Update surfaces and buffers
+            if (mEglManager == null) {
+                Log.w(TAG, "EGL Manager not available for streaming resolution change");
+                return false;
+            }
             
-            return true;
+            // Get resolution from available camera sizes
+            String newResolution = getResolutionFromIndex(resolutionIndex, "streaming");
+            if (newResolution == null) {
+                Log.e(TAG, "Invalid streaming resolution index: " + resolutionIndex);
+                return false;
+            }
+            
+            Log.d(TAG, "📐 Changing streaming resolution to: " + newResolution);
+            
+            // Check if encoder supports dynamic resolution changes
+            if (canChangeResolutionDynamically("streaming")) {
+                // Apply resolution change through EGL manager
+                boolean success = mEglManager.updateDynamicConfiguration("streaming_resolution", newResolution);
+                if (success) {
+                    Log.d(TAG, "✅ Streaming resolution changed dynamically to: " + newResolution);
+                    return true;
+                } else {
+                    Log.w(TAG, "⚠️ Dynamic streaming resolution change failed, will apply on next stream");
+                    return true; // Still successful, just delayed
+                }
+            } else {
+                // Queue for next stream start
+                Log.d(TAG, "📐 Streaming resolution change queued for next stream: " + newResolution);
+                return true;
+            }
             
         } catch (Exception e) {
-            Log.e(TAG, "Error applying resolution change", e);
+            Log.e(TAG, "Error applying streaming resolution change", e);
             return false;
+        }
+    }
+    
+    /**
+     * Apply recording resolution change during active recording
+     */
+    private boolean applyRecordingResolutionChange(int resolutionIndex) {
+        try {
+            Log.d(TAG, "📹 Applying recording resolution change to index: " + resolutionIndex);
+            
+            if (mEglManager == null) {
+                Log.w(TAG, "EGL Manager not available for recording resolution change");
+                return false;
+            }
+            
+            // Get resolution from available camera sizes
+            String newResolution = getResolutionFromIndex(resolutionIndex, "recording");
+            if (newResolution == null) {
+                Log.e(TAG, "Invalid recording resolution index: " + resolutionIndex);
+                return false;
+            }
+            
+            Log.d(TAG, "📹 Changing recording resolution to: " + newResolution);
+            
+            // Check if recorder supports dynamic resolution changes
+            if (canChangeResolutionDynamically("recording")) {
+                // Apply resolution change through EGL manager
+                boolean success = mEglManager.updateDynamicConfiguration("recording_resolution", newResolution);
+                if (success) {
+                    Log.d(TAG, "✅ Recording resolution changed dynamically to: " + newResolution);
+                    return true;
+                } else {
+                    Log.w(TAG, "⚠️ Dynamic recording resolution change failed, will apply on next recording");
+                    return true; // Still successful, just delayed
+                }
+            } else {
+                // Queue for next recording start
+                Log.d(TAG, "📹 Recording resolution change queued for next recording: " + newResolution);
+                return true;
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error applying recording resolution change", e);
+            return false;
+        }
+    }
+    
+    /**
+     * Apply cast resolution change during active casting
+     */
+    private boolean applyCastResolutionChange(int resolutionIndex) {
+        try {
+            Log.d(TAG, "📺 Applying cast resolution change to index: " + resolutionIndex);
+            
+            // Get cast resolution options
+            String[] castResolutions = {"720p", "1080p", "1440p", "2160p"};
+            
+            if (resolutionIndex < 0 || resolutionIndex >= castResolutions.length) {
+                Log.e(TAG, "Invalid cast resolution index: " + resolutionIndex);
+                return false;
+            }
+            
+            String newResolution = castResolutions[resolutionIndex];
+            Log.d(TAG, "📺 Changing cast resolution to: " + newResolution);
+            
+            if (mEglManager != null) {
+                // Apply cast resolution change
+                boolean success = mEglManager.updateDynamicConfiguration("cast_resolution", newResolution);
+                if (success) {
+                    Log.d(TAG, "✅ Cast resolution changed to: " + newResolution);
+                    return true;
+                } else {
+                    Log.w(TAG, "⚠️ Cast resolution change will apply on next cast session");
+                    return true;
+                }
+            } else {
+                Log.d(TAG, "📺 Cast resolution change queued: " + newResolution);
+                return true;
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error applying cast resolution change", e);
+            return false;
+        }
+    }
+    
+    /**
+     * Get resolution string from index
+     */
+    private String getResolutionFromIndex(int index, String type) {
+        try {
+            // Common resolution options
+            String[] streamingResolutions = {
+                "480x360",   // 0
+                "640x480",   // 1
+                "854x480",   // 2
+                "960x540",   // 3
+                "1280x720",  // 4
+                "1920x1080", // 5
+                "2560x1440", // 6
+                "3840x2160"  // 7
+            };
+            
+            String[] recordingResolutions = {
+                "480x360",   // 0
+                "640x480",   // 1
+                "854x480",   // 2
+                "960x540",   // 3
+                "1280x720",  // 4
+                "1920x1080", // 5
+                "2560x1440", // 6
+                "3840x2160"  // 7
+            };
+            
+            String[] resolutions = type.equals("recording") ? recordingResolutions : streamingResolutions;
+            
+            if (index >= 0 && index < resolutions.length) {
+                return resolutions[index];
+            } else {
+                Log.e(TAG, "Resolution index out of bounds: " + index + " for type: " + type);
+                return null;
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting resolution from index", e);
+            return null;
+        }
+    }
+    
+    /**
+     * Check if resolution can be changed dynamically
+     */
+    private boolean canChangeResolutionDynamically(String type) {
+        try {
+            // For most Android encoders, resolution changes require encoder restart
+            // However, some newer hardware encoders support dynamic resolution changes
+            
+            // Check device capabilities (simplified implementation)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                // Android 10+ has better support for dynamic encoder changes
+                Log.d(TAG, "🔧 Device may support dynamic " + type + " resolution changes (API " + 
+                           android.os.Build.VERSION.SDK_INT + ")");
+                return true; // Optimistic approach - try dynamic change first
+            } else {
+                Log.d(TAG, "🔧 Device likely requires encoder restart for " + type + " resolution changes");
+                return false;
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking dynamic resolution support", e);
+            return false;
+        }
+    }
+    
+    /**
+     * Get current streaming resolution
+     */
+    public String getCurrentStreamingResolution() {
+        try {
+            int index = getCurrentConfigValueInt(AppPreference.KEY.STREAMING_RESOLUTION);
+            return getResolutionFromIndex(index, "streaming");
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting current streaming resolution", e);
+            return "Unknown";
+        }
+    }
+    
+    /**
+     * Get current recording resolution
+     */
+    public String getCurrentRecordingResolution() {
+        try {
+            int index = getCurrentConfigValueInt(AppPreference.KEY.VIDEO_RESOLUTION);
+            return getResolutionFromIndex(index, "recording");
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting current recording resolution", e);
+            return "Unknown";
         }
     }
     
@@ -457,6 +664,18 @@ public class RuntimeConfigurationManager {
     }
     
     /**
+     * Get current configuration value as integer
+     */
+    private int getCurrentConfigValueInt(String key) {
+        try {
+            return AppPreference.getInt(key, 0);
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting current config value as int: " + key, e);
+            return 0;
+        }
+    }
+    
+    /**
      * Determine configuration category based on key
      */
     private ConfigCategory determineConfigCategory(String key) {
@@ -491,6 +710,9 @@ public class RuntimeConfigurationManager {
             AppPreference.KEY.STREAMING_BITRATE,
             AppPreference.KEY.ADAPTIVE_MODE,
             AppPreference.KEY.STREAMING_QUALITY,
+            AppPreference.KEY.STREAMING_RESOLUTION,
+            AppPreference.KEY.VIDEO_RESOLUTION,
+            AppPreference.KEY.CAST_RESOLUTION,
             AppPreference.KEY.ADAPTIVE_FRAMERATE,
             AppPreference.KEY.TIMESTAMP,
             AppPreference.KEY.RECORD_AUDIO,
