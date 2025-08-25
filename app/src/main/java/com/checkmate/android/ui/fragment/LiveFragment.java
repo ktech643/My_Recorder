@@ -480,6 +480,13 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
                 retryCount = 0; // Reset retry count
                 resetAutoStartFlags();
             }
+            } catch (Exception e) {
+                Log.e(TAG, "Error in checkAndAutoStart", e);
+                if (CrashLogger.getInstance() != null) {
+                    CrashLogger.getInstance().logError(TAG, "checkAndAutoStart", e);
+                }
+                resetAutoStartFlags();
+            }
         }, RETRY_DELAY);
     }
 
@@ -556,6 +563,12 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
                 // initCameraSpinner(); // Removed - was for old spinner implementation
                 break;
         }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in handleEvent", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "handleEvent", e);
+            }
+        }
     }
 
     public void handleCameraView() {
@@ -582,6 +595,12 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
                 updateAudioOnlyUI(activity);
             } else {
                 updateWifiUI(activity);
+            }
+            } catch (Exception e) {
+                Log.e(TAG, "Error in handleCameraView UI update", e);
+                if (CrashLogger.getInstance() != null) {
+                    CrashLogger.getInstance().logError(TAG, "handleCameraView", e);
+                }
             }
         });
     }

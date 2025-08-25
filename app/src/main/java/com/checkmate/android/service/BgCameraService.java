@@ -289,6 +289,12 @@ public class BgCameraService extends BaseBackgroundService {
                 Thread.currentThread().interrupt();
             }
         }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onDestroy", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "onDestroy", e);
+            }
+        }
     }
 
     void ckearSharedInctance() {

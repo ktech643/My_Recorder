@@ -2051,7 +2051,12 @@ public class MainActivity extends BaseActivity
                 onStart.run();
             }
         }
-
+        } catch (Exception e) {
+            Log.e(TAG, "Error in startStream", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "startStream", e);
+            }
+        }
     }
 
     /* ------------------------------------------------------------------------
@@ -2129,6 +2134,15 @@ public class MainActivity extends BaseActivity
                     .setCancelTextInfo(new TextInfo().setFontColor(Color.BLACK).setBold(true));
         }
         dlg_progress.dismiss();
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onCastStream", e);
+            if (CrashLogger.getInstance() != null) {
+                CrashLogger.getInstance().logError(TAG, "onCastStream", e);
+            }
+            if (dlg_progress != null && dlg_progress.isShowing()) {
+                dlg_progress.dismiss();
+            }
+        }
     }
 
     /* ─────────────────────────────────────────────────────────────────────────
