@@ -150,7 +150,7 @@ public final class BgCastService extends BaseBackgroundService {
                 // Stop screen casting safely
                 ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
                     stopScreenCast();
-                    
+                    return true;
                 }, false);
                 
                 super.onDestroy();
@@ -158,7 +158,16 @@ public final class BgCastService extends BaseBackgroundService {
                 
                 // Stop additional resources safely
                 ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
-                    stopSafe();
+                    // Additional cleanup
+                    if (mMediaProjection != null) {
+                        mMediaProjection.stop();
+                        mMediaProjection = null;
+                    }
+                    
+                    if (mVirtualDisplay != null) {
+                        mVirtualDisplay.release();
+                        mVirtualDisplay = null;
+                    }
                     return true;
                 }, false);
                 
