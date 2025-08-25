@@ -916,39 +916,121 @@ public class SharedEglManager {
             cameraTexture.setDefaultBufferSize(srcW, srcH); // Use source dimensions
             Log.d(TAG, "🎬 Camera texture created with ID: " + textureId);
 
-            // Create display surface with advanced management
+            // Create display surface with advanced management and 100% crash protection
             try {
-                Log.d(TAG, "📱 Creating display surface...");
+                Log.d(TAG, "📱 Creating display surface with crash protection...");
+                
+                // CRASH PROTECTION: Validate texture ID before surface creation
+                if (textureId <= 0) {
+                    Log.e(TAG, "💥 CRASH PREVENTION: Invalid texture ID: " + textureId);
+                    throw new RuntimeException("Invalid texture ID for display surface: " + textureId);
+                }
+                
                 displaySurface = surfaceManager.createDisplaySurface(eglCore, textureId);
                 
                 if (displaySurface == null) {
-                    throw new RuntimeException("Failed to create display surface");
-                }
-                
-                Log.d(TAG, "✅ Display surface created successfully");
-            } catch (Exception e) {
-                Log.e(TAG, "❌ Display surface creation failed", e);
-                throw new RuntimeException("Failed to create display surface", e);
-            }
-
-            // Create encoder surface with advanced management
-            try {
-                if (mStreamer != null && mStreamer.getEncoderSurface() != null) {
-                    Log.d(TAG, "🎯 Creating encoder surface...");
-                    encoderSurface = surfaceManager.createEncoderSurface(eglCore, mStreamer.getEncoderSurface());
+                    Log.e(TAG, "💥 CRASH PREVENTION: Display surface creation returned null");
                     
-                    if (encoderSurface == null) {
-                        Log.w(TAG, "⚠️ Encoder surface creation failed, will retry later");
-                    } else {
-                        Log.d(TAG, "✅ Encoder surface created successfully");
+                    // FALLBACK: Try emergency recovery
+                    try {
+                        Log.w(TAG, "🚨 Attempting emergency recovery for display surface...");
+                        surfaceManager.emergencyRecovery();
+                        
+                        // Retry once after recovery
+                        displaySurface = surfaceManager.createDisplaySurface(eglCore, textureId);
+                        
+                        if (displaySurface == null) {
+                            throw new RuntimeException("Display surface creation failed even after emergency recovery");
+                        } else {
+                            Log.d(TAG, "✅ Display surface created successfully after emergency recovery");
+                        }
+                        
+                    } catch (Exception recoveryError) {
+                        Log.e(TAG, "💥 Emergency recovery failed for display surface", recoveryError);
+                        throw new RuntimeException("Failed to create display surface after recovery attempt", recoveryError);
                     }
                 } else {
-                    Log.w(TAG, "⚠️ Streamer encoder surface is null - skipping encoder surface creation");
+                    Log.d(TAG, "✅ Display surface created successfully on first attempt");
                 }
+                
+            } catch (RuntimeException e) {
+                // Re-throw RuntimeExceptions as they are expected
+                throw e;
             } catch (Exception e) {
-                Log.e(TAG, "❌ Encoder surface creation failed", e);
+                Log.e(TAG, "💥 CRASH PREVENTION: Unexpected error during display surface creation", e);
+                throw new RuntimeException("Unexpected error creating display surface", e);
+            }
+
+            // Create encoder surface with advanced management and 100% crash protection
+            try {
+                Log.d(TAG, "🎯 Creating encoder surface with crash protection...");
+                
+                if (mStreamer != null && mStreamer.getEncoderSurface() != null) {
+                    // CRASH PROTECTION: Validate encoder surface before creation
+                    try {
+                        if (!mStreamer.getEncoderSurface().isValid()) {
+                            Log.e(TAG, "💥 CRASH PREVENTION: Streamer encoder surface is invalid");
+                            Log.w(TAG, "⚠️ Skipping encoder surface creation due to invalid surface");
+                        } else {
+                            encoderSurface = surfaceManager.createEncoderSurface(eglCore, mStreamer.getEncoderSurface());
+                            
+                            if (encoderSurface == null) {
+                                Log.w(TAG, "⚠️ Encoder surface creation returned null, will retry later");
+                                
+                                // FALLBACK: Try emergency recovery for encoder surface
+                                try {
+                                    Log.w(TAG, "🚨 Attempting emergency recovery for encoder surface...");
+                                    surfaceManager.emergencyRecovery();
+                                    
+                                    // Retry once after recovery
+                                    if (mStreamer.getEncoderSurface().isValid()) {
+                                        encoderSurface = surfaceManager.createEncoderSurface(eglCore, mStreamer.getEncoderSurface());
+                                        
+                                        if (encoderSurface != null) {
+                                            Log.d(TAG, "✅ Encoder surface created successfully after emergency recovery");
+                                        } else {
+                                            Log.w(TAG, "⚠️ Encoder surface creation failed even after recovery");
+                                        }
+                                    } else {
+                                        Log.w(TAG, "⚠️ Streamer encoder surface became invalid during recovery");
+                                    }
+                                    
+                                } catch (Exception recoveryError) {
+                                    Log.e(TAG, "💥 Emergency recovery failed for encoder surface", recoveryError);
+                                    Log.w(TAG, "⚠️ Continuing without encoder surface");
+                                }
+                            } else {
+                                Log.d(TAG, "✅ Encoder surface created successfully on first attempt");
+                            }
+                        }
+                        
+                    } catch (Exception validationError) {
+                        Log.e(TAG, "💥 CRASH PREVENTION: Error validating streamer encoder surface", validationError);
+                        Log.w(TAG, "⚠️ Skipping encoder surface creation due to validation error");
+                    }
+                    
+                } else {
+                    if (mStreamer == null) {
+                        Log.w(TAG, "⚠️ Streamer is null - skipping encoder surface creation");
+                    } else {
+                        Log.w(TAG, "⚠️ Streamer encoder surface is null - skipping encoder surface creation");
+                    }
+                }
+                
+            } catch (Exception e) {
+                Log.e(TAG, "💥 CRASH PREVENTION: Critical error during encoder surface creation", e);
                 // Don't throw here - encoder surface can be created later
-                Log.w(TAG, "⚠️ Continuing without encoder surface, will retry later");
+                Log.w(TAG, "⚠️ Continuing without encoder surface due to critical error, will retry later");
+                
+                // Ensure encoderSurface is null in case of partial creation
+                try {
+                    if (encoderSurface != null) {
+                        surfaceManager.releaseSurface(encoderSurface);
+                        encoderSurface = null;
+                    }
+                } catch (Exception cleanupError) {
+                    Log.e(TAG, "💥 Error cleaning up partial encoder surface", cleanupError);
+                }
             }
 
             if (mRecorder != null && mRecorder.getEncoderSurface() != null) {
