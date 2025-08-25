@@ -112,6 +112,9 @@ import com.checkmate.android.database.FileStoreDb;
 import android.media.MediaMetadataRetriever;
 import android.graphics.BitmapFactory;
 import com.checkmate.android.util.StreamingLibraryCompatibility;
+import com.checkmate.android.util.AdvancedPerformanceOptimizer;
+import com.checkmate.android.util.AIAdaptiveQualityManager;
+import com.checkmate.android.util.UltraLowLatencyOptimizer;
 
 @Singleton
 public class SharedEglManager {
