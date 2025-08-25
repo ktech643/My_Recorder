@@ -146,7 +146,7 @@ import static android.content.Context.ACCESSIBILITY_SERVICE;
 import static com.checkmate.android.util.ResourceUtil.getRecordPath;
 import static com.checkmate.android.util.ResourceUtil.getSdCardPath;
 
-public class SettingsFragment extends BaseFragment implements OnStoragePathChangeListener {
+public class SettingsFragment extends BaseFragment implements OnStoragePathChangeListener, View.OnClickListener {
 
     private  ActivityFragmentCallbacks mListener;
     //    public static SettingsFragment instance;
@@ -182,6 +182,10 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
     TextView txt_space;
 
+    TextView txt_update_now;
+
+    TextView txt_update_beta;
+    
     TextView txt_update;
 
     TextView txt_check_update;
@@ -392,6 +396,8 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         swt_orientation = mView.findViewById(R.id.swt_orientation);
         txt_location = mView.findViewById(R.id.txt_location);
         txt_space = mView.findViewById(R.id.txt_space);
+        txt_update_now = mView.findViewById(R.id.txt_update_now);
+        txt_update_beta = mView.findViewById(R.id.txt_update_beta);
         txt_update = mView.findViewById(R.id.txt_update);
         txt_check_update = mView.findViewById(R.id.txt_check_update);
         swt_convert_ui = mView.findViewById(R.id.swt_convert_ui);
@@ -473,6 +479,8 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         if (txt_video_details != null) txt_video_details.setOnClickListener(this);
         if (txt_storage != null) txt_storage.setOnClickListener(this);
         if (txt_transcode != null) txt_transcode.setOnClickListener(this);
+        if (txt_update_now != null) txt_update_now.setOnClickListener(this);
+        if (txt_update_beta != null) txt_update_beta.setOnClickListener(this);
         if (txt_update != null) txt_update.setOnClickListener(this);
         if (txt_check_update != null) txt_check_update.setOnClickListener(this);
         if (txt_wifi_camera != null) txt_wifi_camera.setOnClickListener(this);
@@ -853,12 +861,16 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         txt_version.setText(version);
         if (!TextUtils.isEmpty(AppPreference.getStr(AppPreference.KEY.APP_VERSION, ""))) {
             txt_new_version.setText(AppPreference.getStr(AppPreference.KEY.APP_VERSION, ""));
-            txt_update.setVisibility(View.VISIBLE);
-            txt_check_update.setVisibility(View.GONE);
+            if (txt_update_now != null) txt_update_now.setVisibility(View.VISIBLE);
+            if (txt_update_beta != null) txt_update_beta.setVisibility(View.VISIBLE);
+            if (txt_update != null) txt_update.setVisibility(View.VISIBLE);
+            if (txt_check_update != null) txt_check_update.setVisibility(View.GONE);
         } else {
             txt_new_version.setText(version);
-            txt_update.setVisibility(View.GONE);
-            txt_check_update.setVisibility(View.VISIBLE);
+            if (txt_update_now != null) txt_update_now.setVisibility(View.GONE);
+            if (txt_update_beta != null) txt_update_beta.setVisibility(View.GONE);
+            if (txt_update != null) txt_update.setVisibility(View.GONE);
+            if (txt_check_update != null) txt_check_update.setVisibility(View.VISIBLE);
         }
 
         try {
@@ -2322,10 +2334,16 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 }).show();
     }
 
-    public void OnClick(View view) {
+    public void onClick(View view) {
         switch (view.getId()) {
             case R.id.txt_camera:
                 onAddCamera();
+                break;
+            case R.id.txt_update_now:
+                mListener.fragUpdateApp("");
+                break;
+            case R.id.txt_update_beta:
+                mListener.fragUpdateApp(AppConstant.BETA_UPDATE);
                 break;
             case R.id.txt_update:
                 mListener.fragUpdateApp("");
@@ -2362,41 +2380,45 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.fragUpdateApp(AppConstant.BETA_UPDATE);
                 break;
             case R.id.txt_stream_details:
-                if (txt_stream_details.getText().equals(getString(R.string.show_details))) {
-                    // Show custom streaming fields
-                    ly_streaming_custom.setVisibility(View.VISIBLE);
-                    txt_stream_details.setText(R.string.return_defaults);
-                    // Enable all streaming fields
-                    enableStreamingFields(true);
-                } else {
-                    // Hide custom streaming fields and reset to defaults
-                    ly_streaming_custom.setVisibility(View.GONE);
-                    txt_stream_details.setText(R.string.show_details);
-                    // Set default streaming values (Medium - index 1)
-                    AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
-                    AppPreference.setInt(AppPreference.KEY.STREAMING_QUALITY, 1);
-                    // Reset spinners to default values
-                    resetStreamingToDefaults();
-                    onStreamDetails(false);
+                if (txt_stream_details != null && ly_streaming_custom != null) {
+                    if (txt_stream_details.getText().equals(getString(R.string.show_details))) {
+                        // Show custom streaming fields
+                        ly_streaming_custom.setVisibility(View.VISIBLE);
+                        txt_stream_details.setText(R.string.return_defaults);
+                        // Enable all streaming fields
+                        enableStreamingFields(true);
+                    } else {
+                        // Hide custom streaming fields and reset to defaults
+                        ly_streaming_custom.setVisibility(View.GONE);
+                        txt_stream_details.setText(R.string.show_details);
+                        // Set default streaming values (Medium - index 1)
+                        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
+                        AppPreference.setInt(AppPreference.KEY.STREAMING_QUALITY, 1);
+                        // Reset spinners to default values
+                        resetStreamingToDefaults();
+                        onStreamDetails(false);
+                    }
                 }
                 break;
             case R.id.txt_video_details:
-                if (txt_video_details.getText().equals(getString(R.string.show_details))) {
-                    // Show custom video fields
-                    ly_video_custom.setVisibility(View.VISIBLE);
-                    txt_video_details.setText(R.string.return_defaults);
-                    // Enable all video fields
-                    enableVideoFields(true);
-                } else {
-                    // Hide custom video fields and reset to defaults
-                    ly_video_custom.setVisibility(View.GONE);
-                    txt_video_details.setText(R.string.show_details);
-                    // Set default video values (High - index 0)
-                    AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
-                    AppPreference.setInt(AppPreference.KEY.VIDEO_QUALITY, 0);
-                    // Reset spinners to default values
-                    resetVideoToDefaults();
-                    onVideoDetails(false);
+                if (txt_video_details != null && ly_video_custom != null) {
+                    if (txt_video_details.getText().equals(getString(R.string.show_details))) {
+                        // Show custom video fields
+                        ly_video_custom.setVisibility(View.VISIBLE);
+                        txt_video_details.setText(R.string.return_defaults);
+                        // Enable all video fields
+                        enableVideoFields(true);
+                    } else {
+                        // Hide custom video fields and reset to defaults
+                        ly_video_custom.setVisibility(View.GONE);
+                        txt_video_details.setText(R.string.show_details);
+                        // Set default video values (High - index 0)
+                        AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
+                        AppPreference.setInt(AppPreference.KEY.VIDEO_QUALITY, 0);
+                        // Reset spinners to default values
+                        resetVideoToDefaults();
+                        onVideoDetails(false);
+                    }
                 }
                 break;
             case R.id.txt_transcode:
