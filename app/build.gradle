@@ -3,49 +3,85 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
+    namespace 'com.checkmate.android'
+    compileSdk project.ext.compileSdkVersion
 
-    compileSdkVersion project.ext.compileSdkVersion
-
-    lintOptions {
+    lint {
         checkReleaseBuilds false
-        // Or, if you prefer, you can continue to check for errors in release builds,
-        // but continue the build even when errors are found:
         abortOnError false
+        disable 'MissingTranslation', 'ExtraTranslation'
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
     
     kotlinOptions {
         jvmTarget = '17'
+        freeCompilerArgs += [
+            '-opt-in=kotlin.RequiresOptIn',
+            '-Xjvm-default=all'
+        ]
     }
 
     defaultConfig {
-        compileSdkVersion 34
         applicationId "com.checkmate.android"
-        minSdkVersion 29
-        targetSdkVersion 33
+        minSdk project.ext.minSdkVersion
+        targetSdk project.ext.targetSdkVersion
         versionCode 1
         versionName "4.003"
         setProperty("archivesBaseName", "CheckMate!_" + versionName)
         multiDexEnabled true
+        
+        // Optimize native builds
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_STL=c++_shared'
+                arguments '-DANDROID_STL=c++_shared',
+                         '-DANDROID_PLATFORM=android-26',
+                         '-DCMAKE_BUILD_TYPE=Release'
+                cppFlags '-std=c++17', '-frtti', '-fexceptions'
             }
         }
+        
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a"
         }
-
+        
+        // Performance optimizations
+        vectorDrawables.useSupportLibrary = true
+        resConfigs "en", "es", "fr", "de", "it", "pt"
     }
     buildTypes {
-        release {
+        debug {
+            debuggable true
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            shrinkResources false
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
         }
+        
+        release {
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            // Optimize APK size
+            crunchPngs true
+            
+            // Performance optimizations
+            ndk {
+                debugSymbolLevel 'NONE'
+            }
+        }
+    }
+    
+    buildFeatures {
+        viewBinding true
+        buildConfig true
     }
 
     repositories {
@@ -62,8 +98,24 @@ android {
             version "3.10.2"
         }
     }
-    packagingOptions {
-        pickFirst 'com/serenegiant/dialog/MessageDialogFragment$*.class'
+    packaging {
+        resources {
+            excludes += [
+                '/META-INF/{AL2.0,LGPL2.1}',
+                '/META-INF/DEPENDENCIES',
+                '/META-INF/LICENSE',
+                '/META-INF/LICENSE.txt',
+                '/META-INF/license.txt',
+                '/META-INF/NOTICE',
+                '/META-INF/NOTICE.txt',
+                '/META-INF/notice.txt',
+                '/META-INF/ASL2.0',
+                '/META-INF/*.kotlin_module'
+            ]
+        }
+        pickFirst {
+            include 'com/serenegiant/dialog/MessageDialogFragment$*.class'
+        }
         exclude 'com/serenegiant/common/**'
     }
     
@@ -74,69 +126,119 @@ android {
         }
     }
 
-    ndkVersion '25.1.8937393'
+    ndkVersion '25.2.9519653'
+    
+    // Bundle configuration for better app delivery
+    bundle {
+        language {
+            enableSplit = false
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
+        }
+    }
 }
 
 dependencies {
+    // Core desugaring for modern Java features on older Android versions
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+    
+    // Annotation processors
+    annotationProcessor 'com.github.permissions-dispatcher:permissionsdispatcher-processor:4.9.2'
+    annotationProcessor "com.github.bumptech.glide:compiler:${project.ext.glideVersion}"
+    annotationProcessor 'com.github.stephanenicolas.toothpick:toothpick-compiler:3.1.0'
 
-    annotationProcessor 'com.github.permissions-dispatcher:permissionsdispatcher-processor:4.8.0'
-
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
-
+    // Local dependencies and modules
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation(name: 'libstream-release', ext: 'aar')
-    implementation "androidx.appcompat:appcompat:1.3.0"
-    implementation 'androidx.fragment:fragment:1.5.7'  // Or latest version
-    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
     implementation project(':libuvccamera')
     implementation project(':usbCameraCommon')
 
+    // Core Android libraries - using version variables for consistency
+    implementation "androidx.appcompat:appcompat:${project.ext.appCompatVersion}"
+    implementation 'androidx.fragment:fragment:1.6.2'
+    implementation "androidx.constraintlayout:constraintlayout:${project.ext.constraintLayoutVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation "com.google.android.material:material:1.9.0"
-    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.android.support:design:28.0.0'
-    implementation 'com.github.volsahin:bottomify-navigation-view:v1.0.1'
-
+    
+    // UI and Material Design
+    implementation "com.google.android.material:material:${project.ext.materialVersion}"
     implementation "androidx.cardview:cardview:1.0.0"
-    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    
+    // Lifecycle and Architecture Components
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${project.ext.lifecycleVersion}"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:${project.ext.lifecycleVersion}"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${project.ext.lifecycleVersion}"
+    implementation "androidx.lifecycle:lifecycle-common-java8:${project.ext.lifecycleVersion}"
+    
+    // Navigation and UI components
+    implementation 'com.github.volsahin:bottomify-navigation-view:v1.0.1'
+    
+    // Image loading and processing
+    implementation "com.github.bumptech.glide:glide:${project.ext.glideVersion}"
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    implementation 'androidx.exifinterface:exifinterface:1.3.7'
+    
+    // Video playback - updated to latest stable version
+    implementation 'androidx.media3:media3-exoplayer:1.2.1'
+    implementation 'androidx.media3:media3-ui:1.2.1'
+    implementation 'androidx.media3:media3-common:1.2.1'
+    
+    // Networking - using version variables
+    implementation "com.squareup.retrofit2:retrofit:${project.ext.retrofitVersion}"
+    implementation "com.squareup.retrofit2:converter-gson:${project.ext.retrofitVersion}"
+    implementation "com.squareup.retrofit2:converter-scalars:${project.ext.retrofitVersion}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${project.ext.okHttpVersion}"
+    implementation "com.squareup.okhttp3:okhttp:${project.ext.okHttpVersion}"
+    
+    // UI libraries and utilities
     implementation 'com.github.shasin89:NotificationBanner:1.1.0'
     implementation "com.github.tonyofrancis.Fetch:xfetch2:3.1.6"
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-scalars:2.4.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
     implementation 'com.github.mveroukis:storage-chooser:2.0.4.4a'
     implementation 'com.github.blikoon:QRCodeScanner:0.1.2'
     implementation 'com.wrapp.floatlabelededittext:library:0.0.6'
-    implementation 'io.github.thanosfisherman.wifiutils:wifiutils:1.6.6'
     implementation 'io.github.chaosleung:pinview:1.4.4'
-    implementation 'me.impa:Pinger:0.1'
-    implementation 'com.github.satyan:sugar:1.5'
-    implementation 'com.github.seancfoley:ipaddress:5.2.1'
-    //Local Dependencies
-    implementation 'com.github.permissions-dispatcher:permissionsdispatcher:4.8.0'
-    implementation("ch.acra:acra-mail:5.12.0")
-    implementation("ch.acra:acra-dialog:5.12.0")
-    implementation "com.kongzue.dialogx:DialogX:0.0.49"
-    implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'com.kaopiz:kprogresshud:1.2.0'
+    
+    // Networking and connectivity
+    implementation 'io.github.thanosfisherman.wifiutils:wifiutils:1.6.6'
+    implementation 'me.impa:Pinger:0.1'
+    implementation 'com.github.seancfoley:ipaddress:5.4.0'
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+    
+    // Permissions and system access
+    implementation 'com.github.permissions-dispatcher:permissionsdispatcher:4.9.2'
+    
+    // Database and data persistence
+    implementation 'com.github.satyan:sugar:1.5'
+    
+    // Error reporting and crash analytics
+    implementation 'ch.acra:acra-mail:5.12.0'
+    implementation 'ch.acra:acra-dialog:5.12.0'
+    
+    // Dialog frameworks
+    implementation "com.kongzue.dialogx:DialogX:0.0.49"
+    
+    // Dependency injection
     implementation 'com.github.stephanenicolas.toothpick:toothpick-runtime:3.1.0'
-    annotationProcessor 'com.github.stephanenicolas.toothpick:toothpick-compiler:3.1.0'
     
-    // Add missing dependencies
-    implementation 'com.google.guava:guava:31.1-jre'
+    // Utility libraries
+    implementation 'com.google.guava:guava:32.1.3-jre'
     
-    // Image viewing library (PhotoView for zoom/pan)
-    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    // Testing dependencies
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:5.8.0'
+    testImplementation 'androidx.test:core:1.5.0'
+    testImplementation 'androidx.test.ext:junit:1.1.5'
     
-    // Video player library (ExoPlayer for in-app video playback)
-    implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
-    
-    // For better metadata extraction
-    implementation 'androidx.exifinterface:exifinterface:1.3.6'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
 }
 configurations.configureEach {
     exclude group: 'com.serenegiant', module: 'common'
