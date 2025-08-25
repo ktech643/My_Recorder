@@ -103,6 +103,7 @@ import com.checkmate.android.ui.fragment.SettingsFragment;
 import com.checkmate.android.ui.fragment.StreamingFragment;
 import com.checkmate.android.util.HttpServer.MyHttpServer;
 import com.checkmate.android.util.HttpServer.ServiceManager;
+import com.checkmate.android.util.OptimizationValidator;
 import com.checkmate.android.util.rtsp.EncOpt;
 import com.checkmate.android.util.rtsp.TextOverlayOption;
 import com.checkmate.android.viewmodels.EventType;
@@ -698,9 +699,41 @@ public class MainActivity extends BaseActivity
             
             Log.d(TAG, "Early EGL initialization setup completed");
             
+            // CRITICAL: Validate that all optimization goals are achieved
+            validateOptimizationGoals();
+            
         } catch (Exception e) {
             Log.e(TAG, "Failed to initialize early EGL", e);
         }
+    }
+
+    /**
+     * CRITICAL: Validate that all optimization goals are 100% achieved
+     */
+    private void validateOptimizationGoals() {
+        // Delay validation to ensure all components are fully initialized
+        mHandler.postDelayed(() -> {
+            try {
+                OptimizationValidator validator = new OptimizationValidator(this);
+                
+                Log.d(TAG, "🔍 VALIDATING OPTIMIZATION GOALS...");
+                
+                boolean allGoalsAchieved = validator.certifyOptimizationComplete();
+                
+                if (allGoalsAchieved) {
+                    Log.d(TAG, "🎉 SUCCESS: All optimization goals achieved!");
+                    
+                    // Ensure minimal loading time for all future transitions
+                    StreamTransitionManager.getInstance().ensureMinimalLoadingTime();
+                    
+                } else {
+                    Log.e(TAG, "⚠️ WARNING: Not all optimization goals achieved - check logs for details");
+                }
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to validate optimization goals", e);
+            }
+        }, 2000); // Wait 2 seconds for full initialization
     }
 
     /* ─────────────────────────────────────────────────────────────────────────

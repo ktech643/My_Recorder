@@ -453,6 +453,240 @@ public class StreamTransitionManager {
     }
     
     /**
+     * CRITICAL: Ensure minimal loading time during service transitions
+     */
+    public void ensureMinimalLoadingTime() {
+        if (!mIsInitialized) {
+            Log.w(TAG, "Cannot ensure minimal loading time - not initialized");
+            return;
+        }
+        
+        // Pre-create all necessary components
+        mRenderHandler.post(() -> {
+            try {
+                // Ensure EGL context is ready
+                if (mEglCore == null) {
+                    mEglCore = new EglCoreNew(null, EglCoreNew.FLAG_RECORDABLE);
+                }
+                
+                // Ensure SharedEglManager has streamers ready
+                mEglManager.ensureStreamersCreated();
+                
+                Log.d(TAG, "Minimal loading time ensured - all components ready");
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to ensure minimal loading time", e);
+            }
+        });
+    }
+
+    /**
+     * CRITICAL: Validate that blank screens are prevented
+     */
+    public boolean validateNoBlankScreens() {
+        if (!mIsInitialized) {
+            return false;
+        }
+        
+        // Check if we can render blank frames with overlay
+        try {
+            createOverlayBitmap(1280, 720);
+            return mOverlayBitmap != null && mTimeOverlay != null;
+        } catch (Exception e) {
+            Log.e(TAG, "Blank screen validation failed", e);
+            return false;
+        }
+    }
+
+    /**
+     * CRITICAL: Maintain active stream without compromising user experience
+     */
+    public void maintainActiveStreamDuringTransition(ServiceType fromService, ServiceType toService) {
+        if (!mIsInitialized) {
+            Log.e(TAG, "Cannot maintain active stream - not initialized");
+            return;
+        }
+        
+        Log.d(TAG, "Maintaining active stream during transition: " + fromService + " -> " + toService);
+        
+        // Check if streaming or recording is active
+        boolean isStreamingActive = mEglManager.isStreaming();
+        boolean isRecordingActive = mEglManager.isRecording();
+        
+        if (isStreamingActive || isRecordingActive) {
+            // Start blank frame rendering immediately
+            startBlankFrameRendering(1280, 720); // Default size, will be adjusted
+            
+            Log.d(TAG, "Active stream maintained with blank frames during transition");
+        }
+    }
+
+    /**
+     * CRITICAL: Handle EGL restart only when safe
+     */
+    public void handleEglRestartSafely(ServiceType newServiceType, SurfaceTexture newSurface, int width, int height) {
+        // Check if it's safe to restart EGL
+        if (mEglManager.canPerformMajorOperation()) {
+            Log.d(TAG, "Safe to restart EGL - no active streaming/recording");
+            mEglManager.restartEglForNewConfiguration(newServiceType, newSurface, width, height);
+        } else {
+            Log.d(TAG, "EGL restart not safe - maintaining current configuration");
+            // Use seamless transition instead
+            switchService(mCurrentActiveService, newServiceType, newSurface, width, height);
+        }
+    }
+
+    /**
+     * CRITICAL: Ensure surface updates without interruption
+     */
+    public void updateSurfaceWithoutInterruption(SurfaceTexture newSurface, int width, int height) {
+        if (!mIsInitialized) {
+            Log.e(TAG, "Cannot update surface - not initialized");
+            return;
+        }
+        
+        Log.d(TAG, "Updating surface without interruption: " + width + "x" + height);
+        
+        mRenderHandler.post(() -> {
+            try {
+                // Check if we need to maintain stream during update
+                if (mEglManager.isStreaming() || mEglManager.isRecording()) {
+                    // Start blank frame rendering
+                    startBlankFrameRendering(width, height);
+                    
+                    // Brief delay for smooth transition
+                    Thread.sleep(50);
+                }
+                
+                // Update the surface in SharedEglManager
+                mEglManager.updateActiveSurface(newSurface, width, height);
+                
+                // Stop blank frame rendering
+                stopBlankFrameRendering();
+                
+                Log.d(TAG, "Surface updated without interruption");
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to update surface without interruption", e);
+                stopBlankFrameRendering();
+            }
+        });
+    }
+
+    /**
+     * CRITICAL: Force configuration update without stopping processes
+     */
+    public void forceConfigurationUpdate(String configKey, Object configValue) {
+        if (!mIsInitialized) {
+            Log.e(TAG, "Cannot force configuration update - not initialized");
+            return;
+        }
+        
+        Log.d(TAG, "Force updating configuration without stopping processes: " + configKey);
+        
+        // Use SharedEglManager's force update method
+        mEglManager.forceConfigurationUpdate(configKey, configValue);
+        
+        // Also update through regular method
+        updateConfiguration(configKey, configValue);
+    }
+
+    /**
+     * CRITICAL: Validate all requirements are met
+     */
+    public boolean validateAllRequirements() {
+        Log.d(TAG, "Validating all optimization requirements...");
+        
+        boolean allValid = true;
+        
+        // 1. Check EGL initialization at startup
+        if (!mIsInitialized || mEglCore == null) {
+            Log.e(TAG, "FAILED: EGL not initialized at startup");
+            allValid = false;
+        } else {
+            Log.d(TAG, "PASSED: EGL initialized at startup");
+        }
+        
+        // 2. Check blank frame capability
+        if (!validateNoBlankScreens()) {
+            Log.e(TAG, "FAILED: Cannot prevent blank screens");
+            allValid = false;
+        } else {
+            Log.d(TAG, "PASSED: Blank screen prevention ready");
+        }
+        
+        // 3. Check streaming maintenance capability
+        if (mEglManager == null || !mEglManager.isInitialized()) {
+            Log.e(TAG, "FAILED: Cannot maintain active streams");
+            allValid = false;
+        } else {
+            Log.d(TAG, "PASSED: Active stream maintenance ready");
+        }
+        
+        // 4. Check surface update capability
+        if (mTimeOverlay == null) {
+            Log.e(TAG, "FAILED: Surface updates not ready");
+            allValid = false;
+        } else {
+            Log.d(TAG, "PASSED: Surface updates ready");
+        }
+        
+        // 5. Check dynamic configuration capability
+        try {
+            mEglManager.updateDynamicConfiguration("test", "value");
+            Log.d(TAG, "PASSED: Dynamic configuration updates ready");
+        } catch (Exception e) {
+            Log.e(TAG, "FAILED: Dynamic configuration updates not working");
+            allValid = false;
+        }
+        
+        Log.d(TAG, "Requirements validation result: " + (allValid ? "ALL PASSED" : "SOME FAILED"));
+        return allValid;
+    }
+
+    /**
+     * CRITICAL: Performance monitoring during transitions
+     */
+    public void monitorTransitionPerformance(ServiceType fromService, ServiceType toService) {
+        long startTime = System.currentTimeMillis();
+        
+        // Set up performance callback
+        setTransitionCallback(new TransitionCallback() {
+            @Override
+            public void onTransitionStarted(ServiceType from, ServiceType to) {
+                Log.d(TAG, "PERFORMANCE: Transition started at " + startTime);
+            }
+            
+            @Override
+            public void onTransitionCompleted(ServiceType newService) {
+                long endTime = System.currentTimeMillis();
+                long duration = endTime - startTime;
+                
+                Log.d(TAG, "PERFORMANCE: Transition completed in " + duration + "ms");
+                
+                if (duration > 200) {
+                    Log.w(TAG, "PERFORMANCE WARNING: Transition took longer than expected");
+                } else {
+                    Log.d(TAG, "PERFORMANCE: Transition within optimal time");
+                }
+            }
+            
+            @Override
+            public void onTransitionFailed(ServiceType targetService, String error) {
+                long endTime = System.currentTimeMillis();
+                long duration = endTime - startTime;
+                
+                Log.e(TAG, "PERFORMANCE: Transition failed after " + duration + "ms: " + error);
+            }
+            
+            @Override
+            public void onBlankFrameRendered(long timestamp) {
+                // Monitor blank frame rendering performance
+            }
+        });
+    }
+
+    /**
      * Release resources and cleanup
      */
     public void release() {

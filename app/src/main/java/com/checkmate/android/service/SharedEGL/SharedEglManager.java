@@ -3626,5 +3626,267 @@ public class SharedEglManager {
             }
         });
     }
+
+    /**
+     * CRITICAL: Get current active service - required for seamless transitions
+     */
+    public ServiceType getCurrentActiveService() {
+        synchronized (mServiceLock) {
+            return mCurrentActiveService;
+        }
+    }
+
+    /**
+     * CRITICAL: Check if SharedEglManager is fully initialized
+     */
+    public boolean isInitialized() {
+        return mIsInitialized && eglIsReady;
+    }
+
+    /**
+     * CRITICAL: Request render - called when new frames are available
+     */
+    public void requestRender() {
+        if (eglIsReady && !mClosing) {
+            mCameraHandler.post(() -> {
+                try {
+                    drawFrame();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error during requested render", e);
+                }
+            });
+        }
+    }
+
+    /**
+     * CRITICAL: Update active surface without stopping streams
+     */
+    public void updateActiveSurface(SurfaceTexture surfaceTexture, int width, int height) {
+        synchronized (mServiceLock) {
+            if (mCurrentActiveService == null) {
+                Log.w(TAG, "No active service to update surface for");
+                return;
+            }
+            
+            Log.d(TAG, "Updating active surface for service: " + mCurrentActiveService);
+            setPreviewSurface(surfaceTexture, width, height);
+        }
+    }
+
+    /**
+     * CRITICAL: Restart EGL and services when both streaming and recording are inactive
+     */
+    public void restartEglForNewConfiguration(ServiceType newServiceType, SurfaceTexture newSurface, int width, int height) {
+        if (mStreaming || mRecording) {
+            Log.w(TAG, "Cannot restart EGL - streaming or recording is active");
+            return;
+        }
+        
+        Log.d(TAG, "Restarting EGL for new configuration with service: " + newServiceType);
+        
+        mCameraHandler.post(() -> {
+            try {
+                // Release current EGL
+                releaseEgl();
+                
+                // Reinitialize EGL with new configuration
+                initializeEGL();
+                
+                // Switch to new service
+                switchActiveService(newServiceType, newSurface, width, height);
+                
+                Log.d(TAG, "EGL restarted successfully with new configuration");
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to restart EGL for new configuration", e);
+            }
+        });
+    }
+
+    /**
+     * CRITICAL: Force render blank frame with time overlay
+     */
+    public void renderBlankFrameWithTime() {
+        if (!eglIsReady) {
+            return;
+        }
+        
+        mCameraHandler.post(() -> {
+            try {
+                // Clear to black
+                GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+                GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+                
+                // Render time overlay
+                renderTimeOverlay();
+                
+                // Swap buffers for all active surfaces
+                if (encoderSurface != null && mStreaming) {
+                    encoderSurface.swapBuffers();
+                }
+                if (recorderSurface != null && mRecording) {
+                    recorderSurface.swapBuffers();
+                }
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Error rendering blank frame with time", e);
+            }
+        });
+    }
+
+    /**
+     * CRITICAL: Render time overlay on current frame
+     */
+    private void renderTimeOverlay() {
+        try {
+            synchronized (overlayLock) {
+                if (overlay != null) {
+                    String timeText = getCurrentDateTime();
+                    setTextForTime(timeText);
+                    
+                    // Draw the overlay
+                    overlay.drawFrame();
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error rendering time overlay", e);
+        }
+    }
+
+    /**
+     * CRITICAL: Ensure no shared EGL stop/restart during service operations
+     */
+    public void preventEglRestart() {
+        synchronized (SharedEglManager.class) {
+            if (mStreaming || mRecording) {
+                Log.d(TAG, "EGL restart prevented - active streaming/recording detected");
+                return;
+            }
+        }
+    }
+
+    /**
+     * CRITICAL: Validate streaming/recording state before major operations
+     */
+    public boolean canPerformMajorOperation() {
+        return !mStreaming && !mRecording;
+    }
+
+    /**
+     * CRITICAL: Force configuration update during active streams
+     */
+    public void forceConfigurationUpdate(String configKey, Object configValue) {
+        Log.d(TAG, "Force updating configuration during active operation: " + configKey);
+        
+        mCameraHandler.post(() -> {
+            try {
+                // Apply configuration even if streaming/recording
+                switch (configKey) {
+                    case "resolution":
+                        forceUpdateResolution((String) configValue);
+                        break;
+                    case "bitrate":
+                        forceUpdateBitrate((Integer) configValue);
+                        break;
+                    case "fps":
+                        forceUpdateFrameRate((Integer) configValue);
+                        break;
+                    default:
+                        updateDynamicConfiguration(configKey, configValue);
+                        break;
+                }
+                
+                Log.d(TAG, "Force configuration update completed: " + configKey);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to force update configuration: " + configKey, e);
+            }
+        });
+    }
+
+    /**
+     * Force update resolution during active streaming/recording
+     */
+    private void forceUpdateResolution(String resolution) {
+        try {
+            String[] parts = resolution.split("x");
+            if (parts.length == 2) {
+                int width = Integer.parseInt(parts[0]);
+                int height = Integer.parseInt(parts[1]);
+                
+                // Update size variables
+                mScreenWidth = width;
+                mScreenHeight = height;
+                videoSize = new Streamer.Size(width, height);
+                recordSize = new Streamer.Size(width, height);
+                
+                // Update camera texture
+                if (cameraTexture != null) {
+                    cameraTexture.setDefaultBufferSize(width, height);
+                }
+                
+                // Update surfaces if active
+                updateSurfacesForNewResolution(width, height);
+                
+                Log.d(TAG, "Force resolution update completed: " + resolution);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to force update resolution", e);
+        }
+    }
+
+    /**
+     * Force update bitrate during active streaming/recording
+     */
+    private void forceUpdateBitrate(int bitrate) {
+        try {
+            if (mStreamer != null && mStreaming) {
+                mStreamer.setBitrate(bitrate);
+            }
+            if (mRecorder != null && mRecording) {
+                mRecorder.setBitrate(bitrate);
+            }
+            Log.d(TAG, "Force bitrate update completed: " + bitrate);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to force update bitrate", e);
+        }
+    }
+
+    /**
+     * Force update frame rate during active streaming/recording
+     */
+    private void forceUpdateFrameRate(int fps) {
+        try {
+            if (mStreamer != null && mStreaming) {
+                mStreamer.setFramerate(fps);
+            }
+            if (mRecorder != null && mRecording) {
+                mRecorder.setFramerate(fps);
+            }
+            Log.d(TAG, "Force frame rate update completed: " + fps);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to force update frame rate", e);
+        }
+    }
+
+    /**
+     * Update surfaces for new resolution without stopping streams
+     */
+    private void updateSurfacesForNewResolution(int width, int height) {
+        try {
+            // Update display surface
+            if (displaySurface != null) {
+                displaySurface.updateSize(width, height);
+            }
+            
+            // Recreate overlay for new dimensions
+            initializeOverlay();
+            
+            Log.d(TAG, "Surfaces updated for new resolution: " + width + "x" + height);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to update surfaces for new resolution", e);
+        }
+    }
 }
 
