@@ -290,21 +290,53 @@ public class AppPreference {
     }
 
     // string
+    // string - ANR Protected
     public static String getStr(String key, String def) {
-        return instance.getString(key, def);
+        try {
+            return ANRProtectionManager.getInstance().executePreferenceOperation(
+                "getStr_" + key,
+                () -> instance.getString(key, def),
+                def
+            );
+        } catch (Exception e) {
+            Log.e("AppPreference", "Error getting string for key: " + key, e);
+            return def;
+        }
     }
 
     public static void setStr(String key, String value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putString(key, value);
-        editor.apply();
+        try {
+            ANRProtectionManager.getInstance().executePreferenceOperation(
+                "setStr_" + key,
+                () -> {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.putString(key, value);
+                    editor.apply(); // Use apply instead of commit for better performance
+                    return null;
+                },
+                null
+            );
+        } catch (Exception e) {
+            Log.e("AppPreference", "Error setting string for key: " + key, e);
+        }
     }
 
-    // remove
+    // remove - ANR Protected
     public static void removeKey(String key) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.remove(key);
-        editor.apply();
+        try {
+            ANRProtectionManager.getInstance().executePreferenceOperation(
+                "removeKey_" + key,
+                () -> {
+                    SharedPreferences.Editor editor = instance.edit();
+                    editor.remove(key);
+                    editor.apply(); // Use apply instead of commit for better performance
+                    return null;
+                },
+                null
+            );
+        } catch (Exception e) {
+            Log.e("AppPreference", "Error removing key: " + key, e);
+        }
     }
     
     // Rotation settings methods

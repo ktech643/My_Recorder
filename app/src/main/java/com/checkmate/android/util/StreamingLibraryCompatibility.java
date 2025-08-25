@@ -1,6 +1,7 @@
 package com.checkmate.android.util;
 
 import android.util.Log;
+import com.wmspanel.libstream.Streamer;
 import com.wmspanel.libstream.StreamerSurface;
 import java.lang.reflect.Method;
 
@@ -13,6 +14,56 @@ import java.lang.reflect.Method;
 public class StreamingLibraryCompatibility {
     private static final String TAG = "StreamCompatibility";
     
+    /**
+     * Safely set bitrate on Streamer class
+     */
+    public static boolean safelySetBitrateOnStreamer(Streamer streamer, int bitrate) {
+        if (streamer == null) {
+            return false;
+        }
+        
+        try {
+            // Try direct method call first
+            Method setBitrateMethod = streamer.getClass().getMethod("setBitrate", int.class);
+            setBitrateMethod.invoke(streamer, bitrate);
+            Log.d(TAG, "✅ Bitrate set successfully on Streamer: " + bitrate);
+            return true;
+            
+        } catch (NoSuchMethodException e) {
+            Log.w(TAG, "setBitrate method not available on Streamer, trying alternatives");
+            return tryAlternativeBitrateMethodOnStreamer(streamer, bitrate);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to set bitrate on Streamer: " + bitrate, e);
+            return false;
+        }
+    }
+
+    /**
+     * Safely set frame rate on Streamer class  
+     */
+    public static boolean safelySetFramerateOnStreamer(Streamer streamer, int fps) {
+        if (streamer == null) {
+            return false;
+        }
+        
+        try {
+            // Try direct method call first
+            Method setFramerateMethod = streamer.getClass().getMethod("setFramerate", int.class);
+            setFramerateMethod.invoke(streamer, fps);
+            Log.d(TAG, "✅ Frame rate set successfully on Streamer: " + fps);
+            return true;
+            
+        } catch (NoSuchMethodException e) {
+            Log.w(TAG, "setFramerate method not available on Streamer, trying alternatives");
+            return tryAlternativeFramerateMethodOnStreamer(streamer, fps);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to set frame rate on Streamer: " + fps, e);
+            return false;
+        }
+    }
+
     /**
      * Safely set bitrate on streamer/recorder
      */
@@ -63,6 +114,54 @@ public class StreamingLibraryCompatibility {
         }
     }
     
+    /**
+     * Try alternative method names for bitrate on Streamer class
+     */
+    private static boolean tryAlternativeBitrateMethodOnStreamer(Streamer streamer, int bitrate) {
+        String[] alternativeNames = {
+            "setBitRate", "setVideoBitrate", "setEncodingBitrate", 
+            "updateBitrate", "changeBitrate", "setTargetBitrate"
+        };
+        
+        for (String methodName : alternativeNames) {
+            try {
+                Method method = streamer.getClass().getMethod(methodName, int.class);
+                method.invoke(streamer, bitrate);
+                Log.d(TAG, "✅ Bitrate set on Streamer using alternative method: " + methodName);
+                return true;
+            } catch (Exception e) {
+                // Continue trying other methods
+            }
+        }
+        
+        Log.w(TAG, "⚠️ No bitrate method available on Streamer - feature not supported");
+        return false; // Not necessarily an error, just not supported
+    }
+
+    /**
+     * Try alternative method names for frame rate on Streamer class
+     */
+    private static boolean tryAlternativeFramerateMethodOnStreamer(Streamer streamer, int fps) {
+        String[] alternativeNames = {
+            "setFrameRate", "setVideoFramerate", "setEncodingFramerate",
+            "updateFramerate", "changeFramerate", "setTargetFramerate", "setFps"
+        };
+        
+        for (String methodName : alternativeNames) {
+            try {
+                Method method = streamer.getClass().getMethod(methodName, int.class);
+                method.invoke(streamer, fps);
+                Log.d(TAG, "✅ Frame rate set on Streamer using alternative method: " + methodName);
+                return true;
+            } catch (Exception e) {
+                // Continue trying other methods
+            }
+        }
+        
+        Log.w(TAG, "⚠️ No framerate method available on Streamer - feature not supported");
+        return false; // Not necessarily an error, just not supported
+    }
+
     /**
      * Try alternative method names for bitrate
      */

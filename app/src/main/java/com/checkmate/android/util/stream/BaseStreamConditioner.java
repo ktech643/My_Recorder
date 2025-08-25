@@ -6,6 +6,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.wmspanel.libstream.Streamer;
+import com.checkmate.android.util.StreamingLibraryCompatibility;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -300,12 +301,22 @@ public abstract class BaseStreamConditioner implements StreamConditioner {
             int oldBitrate = mCurrentBitrate.getAndSet(adjustment.newBitrate);
             int oldFrameRate = mCurrentFrameRate.getAndSet(adjustment.newFrameRate);
             
-            // Apply to streamer
+            // Apply to streamer using compatibility layer
             if (mStreamer != null) {
-                // TODO: Implement setBitrate method in Streamer class
-                // mStreamer.setBitrate(adjustment.newBitrate);
-                // Note: Frame rate would typically be set during encoder initialization
-                // For runtime changes, this might require encoder restart in some implementations
+                boolean bitrateSuccess = StreamingLibraryCompatibility.safelySetBitrateOnStreamer(mStreamer, adjustment.newBitrate);
+                if (bitrateSuccess) {
+                    Log.d(TAG, "✅ Bitrate successfully applied: " + (adjustment.newBitrate / 1024) + " Kbps");
+                } else {
+                    Log.w(TAG, "⚠️ Bitrate change not supported by streaming library");
+                }
+                
+                // Apply frame rate changes if supported
+                boolean framerateSuccess = StreamingLibraryCompatibility.safelySetFramerateOnStreamer(mStreamer, adjustment.newFrameRate);
+                if (framerateSuccess) {
+                    Log.d(TAG, "✅ Frame rate successfully applied: " + adjustment.newFrameRate + " FPS");
+                } else {
+                    Log.w(TAG, "⚠️ Frame rate change not supported by streaming library");
+                }
             }
             
             // Update statistics
