@@ -239,7 +239,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
     MySpinner spinner_adaptive;
 
-    MySpinner spinner_cast_adaptive;
+
 
     ViewGroup ly_streaming_custom;
 
@@ -294,6 +294,10 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
     LinearLayout usb_path_ll;
 
     TextView txt_usb_cam;
+    TextView txt_camera;
+    TextView txt_reactivate;
+    TextView txt_exit;
+    TextView txt_cast_video_details;
 
     MySpinner spinner_usb_codec;
 
@@ -413,7 +417,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         streaming_resolution = mView.findViewById(R.id.streaming_resolution);
         streaming_frame = mView.findViewById(R.id.streaming_frame);
         spinner_adaptive = mView.findViewById(R.id.spinner_adaptive);
-        spinner_cast_adaptive = mView.findViewById(R.id.spinner_cast_adaptive);
+
         ly_streaming_custom = mView.findViewById(R.id.ly_streaming_custom);
         edt_streaming_bitrate = mView.findViewById(R.id.edt_streaming_bitrate);
         edt_streaming_keyFrame = mView.findViewById(R.id.edt_streaming_keyFrame);
@@ -457,8 +461,29 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_option_bitrate = mView.findViewById(R.id.audio_option_bitrate);
         audio_option_sample_rate = mView.findViewById(R.id.audio_option_sample_rate);
         audio_option_channel_count = mView.findViewById(R.id.audio_option_channel_count);
+        txt_camera = mView.findViewById(R.id.txt_camera);
+        txt_reactivate = mView.findViewById(R.id.txt_reactivate);
+        txt_exit = mView.findViewById(R.id.txt_exit);
+        txt_cast_video_details = mView.findViewById(R.id.txt_cast_video_details);
 
         // Remove invalid findViewById calls for non-existent UI elements
+
+        // Set up click listeners for buttons (with null checks)
+        if (txt_stream_details != null) txt_stream_details.setOnClickListener(this);
+        if (txt_video_details != null) txt_video_details.setOnClickListener(this);
+        if (txt_storage != null) txt_storage.setOnClickListener(this);
+        if (txt_transcode != null) txt_transcode.setOnClickListener(this);
+        if (txt_update != null) txt_update.setOnClickListener(this);
+        if (txt_check_update != null) txt_check_update.setOnClickListener(this);
+        if (txt_wifi_camera != null) txt_wifi_camera.setOnClickListener(this);
+        if (txt_beta_update != null) txt_beta_update.setOnClickListener(this);
+        if (txt_camera != null) txt_camera.setOnClickListener(this);
+        if (txt_reactivate != null) txt_reactivate.setOnClickListener(this);
+        if (txt_exit != null) txt_exit.setOnClickListener(this);
+        if (txt_cast_video_details != null) txt_cast_video_details.setOnClickListener(this);
+
+        // Initialize default values and field states
+        initializeDefaultValues();
 
         // Initialize the SharedViewModel
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
@@ -1208,31 +1233,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         });
         spinner_adaptive.setSelection(adaptive_mode);
 
-        int adaptive_mode_cast = AppPreference.getInt(AppPreference.KEY.ADAPTIVE_MODE_CAST, 0);
-        spinner_cast_adaptive.setAdapter(adaptiveAdapter);
-        spinner_cast_adaptive.setOnItemSelectedEvenIfUnchangedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                int mode = AppPreference.getInt(AppPreference.KEY.ADAPTIVE_MODE_CAST, 0);
-                AppPreference.setInt(AppPreference.KEY.ADAPTIVE_MODE_CAST, position);
-                mListener.isDialog(false);
-                if (mode != position) {
-                    mListener.fragCameraRestart(true);
-                }
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        spinner_cast_adaptive.setOnTouchListener((view, motionEvent) -> {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                mListener.isDialog(true);
-            }
-            return false;
-        });
-        spinner_cast_adaptive.setSelection(adaptive_mode_cast);
 
         List<String> spinnerFrame = Arrays.asList(getResources().getStringArray(R.array.video_frame));
         ArrayAdapter<String> frameAdapter = new ArrayAdapter<>(
@@ -2338,26 +2339,40 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.fragUpdateApp(AppConstant.BETA_UPDATE);
                 break;
             case R.id.txt_stream_details:
-                if (txt_stream_details.getText() == getString(R.string.show_details)) {
+                if (txt_stream_details.getText().equals(getString(R.string.show_details))) {
+                    // Show custom streaming fields
                     ly_streaming_custom.setVisibility(View.VISIBLE);
                     txt_stream_details.setText(R.string.return_defaults);
+                    // Enable all streaming fields
+                    enableStreamingFields(true);
                 } else {
+                    // Hide custom streaming fields and reset to defaults
                     ly_streaming_custom.setVisibility(View.GONE);
                     txt_stream_details.setText(R.string.show_details);
+                    // Set default streaming values (Medium - index 1)
                     AppPreference.setBool(AppPreference.KEY.IS_NATIVE_STREAMING, true);
                     AppPreference.setInt(AppPreference.KEY.STREAMING_QUALITY, 1);
+                    // Reset spinners to default values
+                    resetStreamingToDefaults();
                     onStreamDetails(false);
                 }
                 break;
             case R.id.txt_video_details:
-                if (txt_video_details.getText() == getString(R.string.show_details)) {
+                if (txt_video_details.getText().equals(getString(R.string.show_details))) {
+                    // Show custom video fields
                     ly_video_custom.setVisibility(View.VISIBLE);
                     txt_video_details.setText(R.string.return_defaults);
+                    // Enable all video fields
+                    enableVideoFields(true);
                 } else {
+                    // Hide custom video fields and reset to defaults
                     ly_video_custom.setVisibility(View.GONE);
                     txt_video_details.setText(R.string.show_details);
+                    // Set default video values (High - index 0)
                     AppPreference.setBool(AppPreference.KEY.IS_NATIVE_RESOLUTION, true);
                     AppPreference.setInt(AppPreference.KEY.VIDEO_QUALITY, 0);
+                    // Reset spinners to default values
+                    resetVideoToDefaults();
                     onVideoDetails(false);
                 }
                 break;
@@ -3434,5 +3449,101 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             }
         });
         codeDialog.show();
+    }
+
+    // Initialize default values and field states
+    private void initializeDefaultValues() {
+        // Set default streaming quality to Medium (index 1)
+        if (streaming_quality != null) {
+            streaming_quality.setSelection(1);
+        }
+        
+        // Set default video quality to High (index 0)
+        if (spinner_quality != null) {
+            spinner_quality.setSelection(0);
+        }
+        
+        // Initially disable custom fields
+        enableStreamingFields(false);
+        enableVideoFields(false);
+        
+        // Set default text for show details buttons
+        if (txt_stream_details != null) {
+            txt_stream_details.setText(R.string.show_details);
+        }
+        if (txt_video_details != null) {
+            txt_video_details.setText(R.string.show_details);
+        }
+    }
+
+    // Helper methods for enabling/disabling fields and setting defaults
+    private void enableStreamingFields(boolean enable) {
+        if (streaming_resolution != null) {
+            streaming_resolution.setEnabled(enable);
+        }
+        if (streaming_frame != null) {
+            streaming_frame.setEnabled(enable);
+        }
+        if (streaming_audio_bitrate != null) {
+            streaming_audio_bitrate.setEnabled(enable);
+        }
+        if (spinner_audio_src != null) {
+            spinner_audio_src.setEnabled(enable);
+        }
+        if (spinner_sample_rate != null) {
+            spinner_sample_rate.setEnabled(enable);
+        }
+        if (spinner_adaptive != null) {
+            spinner_adaptive.setEnabled(enable);
+        }
+    }
+
+    private void enableVideoFields(boolean enable) {
+        if (spinner_resolution != null) {
+            spinner_resolution.setEnabled(enable);
+        }
+        if (spinner_frame != null) {
+            spinner_frame.setEnabled(enable);
+        }
+    }
+
+    private void resetStreamingToDefaults() {
+        // Set streaming quality to Medium (index 1)
+        if (streaming_quality != null) {
+            streaming_quality.setSelection(1);
+        }
+        // Reset other fields to default values
+        if (streaming_resolution != null) {
+            streaming_resolution.setSelection(0);
+        }
+        if (streaming_frame != null) {
+            streaming_frame.setSelection(0);
+        }
+        if (streaming_audio_bitrate != null) {
+            streaming_audio_bitrate.setSelection(0);
+        }
+        if (spinner_audio_src != null) {
+            spinner_audio_src.setSelection(0);
+        }
+        if (spinner_sample_rate != null) {
+            spinner_sample_rate.setSelection(0);
+        }
+        if (spinner_adaptive != null) {
+            spinner_adaptive.setSelection(0);
+        }
+    }
+
+    private void resetVideoToDefaults() {
+        // Set video quality to High (index 0)
+        if (spinner_quality != null) {
+            spinner_quality.setSelection(0);
+        }
+        // Reset other fields to default values
+        if (spinner_resolution != null) {
+            spinner_resolution.setSelection(0);
+        }
+        if (spinner_frame != null) {
+            spinner_frame.setSelection(0);
+        }
     }
 }
