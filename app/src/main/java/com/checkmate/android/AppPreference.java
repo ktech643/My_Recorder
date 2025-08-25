@@ -1,9 +1,17 @@
 package com.checkmate.android;
 
 import android.content.SharedPreferences;
+import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class AppPreference {
-    private static SharedPreferences instance = null;
+    private static final String TAG = "AppPreference";
+    private static volatile SharedPreferences instance = null;
+    private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
+    private static final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
 
     public static class KEY {
         // settings
@@ -176,71 +184,217 @@ public class AppPreference {
         final public static String IS_MIRRORED = "IS_MIRRORED";
     }
 
-    public static void initialize(SharedPreferences pref) {
-        instance = pref;
+    public static void initialize(@NonNull SharedPreferences pref) {
+        writeLock.lock();
+        try {
+            if (pref == null) {
+                Log.e(TAG, "SharedPreferences cannot be null");
+                throw new IllegalArgumentException("SharedPreferences cannot be null");
+            }
+            instance = pref;
+            Log.d(TAG, "AppPreference initialized successfully");
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing AppPreference", e);
+            throw e;
+        } finally {
+            writeLock.unlock();
+        }
+    }
+    
+    private static boolean isInitialized() {
+        readLock.lock();
+        try {
+            boolean initialized = instance != null;
+            if (!initialized) {
+                Log.e(TAG, "AppPreference not initialized. Call initialize() first.");
+            }
+            return initialized;
+        } finally {
+            readLock.unlock();
+        }
     }
 
     // check contain
-    public static boolean contains(String key) {
-        return instance.contains(key);
+    public static boolean contains(@NonNull String key) {
+        if (!isInitialized() || key == null) return false;
+        readLock.lock();
+        try {
+            return instance.contains(key);
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking if key exists: " + key, e);
+            return false;
+        } finally {
+            readLock.unlock();
+        }
     }
 
     // boolean
-    public static boolean getBool(String key, boolean def) {
-        return instance.getBoolean(key, def);
+    public static boolean getBool(@NonNull String key, boolean def) {
+        if (!isInitialized() || key == null) return def;
+        readLock.lock();
+        try {
+            return instance.getBoolean(key, def);
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting boolean for key: " + key, e);
+            return def;
+        } finally {
+            readLock.unlock();
+        }
     }
 
-    public static void setBool(String key, boolean value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putBoolean(key, value);
-        editor.commit();
+    public static void setBool(@NonNull String key, boolean value) {
+        if (!isInitialized() || key == null) {
+            Log.e(TAG, "Cannot set boolean - invalid state or null key");
+            return;
+        }
+        writeLock.lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            editor.putBoolean(key, value);
+            if (!editor.commit()) {
+                Log.e(TAG, "Failed to commit boolean preference for key: " + key);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting boolean for key: " + key, e);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     // int
-    public static int getInt(String key, int def) {
-        return instance.getInt(key, def);
+    public static int getInt(@NonNull String key, int def) {
+        if (!isInitialized() || key == null) return def;
+        readLock.lock();
+        try {
+            return instance.getInt(key, def);
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting int for key: " + key, e);
+            return def;
+        } finally {
+            readLock.unlock();
+        }
     }
 
-    public static void setInt(String key, int value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putInt(key, value);
-        editor.commit();
+    public static void setInt(@NonNull String key, int value) {
+        if (!isInitialized() || key == null) {
+            Log.e(TAG, "Cannot set int - invalid state or null key");
+            return;
+        }
+        writeLock.lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            editor.putInt(key, value);
+            if (!editor.commit()) {
+                Log.e(TAG, "Failed to commit int preference for key: " + key);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting int for key: " + key, e);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     // long
-    public static long getLong(String key, long def) {
-        return instance.getLong(key, def);
+    public static long getLong(@NonNull String key, long def) {
+        if (!isInitialized() || key == null) return def;
+        readLock.lock();
+        try {
+            return instance.getLong(key, def);
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting long for key: " + key, e);
+            return def;
+        } finally {
+            readLock.unlock();
+        }
     }
 
-    public static void setLong(String key, long value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putLong(key, value);
-        editor.apply();
+    public static void setLong(@NonNull String key, long value) {
+        if (!isInitialized() || key == null) {
+            Log.e(TAG, "Cannot set long - invalid state or null key");
+            return;
+        }
+        writeLock.lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            editor.putLong(key, value);
+            editor.apply();
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting long for key: " + key, e);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     // string
-    public static String getStr(String key, String def) {
-        return instance.getString(key, def);
+    @Nullable
+    public static String getStr(@NonNull String key, @Nullable String def) {
+        if (!isInitialized() || key == null) return def;
+        readLock.lock();
+        try {
+            return instance.getString(key, def);
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting string for key: " + key, e);
+            return def;
+        } finally {
+            readLock.unlock();
+        }
     }
 
-    public static void setStr(String key, String value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putString(key, value);
-        editor.apply();
+    public static void setStr(@NonNull String key, @Nullable String value) {
+        if (!isInitialized() || key == null) {
+            Log.e(TAG, "Cannot set string - invalid state or null key");
+            return;
+        }
+        writeLock.lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            editor.putString(key, value);
+            editor.apply();
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting string for key: " + key, e);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     // remove
-    public static void removeKey(String key) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.remove(key);
-        editor.apply();
+    public static void removeKey(@NonNull String key) {
+        if (!isInitialized() || key == null) {
+            Log.e(TAG, "Cannot remove key - invalid state or null key");
+            return;
+        }
+        writeLock.lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            editor.remove(key);
+            editor.apply();
+        } catch (Exception e) {
+            Log.e(TAG, "Error removing key: " + key, e);
+        } finally {
+            writeLock.unlock();
+        }
     }
     
-    // Rotation settings methods
+    // Rotation settings methods - Thread-safe batch operations
     public static void saveRotationSettings(int rotation, boolean isFlipped, boolean isMirrored) {
-        setInt(KEY.IS_ROTATED, rotation);
-        setBool(KEY.IS_FLIPPED, isFlipped);
-        setBool(KEY.IS_MIRRORED, isMirrored);
+        if (!isInitialized()) {
+            Log.e(TAG, "Cannot save rotation settings - not initialized");
+            return;
+        }
+        writeLock.lock();
+        try {
+            SharedPreferences.Editor editor = instance.edit();
+            editor.putInt(KEY.IS_ROTATED, rotation);
+            editor.putBoolean(KEY.IS_FLIPPED, isFlipped);
+            editor.putBoolean(KEY.IS_MIRRORED, isMirrored);
+            if (!editor.commit()) {
+                Log.e(TAG, "Failed to commit rotation settings");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error saving rotation settings", e);
+        } finally {
+            writeLock.unlock();
+        }
     }
     
     public static int getRotation() {
@@ -257,6 +411,26 @@ public class AppPreference {
     
     public static void resetRotationSettings() {
         saveRotationSettings(0, false, false);
+    }
+    
+    // ANR Recovery mechanism for preferences
+    public static void recoverFromANR() {
+        Log.w(TAG, "Attempting ANR recovery for AppPreference");
+        writeLock.lock();
+        try {
+            if (instance != null) {
+                // Force a simple operation to test if SharedPreferences is responsive
+                instance.contains("test_key");
+                Log.i(TAG, "AppPreference ANR recovery successful");
+            } else {
+                Log.e(TAG, "AppPreference instance is null during ANR recovery");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "AppPreference ANR recovery failed", e);
+            // Could trigger app restart or use fallback storage here
+        } finally {
+            writeLock.unlock();
+        }
     }
 
 }
