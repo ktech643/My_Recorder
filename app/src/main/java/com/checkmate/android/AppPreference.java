@@ -1,9 +1,21 @@
 package com.checkmate.android;
 
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import com.checkmate.android.util.InternalLogger;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class AppPreference {
-    private static SharedPreferences instance = null;
+    private static final String TAG = "AppPreference";
+    private static final int OPERATION_TIMEOUT_SECONDS = 5;
+    private static volatile SharedPreferences instance = null;
+    private static final Object instanceLock = new Object();
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public static class KEY {
         // settings
@@ -176,87 +188,490 @@ public class AppPreference {
         final public static String IS_MIRRORED = "IS_MIRRORED";
     }
 
+    /**
+     * Thread-safe initialization of SharedPreferences instance
+     * @param pref SharedPreferences instance to use
+     */
     public static void initialize(SharedPreferences pref) {
-        instance = pref;
+        if (pref == null) {
+            InternalLogger.e(TAG, "Attempted to initialize with null SharedPreferences");
+            return;
+        }
+        
+        synchronized (instanceLock) {
+            instance = pref;
+            InternalLogger.i(TAG, "AppPreference initialized successfully");
+        }
+    }
+    
+    /**
+     * Check if AppPreference is properly initialized
+     * @return true if initialized, false otherwise
+     */
+    public static boolean isInitialized() {
+        return instance != null;
+    }
+    
+    /**
+     * Get SharedPreferences instance with null safety
+     * @return SharedPreferences instance or null if not initialized
+     */
+    private static SharedPreferences getInstance() {
+        if (instance == null) {
+            InternalLogger.w(TAG, "AppPreference not initialized, returning null");
+        }
+        return instance;
+    }
+    
+    /**
+     * Execute preference operation with ANR prevention and error recovery
+     * @param operation The operation to execute
+     * @param defaultValue Default value to return on failure
+     * @param <T> Return type
+     * @return Result of operation or default value
+     */
+    private static <T> T executeWithTimeout(PreferenceOperation<T> operation, T defaultValue) {
+        if (instance == null) {
+            InternalLogger.w(TAG, "SharedPreferences not initialized, returning default value");
+            return defaultValue;
+        }
+        
+        // If we're on the main thread, execute directly to avoid deadlock
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            try {
+                return operation.execute(instance);
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Preference operation failed on main thread", e);
+                return defaultValue;
+            }
+        }
+        
+        // For background threads, use timeout mechanism
+        final AtomicReference<T> result = new AtomicReference<>(defaultValue);
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicReference<Exception> exception = new AtomicReference<>();
+        
+        mainHandler.post(() -> {
+            try {
+                T value = operation.execute(instance);
+                result.set(value);
+            } catch (Exception e) {
+                exception.set(e);
+                InternalLogger.e(TAG, "Preference operation failed", e);
+            } finally {
+                latch.countDown();
+            }
+        });
+        
+        try {
+            if (latch.await(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                Exception ex = exception.get();
+                if (ex != null) {
+                    InternalLogger.w(TAG, "Preference operation completed with error, using default value");
+                    return defaultValue;
+                }
+                return result.get();
+            } else {
+                InternalLogger.e(TAG, "Preference operation timed out, using default value");
+                return defaultValue;
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            InternalLogger.e(TAG, "Preference operation interrupted", e);
+            return defaultValue;
+        }
+    }
+    
+    /**
+     * Interface for preference operations
+     */
+    private interface PreferenceOperation<T> {
+        T execute(SharedPreferences prefs) throws Exception;
     }
 
-    // check contain
+    /**
+     * Thread-safe check if preference contains key
+     * @param key Preference key to check
+     * @return true if key exists, false otherwise
+     */
     public static boolean contains(String key) {
-        return instance.contains(key);
+        if (key == null || key.trim().isEmpty()) {
+            InternalLogger.w(TAG, "contains() called with null or empty key");
+            return false;
+        }
+        
+        return executeWithTimeout(prefs -> prefs.contains(key), false);
     }
 
-    // boolean
+    /**
+     * Thread-safe boolean getter with null safety and type checking
+     * @param key Preference key
+     * @param def Default value
+     * @return Boolean value or default if error occurs
+     */
     public static boolean getBool(String key, boolean def) {
-        return instance.getBoolean(key, def);
+        if (key == null || key.trim().isEmpty()) {
+            InternalLogger.w(TAG, "getBool() called with null or empty key, returning default");
+            return def;
+        }
+        
+        return executeWithTimeout(prefs -> {
+            try {
+                return prefs.getBoolean(key, def);
+            } catch (ClassCastException e) {
+                InternalLogger.w(TAG, "Type mismatch for key: " + key + ", expected boolean, returning default");
+                return def;
+            }
+        }, def);
     }
 
+    /**
+     * Thread-safe boolean setter with error recovery
+     * @param key Preference key
+     * @param value Boolean value to set
+     */
     public static void setBool(String key, boolean value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putBoolean(key, value);
-        editor.commit();
+        if (key == null || key.trim().isEmpty()) {
+            InternalLogger.w(TAG, "setBool() called with null or empty key, ignoring");
+            return;
+        }
+        
+        executeWithTimeout(prefs -> {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean(key, value);
+            
+            // Use apply() for better performance and ANR prevention
+            editor.apply();
+            
+            // Verify write was successful
+            if (!prefs.getBoolean(key, !value)) {
+                InternalLogger.w(TAG, "Failed to verify boolean write for key: " + key + ", attempting commit");
+                editor = prefs.edit();
+                editor.putBoolean(key, value);
+                if (!editor.commit()) {
+                    InternalLogger.e(TAG, "Failed to commit boolean preference for key: " + key);
+                }
+            }
+            return null;
+        }, null);
     }
 
-    // int
+    /**
+     * Thread-safe integer getter with null safety and type checking
+     * @param key Preference key
+     * @param def Default value
+     * @return Integer value or default if error occurs
+     */
     public static int getInt(String key, int def) {
-        return instance.getInt(key, def);
+        if (key == null || key.trim().isEmpty()) {
+            InternalLogger.w(TAG, "getInt() called with null or empty key, returning default");
+            return def;
+        }
+        
+        return executeWithTimeout(prefs -> {
+            try {
+                return prefs.getInt(key, def);
+            } catch (ClassCastException e) {
+                InternalLogger.w(TAG, "Type mismatch for key: " + key + ", expected int, returning default");
+                return def;
+            }
+        }, def);
     }
 
+    /**
+     * Thread-safe integer setter with error recovery
+     * @param key Preference key
+     * @param value Integer value to set
+     */
     public static void setInt(String key, int value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putInt(key, value);
-        editor.commit();
+        if (key == null || key.trim().isEmpty()) {
+            InternalLogger.w(TAG, "setInt() called with null or empty key, ignoring");
+            return;
+        }
+        
+        executeWithTimeout(prefs -> {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(key, value);
+            
+            // Use apply() for better performance and ANR prevention
+            editor.apply();
+            
+            // Verify write was successful
+            if (prefs.getInt(key, value - 1) != value) {
+                InternalLogger.w(TAG, "Failed to verify int write for key: " + key + ", attempting commit");
+                editor = prefs.edit();
+                editor.putInt(key, value);
+                if (!editor.commit()) {
+                    InternalLogger.e(TAG, "Failed to commit int preference for key: " + key);
+                }
+            }
+            return null;
+        }, null);
     }
 
-    // long
+    /**
+     * Thread-safe long getter with null safety and type checking
+     * @param key Preference key
+     * @param def Default value
+     * @return Long value or default if error occurs
+     */
     public static long getLong(String key, long def) {
-        return instance.getLong(key, def);
+        if (key == null || key.trim().isEmpty()) {
+            InternalLogger.w(TAG, "getLong() called with null or empty key, returning default");
+            return def;
+        }
+        
+        return executeWithTimeout(prefs -> {
+            try {
+                return prefs.getLong(key, def);
+            } catch (ClassCastException e) {
+                InternalLogger.w(TAG, "Type mismatch for key: " + key + ", expected long, returning default");
+                return def;
+            }
+        }, def);
     }
 
+    /**
+     * Thread-safe long setter with error recovery
+     * @param key Preference key
+     * @param value Long value to set
+     */
     public static void setLong(String key, long value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putLong(key, value);
-        editor.apply();
+        if (key == null || key.trim().isEmpty()) {
+            InternalLogger.w(TAG, "setLong() called with null or empty key, ignoring");
+            return;
+        }
+        
+        executeWithTimeout(prefs -> {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putLong(key, value);
+            
+            // Use apply() for better performance and ANR prevention
+            editor.apply();
+            
+            // Verify write was successful
+            if (prefs.getLong(key, value - 1) != value) {
+                InternalLogger.w(TAG, "Failed to verify long write for key: " + key + ", attempting commit");
+                editor = prefs.edit();
+                editor.putLong(key, value);
+                if (!editor.commit()) {
+                    InternalLogger.e(TAG, "Failed to commit long preference for key: " + key);
+                }
+            }
+            return null;
+        }, null);
     }
 
-    // string
+    /**
+     * Thread-safe string getter with null safety and type checking
+     * @param key Preference key
+     * @param def Default value
+     * @return String value or default if error occurs
+     */
     public static String getStr(String key, String def) {
-        return instance.getString(key, def);
+        if (key == null || key.trim().isEmpty()) {
+            InternalLogger.w(TAG, "getStr() called with null or empty key, returning default");
+            return def;
+        }
+        
+        return executeWithTimeout(prefs -> {
+            try {
+                String result = prefs.getString(key, def);
+                return result != null ? result : def;
+            } catch (ClassCastException e) {
+                InternalLogger.w(TAG, "Type mismatch for key: " + key + ", expected string, returning default");
+                return def;
+            }
+        }, def);
     }
 
+    /**
+     * Thread-safe string setter with error recovery
+     * @param key Preference key
+     * @param value String value to set (null values are converted to empty string)
+     */
     public static void setStr(String key, String value) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.putString(key, value);
-        editor.apply();
+        if (key == null || key.trim().isEmpty()) {
+            InternalLogger.w(TAG, "setStr() called with null or empty key, ignoring");
+            return;
+        }
+        
+        // Convert null to empty string for consistency
+        final String safeValue = value != null ? value : "";
+        
+        executeWithTimeout(prefs -> {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(key, safeValue);
+            
+            // Use apply() for better performance and ANR prevention
+            editor.apply();
+            
+            // Verify write was successful
+            String stored = prefs.getString(key, null);
+            if (!safeValue.equals(stored)) {
+                InternalLogger.w(TAG, "Failed to verify string write for key: " + key + ", attempting commit");
+                editor = prefs.edit();
+                editor.putString(key, safeValue);
+                if (!editor.commit()) {
+                    InternalLogger.e(TAG, "Failed to commit string preference for key: " + key);
+                }
+            }
+            return null;
+        }, null);
     }
 
-    // remove
+    /**
+     * Thread-safe key removal with error recovery
+     * @param key Preference key to remove
+     */
     public static void removeKey(String key) {
-        SharedPreferences.Editor editor = instance.edit();
-        editor.remove(key);
-        editor.apply();
+        if (key == null || key.trim().isEmpty()) {
+            InternalLogger.w(TAG, "removeKey() called with null or empty key, ignoring");
+            return;
+        }
+        
+        executeWithTimeout(prefs -> {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.remove(key);
+            
+            // Use apply() for better performance and ANR prevention
+            editor.apply();
+            
+            // Verify removal was successful
+            if (prefs.contains(key)) {
+                InternalLogger.w(TAG, "Failed to verify key removal for: " + key + ", attempting commit");
+                editor = prefs.edit();
+                editor.remove(key);
+                if (!editor.commit()) {
+                    InternalLogger.e(TAG, "Failed to commit key removal for: " + key);
+                }
+            }
+            return null;
+        }, null);
     }
     
-    // Rotation settings methods
+    /**
+     * Thread-safe batch rotation settings save with validation
+     * @param rotation Rotation angle (validated to be 0, 90, 180, or 270)
+     * @param isFlipped Whether image is flipped
+     * @param isMirrored Whether image is mirrored
+     */
     public static void saveRotationSettings(int rotation, boolean isFlipped, boolean isMirrored) {
-        setInt(KEY.IS_ROTATED, rotation);
-        setBool(KEY.IS_FLIPPED, isFlipped);
-        setBool(KEY.IS_MIRRORED, isMirrored);
+        // Validate rotation value
+        if (rotation != 0 && rotation != 90 && rotation != 180 && rotation != 270) {
+            InternalLogger.w(TAG, "Invalid rotation value: " + rotation + ", using 0");
+            rotation = 0;
+        }
+        
+        // Use batch operation for consistency
+        final int finalRotation = rotation;
+        executeWithTimeout(prefs -> {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(KEY.IS_ROTATED, finalRotation);
+            editor.putBoolean(KEY.IS_FLIPPED, isFlipped);
+            editor.putBoolean(KEY.IS_MIRRORED, isMirrored);
+            
+            // Use apply() for better performance
+            editor.apply();
+            
+            // Verify batch write was successful
+            if (prefs.getInt(KEY.IS_ROTATED, -1) != finalRotation ||
+                prefs.getBoolean(KEY.IS_FLIPPED, !isFlipped) != isFlipped ||
+                prefs.getBoolean(KEY.IS_MIRRORED, !isMirrored) != isMirrored) {
+                
+                InternalLogger.w(TAG, "Failed to verify rotation settings write, attempting commit");
+                editor = prefs.edit();
+                editor.putInt(KEY.IS_ROTATED, finalRotation);
+                editor.putBoolean(KEY.IS_FLIPPED, isFlipped);
+                editor.putBoolean(KEY.IS_MIRRORED, isMirrored);
+                
+                if (!editor.commit()) {
+                    InternalLogger.e(TAG, "Failed to commit rotation settings");
+                }
+            }
+            return null;
+        }, null);
     }
     
+    /**
+     * Thread-safe rotation getter with validation
+     * @return Rotation angle (0, 90, 180, or 270)
+     */
     public static int getRotation() {
-        return getInt(KEY.IS_ROTATED, 0);
+        int rotation = getInt(KEY.IS_ROTATED, 0);
+        
+        // Validate retrieved value
+        if (rotation != 0 && rotation != 90 && rotation != 180 && rotation != 270) {
+            InternalLogger.w(TAG, "Invalid stored rotation value: " + rotation + ", returning 0");
+            return 0;
+        }
+        
+        return rotation;
     }
     
+    /**
+     * Thread-safe flip status getter
+     * @return true if image is flipped, false otherwise
+     */
     public static boolean isFlipped() {
         return getBool(KEY.IS_FLIPPED, false);
     }
     
+    /**
+     * Thread-safe mirror status getter
+     * @return true if image is mirrored, false otherwise
+     */
     public static boolean isMirrored() {
         return getBool(KEY.IS_MIRRORED, false);
     }
     
+    /**
+     * Thread-safe rotation settings reset
+     */
     public static void resetRotationSettings() {
         saveRotationSettings(0, false, false);
+    }
+    
+    /**
+     * Get current restart count for ANR tracking
+     * @return Number of app restarts
+     */
+    public static int getRestartCount() {
+        return getInt(KEY.RESTART_COUNT, 0);
+    }
+    
+    /**
+     * Increment restart count for ANR tracking
+     */
+    public static void incrementRestartCount() {
+        int currentCount = getRestartCount();
+        setInt(KEY.RESTART_COUNT, currentCount + 1);
+        setLong(KEY.LAST_RESTART_TIME, System.currentTimeMillis());
+    }
+    
+    /**
+     * Reset restart count (called after successful stable operation)
+     */
+    public static void resetRestartCount() {
+        setInt(KEY.RESTART_COUNT, 0);
+        removeKey(KEY.LAST_RESTART_TIME);
+    }
+    
+    /**
+     * Check if app is in ANR recovery mode based on restart count
+     * @return true if multiple recent restarts detected
+     */
+    public static boolean isInAnrRecoveryMode() {
+        int restartCount = getRestartCount();
+        long lastRestartTime = getLong(KEY.LAST_RESTART_TIME, 0);
+        
+        // If more than 3 restarts in the last 5 minutes, consider ANR mode
+        if (restartCount >= 3 && lastRestartTime > 0) {
+            long timeSinceLastRestart = System.currentTimeMillis() - lastRestartTime;
+            return timeSinceLastRestart < (5 * 60 * 1000); // 5 minutes
+        }
+        
+        return false;
     }
 
 }
