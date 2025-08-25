@@ -292,22 +292,30 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        try {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        // Handle storage permissions using StoragePermissionHelper
-        StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
-
-        // Handle storage helper permissions
-        if (storageHelper != null) {
-            storageHelper.handlePermissionResult(requestCode, permissions, grantResults);
-        }
-        
-        // Handle storage permission request for activation
-        if (requestCode == StoragePermissionHelper.REQUEST_STORAGE_PERMISSION && hasRequestedStoragePermission) {
-            // Continue with activation regardless of permission result
-            // The app will use default storage if permission is denied
-            continueWithActivation();
-            return;
+            // Prevent multiple callbacks
+            if (requestCode == StoragePermissionHelper.REQUEST_STORAGE_PERMISSION && hasRequestedStoragePermission) {
+                hasRequestedStoragePermission = false; // Reset flag to prevent re-entry
+                
+                // Handle storage permissions using StoragePermissionHelper
+                StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
+                
+                // Continue with activation regardless of permission result
+                // The app will use default storage if permission is denied
+                continueWithActivation();
+                return;
+            }
+            
+            // Handle storage helper permissions only if not already handled
+            if (storageHelper != null && requestCode != StoragePermissionHelper.REQUEST_STORAGE_PERMISSION) {
+                storageHelper.handlePermissionResult(requestCode, permissions, grantResults);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onRequestPermissionsResult", e);
+            // Continue with default behavior on error
+            gotoNextView();
         }
 
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
@@ -464,31 +472,57 @@ public class SplashActivity extends BaseActivity {
      * Continue with activation after storage is configured
      */
     private void continueWithActivation() {
-        // Validate and fix storage location if needed
-        PreferenceInitializer.validateStorageLocation(this);
-        // Check storage permissions and request if needed using StoragePermissionHelper
-        if (!StoragePermissionHelper.areStoragePermissionsGranted(this) && !hasRequestedStoragePermission) {
-            Log.d(TAG, "Storage permissions not granted, requesting permissions");
-            hasRequestedStoragePermission = true;
-            StoragePermissionHelper.requestStoragePermissions(this);
-            return; // Exit here and wait for permission result
+        try {
+            // Validate and fix storage location if needed
+            PreferenceInitializer.validateStorageLocation(this);
+            
+            // Check if we're already showing a dialog
+            if (is_dialog_show) {
+                Log.d(TAG, "Dialog already showing, skipping");
+                return;
+            }
+            
+            // Check storage permissions and request if needed using StoragePermissionHelper
+            if (!StoragePermissionHelper.areStoragePermissionsGranted(this) && !hasRequestedStoragePermission) {
+                Log.d(TAG, "Storage permissions not granted, requesting permissions");
+                hasRequestedStoragePermission = true;
+                StoragePermissionHelper.requestStoragePermissions(this);
+                return; // Exit here and wait for permission result
+            }
+            
+            // Reset permission flag if we reach here
+            hasRequestedStoragePermission = false;
+            
+            // Continue with activation dialog
+            should_show_complete = true;
+            is_dialog_show = true;
+            
+            // Run on UI thread to ensure proper dialog display
+            runOnUiThread(() -> {
+                try {
+                    ActivationDialog activationDialog = new ActivationDialog(this);
+                    activationDialog.setOkListener(view -> {
+                        activationDialog.dismiss();
+                        is_dialog_show = false;
+                        setSerialNumber();
+                    });
+                    activationDialog.setCloseListener(view -> {
+                        is_dialog_show = false;
+                        activationDialog.dismiss();
+                        finish();
+                    });
+                    activationDialog.show();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error showing activation dialog", e);
+                    is_dialog_show = false;
+                    gotoNextView();
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "Error in continueWithActivation", e);
+            is_dialog_show = false;
+            gotoNextView();
         }
-        
-        // Continue with activation dialog
-        should_show_complete = true;
-        is_dialog_show = true;
-        ActivationDialog activationDialog = new ActivationDialog(this);
-        activationDialog.setOkListener(view -> {
-            activationDialog.dismiss();
-            is_dialog_show = false;
-            setSerialNumber();
-        });
-        activationDialog.setCloseListener(view -> {
-            is_dialog_show = false;
-            activationDialog.dismiss();
-            finish();
-        });
-        activationDialog.show();
     }
 
 

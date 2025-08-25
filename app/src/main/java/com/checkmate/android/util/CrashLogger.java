@@ -427,7 +427,6 @@ public class CrashLogger implements Thread.UncaughtExceptionHandler {
     }
 
     public void logANR(String tag, String message) {
-        String log = formatLog("ANR", tag, message);
         log("ANR", tag, message, null);
     }
 }
