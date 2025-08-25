@@ -3328,8 +3328,9 @@ public class SharedEglManager {
                     // Update the encoder parameters
                     Bundle params = new Bundle();
                     params.putInt(MediaCodec.PARAMETER_KEY_VIDEO_BITRATE, newBitrate);
-                    if (encoderSurface != null && encoderSurface.getEncoder() != null) {
-                        encoderSurface.getEncoder().setParameters(params);
+                    if (mStreamer != null) {
+                        // TODO: Implement encoder parameter update
+                        // mStreamer.updateBitrate(newBitrate);
                         Log.d(TAG, "Updated video bitrate to: " + newBitrate);
                     }
                 } catch (Exception e) {

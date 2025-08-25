@@ -73,8 +73,8 @@ public class DynamicSettingsManager implements SharedPreferences.OnSharedPrefere
         
         // Some video settings can be dynamic with proper handling
         dynamicSettings.add(AppPreference.KEY.VIDEO_BITRATE);
-        dynamicSettings.add(AppPreference.KEY.STREAMING_BITRATE);
-        dynamicSettings.add(AppPreference.KEY.USB_BITRATE);
+        
+        
     }
     
     private void initializeCriticalSettings() {

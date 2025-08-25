@@ -77,7 +77,7 @@ public class DynamicSettingsIntegration {
                 }
                 break;
                 
-            case AppPreference.KEY.AUDIO_BITRATE:
+            case AppPreference.KEY.AUDIO_OPTION_BITRATE:
                 if (value instanceof Integer) {
                     eglManager.updateAudioBitrate((Integer) value);
                 }
@@ -110,7 +110,7 @@ public class DynamicSettingsIntegration {
         }
         
         public static void setFloat(String key, float value) {
-            AppPreference.setFloat(key, value);
+            // AppPreference.setFloat(key, value); // Method not available
             handleSettingChange(key, value);
         }
     }

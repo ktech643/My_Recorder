@@ -412,8 +412,6 @@ public class MyApp extends Application {
             // Initialize Critical Components Monitor
             CriticalComponentsMonitor.getInstance(this).startMonitoring();
             
-            // Initialize Thread Safety Manager
-            ThreadSafetyManager.getInstance().init();
             
             InternalLogger.i(TAG, "Monitoring systems initialized successfully");
             
