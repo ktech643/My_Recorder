@@ -7,6 +7,8 @@ import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.graphics.Color;
 
 /**
  * Comprehensive safety enhancer for ALL app components
@@ -43,21 +45,21 @@ public class ComponentSafetyEnhancer {
                 InternalLogger.d(TAG, fragmentName + " onCreateView starting");
                 
                 if (ANRSafeHelper.isNullWithLog(inflater, "LayoutInflater in " + fragmentName)) {
-                    return createErrorView(fragmentName);
+                    return createErrorView(fragmentName, container != null ? container.getContext() : null);
                 }
                 
                 return CriticalComponentsMonitor.executeComponentSafely(fragmentName, () -> {
                     View result = operation.execute(inflater, container, savedInstanceState);
                     if (ANRSafeHelper.isNullWithLog(result, "View from " + fragmentName + " onCreateView")) {
-                        return createErrorView(fragmentName);
+                        return createErrorView(fragmentName, container != null ? container.getContext() : null);
                     }
                     InternalLogger.d(TAG, fragmentName + " onCreateView completed successfully");
                     return result;
-                }, createErrorView(fragmentName));
+                }, createErrorView(fragmentName, container != null ? container.getContext() : null));
             } catch (Exception e) {
                 InternalLogger.e(TAG, "Critical error in " + fragmentName + " onCreateView", e);
                 CriticalComponentsMonitor.recordComponentError(fragmentName, "onCreateView failed", e);
-                return createErrorView(fragmentName);
+                return createErrorView(fragmentName, container != null ? container.getContext() : null);
             }
         }
         
@@ -89,11 +91,18 @@ public class ComponentSafetyEnhancer {
             }
         }
         
-        private static View createErrorView(String fragmentName) {
+        private static View createErrorView(String fragmentName, Context context) {
             try {
                 InternalLogger.w(TAG, "Creating error view for " + fragmentName);
-                // Return null here as we don't have context - the caller should handle this
-                return null;
+                if (context == null) {
+                    return null;
+                }
+                TextView errorView = new TextView(context);
+                errorView.setText(fragmentName + " temporarily unavailable");
+                errorView.setTextColor(Color.WHITE);
+                errorView.setBackgroundColor(Color.BLACK);
+                errorView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                return errorView;
             } catch (Exception e) {
                 InternalLogger.e(TAG, "Failed to create error view for " + fragmentName, e);
                 return null;
@@ -202,7 +211,7 @@ public class ComponentSafetyEnhancer {
     // UI Component Safety Patterns
     public static class UISafety {
         
-        public static <T extends View> T safefindViewById(View parent, int id, String viewName) {
+        public static <T extends View> T safeFindViewById(View parent, int id, String viewName) {
             try {
                 if (ANRSafeHelper.isNullWithLog(parent, "Parent view for " + viewName)) {
                     return null;
@@ -224,4 +233,48 @@ public class ComponentSafetyEnhancer {
         
         public static void safeSetClickListener(View view, String viewName, View.OnClickListener listener) {
             try {
-                if (view != null && listener != null) {\n                    view.setOnClickListener(v -> {\n                        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {\n                            listener.onClick(v);\n                            return true;\n                        }, false);\n                    });\n                } else {\n                    InternalLogger.w(TAG, \"Cannot set click listener for \" + viewName + \n                                   \": view=\" + (view != null) + \", listener=\" + (listener != null));\n                }\n            } catch (Exception e) {\n                InternalLogger.e(TAG, \"Error setting click listener for \" + viewName, e);\n            }\n        }\n        \n        public static void safeSetText(android.widget.TextView textView, String text, String viewName) {\n            try {\n                if (textView != null) {\n                    ANRSafeHelper.getInstance().postToMainThreadSafely(() -> {\n                        textView.setText(text != null ? text : \"\");\n                    });\n                } else {\n                    InternalLogger.w(TAG, \"Cannot set text for null TextView: \" + viewName);\n                }\n            } catch (Exception e) {\n                InternalLogger.e(TAG, \"Error setting text for \" + viewName, e);\n            }\n        }\n        \n        public static void safeSetVisibility(View view, int visibility, String viewName) {\n            try {\n                if (view != null) {\n                    ANRSafeHelper.getInstance().postToMainThreadSafely(() -> {\n                        view.setVisibility(visibility);\n                    });\n                } else {\n                    InternalLogger.w(TAG, \"Cannot set visibility for null view: \" + viewName);\n                }\n            } catch (Exception e) {\n                InternalLogger.e(TAG, \"Error setting visibility for \" + viewName, e);\n            }\n        }\n    }\n    \n    // Generic Operation Safety\n    public static class OperationSafety {\n        \n        public static <T> T safeExecute(String operationName, SafeOperation<T> operation, T defaultValue) {\n            return ANRSafeHelper.getInstance().executeWithANRProtection(() -> {\n                try {\n                    InternalLogger.d(TAG, \"Executing safe operation: \" + operationName);\n                    T result = operation.execute();\n                    InternalLogger.d(TAG, \"Safe operation completed: \" + operationName);\n                    return result;\n                } catch (Exception e) {\n                    InternalLogger.e(TAG, \"Safe operation failed: \" + operationName, e);\n                    throw e;\n                }\n            }, defaultValue);\n        }\n        \n        public static void safeExecuteVoid(String operationName, SafeVoidOperation operation) {\n            safeExecute(operationName, () -> {\n                operation.execute();\n                return null;\n            }, null);\n        }\n        \n        public interface SafeOperation<T> {\n            T execute() throws Exception;\n        }\n        \n        public interface SafeVoidOperation {\n            void execute() throws Exception;\n        }\n    }\n    \n    // Database Operation Safety\n    public static class DatabaseSafety {\n        \n        public static <T> T safeDbOperation(String operationName, DatabaseOperation<T> operation, T defaultValue) {\n            return ANRSafeHelper.getInstance().executeWithANRProtection(() -> {\n                try {\n                    InternalLogger.d(TAG, \"Executing database operation: \" + operationName);\n                    T result = operation.execute();\n                    InternalLogger.d(TAG, \"Database operation completed: \" + operationName);\n                    return result;\n                } catch (Exception e) {\n                    InternalLogger.e(TAG, \"Database operation failed: \" + operationName, e);\n                    CriticalComponentsMonitor.recordComponentError(\"DatabaseOperation\", operationName + \" failed\", e);\n                    return defaultValue;\n                }\n            }, defaultValue, 10); // Longer timeout for DB operations\n        }\n        \n        public interface DatabaseOperation<T> {\n            T execute() throws Exception;\n        }\n    }\n    \n    // Network Operation Safety\n    public static class NetworkSafety {\n        \n        public static <T> T safeNetworkOperation(String operationName, NetworkOperation<T> operation, T defaultValue) {\n            return ANRSafeHelper.getInstance().executeWithANRProtection(() -> {\n                try {\n                    InternalLogger.d(TAG, \"Executing network operation: \" + operationName);\n                    T result = operation.execute();\n                    InternalLogger.d(TAG, \"Network operation completed: \" + operationName);\n                    return result;\n                } catch (Exception e) {\n                    InternalLogger.e(TAG, \"Network operation failed: \" + operationName, e);\n                    CriticalComponentsMonitor.recordComponentError(\"NetworkOperation\", operationName + \" failed\", e);\n                    return defaultValue;\n                }\n            }, defaultValue, 15); // Longer timeout for network operations\n        }\n        \n        public interface NetworkOperation<T> {\n            T execute() throws Exception;\n        }\n    }\n}
+                if (view != null && listener != null) {
+                    view.setOnClickListener(v -> {
+                        ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
+                            listener.onClick(v);
+                            return true;
+                        }, false);
+                    });
+                } else {
+                    InternalLogger.w(TAG, "Cannot set click listener for " + viewName + 
+                                   ": view=" + (view != null) + ", listener=" + (listener != null));
+                }
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error setting click listener for " + viewName, e);
+            }
+        }
+        
+        public static void safeSetText(TextView textView, String text, String viewName) {
+            try {
+                if (textView != null) {
+                    ANRSafeHelper.getInstance().postToMainThreadSafely(() -> {
+                        textView.setText(text != null ? text : "");
+                    });
+                } else {
+                    InternalLogger.w(TAG, "Cannot set text for null TextView: " + viewName);
+                }
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error setting text for " + viewName, e);
+            }
+        }
+        
+        public static void safeSetVisibility(View view, int visibility, String viewName) {
+            try {
+                if (view != null) {
+                    ANRSafeHelper.getInstance().postToMainThreadSafely(() -> {
+                        view.setVisibility(visibility);
+                    });
+                } else {
+                    InternalLogger.w(TAG, "Cannot set visibility for null view: " + viewName);
+                }
+            } catch (Exception e) {
+                InternalLogger.e(TAG, "Error setting visibility for " + viewName, e);
+            }
+        }
+    }
+}
