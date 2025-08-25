@@ -1625,6 +1625,21 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
             }
         });
+        
+        // Add focus change listener to update server request when leaving field
+        edt_cloud.setOnFocusChangeListener((view, hasFocus) -> {
+            if (!hasFocus) {
+                // Field lost focus, update server request
+                String serverUrl = edt_cloud.getText().toString().trim();
+                if (!TextUtils.isEmpty(serverUrl)) {
+                    AppPreference.setStr(AppPreference.KEY.BETA_URL, serverUrl);
+                    // Optionally show a toast to confirm the update
+                    if (isAdded() && getContext() != null) {
+                        MessageUtil.showToast(getContext(), "Cloud server URL updated: " + serverUrl);
+                    }
+                }
+            }
+        });
         edt_cloud.setText(AppPreference.getStr(AppPreference.KEY.BETA_URL, RestApiService.DNS));
 
         String pin = AppPreference.getStr(AppPreference.KEY.PIN_NUMBER, "");
@@ -2307,13 +2322,20 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 }).show();
     }
 
-    public void OnClick(View view) {
+    @Override
+    public void onClick(View view) {
         switch (view.getId()) {
             case R.id.txt_camera:
                 onAddCamera();
                 break;
             case R.id.txt_update:
-                mListener.fragUpdateApp("");
+                // Update Now button - Install available update
+                if (!TextUtils.isEmpty(AppPreference.getStr(AppPreference.KEY.APP_VERSION, ""))) {
+                    String updateUrl = AppPreference.getStr(AppPreference.KEY.APP_URL, "");
+                    mListener.fragUpdateApp(updateUrl);
+                } else {
+                    MessageUtil.showToast(requireContext(), "No update available");
+                }
                 break;
             case R.id.txt_storage:
                 mListener.isDialog(true);
@@ -2330,7 +2352,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 checkUpdate();
                 break;
             case R.id.txt_exit:
-                exitApp();
+                moveAppToBackground();
                 break;
             case R.id.txt_wifi_camera:
 //                onAddWifiCamera();
@@ -2387,6 +2409,19 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                     }
                 });
                 dlg.show();
+                break;
+            case R.id.txt_cast_video_details:
+                if (ly_cast_video_settings != null) {
+                    if (ly_cast_video_settings.getVisibility() == View.VISIBLE) {
+                        // Hide cast video fields
+                        ly_cast_video_settings.setVisibility(View.GONE);
+                        txt_cast_video_details.setText(R.string.show_details);
+                    } else {
+                        // Show cast video fields
+                        ly_cast_video_settings.setVisibility(View.VISIBLE);
+                        txt_cast_video_details.setText(R.string.return_defaults);
+                    }
+                }
                 break;
         }
     }
@@ -3161,6 +3196,19 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             mListener.isDialog(false);
         });
         serialDialog.show();
+    }
+
+    void moveAppToBackground() {
+        if (!isAdded() || getActivity() == null) {
+            Log.e("SettingsFragment", "Fragment detached, cannot move app to background");
+            return;
+        }
+        
+        // Move the app to background instead of finishing it
+        Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+        homeIntent.addCategory(Intent.CATEGORY_HOME);
+        homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(homeIntent);
     }
 
     void exitApp() {
