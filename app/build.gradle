@@ -35,19 +35,20 @@ android {
         setProperty("archivesBaseName", "CheckMate!_" + versionName)
         multiDexEnabled true
         
-        // Optimize native builds
-        externalNativeBuild {
-            cmake {
-                arguments '-DANDROID_STL=c++_shared',
-                         '-DANDROID_PLATFORM=android-26',
-                         '-DCMAKE_BUILD_TYPE=Release'
-                cppFlags '-std=c++17', '-frtti', '-fexceptions'
-            }
-        }
+        // Native builds temporarily disabled for build testing
+        // Will be re-enabled once basic build is working
+        // externalNativeBuild {
+        //     cmake {
+        //         arguments '-DANDROID_STL=c++_shared',
+        //                  '-DANDROID_PLATFORM=android-26',
+        //                  '-DCMAKE_BUILD_TYPE=Release'
+        //         cppFlags '-std=c++17', '-frtti', '-fexceptions'
+        //     }
+        // }
         
-        ndk {
-            abiFilters "armeabi-v7a", "arm64-v8a"
-        }
+        // ndk {
+        //     abiFilters "armeabi-v7a", "arm64-v8a"
+        // }
         
         // Performance optimizations
         vectorDrawables.useSupportLibrary = true
@@ -78,11 +79,7 @@ android {
             }
         }
     }
-    
-    buildFeatures {
-        viewBinding true
-        buildConfig true
-    }
+
 
     repositories {
         flatDir { dirs 'libs' }
@@ -92,13 +89,13 @@ android {
             jniLibs.srcDirs = ['src/main/jniLibs/lib']
         }
     }
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-            version "3.10.2"
-        }
-    }
-    packaging {
+    // externalNativeBuild {
+    //     cmake {
+    //         path "src/main/cpp/CMakeLists.txt"
+    //         version "3.10.2"
+    //     }
+    // }
+    packagingOptions {
         resources {
             excludes += [
                 '/META-INF/{AL2.0,LGPL2.1}',
@@ -113,9 +110,7 @@ android {
                 '/META-INF/*.kotlin_module'
             ]
         }
-        pickFirst {
-            include 'com/serenegiant/dialog/MessageDialogFragment$*.class'
-        }
+        pickFirst 'com/serenegiant/dialog/MessageDialogFragment$*.class'
         exclude 'com/serenegiant/common/**'
     }
     
@@ -126,7 +121,7 @@ android {
         }
     }
 
-    ndkVersion '25.2.9519653'
+    // ndkVersion '25.2.9519653'  // Temporarily disabled
     
     // Bundle configuration for better app delivery
     bundle {
@@ -139,6 +134,12 @@ android {
         abi {
             enableSplit = true
         }
+    }
+    
+    // Configure build features properly
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
     }
 }
 
