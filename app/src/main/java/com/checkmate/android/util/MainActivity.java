@@ -321,6 +321,17 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Initialize thread safety and logging systems
+        try {
+            InternalLogger.initialize(this);
+            ANRDetector.initialize(this);
+            ANRDetector.getInstance().startMonitoring();
+            InternalLogger.logInfo("MainActivity", "Thread safety systems initialized");
+        } catch (Exception e) {
+            Log.e("MainActivity", "Failed to initialize thread safety systems", e);
+        }
+        
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,WindowManager.LayoutParams.FLAG_SECURE);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // kept once
@@ -1985,6 +1996,17 @@ public class MainActivity extends BaseActivity
      * ──────────────────────────────────────────────────────────────────────── */
     @Override
     protected void onDestroy() {
+        
+        // Cleanup thread safety systems
+        try {
+            ANRDetector.getInstance().stopMonitoring();
+            ANRDetector.getInstance().shutdown();
+            ThreadSafetyUtils.shutdown();
+            InternalLogger.getInstance().shutdown();
+            InternalLogger.logInfo("MainActivity", "Thread safety systems cleaned up");
+        } catch (Exception e) {
+            Log.e("MainActivity", "Error cleaning up thread safety systems", e);
+        }
 
         // stopHTTPServer();   // still optional – uncomment if you use HTTP server
 

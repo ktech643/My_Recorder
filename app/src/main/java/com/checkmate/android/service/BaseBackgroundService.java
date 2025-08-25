@@ -19,6 +19,11 @@ import com.checkmate.android.service.SharedEGL.ServiceType;
 import com.checkmate.android.service.SharedEGL.SharedEglManager;
 import com.checkmate.android.viewmodels.SharedViewModel;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
+import com.checkmate.android.util.InternalLogger;
+import com.checkmate.android.util.ANRDetector;
+import com.checkmate.android.util.ThreadSafetyUtils;
 import toothpick.Scope;
 import toothpick.Toothpick;
 import toothpick.config.Module;
@@ -31,7 +36,8 @@ public abstract class BaseBackgroundService extends Service {
     protected SurfaceTexture mPreviewTexture;
     protected Surface mPreviewSurface;
     protected Handler mHandler;
-    protected boolean isRunning = false;
+    protected final AtomicBoolean isRunning = new AtomicBoolean(false);
+    protected final ReentrantLock serviceLock = new ReentrantLock();
     protected PowerManager.WakeLock wakeLock;
     protected SharedViewModel sharedViewModel;
 

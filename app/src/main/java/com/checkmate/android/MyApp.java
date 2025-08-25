@@ -15,6 +15,9 @@ import androidx.annotation.NonNull;
 import com.checkmate.android.database.DBManager;
 import com.checkmate.android.service.SharedEGL.GraphicsModule;
 import com.checkmate.android.util.HttpServer.ServiceModule;
+import com.checkmate.android.util.InternalLogger;
+import com.checkmate.android.util.ANRDetector;
+import com.checkmate.android.util.ThreadSafetyUtils;
 
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -34,6 +37,14 @@ public class MyApp extends Application {
 
         mContext = getApplicationContext();
 
+        // Initialize thread safety and logging systems early
+        try {
+            InternalLogger.initialize(this);
+            ANRDetector.initialize(this);
+            InternalLogger.logInfo("MyApp", "Application started with thread safety systems");
+        } catch (Exception e) {
+            Log.e("MyApp", "Failed to initialize thread safety systems", e);
+        }
 
         // Configure Toothpick
         if (BuildConfig.DEBUG) {
