@@ -301,6 +301,14 @@ public class SplashActivity extends BaseActivity {
         if (storageHelper != null) {
             storageHelper.handlePermissionResult(requestCode, permissions, grantResults);
         }
+        
+        // Handle storage permission request for activation
+        if (requestCode == StoragePermissionHelper.REQUEST_STORAGE_PERMISSION && hasRequestedStoragePermission) {
+            // Continue with activation regardless of permission result
+            // The app will use default storage if permission is denied
+            continueWithActivation();
+            return;
+        }
 
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -383,6 +391,7 @@ public class SplashActivity extends BaseActivity {
     boolean is_dialog_show = false;
     boolean should_show_complete = false;
     private SplashStorageHelper storageHelper;
+    private boolean hasRequestedStoragePermission = false;
 
     public synchronized String getUniqueChannelName(Context context) {
         SharedPreferences sharedPrefs = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
@@ -420,7 +429,10 @@ public class SplashActivity extends BaseActivity {
                     Log.w(TAG, "Storage selection cancelled");
                     // Use default storage and continue
                     PreferenceInitializer.validateStorageLocation(SplashActivity.this);
-                    continueWithActivation();
+                    // Only continue if we haven't already shown the activation dialog
+                    if (!is_dialog_show) {
+                        continueWithActivation();
+                    }
                 }
             });
             // Show storage selection dialog and wait for user selection
@@ -455,10 +467,14 @@ public class SplashActivity extends BaseActivity {
         // Validate and fix storage location if needed
         PreferenceInitializer.validateStorageLocation(this);
         // Check storage permissions and request if needed using StoragePermissionHelper
-        if (!StoragePermissionHelper.areStoragePermissionsGranted(this)) {
+        if (!StoragePermissionHelper.areStoragePermissionsGranted(this) && !hasRequestedStoragePermission) {
             Log.d(TAG, "Storage permissions not granted, requesting permissions");
+            hasRequestedStoragePermission = true;
             StoragePermissionHelper.requestStoragePermissions(this);
+            return; // Exit here and wait for permission result
         }
+        
+        // Continue with activation dialog
         should_show_complete = true;
         is_dialog_show = true;
         ActivationDialog activationDialog = new ActivationDialog(this);
