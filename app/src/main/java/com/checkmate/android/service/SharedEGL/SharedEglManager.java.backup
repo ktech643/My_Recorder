@@ -1079,14 +1079,6 @@ public class SharedEglManager {
                 monitorResources();
             }
         });
-        } catch (Exception e) {
-            Log.e(TAG, "Error in drawFrame", e);
-            if (CrashLogger.getInstance() != null) {
-                CrashLogger.getInstance().logError(TAG, "drawFrame", e);
-            }
-        } finally {
-            drawLock.unlock();
-        }
     }
 
     private void drawToSurface(WindowSurfaceNew surface, int dstW, int dstH, int srcW, int srcH) {
