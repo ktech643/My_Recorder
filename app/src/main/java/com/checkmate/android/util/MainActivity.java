@@ -109,6 +109,7 @@ import com.checkmate.android.util.GradleBuildValidator;
 import com.checkmate.android.util.AdvancedPerformanceOptimizer;
 import com.checkmate.android.util.AIAdaptiveQualityManager;
 import com.checkmate.android.util.UltraLowLatencyOptimizer;
+import com.checkmate.android.util.RuntimeConfigurationManager;
 import com.checkmate.android.util.rtsp.EncOpt;
 import com.checkmate.android.util.rtsp.TextOverlayOption;
 import com.checkmate.android.viewmodels.EventType;
@@ -548,19 +549,23 @@ public class MainActivity extends BaseActivity
         bottom_tab.setOnNavigationItemChangedListener(item -> {
             int position = item.getPosition();
 
-            // Prevent switching to settings while recording/streaming
-            if ((isRecordingCamera()   && position == AppConstant.SW_FRAGMENT_SETTINGS) ||
-                    (isRecordingUSB()      && position == AppConstant.SW_FRAGMENT_SETTINGS) ||
-                    (isStreaming()         && position == AppConstant.SW_FRAGMENT_SETTINGS) ||
-                    ((mUSBService != null && position == AppConstant.SW_FRAGMENT_SETTINGS
-                            && mUSBService.isStreaming())) ||
-                    (isWifiStreaming()     && position == AppConstant.SW_FRAGMENT_SETTINGS) ||
-                    (isWifiRecording()     && position == AppConstant.SW_FRAGMENT_SETTINGS)) {
-
-                if (mCurrentFragmentIndex < 0 || mCurrentFragmentIndex >= 5)
-                    mCurrentFragmentIndex = 0;                         // safety
-                bottom_tab.setActiveNavigationIndex(mCurrentFragmentIndex);
-                return;
+            // RUNTIME CONFIGURATION: Allow settings access during streaming/recording
+            // Settings can now be changed live without stopping active streams/recordings
+            if ((isRecordingCamera() || isRecordingUSB() || isStreaming() || 
+                 (mUSBService != null && mUSBService.isStreaming()) ||
+                 isWifiStreaming() || isWifiRecording()) && 
+                position == AppConstant.SW_FRAGMENT_SETTINGS) {
+                
+                Log.d(TAG, "🔧 Accessing settings during active streaming/recording - Runtime configuration enabled");
+                
+                // Initialize runtime configuration manager if not already done
+                RuntimeConfigurationManager runtimeManager = RuntimeConfigurationManager.getInstance();
+                if (!runtimeManager.isRuntimeConfigurationSupported()) {
+                    runtimeManager.initialize(this);
+                    Log.d(TAG, "✅ Runtime configuration manager initialized");
+                }
+                
+                // Allow settings access - changes will be applied in real-time
             }
 
             CommonUtil.hideKeyboard(this, bottom_tab);
