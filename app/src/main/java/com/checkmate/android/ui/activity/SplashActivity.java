@@ -88,35 +88,30 @@ public class SplashActivity extends BaseActivity {
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 105; // Define your request code
     private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 106; // Notification permission request code
 
-    // Essential permissions needed for core app functionality - request these first
-    private static final String[] ESSENTIAL_PERMISSIONS = {
+    // Core permissions - requesting only what's absolutely essential to prevent dialog overload
+    private static final String[] CORE_PERMISSIONS = {
             Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            Manifest.permission.RECORD_AUDIO
     };
     
-    // Secondary permissions for additional features - request these after essential ones
-    private static final String[] SECONDARY_PERMISSIONS = {
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.VIBRATE,
-            Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.ACCESS_WIFI_STATE,
-            Manifest.permission.CHANGE_WIFI_STATE,
-            Manifest.permission.MODIFY_AUDIO_SETTINGS
-    };
-    
-    // Optional permissions for advanced features - request last
-    private static final String[] OPTIONAL_PERMISSIONS = {
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.CHANGE_NETWORK_STATE,
-            Manifest.permission.WAKE_LOCK,
-            Manifest.permission.READ_MEDIA_AUDIO,
-            Manifest.permission.CAPTURE_AUDIO_OUTPUT
+    // Storage permissions - handled separately to prevent conflicts
+    private static final String[] STORAGE_PERMISSIONS = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
     
     // Legacy - keeping for backward compatibility
-    private static final String[] PERMISSIONS = ESSENTIAL_PERMISSIONS;
+    private static final String[] PERMISSIONS = CORE_PERMISSIONS;
+    
+    // Permission state tracking to prevent multiple simultaneous requests
+    private boolean isRequestingPermissions = false;
+    private boolean hasRequestedCorePermissions = false;
+    private boolean hasRequestedStoragePermissions = false;
+    private boolean hasRequestedSystemPermissions = false;
+    
+    // Dialog state tracking to prevent overlapping popups
+    private boolean isDialogShowing = false;
+    private boolean isNavigatingToNextView = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,24 +123,12 @@ public class SplashActivity extends BaseActivity {
 
         // Remove notification permission request from onCreate - will be requested after activation
 
-        // Prevent screen blinking when notifications appear
+        // Optimized window flags to prevent screen jerking and maintain stability
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-        // Additional flags to prevent blinking and ensure stable display
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
-
-        // Set window to be stable and prevent focus changes from causing blinking
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
-                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
-                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-        );
+        
+        // Prevent focus loss during permission requests
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LOCAL_FOCUS_MODE);
 
         // Ensure the window is stable and doesn't get affected by system UI changes
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -161,13 +144,11 @@ public class SplashActivity extends BaseActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-
-        // Prevent screen blinking when focus changes (e.g., when notifications appear)
-        if (hasFocus) {
-            // Ensure the window stays stable
+        
+        // Prevent screen jerking when focus changes during permission dialogs
+        if (hasFocus && !isRequestingPermissions) {
+            // Only apply window flags when not in permission flow to prevent conflicts
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
         }
     }
 
@@ -175,33 +156,37 @@ public class SplashActivity extends BaseActivity {
     protected void onPause() {
         super.onPause();
         // Keep the screen on even when paused to prevent blinking
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if (!isRequestingPermissions) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        // Ensure window stability when resuming
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+        // Minimize window flag changes to prevent jerking
+        if (!isRequestingPermissions) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
 
         if (AppPreference.getBool(AppPreference.KEY.APP_FORCE_QUIT, true)) {
             AppPreference.setBool(AppPreference.KEY.APP_FORCE_QUIT, true);
-            verifyPermissions(this);
+            // Add delay to prevent immediate permission requests that can cause freezing
+            new Handler().postDelayed(() -> {
+                if (!isRequestingPermissions && !isDialogShowing) {
+                    verifyPermissions(this);
+                }
+            }, 1000); // Increased delay to 1 second
         } else {
             MessageUtil.showToast(getApplicationContext(), "CheckMate! Will be closing. Please use main icon to open.");
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Intent startMain = new Intent(Intent.ACTION_MAIN);
-                    startMain.addCategory(Intent.CATEGORY_HOME);
-                    startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(startMain);
-                    AppPreference.setBool(AppPreference.KEY.APP_FORCE_QUIT, true);
-                    finish();
-                }
+            new Handler().postDelayed(() -> {
+                Intent startMain = new Intent(Intent.ACTION_MAIN);
+                startMain.addCategory(Intent.CATEGORY_HOME);
+                startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(startMain);
+                AppPreference.setBool(AppPreference.KEY.APP_FORCE_QUIT, true);
+                finish();
             }, 2500);
         }
     }
@@ -217,66 +202,90 @@ public class SplashActivity extends BaseActivity {
     ConnectivityManager connection_manager;
 
     public void verifyPermissions(Activity activity) {
-        Log.d(TAG, "Starting tiered permission verification to prevent system overload");
+        if (isRequestingPermissions) {
+            Log.w(TAG, "Permission request already in progress, skipping to prevent conflicts");
+            return;
+        }
         
-        // Start with essential permissions only - this prevents overwhelming the system
-        requestEssentialPermissions(activity);
+        Log.d(TAG, "Starting controlled permission verification");
+        isRequestingPermissions = true;
+        
+        // Start with core permissions only to prevent dialog overload
+        requestCorePermissions(activity);
     }
     
     /**
-     * Request only essential permissions first (Camera, Audio, Storage)
+     * Request only core permissions first (Camera, Audio) - minimal set to prevent freezing
      */
-    private void requestEssentialPermissions(Activity activity) {
-        List<String> missingEssential = new ArrayList<>();
+    private void requestCorePermissions(Activity activity) {
+        if (hasRequestedCorePermissions) {
+            Log.d(TAG, "Core permissions already requested, proceeding to storage");
+            requestStoragePermissions(activity);
+            return;
+        }
         
-        for (String permission : ESSENTIAL_PERMISSIONS) {
+        List<String> missingCore = new ArrayList<>();
+        
+        for (String permission : CORE_PERMISSIONS) {
             if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-                missingEssential.add(permission);
+                missingCore.add(permission);
             }
         }
         
-        if (!missingEssential.isEmpty()) {
-            Log.d(TAG, "Requesting essential permissions: " + missingEssential.size() + " permissions");
+        if (!missingCore.isEmpty()) {
+            Log.d(TAG, "Requesting core permissions: " + missingCore.size() + " permissions");
+            hasRequestedCorePermissions = true;
             ActivityCompat.requestPermissions(
                     activity,
-                    missingEssential.toArray(new String[0]),
+                    missingCore.toArray(new String[0]),
                     PERMISSION_REQUEST_CODE_FOR_PERMISSION
             );
         } else {
-            Log.d(TAG, "Essential permissions granted, proceeding to secondary permissions");
-            requestSecondaryPermissions(activity);
+            Log.d(TAG, "Core permissions granted, proceeding to storage permissions");
+            hasRequestedCorePermissions = true;
+            requestStoragePermissions(activity);
         }
     }
     
     /**
-     * Request secondary permissions after essential ones are granted
+     * Request storage permissions separately to prevent conflicts
      */
-    private void requestSecondaryPermissions(Activity activity) {
-        List<String> missingSecondary = new ArrayList<>();
+    private void requestStoragePermissions(Activity activity) {
+        if (hasRequestedStoragePermissions) {
+            Log.d(TAG, "Storage permissions already requested, proceeding to system permissions");
+            requestSystemPermissions(activity);
+            return;
+        }
         
-        for (String permission : SECONDARY_PERMISSIONS) {
+        List<String> missingStorage = new ArrayList<>();
+        
+        for (String permission : STORAGE_PERMISSIONS) {
             if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-                missingSecondary.add(permission);
+                missingStorage.add(permission);
             }
         }
         
-        if (!missingSecondary.isEmpty()) {
-            Log.d(TAG, "Requesting secondary permissions: " + missingSecondary.size() + " permissions");
-            // Use a delay to prevent overwhelming the system
+        if (!missingStorage.isEmpty()) {
+            Log.d(TAG, "Requesting storage permissions: " + missingStorage.size() + " permissions");
+            hasRequestedStoragePermissions = true;
+            // Delay to prevent dialog conflicts
             new Handler().postDelayed(() -> {
                 ActivityCompat.requestPermissions(
                         activity,
-                        missingSecondary.toArray(new String[0]),
+                        missingStorage.toArray(new String[0]),
                         PERMISSION_REQUEST_CODE_FOR_PERMISSION + 1
                 );
-            }, 2000); // 2 second delay between permission groups
+            }, 2000); // 2 second delay to ensure previous dialog closed
         } else {
-            Log.d(TAG, "Secondary permissions granted, proceeding to additional permissions");
-            requestAdditionalPermissions(activity);
+            Log.d(TAG, "Storage permissions granted, proceeding to system permissions");
+            hasRequestedStoragePermissions = true;
+            requestSystemPermissions(activity);
         }
     }
 
     public void verifyStoragePermissions(Activity activity) {
+        // This method is kept for compatibility but should not trigger new permission requests
+        // to prevent conflicts with our controlled permission flow
         List<String> requiredPermissions = new ArrayList<>();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -298,9 +307,7 @@ public class SplashActivity extends BaseActivity {
         }
 
         if (!missingPermissions.isEmpty()) {
-            ActivityCompat.requestPermissions(activity,
-                    missingPermissions.toArray(new String[0]),
-                    REQUEST_STORAGE_PERMISSION);
+            Log.d(TAG, "Storage permissions missing but not requesting to avoid conflicts");
         } else {
             Log.d("Storage", "All permissions granted!");
         }
@@ -311,7 +318,7 @@ public class SplashActivity extends BaseActivity {
 
     private void checkStoragePermissions() {
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
+            Log.d(TAG, "Storage permission missing but not requesting to avoid conflicts");
         }
     }
 
@@ -319,22 +326,34 @@ public class SplashActivity extends BaseActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        // Handle storage permissions using StoragePermissionHelper
-        StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
+        // Handle storage permissions using StoragePermissionHelper (but don't let it trigger new requests)
+        try {
+            StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
+        } catch (Exception e) {
+            Log.w(TAG, "StoragePermissionHelper error: " + e.getMessage());
+        }
 
         // Handle storage helper permissions
         if (storageHelper != null) {
-            storageHelper.handlePermissionResult(requestCode, permissions, grantResults);
+            try {
+                storageHelper.handlePermissionResult(requestCode, permissions, grantResults);
+            } catch (Exception e) {
+                Log.w(TAG, "StorageHelper error: " + e.getMessage());
+            }
         }
 
         if (requestCode == PERMISSION_REQUEST_CODE_FOR_PERMISSION) {
-            // Essential permissions handled, now request secondary permissions
-            Log.d(TAG, "Essential permissions result received, proceeding to secondary permissions");
-            requestSecondaryPermissions(this);
+            // Core permissions handled, now request storage permissions
+            Log.d(TAG, "Core permissions result received, proceeding to storage permissions");
+            new Handler().postDelayed(() -> {
+                requestStoragePermissions(this);
+            }, 1500); // Delay to prevent dialog conflicts
         } else if (requestCode == PERMISSION_REQUEST_CODE_FOR_PERMISSION + 1) {
-            // Secondary permissions handled, now request additional system permissions
-            Log.d(TAG, "Secondary permissions result received, proceeding to additional permissions");
-            requestAdditionalPermissions(this);
+            // Storage permissions handled, now request system permissions
+            Log.d(TAG, "Storage permissions result received, proceeding to system permissions");
+            new Handler().postDelayed(() -> {
+                requestSystemPermissions(this);
+            }, 1500); // Delay to prevent dialog conflicts
         }
 
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
@@ -359,34 +378,46 @@ public class SplashActivity extends BaseActivity {
     }
 
     /**
-     * Request additional permissions sequentially to avoid "Can request only one set of permissions at a time" warning
+     * Request system permissions one at a time to prevent overlapping intents
      */
-    private void requestAdditionalPermissions(Activity activity) {
-        Log.d(TAG, "Starting sequential permission flow to prevent system overload");
+    private void requestSystemPermissions(Activity activity) {
+        if (hasRequestedSystemPermissions) {
+            Log.d(TAG, "System permissions already requested, continuing to main view");
+            isRequestingPermissions = false;
+            safeGotoNextView();
+            return;
+        }
         
-        // Request permissions one at a time with proper callbacks to avoid overwhelming the system
+        hasRequestedSystemPermissions = true;
+        Log.d(TAG, "Starting controlled system permission flow");
+        
+        // Request system permissions one at a time with longer delays to prevent freezing
         requestOverlayPermissionSequential(activity, () -> {
             requestBatteryOptimizationSequential(activity, () -> {
                 requestSystemSettingsSequential(activity, () -> {
-                    Log.d(TAG, "All additional permissions processed, continuing to main");
-                    gotoNextView();
+                    Log.d(TAG, "All system permissions processed, continuing to main");
+                    isRequestingPermissions = false;
+                    safeGotoNextView();
                 });
             });
         });
     }
     
     private void requestOverlayPermissionSequential(Activity activity, Runnable onComplete) {
-        if (!Settings.canDrawOverlays(activity)) {
-            Log.d(TAG, "Requesting overlay permission");
-            try {
+        try {
+            if (!Settings.canDrawOverlays(activity)) {
+                Log.d(TAG, "Requesting overlay permission");
                 requestDrawOverAppsPermission(activity);
-                new Handler().postDelayed(onComplete, 3000);
-            } catch (Exception e) {
-                Log.e(TAG, "Error requesting overlay permission", e);
-                onComplete.run();
+                // Longer delay to ensure system settings intent completes
+                new Handler().postDelayed(onComplete, 6000); // Increased to 6 seconds
+            } else {
+                Log.d(TAG, "Overlay permission already granted");
+                // Still use delay to prevent rapid transitions
+                new Handler().postDelayed(onComplete, 1000);
             }
-        } else {
-            onComplete.run();
+        } catch (Exception e) {
+            Log.e(TAG, "Error requesting overlay permission", e);
+            new Handler().postDelayed(onComplete, 1000);
         }
     }
     
@@ -396,13 +427,16 @@ public class SplashActivity extends BaseActivity {
             if (pm != null && !pm.isIgnoringBatteryOptimizations(activity.getPackageName())) {
                 Log.d(TAG, "Requesting battery optimization");
                 requestIgnoreBatteryOptimizationsPermission(activity);
-                new Handler().postDelayed(onComplete, 3000);
+                // Longer delay to ensure system settings intent completes
+                new Handler().postDelayed(onComplete, 6000); // Increased to 6 seconds
             } else {
-                onComplete.run();
+                Log.d(TAG, "Battery optimization already granted");
+                // Still use delay to prevent rapid transitions
+                new Handler().postDelayed(onComplete, 1000);
             }
         } catch (Exception e) {
             Log.e(TAG, "Error requesting battery optimization", e);
-            onComplete.run();
+            new Handler().postDelayed(onComplete, 1000);
         }
     }
     
@@ -411,13 +445,16 @@ public class SplashActivity extends BaseActivity {
             if (!Settings.System.canWrite(activity)) {
                 Log.d(TAG, "Requesting system settings access");
                 requestModifySystemSettingsPermission(activity);
-                new Handler().postDelayed(onComplete, 3000);
+                // Longer delay to ensure system settings intent completes
+                new Handler().postDelayed(onComplete, 6000); // Increased to 6 seconds
             } else {
-                onComplete.run();
+                Log.d(TAG, "System settings permission already granted");
+                // Still use delay to prevent rapid transitions
+                new Handler().postDelayed(onComplete, 1000);
             }
         } catch (Exception e) {
             Log.e(TAG, "Error requesting system settings", e);
-            onComplete.run();
+            new Handler().postDelayed(onComplete, 1000);
         }
     }
 
@@ -491,10 +528,30 @@ public class SplashActivity extends BaseActivity {
         }
         return uniqueID;
     }
-    void gotoNextView() {
-        if (is_dialog_show) {
+    
+    /**
+     * Safe navigation to next view with recursive call protection
+     */
+    void safeGotoNextView() {
+        if (isNavigatingToNextView) {
+            Log.w(TAG, "Already navigating to next view, skipping to prevent recursive calls");
             return;
         }
+        isNavigatingToNextView = true;
+        
+        // Add delay to ensure previous dialogs are dismissed
+        new Handler().postDelayed(() -> {
+            gotoNextView();
+        }, 500);
+    }
+    
+    void gotoNextView() {
+        if (is_dialog_show || isDialogShowing) {
+            Log.w(TAG, "Dialog already showing, skipping navigation");
+            isNavigatingToNextView = false;
+            return;
+        }
+        
         // check activation
         String activation = AppPreference.getStr(AppPreference.KEY.ACTIVATION_CODE, "");
         if (TextUtils.isEmpty(activation)) {
@@ -511,6 +568,7 @@ public class SplashActivity extends BaseActivity {
                 public void onStorageSelected(String storagePath, String storageType) {
                     Log.d(TAG, "Storage selected: " + storagePath + " (" + storageType + ")");
                     // After storage is selected, continue with activation
+                    isNavigatingToNextView = false;
                     continueWithActivation();
                 }
                 @Override
@@ -518,15 +576,20 @@ public class SplashActivity extends BaseActivity {
                     Log.w(TAG, "Storage selection cancelled");
                     // Use default storage and continue
                     PreferenceInitializer.validateStorageLocation(SplashActivity.this);
+                    isNavigatingToNextView = false;
                     continueWithActivation();
                 }
             });
             // Show storage selection dialog and wait for user selection
+            isDialogShowing = true;
             storageHelper.showCustomStorageDialog();
+            isNavigatingToNextView = false;
             return;
         } else { // check
             if (!isValidActivation(activation)) {
-                gotoNextView();
+                // FIXED: This was causing recursive loops - don't call gotoNextView again
+                Log.w(TAG, "Invalid activation, returning to avoid recursion");
+                isNavigatingToNextView = false;
                 return;
             }
         }
@@ -534,14 +597,18 @@ public class SplashActivity extends BaseActivity {
         if (should_show_complete) {
             should_show_complete = false;
             is_dialog_show = true;
+            isDialogShowing = true;
             ActivationCompleteDialog com_dialog = new ActivationCompleteDialog(this);
             com_dialog.setOkListener(view -> {
                 is_dialog_show = false;
+                isDialogShowing = false;
                 com_dialog.dismiss();
+                isNavigatingToNextView = false;
                 maybeAskNotificationThenMain();
             });
             com_dialog.show();
         } else {
+            isNavigatingToNextView = false;
             maybeAskNotificationThenMain();
         }
     }
@@ -552,21 +619,23 @@ public class SplashActivity extends BaseActivity {
     private void continueWithActivation() {
         // Validate and fix storage location if needed
         PreferenceInitializer.validateStorageLocation(this);
-        // Check storage permissions and request if needed using StoragePermissionHelper
+        // Check storage permissions but don't trigger new requests to avoid conflicts
         if (!StoragePermissionHelper.areStoragePermissionsGranted(this)) {
-            Log.d(TAG, "Storage permissions not granted, requesting permissions");
-            StoragePermissionHelper.requestStoragePermissions(this);
+            Log.d(TAG, "Storage permissions not granted, but skipping request to avoid conflicts");
         }
         should_show_complete = true;
         is_dialog_show = true;
+        isDialogShowing = true;
         ActivationDialog activationDialog = new ActivationDialog(this);
         activationDialog.setOkListener(view -> {
             activationDialog.dismiss();
             is_dialog_show = false;
+            isDialogShowing = false;
             setSerialNumber();
         });
         activationDialog.setCloseListener(view -> {
             is_dialog_show = false;
+            isDialogShowing = false;
             activationDialog.dismiss();
             finish();
         });
@@ -577,15 +646,18 @@ public class SplashActivity extends BaseActivity {
     void openMainScreen() {
 
         if (AppPreference.getBool(AppPreference.KEY.APP_FIRST_LAUNCH, true)) {
+            isDialogShowing = true;
             AlertDialog.Builder  builder = new AlertDialog.Builder(this)
                     .setTitle(R.string.convert_mode)
                     .setMessage(getString(R.string.confirm_convert))
                     .setIcon(R.mipmap.ic_launcher)
                     .setCancelable(false)
                     .setPositiveButton(R.string.configure_covert, (dialog, whichButton) -> {
+                        isDialogShowing = false;
                         setPinCode();
                     })
                     .setNegativeButton(R.string.without_configure_covert, (dialog, whichButton) -> {
+                        isDialogShowing = false;
                         chooseAudioOption();
                     });
             AlertDialog alertDialog = builder.create();
@@ -616,6 +688,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     void chooseAudioOption() {
+        isDialogShowing = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.choose_audio)
                 .setMessage(getString(R.string.confirm_audio))
@@ -628,6 +701,7 @@ public class SplashActivity extends BaseActivity {
                     AppPreference.setBool(AppPreference.KEY.USE_AUDIO, false);
                 })
                 .setOnDismissListener(dialogInterface -> {
+                    isDialogShowing = false;
                     AppPreference.setBool(AppPreference.KEY.APP_FIRST_LAUNCH, false);
                     openMain();
                 });
@@ -739,19 +813,23 @@ public class SplashActivity extends BaseActivity {
         runOnUiThread(() -> {
             AppPreference.setStr(AppPreference.KEY.APP_OLD_VERSION, CommonUtil.getVersionCode(SplashActivity.this));
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
-            overridePendingTransition(0, 0); // Disable transition animation
+            overridePendingTransition(0, 0); // Disable transition animation to prevent jerking
             finish();
         });
     }
 
     void restartApp() {
         Log.e(TAG, "restartCamera: 2");
+        isDialogShowing = true;
         AlertDialog.Builder aboutDialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.restart_required)
                 .setMessage(R.string.service_restart_info)
                 .setPositiveButton(android.R.string.ok, null)
                 .setCancelable(true)
-                .setOnDismissListener(dialog -> quitApp());
+                .setOnDismissListener(dialog -> {
+                    isDialogShowing = false;
+                    quitApp();
+                });
 
         AlertDialog alertDialog = aboutDialog.create();
         alertDialog.show();
@@ -770,29 +848,33 @@ public class SplashActivity extends BaseActivity {
     }
 
     void setSerialNumber() {
-        if (is_dialog_show) {
+        if (is_dialog_show || isDialogShowing) {
             return;
         }
         is_dialog_show = true;
+        isDialogShowing = true;
 
         SerialDialog serialDialog = new SerialDialog(this);
         serialDialog.setOkListener(view -> {
             is_dialog_show = false;
+            isDialogShowing = false;
             serialDialog.dismiss();
             String serial_number = serialDialog.edt_serial.getText().toString();
             if (isValidSerial(serial_number)) {
                 displayID();
             } else {
-                gotoNextView();
+                safeGotoNextView();
             }
         });
         serialDialog.setCloseListener(view -> {
             serialDialog.dismiss();
             is_dialog_show = false;
-            gotoNextView();
+            isDialogShowing = false;
+            safeGotoNextView();
         });
         serialDialog.setScanListener(view -> {
             is_dialog_show = false;
+            isDialogShowing = false;
             serialDialog.dismiss();
             Intent i = new Intent(SplashActivity.this, QrCodeActivity.class);
             startActivityForResult(i, REQUEST_CODE_QR_SCAN_SERIAL_NUMBER);
@@ -804,6 +886,7 @@ public class SplashActivity extends BaseActivity {
                 public void onClick(View view) {
                     serialDialog.dismiss();
                     is_dialog_show = false;
+                    isDialogShowing = false;
                     setSerialNumber();
                 }
             });
@@ -812,50 +895,57 @@ public class SplashActivity extends BaseActivity {
     }
 
     void setActivationCode() {
-        if (is_dialog_show) {
+        if (is_dialog_show || isDialogShowing) {
             return;
         }
         is_dialog_show = true;
+        isDialogShowing = true;
 
         CodeDialog codeDialog = new CodeDialog(this);
         codeDialog.setCloseListener(view -> {
             codeDialog.dismiss();
             is_dialog_show = false;
-            gotoNextView();
+            isDialogShowing = false;
+            safeGotoNextView();
         });
         codeDialog.setOkListener(view -> {
             codeDialog.dismiss();
             String activation_code = codeDialog.edt_code.getText().toString();
             isValidActivation(activation_code);
             is_dialog_show = false;
-            gotoNextView();
+            isDialogShowing = false;
+            safeGotoNextView();
         });
         codeDialog.setScanListener(view -> {
             codeDialog.dismiss();
             Intent i = new Intent(SplashActivity.this, QrCodeActivity.class);
             startActivityForResult(i, REQUEST_CODE_QR_SCAN_ACTIVATION);
             is_dialog_show = false;
+            isDialogShowing = false;
         });
         codeDialog.show();
     }
 
     void displayID() {
-        if (is_dialog_show) {
+        if (is_dialog_show || isDialogShowing) {
             return;
         }
         is_dialog_show = true;
+        isDialogShowing = true;
         String machine_code = CommonUtil.getDeviceID(this);
         MachineCodeDialog machineCodeDialog = new MachineCodeDialog(this);
         machineCodeDialog.setMachineCode(machine_code);
         machineCodeDialog.setOkListener(view -> {
             machineCodeDialog.dismiss();
             is_dialog_show = false;
+            isDialogShowing = false;
             setActivationCode();
         });
         machineCodeDialog.setCloseListener(view -> {
             machineCodeDialog.dismiss();
             is_dialog_show = false;
-            gotoNextView();
+            isDialogShowing = false;
+            safeGotoNextView();
         });
         machineCodeDialog.setOnlineListener(view -> {
             // online activation
@@ -870,6 +960,7 @@ public class SplashActivity extends BaseActivity {
                 public void onResponse(Call<String> call, Response<String> response) {
                     machineCodeDialog.dismiss();
                     is_dialog_show = false;
+                    isDialogShowing = false;
                     dlg_progress.dismiss();
                     if (response.code() == 404) { // invalid serial
                         MessageUtil.showToast(getApplicationContext(), R.string.invalid_serial);
@@ -877,13 +968,15 @@ public class SplashActivity extends BaseActivity {
                         MessageUtil.showToast(getApplicationContext(), R.string.invalid_machine_code);
                     } else if (response.code() == 405) { // method not allowed
 //                        MessageUtil.showToast(SplashActivity.this, R.string.method_not_allowed);
+                        isDialogShowing = true;
                         AlertDialog.Builder aboutDialog = new AlertDialog.Builder(SplashActivity.this)
                                 .setTitle(R.string.warning)
                                 .setMessage(R.string.license_exceed_mgs)
                                 .setPositiveButton(android.R.string.ok, null)
                                 .setCancelable(true)
                                 .setOnDismissListener(dialog -> {
-                                    gotoNextView();
+                                    isDialogShowing = false;
+                                    safeGotoNextView();
                                 });
                         aboutDialog.show();
                         return;
@@ -892,16 +985,17 @@ public class SplashActivity extends BaseActivity {
                     } else {
                         MessageUtil.showToast(getApplicationContext(), R.string.unknown_error);
                     }
-                    gotoNextView();
+                    safeGotoNextView();
                 }
 
                 @Override
                 public void onFailure(Call<String> call, Throwable t) {
                     machineCodeDialog.dismiss();
                     is_dialog_show = false;
+                    isDialogShowing = false;
                     dlg_progress.dismiss();
                     MessageUtil.showToast(getApplicationContext(), t.getLocalizedMessage());
-                    gotoNextView();
+                    safeGotoNextView();
                 }
             });
         });
@@ -911,10 +1005,11 @@ public class SplashActivity extends BaseActivity {
 
 
     void setPinCode() {
-        if (is_dialog_show) {
+        if (is_dialog_show || isDialogShowing) {
             return;
         }
         is_dialog_show = true;
+        isDialogShowing = true;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View customTitleView = inflater.inflate(R.layout.dialog_title, null);
         View rootview = findViewById(android.R.id.content);
@@ -929,10 +1024,11 @@ public class SplashActivity extends BaseActivity {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 is_dialog_show = false;
+                isDialogShowing = false;
                 String pin = input.getText().toString();
                 if (TextUtils.isEmpty(pin) || pin.length() != 4) {
                     MessageUtil.showToast(getApplicationContext(), R.string.invalid_pin);
-                    gotoNextView();
+                    safeGotoNextView();
                 } else {
                     AppPreference.setStr(AppPreference.KEY.PIN_NUMBER, pin);
                     AppPreference.setBool(AppPreference.KEY.APP_FIRST_LAUNCH, false);
@@ -946,7 +1042,8 @@ public class SplashActivity extends BaseActivity {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
                 is_dialog_show = false;
-                gotoNextView();
+                isDialogShowing = false;
+                safeGotoNextView();
             }
         });
 
@@ -968,13 +1065,13 @@ public class SplashActivity extends BaseActivity {
                 if (isValidSerial(result)) {
                     displayID();
                 } else {
-                    gotoNextView();
+                    safeGotoNextView();
                 }
             } else if (requestCode == REQUEST_CODE_QR_SCAN_ACTIVATION) {
                 String result = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
                 if (!isValidActivation(result)) {
                 }
-                gotoNextView();
+                safeGotoNextView();
             }
         }
     }
@@ -1070,7 +1167,12 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void navigateToNotificationSettings() {
+        if (isDialogShowing) {
+            Log.w(TAG, "Dialog already showing, skipping notification settings");
+            return;
+        }
         // Show instructions dialog first
+        isDialogShowing = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("🔔 Enable Notifications");
         builder.setMessage("To enable notifications:\n\n" +
@@ -1082,6 +1184,7 @@ public class SplashActivity extends BaseActivity {
 
         builder.setPositiveButton("Open Settings", (dialog, which) -> {
             dialog.dismiss();
+            isDialogShowing = false;
             // Navigate to app settings
             Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
             Uri uri = Uri.fromParts("package", getPackageName(), null);
@@ -1091,7 +1194,7 @@ public class SplashActivity extends BaseActivity {
             // Show a reminder dialog after a delay
             new Handler().postDelayed(() -> {
                 showNotificationReminderDialog();
-            }, 3000); // 3 seconds delay
+            }, 4000); // 4 seconds delay to allow settings to load
         });
 
         builder.setCancelable(false);
@@ -1118,6 +1221,11 @@ public class SplashActivity extends BaseActivity {
      * Show reminder dialog to check if user enabled notifications
      */
     private void showNotificationReminderDialog() {
+        if (isDialogShowing) {
+            Log.w(TAG, "Dialog already showing, skipping notification reminder");
+            return;
+        }
+        isDialogShowing = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("🔔 Notification Status");
         builder.setMessage("Did you enable notifications in the settings?\n\n" +
@@ -1125,6 +1233,7 @@ public class SplashActivity extends BaseActivity {
 
         builder.setPositiveButton("Continue", (dialog, which) -> {
             dialog.dismiss();
+            isDialogShowing = false;
             // Check if notification permission is now granted
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
