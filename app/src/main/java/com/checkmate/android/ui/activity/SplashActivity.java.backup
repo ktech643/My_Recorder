@@ -339,8 +339,10 @@ public class SplashActivity extends BaseActivity {
             requestDoNotDisturbPermission(activity);
         }, 300);
         
-        // Storage permissions are handled separately in continueWithActivation
-        // Removed verifyStoragePermissions to prevent infinite loop
+        new Handler().postDelayed(() -> {
+            verifyStoragePermissions(activity);
+        }, 400);
+        
         new Handler().postDelayed(() -> {
             requestModifySystemSettingsPermission(activity);
         }, 500);
