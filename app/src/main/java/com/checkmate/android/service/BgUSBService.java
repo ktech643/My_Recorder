@@ -21,6 +21,9 @@ import android.widget.Toast;
 import com.checkmate.android.AppPreference;
 import com.checkmate.android.R;
 import com.checkmate.android.model.SurfaceModel;
+import com.checkmate.android.util.InternalLogger;
+import com.checkmate.android.util.ANRSafeHelper;
+import com.checkmate.android.util.CriticalComponentsMonitor;
 import com.checkmate.android.service.SharedEGL.ServiceType;
 import com.checkmate.android.service.SharedEGL.SharedEglManager;
 import com.checkmate.android.ui.fragment.LiveFragment;
@@ -106,8 +109,11 @@ public class BgUSBService extends BaseBackgroundService {
 
     @Override
     public void onCreate() {
-        super.onCreate();
-        Log.d(TAG, "Service created");
+        try {
+            InternalLogger.i(TAG, "BgUSBService onCreate starting");
+            CriticalComponentsMonitor.executeComponentSafely("BgUSBService", () -> {
+                super.onCreate();
+                Log.d(TAG, "Service created");
         // Initialize Notification
         mServiceHandlerThread = new HandlerThread("BgUSBService");
         mServiceHandlerThread.start();
@@ -120,14 +126,24 @@ public class BgUSBService extends BaseBackgroundService {
             mLastRestartTime = AppPreference.getLong(AppPreference.KEY.LAST_RESTART_TIME, 0);
         }
 
-        // Get the singleton instance
-        mEglManager = SharedEglManager.getInstance();
+                // Get the singleton instance
+                mEglManager = SharedEglManager.getInstance();
+                InternalLogger.i(TAG, "BgUSBService onCreate completed successfully");
+            });
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in BgUSBService onCreate", e);
+            CriticalComponentsMonitor.recordComponentError("BgUSBService", "onCreate failed", e);
+        }
     }
 
 
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        startForeground(NOTIFICATION_ID,buildNotification());
+        try {
+            InternalLogger.d(TAG, "BgUSBService onStartCommand starting");
+            return CriticalComponentsMonitor.executeComponentSafely("BgUSBService", () -> {
+                super.onStartCommand(intent, flags, startId);
+                startForeground(NOTIFICATION_ID,buildNotification());
         isRunning = true;
         codec_sources = Arrays.asList(getResources().getStringArray(R.array.usb_codec));
         mRunningIntent = intent;
@@ -136,8 +152,15 @@ public class BgUSBService extends BaseBackgroundService {
             isRestartDueToEGLFailure = true;
             Log.w(TAG, "Restarting due to EGL failure");
         }
-        setStatus(BackgroundNotification.NOTIFICATION_STATUS.SERVICE_STARTED);
-        return START_STICKY;
+                setStatus(BackgroundNotification.NOTIFICATION_STATUS.SERVICE_STARTED);
+                InternalLogger.d(TAG, "BgUSBService onStartCommand completed successfully");
+                return START_STICKY;
+            }, START_NOT_STICKY);
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in BgUSBService onStartCommand", e);
+            CriticalComponentsMonitor.recordComponentError("BgUSBService", "onStartCommand failed", e);
+            return START_NOT_STICKY;
+        }
     }
 
     public void setSharedViewModel(SharedViewModel vm) {
@@ -896,8 +919,11 @@ public class BgUSBService extends BaseBackgroundService {
     }
     @Override
     public void onDestroy() {
-        // 1. Release WakeLock
-        mCameraDeviceList.clear();
+        try {
+            InternalLogger.i(TAG, "BgUSBService onDestroy starting");
+            CriticalComponentsMonitor.executeComponentSafely("BgUSBService", () -> {
+                // 1. Release WakeLock
+                mCameraDeviceList.clear();
 
         if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();
@@ -955,8 +981,13 @@ public class BgUSBService extends BaseBackgroundService {
         activeCameraDevice = null;
         isRestarting = false;
         isRestartDueToEGLFailure = false;
-        super.onDestroy();
-        stopSafe();
+                super.onDestroy();
+                stopSafe();
+                InternalLogger.i(TAG, "BgUSBService onDestroy completed successfully");
+            });
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in BgUSBService onDestroy", e);
+        }
     }
 
     void ckearSharedInctance() {
