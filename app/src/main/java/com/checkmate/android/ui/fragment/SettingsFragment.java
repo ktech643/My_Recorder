@@ -1071,6 +1071,8 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 .simple_spinner_dropdown_item);
         spinner_quality.setAdapter(qualityArrayAdapter);
         int video_quality = AppPreference.getInt(AppPreference.KEY.VIDEO_QUALITY, 0);
+        // Recording card is always visible by default
+        ly_recording_settings.setVisibility(View.VISIBLE);
         if (video_quality != AppConstant.QUALITY_CUSTOM) {
             ly_video_custom.setVisibility(View.GONE);
             txt_video_details.setText(R.string.show_details);
