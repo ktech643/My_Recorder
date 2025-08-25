@@ -80,6 +80,7 @@ import com.checkmate.android.networking.RestApiService;
 import com.checkmate.android.receiver.PowerConnectionReceiver;
 import com.checkmate.android.receiver.ScreenReceiver;
 import com.checkmate.android.receiver.WifiBroadcastReceiver;
+import com.checkmate.android.model.SurfaceModel;
 import com.checkmate.android.service.BgAudioService;
 import com.checkmate.android.service.BgCameraService;
 import com.checkmate.android.service.BgCastService;

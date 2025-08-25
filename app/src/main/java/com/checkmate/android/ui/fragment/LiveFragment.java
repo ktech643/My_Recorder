@@ -742,7 +742,7 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
             MainActivity activity = mActivityRef.get();
             // Stop camera service first
             if (activity.mCamService != null) {
-                activity.mCamService.stopSafe();
+                if (activity.mCamService != null) activity.mCamService.stopSelf();
                 activity.mCamService = null;
             }
             mListener.stopFragBgCamera();
@@ -1404,7 +1404,7 @@ public class LiveFragment extends BaseFragment { // Removed AdapterView.OnItemSe
         try {
             // Stop camera service
             if (activity.mCamService != null) {
-                activity.mCamService.stopSafe();
+                if (activity.mCamService != null) activity.mCamService.stopSelf();
                 activity.mCamService = null;
             }
             
