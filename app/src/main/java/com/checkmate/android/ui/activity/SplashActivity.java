@@ -77,34 +77,23 @@ import retrofit2.Response;
 
 import android.view.WindowManager;
 import java.util.Arrays;
+import com.checkmate.android.util.SynchronizedPermissionManager;
+import com.checkmate.android.util.PermissionTestHelper;
 
 
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends BaseActivity implements SynchronizedPermissionManager.PermissionCallback {
 
     static final String TAG = "SplashActivity";
-    private static final int PERMISSION_REQUEST_CODE_FOR_PERMISSION = 1;
     private static final int REQUEST_CODE_QR_SCAN_SERIAL_NUMBER = 101;
     private static final int REQUEST_CODE_QR_SCAN_ACTIVATION = 102;
-    private static final int CAMERA_PERMISSION_REQUEST_CODE = 105; // Define your request code
-    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 106; // Notification permission request code
-
-    private static final String[] PERMISSIONS = {
-            Manifest.permission.CAMERA,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.VIBRATE,
-            Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.ACCESS_WIFI_STATE,
-            Manifest.permission.CHANGE_WIFI_STATE,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.CHANGE_NETWORK_STATE,
-            Manifest.permission.WAKE_LOCK,
-            Manifest.permission.MODIFY_AUDIO_SETTINGS,
-            Manifest.permission.READ_MEDIA_AUDIO,
-            Manifest.permission.CAPTURE_AUDIO_OUTPUT
-    };
+    
+    // Synchronized permission manager
+    private SynchronizedPermissionManager permissionManager;
+    
+    // Thread-safe state management
+    private final Object stateLock = new Object();
+    private volatile boolean isDestroyed = false;
+    private volatile boolean permissionsCompleted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,31 +103,11 @@ public class SplashActivity extends BaseActivity {
         // Create notification channels for Android 14 compatibility
         createNotificationChannels();
 
-        // Remove notification permission request from onCreate - will be requested after activation
+        // Initialize synchronized permission manager
+        permissionManager = new SynchronizedPermissionManager(this, this);
 
-        // Prevent screen blinking when notifications appear
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-        // Additional flags to prevent blinking and ensure stable display
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
-
-        // Set window to be stable and prevent focus changes from causing blinking
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
-                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
-                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-        );
-
-        // Ensure the window is stable and doesn't get affected by system UI changes
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.blue_dark));
-        }
+        // Configure window for stability - simplified approach to prevent conflicts
+        configureWindowStability();
 
         runADBCommands();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -146,43 +115,58 @@ public class SplashActivity extends BaseActivity {
         connection_manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-
-        // Prevent screen blinking when focus changes (e.g., when notifications appear)
-        if (hasFocus) {
-            // Ensure the window stays stable
+    /**
+     * Configure window flags for stability without excessive manipulation
+     */
+    private void configureWindowStability() {
+        try {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+            
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.blue_dark));
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Error configuring window stability", e);
         }
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        // Keep the screen on even when paused to prevent blinking
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        // Minimal window management to prevent UI instability
+        if (hasFocus && !isDestroyed) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        
+        synchronized (stateLock) {
+            if (isDestroyed) {
+                return;
+            }
+        }
 
         // Ensure window stability when resuming
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
 
         if (AppPreference.getBool(AppPreference.KEY.APP_FORCE_QUIT, true)) {
             AppPreference.setBool(AppPreference.KEY.APP_FORCE_QUIT, true);
-            verifyPermissions(this);
+            
+            // Start synchronized permission flow if not already completed
+            if (!permissionsCompleted && permissionManager != null && !permissionManager.isProcessing()) {
+                permissionManager.startPermissionFlow();
+            } else if (permissionsCompleted) {
+                // Permissions already completed, proceed to next view
+                gotoNextView();
+            }
         } else {
             MessageUtil.showToast(getApplicationContext(), "CheckMate! Will be closing. Please use main icon to open.");
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
+            new Handler().postDelayed(() -> {
+                if (!isDestroyed) {
                     Intent startMain = new Intent(Intent.ACTION_MAIN);
                     startMain.addCategory(Intent.CATEGORY_HOME);
                     startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -192,6 +176,21 @@ public class SplashActivity extends BaseActivity {
                 }
             }, 2500);
         }
+    }
+    
+    @Override
+    protected void onDestroy() {
+        synchronized (stateLock) {
+            isDestroyed = true;
+        }
+        
+        // Clean up permission manager
+        if (permissionManager != null) {
+            permissionManager.cleanup();
+            permissionManager = null;
+        }
+        
+        super.onDestroy();
     }
 
     void runADBCommands(){
@@ -204,180 +203,79 @@ public class SplashActivity extends BaseActivity {
 
     ConnectivityManager connection_manager;
 
+    // DEPRECATED: Replaced by SynchronizedPermissionManager
+    // This method is kept for compatibility but should not be used
+    @Deprecated
     public void verifyPermissions(Activity activity) {
-        int permission0 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
-        int permission1 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int permission2 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
-        int permission3 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.RECORD_AUDIO);
-        int permission4 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.VIBRATE);
-        int permission5 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.MODIFY_AUDIO_SETTINGS);
-        int permission6 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_PHONE_STATE);
-        int permission7 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_WIFI_STATE);
-        int permission8 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CHANGE_WIFI_STATE);
-        int permission9 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
-        int permission10 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION);
-        int permission11 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CHANGE_NETWORK_STATE);
-        int permission12 = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WAKE_LOCK);
-
-        if (permission0 != PackageManager.PERMISSION_GRANTED
-                || permission1 != PackageManager.PERMISSION_GRANTED
-                || permission2 != PackageManager.PERMISSION_GRANTED
-                || permission3 != PackageManager.PERMISSION_GRANTED
-                || permission4 != PackageManager.PERMISSION_GRANTED
-                || permission5 != PackageManager.PERMISSION_GRANTED
-                || permission6 != PackageManager.PERMISSION_GRANTED
-                || permission7 != PackageManager.PERMISSION_GRANTED
-                || permission8 != PackageManager.PERMISSION_GRANTED
-                || permission9 != PackageManager.PERMISSION_GRANTED
-                || permission10 != PackageManager.PERMISSION_GRANTED
-                || permission11 != PackageManager.PERMISSION_GRANTED
-                || permission12 != PackageManager.PERMISSION_GRANTED
-        ) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS,
-                    PERMISSION_REQUEST_CODE_FOR_PERMISSION
-            );
-
-            requestDrawOverAppsPermission(activity);
-            requestIgnoreBatteryOptimizationsPermission(activity);
-            requestDoNotDisturbPermission(activity);
-            verifyStoragePermissions(activity);
-            requestModifySystemSettingsPermission(activity);
-            checkStoragePermissions();
-        } else {
-            gotoNextView();
+        Log.w(TAG, "verifyPermissions() is deprecated. Use SynchronizedPermissionManager instead.");
+        // Redirect to synchronized permission flow
+        if (permissionManager != null && !permissionManager.isProcessing()) {
+            permissionManager.startPermissionFlow();
         }
     }
 
+    // DEPRECATED: Storage permissions now handled by SynchronizedPermissionManager
+    @Deprecated
     public void verifyStoragePermissions(Activity activity) {
-        List<String> requiredPermissions = new ArrayList<>();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requiredPermissions.add(Manifest.permission.READ_MEDIA_IMAGES);
-            requiredPermissions.add(Manifest.permission.READ_MEDIA_VIDEO);
-            requiredPermissions.add(Manifest.permission.READ_MEDIA_AUDIO);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            requiredPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-        } else {
-            requiredPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            requiredPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-        }
-
-        List<String> missingPermissions = new ArrayList<>();
-        for (String permission : requiredPermissions) {
-            if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-                missingPermissions.add(permission);
-            }
-        }
-
-        if (!missingPermissions.isEmpty()) {
-            ActivityCompat.requestPermissions(activity,
-                    missingPermissions.toArray(new String[0]),
-                    REQUEST_STORAGE_PERMISSION);
-        } else {
-            Log.d("Storage", "All permissions granted!");
-        }
+        Log.w(TAG, "verifyStoragePermissions() is deprecated. Storage permissions are handled by SynchronizedPermissionManager.");
     }
 
-
-    private static final int REQUEST_STORAGE_PERMISSION = 1001;
-
+    // DEPRECATED: Storage permissions now handled by SynchronizedPermissionManager
+    @Deprecated
     private void checkStoragePermissions() {
-        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
-        }
+        Log.w(TAG, "checkStoragePermissions() is deprecated. Storage permissions are handled by SynchronizedPermissionManager.");
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        
+        synchronized (stateLock) {
+            if (isDestroyed) {
+                return;
+            }
+        }
 
-        // Handle storage permissions using StoragePermissionHelper
+        // Delegate to synchronized permission manager
+        if (permissionManager != null) {
+            permissionManager.handlePermissionResult(requestCode, permissions, grantResults);
+        }
+
+        // Handle storage permissions using StoragePermissionHelper for backward compatibility
         StoragePermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
 
         // Handle storage helper permissions
         if (storageHelper != null) {
             storageHelper.handlePermissionResult(requestCode, permissions, grantResults);
         }
-
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("Camera", "Permission granted!");
-            } else {
-                Log.d("Camera", "Permission denied!");
-            }
-        }
-
-        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("Notification", "Notification permission granted!");
-                Toast.makeText(this, "Notifications enabled successfully!", Toast.LENGTH_SHORT).show();
-                openMainScreen();
-            } else {
-                Log.d("Notification", "Notification permission denied!");
-                // Show dialog to guide user to settings
-                navigateToNotificationSettings();
-            }
-        }
     }
 
+    // DEPRECATED: Special permissions now handled by SynchronizedPermissionManager
+    @Deprecated
     public void requestDoNotDisturbPermission(Context context) {
-        NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (!notificationManager.isNotificationPolicyAccessGranted()) {
-            Intent intent = new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        }
+        Log.w(TAG, "requestDoNotDisturbPermission() is deprecated. Special permissions are handled by SynchronizedPermissionManager.");
     }
 
+    @Deprecated
     public void requestIgnoreBatteryOptimizationsPermission(Context context) {
-        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-
-        if (!powerManager.isIgnoringBatteryOptimizations(context.getPackageName())) {
-            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-            intent.setData(Uri.parse("package:" + context.getPackageName()));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        }
+        Log.w(TAG, "requestIgnoreBatteryOptimizationsPermission() is deprecated. Special permissions are handled by SynchronizedPermissionManager.");
     }
 
+    @Deprecated
     public void requestDrawOverAppsPermission(Context context) {
-        if (!Settings.canDrawOverlays(context)) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-            intent.setData(Uri.parse("package:" + context.getPackageName()));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        }
+        Log.w(TAG, "requestDrawOverAppsPermission() is deprecated. Special permissions are handled by SynchronizedPermissionManager.");
     }
 
+    @Deprecated
     public void requestModifySystemSettingsPermission(Context context) {
-        if (!Settings.System.canWrite(context)) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-            intent.setData(Uri.parse("package:" + context.getPackageName()));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        }
+        Log.w(TAG, "requestModifySystemSettingsPermission() is deprecated. Special permissions are handled by SynchronizedPermissionManager.");
     }
 
-    private boolean notificationAsked = false;
-
+    // DEPRECATED: Notification handling now done by SynchronizedPermissionManager
+    @Deprecated
     private void maybeAskNotificationThenMain() {
-        if (notificationAsked) {
-            openMainScreen();
-            return;
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                        != PackageManager.PERMISSION_GRANTED) {
-            notificationAsked = true;
-            navigateToNotificationSettings(); // this calls openMainScreen() on skip/continue
-        } else {
-            openMainScreen();
-        }
+        Log.w(TAG, "maybeAskNotificationThenMain() is deprecated. Notifications are handled by SynchronizedPermissionManager.");
+        openMainScreen();
     }
 
     boolean is_dialog_show = false;
@@ -440,11 +338,11 @@ public class SplashActivity extends BaseActivity {
             com_dialog.setOkListener(view -> {
                 is_dialog_show = false;
                 com_dialog.dismiss();
-                maybeAskNotificationThenMain();
+                openMainScreen();
             });
             com_dialog.show();
         } else {
-            maybeAskNotificationThenMain();
+            openMainScreen();
         }
     }
 
@@ -971,86 +869,65 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
+    // DEPRECATED: Notification settings handling now done by SynchronizedPermissionManager
+    @Deprecated
     private void navigateToNotificationSettings() {
-        // Show instructions dialog first
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("🔔 Enable Notifications");
-        builder.setMessage("To enable notifications:\n\n" +
-                "1. Tap 'Open Settings' below\n" +
-                "2. Find 'Notifications' in the app settings\n" +
-                "3. Turn ON 'Allow notifications'\n" +
-                "4. Return to CheckMate! when done\n\n" +
-                "This ensures you receive important alerts about your recordings.");
-
-        builder.setPositiveButton("Open Settings", (dialog, which) -> {
-            dialog.dismiss();
-            // Navigate to app settings
-            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intent.setData(uri);
-            startActivity(intent);
-
-            // Show a reminder dialog after a delay
-            new Handler().postDelayed(() -> {
-                showNotificationReminderDialog();
-            }, 3000); // 3 seconds delay
-        });
-
-        builder.setCancelable(false);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        // Make buttons more visible
-        try {
-            Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-
-            if (positiveButton != null) {
-                positiveButton.setTextColor(Color.BLACK);
-            }
-            if (negativeButton != null) {
-                negativeButton.setTextColor(Color.BLACK);
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Could not set button colors", e);
-        }
+        Log.w(TAG, "navigateToNotificationSettings() is deprecated. Notifications are handled by SynchronizedPermissionManager.");
+        openMainScreen();
     }
 
-    /**
-     * Show reminder dialog to check if user enabled notifications
-     */
+    @Deprecated
     private void showNotificationReminderDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("🔔 Notification Status");
-        builder.setMessage("Did you enable notifications in the settings?\n\n" +
-                "If yes, tap 'Continue'. If not, you can enable them later from the app settings.");
-
-        builder.setPositiveButton("Continue", (dialog, which) -> {
-            dialog.dismiss();
-            // Check if notification permission is now granted
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Notifications enabled successfully!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "You can enable notifications later from app settings", Toast.LENGTH_LONG).show();
-                }
+        Log.w(TAG, "showNotificationReminderDialog() is deprecated. Notifications are handled by SynchronizedPermissionManager.");
+        openMainScreen();
+    }
+    
+    // SynchronizedPermissionManager.PermissionCallback implementation
+    @Override
+    public void onAllPermissionsGranted() {
+        Log.d(TAG, "All permissions granted by SynchronizedPermissionManager");
+        
+        // Test and validate all permissions
+        PermissionTestHelper.testAllPermissions(this);
+        String summary = PermissionTestHelper.getPermissionSummary(this);
+        Log.i(TAG, "Permission Summary: " + summary);
+        
+        synchronized (stateLock) {
+            if (isDestroyed) {
+                return;
             }
-            openMainScreen();
-        });
-
-        builder.setCancelable(false);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        // Make button more visible
-        try {
-            Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            if (positiveButton != null) {
-                positiveButton.setTextColor(Color.BLACK);
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Could not set button colors", e);
+            permissionsCompleted = true;
         }
+        
+        // Continue with app flow
+        runOnUiThread(() -> {
+            if (!isDestroyed) {
+                gotoNextView();
+            }
+        });
+    }
+    
+    @Override
+    public void onPermissionDenied(String permission) {
+        Log.w(TAG, "Permission denied: " + permission);
+        
+        // Show user-friendly message about denied permission
+        runOnUiThread(() -> {
+            if (!isDestroyed) {
+                Toast.makeText(this, "Some permissions were denied. The app may not function properly.", Toast.LENGTH_LONG).show();
+                
+                // Continue with app flow anyway
+                synchronized (stateLock) {
+                    permissionsCompleted = true;
+                }
+                gotoNextView();
+            }
+        });
+    }
+    
+    @Override
+    public void onPermissionFlow() {
+        Log.d(TAG, "Permission flow callback triggered");
+        // This can be used for additional permission flow handling if needed
     }
 }

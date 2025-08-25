@@ -16,12 +16,14 @@ import com.checkmate.android.BuildConfig;
 import com.checkmate.android.R;
 import com.checkmate.android.ui.dialog.MyProgressDialog;
 import com.checkmate.android.ui.fragment.LiveFragment;
+import com.checkmate.android.util.DialogManager;
 import com.shasin.notificationbanner.Banner;
 
 public class BaseActivity extends FragmentActivity {
 
     // UI
     public MyProgressDialog dlg_progress;
+    protected DialogManager dialogManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,7 @@ public class BaseActivity extends FragmentActivity {
         }
 
         dlg_progress = new MyProgressDialog(this);
+        dialogManager = new DialogManager(this);
     }
 
 
@@ -74,10 +77,22 @@ public class BaseActivity extends FragmentActivity {
 
     @Override
     protected void onDestroy() {
-        // TODO Auto-generated method stub
+        // Clean up dialogs to prevent window leaks
+        if (dialogManager != null) {
+            dialogManager.cleanup();
+            dialogManager = null;
+        }
+        
+        if (dlg_progress != null) {
+            try {
+                dlg_progress.dismiss();
+            } catch (Exception e) {
+                // Ignore - activity may already be destroyed
+            }
+            dlg_progress = null;
+        }
+        
         super.onDestroy();
-        if (dlg_progress != null)
-            dlg_progress.dismiss();
     }
 
     @Override
