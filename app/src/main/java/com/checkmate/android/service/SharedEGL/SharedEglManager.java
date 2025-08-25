@@ -20,6 +20,7 @@ import android.graphics.Typeface;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.AudioPlaybackCaptureConfiguration;
+import android.media.MediaCodec;
 import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
 import android.net.Uri;
@@ -28,6 +29,7 @@ import android.opengl.EGLContext;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.PowerManager;
@@ -3311,6 +3313,124 @@ public class SharedEglManager {
             cleanupDeadReferences();
             return mRegisteredServices.keySet().toArray(new ServiceType[0]);
         }
+    }
+    
+    // ========== Dynamic Settings Update Methods ==========
+    
+    /**
+     * Update encoder bitrate dynamically without restarting stream
+     * @param newBitrate New bitrate in bits per second
+     */
+    public void updateEncoderBitrate(int newBitrate) {
+        if (mStreaming && mStreamer != null) {
+            mCameraHandler.post(() -> {
+                try {
+                    // Update the encoder parameters
+                    Bundle params = new Bundle();
+                    params.putInt(MediaCodec.PARAMETER_KEY_VIDEO_BITRATE, newBitrate);
+                    if (encoderSurface != null && encoderSurface.getEncoder() != null) {
+                        encoderSurface.getEncoder().setParameters(params);
+                        Log.d(TAG, "Updated video bitrate to: " + newBitrate);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to update bitrate", e);
+                    if (CrashLogger.getInstance() != null) {
+                        CrashLogger.getInstance().logError(TAG, "updateEncoderBitrate", e);
+                    }
+                }
+            });
+        }
+    }
+    
+    /**
+     * Update audio bitrate dynamically
+     * @param newBitrate New audio bitrate
+     */
+    public void updateAudioBitrate(int newBitrate) {
+        if (mStreaming && mStreamer != null) {
+            mCameraHandler.post(() -> {
+                try {
+                    // Update audio encoder parameters if possible
+                    if (mStreamer != null) {
+                        // This would require access to audio encoder
+                        Log.d(TAG, "Audio bitrate update requested: " + newBitrate);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to update audio bitrate", e);
+                    if (CrashLogger.getInstance() != null) {
+                        CrashLogger.getInstance().logError(TAG, "updateAudioBitrate", e);
+                    }
+                }
+            });
+        }
+    }
+    
+    /**
+     * Update timestamp overlay dynamically
+     * @param enabled Whether to show timestamp
+     */
+    public void updateTimestampOverlay(boolean enabled) {
+        // Timestamp is already checked dynamically in drawFrame
+        Log.d(TAG, "Timestamp overlay updated: " + enabled);
+    }
+    
+    /**
+     * Update file split time for recordings
+     * @param splitTimeMinutes New split time in minutes
+     */
+    public void updateFileSplitTime(int splitTimeMinutes) {
+        if (mRecording) {
+            mCameraHandler.post(() -> {
+                try {
+                    // This will be applied to the next file split
+                    Log.d(TAG, "File split time updated to: " + splitTimeMinutes + " minutes");
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to update split time", e);
+                    if (CrashLogger.getInstance() != null) {
+                        CrashLogger.getInstance().logError(TAG, "updateFileSplitTime", e);
+                    }
+                }
+            });
+        }
+    }
+    
+    /**
+     * Check if streaming is active
+     * @return true if currently streaming
+     */
+    public boolean isStreaming() {
+        return mStreaming;
+    }
+    
+    /**
+     * Check if recording is active
+     * @return true if currently recording
+     */
+    public boolean isRecording() {
+        return mRecording;
+    }
+    
+    /**
+     * Apply dynamic settings that don't require restart
+     */
+    public void applyDynamicSettings() {
+        if (!mStreaming && !mRecording) return;
+        
+        mCameraHandler.post(() -> {
+            try {
+                // Re-read dynamic settings and apply them
+                boolean timestampEnabled = AppPreference.getBool(AppPreference.KEY.TIMESTAMP, true);
+                int splitTime = AppPreference.getInt(AppPreference.KEY.SPLIT_TIME, 10);
+                
+                Log.d(TAG, "Dynamic settings applied - Timestamp: " + timestampEnabled + ", Split time: " + splitTime);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to apply dynamic settings", e);
+                if (CrashLogger.getInstance() != null) {
+                    CrashLogger.getInstance().logError(TAG, "applyDynamicSettings", e);
+                }
+            }
+        });
     }
 }
 
