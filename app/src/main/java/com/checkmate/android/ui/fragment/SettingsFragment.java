@@ -2292,6 +2292,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
     void onAddWifiCamera(int camera_type) {
         mListener.isDialog(true);
         if (!isAdded() || getActivity() == null) {
+            mListener.isDialog(false);
             return;
         }
         getActivity().setTheme(R.style.ActionSheetStyleiOS7);
@@ -2308,6 +2309,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
 
                     @Override
                     public void onOtherButtonClick(ActionSheet actionSheet, int index) {
+                        mListener.isDialog(false);
                         switch (index) {
                             case 0:
                                 scanWifiQR(camera_type);
@@ -2364,7 +2366,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 exitApp();
                 break;
             case R.id.txt_wifi_camera:
-//                onAddWifiCamera();
+                onAddWifiCamera(0); // Default camera type
                 break;
             case R.id.txt_beta_update:
                 mListener.fragUpdateApp(AppConstant.BETA_UPDATE);
@@ -2411,10 +2413,10 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
                 mListener.isDialog(true);
                 TranscodeDialog dlg = new TranscodeDialog(requireContext());
                 dlg.setResultLisetner(is_changed -> {
+                    mListener.isDialog(false);
                     if (is_changed) {
                         mListener.fragCameraRestart(true);
                         mListener.stopFragWifiService();
-
                     }
                 });
                 dlg.show();
