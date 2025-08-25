@@ -118,9 +118,6 @@ public final class BgCastService extends BaseBackgroundService {
                 CriticalComponentsMonitor.recordComponentError("BgCastService", "onCreate failed", e);
                 
             }
-        }, () -> {
-            InternalLogger.e(TAG, "Failed to create BgCastService");
-            
         });
     }
 
@@ -162,7 +159,7 @@ public final class BgCastService extends BaseBackgroundService {
                 // Stop additional resources safely
                 ANRSafeHelper.getInstance().executeWithANRProtection(() -> {
                     stopSafe();
-                    
+                    return true;
                 }, false);
                 
                 InternalLogger.i(TAG, "BgCastService onDestroy completed successfully");
@@ -173,9 +170,6 @@ public final class BgCastService extends BaseBackgroundService {
                 CriticalComponentsMonitor.recordComponentError("BgCastService", "onDestroy failed", e);
                 
             }
-        }, () -> {
-            InternalLogger.e(TAG, "Failed to destroy BgCastService properly");
-            
         });
     }
 

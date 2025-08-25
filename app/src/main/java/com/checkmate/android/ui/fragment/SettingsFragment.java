@@ -355,7 +355,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             try {
                 super.onAttach(context);
                 instance = new WeakReference<>(this);
-                mActivity = ANRSafeHelper.nullSafe(MainActivity.getInstance(), null, "MainActivity.getInstance");
+                mActivity = ANRSafeHelper.nullSafe(MainActivity.getInstance(), null);
                 
                 if (ANRSafeHelper.isNullWithLog(context, "context")) {
                     InternalLogger.e("SettingsFragment", "Context is null in onAttach");
@@ -374,8 +374,6 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             } catch (Exception e) {
                 InternalLogger.e("SettingsFragment", "Error in onAttach", e);
             }
-        }, () -> {
-            InternalLogger.e("SettingsFragment", "Failed to attach SettingsFragment");
         });
     }
 
@@ -1001,7 +999,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         spinner_resolution.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
+            return true;
         });
 
         List<String> spinnerArrayStreaming = Arrays.asList(camera_sizes);
@@ -1046,7 +1046,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         streaming_resolution.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
+            return true;
         });
         streaming_resolution.setSelection(AppPreference.getInt(AppPreference.KEY.STREAMING_RESOLUTION, default_size_index));
         if (getActivity() == null) {
@@ -1078,7 +1080,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         spinner_cast_resolution.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
+            return true;
         });
         spinner_cast_resolution.setSelection(cast_resolution);
 
@@ -1144,7 +1148,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         spinner_quality.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
+            return true;
         });
 
         List<String> qualityStreaming = Arrays.asList(getResources().getStringArray(R.array.video_quality));
@@ -1214,7 +1220,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         streaming_quality.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
+            return true;
         });
         streaming_quality.setSelection(streaming_position);
 
@@ -1245,7 +1253,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         spinner_adaptive.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
+            return true;
         });
         spinner_adaptive.setSelection(adaptive_mode);
 
@@ -1276,7 +1286,9 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         spinner_frame.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
+            return true;
         });
 
         List<String> ranges = new ArrayList<>();
@@ -1331,6 +1343,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         streaming_frame.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1360,6 +1373,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         streaming_audio_bitrate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1384,6 +1398,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         usb_audio_bitrate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1414,6 +1429,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         spinner_audio_src.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1439,6 +1455,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         usb_audio_src.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1469,6 +1486,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         usb_channel_count.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1494,6 +1512,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         bluetooth_audio_src.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1520,6 +1539,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         usb_bluetooth_src.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1550,6 +1570,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         spinner_sample_rate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
         usb_sample_rate.setAdapter(sample_adapter);
@@ -1574,6 +1595,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         usb_sample_rate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1715,11 +1737,13 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         spinner_usb_codec.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
         spinner_usb_resolution.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1826,6 +1850,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_src.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1856,6 +1881,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_pref_mic.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1885,6 +1911,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_option_bitrate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1915,6 +1942,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_option_sample_rate.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -1945,6 +1973,7 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
         audio_option_channel_count.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.isDialog(true);
+            return true;
             }
         });
 
@@ -2228,8 +2257,6 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             } catch (Exception e) {
                 InternalLogger.e("SettingsFragment", "Error in onResume", e);
             }
-        }, () -> {
-            InternalLogger.e("SettingsFragment", "Failed to resume SettingsFragment");
         });
     }
 
@@ -2262,8 +2289,6 @@ public class SettingsFragment extends BaseFragment implements OnStoragePathChang
             } catch (Exception e) {
                 InternalLogger.e("SettingsFragment", "Error in onDestroy", e);
             }
-        }, () -> {
-            InternalLogger.e("SettingsFragment", "Failed to destroy SettingsFragment properly");
         });
     }
 
