@@ -88,6 +88,9 @@ import com.checkmate.android.service.BgWifiService;
 import com.checkmate.android.service.LocationManagerService;
 import com.checkmate.android.service.MyAccessibilityService;
 import com.checkmate.android.service.PlayService;
+import com.checkmate.android.service.StreamTransitionManager;
+import com.checkmate.android.service.SharedEGL.SharedEglManager;
+import com.checkmate.android.service.SharedEGL.ServiceType;
 import com.checkmate.android.ui.activity.BaseActivity;
 import com.checkmate.android.ui.activity.ChessActivity;
 import com.checkmate.android.ui.activity.SplashActivity;
@@ -623,6 +626,83 @@ public class MainActivity extends BaseActivity
         OpenLog();             // create log dir & native writer
         initNetworkTimer();    // periodic UI updates
     } // end init()
+
+    /**
+     * Initialize EGL early for optimized performance and seamless transitions
+     * This method sets up the StreamTransitionManager and SharedEglManager
+     * for instant service switching without delays
+     */
+    private void initializeEarlyEGL() {
+        Log.d(TAG, "Initializing early EGL for optimized streaming transitions");
+        
+        try {
+            // Initialize StreamTransitionManager for seamless service transitions
+            StreamTransitionManager transitionManager = StreamTransitionManager.getInstance();
+            transitionManager.initializeEarly(this);
+            
+            // Set transition callback to handle events
+            transitionManager.setTransitionCallback(new StreamTransitionManager.TransitionCallback() {
+                @Override
+                public void onTransitionStarted(ServiceType fromService, ServiceType toService) {
+                    runOnUiThread(() -> {
+                        Log.d(TAG, "Service transition started: " + fromService + " -> " + toService);
+                        // Optional: Show transition indicator in UI
+                    });
+                }
+                
+                @Override
+                public void onTransitionCompleted(ServiceType newService) {
+                    runOnUiThread(() -> {
+                        Log.d(TAG, "Service transition completed: " + newService);
+                        // Optional: Update UI to reflect new service
+                    });
+                }
+                
+                @Override
+                public void onTransitionFailed(ServiceType targetService, String error) {
+                    runOnUiThread(() -> {
+                        Log.e(TAG, "Service transition failed for " + targetService + ": " + error);
+                        // Optional: Show error message to user
+                    });
+                }
+                
+                @Override
+                public void onBlankFrameRendered(long timestamp) {
+                    // Called for each blank frame during transition
+                    // Used for performance monitoring
+                }
+            });
+            
+            // Also initialize SharedEglManager early
+            SharedEglManager eglManager = SharedEglManager.getInstance();
+            eglManager.initializeEarlyEGL(this);
+            
+            // Set EGL ready callback
+            eglManager.setEglReadyCallback(new SharedEglManager.EglReadyCallback() {
+                @Override
+                public void onEglReady() {
+                    runOnUiThread(() -> {
+                        Log.d(TAG, "EGL initialization completed - ready for seamless streaming");
+                        // EGL is now ready for instant service switching
+                    });
+                }
+                
+                @Override
+                public void onEglError(String error) {
+                    runOnUiThread(() -> {
+                        Log.e(TAG, "EGL initialization failed: " + error);
+                        // Handle initialization failure
+                    });
+                }
+            });
+            
+            Log.d(TAG, "Early EGL initialization setup completed");
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize early EGL", e);
+        }
+    }
+
     /* ─────────────────────────────────────────────────────────────────────────
      *  Graceful tear-down helpers
      * ──────────────────────────────────────────────────────────────────────── */
@@ -1984,6 +2064,14 @@ public class MainActivity extends BaseActivity
     protected void onDestroy() {
 
         // stopHTTPServer();   // still optional – uncomment if you use HTTP server
+
+        // Release StreamTransitionManager resources
+        try {
+            StreamTransitionManager.getInstance().release();
+            Log.d(TAG, "StreamTransitionManager resources released");
+        } catch (Exception e) {
+            Log.e(TAG, "Error releasing StreamTransitionManager", e);
+        }
 
         unregisterReceiverSafe(usbReceiver);
         unregisterReceiverSafe(myReceiver);

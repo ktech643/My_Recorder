@@ -347,4 +347,185 @@ public abstract class BaseBackgroundService extends Service {
             );
         }
     }
+
+    /**
+     * Seamlessly switch to this service using StreamTransitionManager
+     * This provides optimal performance with blank frame handling during transitions
+     */
+    public void activateServiceSeamlessly(SurfaceTexture surface, int width, int height) {
+        ServiceType currentActive = null;
+        if (mEglManager != null) {
+            // Try to get current active service for smooth transition
+            try {
+                currentActive = mEglManager.getCurrentActiveService();
+            } catch (Exception e) {
+                // If no current service, proceed with direct activation
+            }
+        }
+        
+        // Use StreamTransitionManager for seamless transition
+        StreamTransitionManager transitionManager = StreamTransitionManager.getInstance();
+        transitionManager.switchService(
+            currentActive,
+            getServiceType(),
+            surface,
+            width,
+            height
+        );
+    }
+
+    /**
+     * Update surface configuration dynamically without stopping streams
+     */
+    public void updateSurfaceConfiguration(int width, int height) {
+        mSurfaceWidth = width;
+        mSurfaceHeight = height;
+        
+        if (mPreviewTexture != null) {
+            mPreviewTexture.setDefaultBufferSize(width, height);
+        }
+        
+        // Update SharedEglManager with new surface dimensions
+        if (mEglManager != null) {
+            mEglManager.updateActiveSurface(mPreviewTexture, width, height);
+        }
+    }
+
+    /**
+     * Update configuration dynamically using StreamTransitionManager
+     */
+    public void updateDynamicConfiguration(String configKey, Object configValue) {
+        StreamTransitionManager transitionManager = StreamTransitionManager.getInstance();
+        transitionManager.updateConfiguration(configKey, configValue);
+    }
+
+    /**
+     * Prepare surface for optimal performance
+     */
+    protected void prepareSurfaceForOptimalPerformance() {
+        if (mPreviewTexture == null) {
+            Log.w("BaseBackgroundService", "Cannot prepare surface - preview texture is null");
+            return;
+        }
+        
+        try {
+            // Set optimal buffer size
+            mPreviewTexture.setDefaultBufferSize(mSurfaceWidth, mSurfaceHeight);
+            
+            // Create surface if needed
+            if (mPreviewSurface == null) {
+                mPreviewSurface = new Surface(mPreviewTexture);
+            }
+            
+            // Set frame available listener for performance monitoring
+            if (mFrameAvailableListener == null) {
+                mFrameAvailableListener = new SurfaceTexture.OnFrameAvailableListener() {
+                    @Override
+                    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+                        // Notify SharedEglManager that a new frame is available
+                        if (mEglManager != null) {
+                            mEglManager.requestRender();
+                        }
+                    }
+                };
+                mPreviewTexture.setOnFrameAvailableListener(mFrameAvailableListener);
+            }
+            
+            Log.d("BaseBackgroundService", "Surface prepared for optimal performance: " + 
+                  mSurfaceWidth + "x" + mSurfaceHeight);
+            
+        } catch (Exception e) {
+            Log.e("BaseBackgroundService", "Failed to prepare surface for optimal performance", e);
+        }
+    }
+
+    /**
+     * Check if this service can handle seamless transitions
+     */
+    public boolean supportsSeamlessTransitions() {
+        return mEglManager != null && mEglManager.isInitialized();
+    }
+
+    /**
+     * Get optimal surface dimensions based on service type
+     */
+    protected void calculateOptimalSurfaceDimensions() {
+        // Default implementation - services can override for specific needs
+        ServiceType serviceType = getServiceType();
+        
+        switch (serviceType) {
+            case BgCamera:
+            case BgUSBCamera:
+                // For cameras, use high resolution by default
+                mSurfaceWidth = 1920;
+                mSurfaceHeight = 1080;
+                break;
+                
+            case BgScreenCast:
+                // For screen casting, match device resolution
+                // This would typically get actual screen dimensions
+                mSurfaceWidth = 1280;
+                mSurfaceHeight = 720;
+                break;
+                
+            case BgAudio:
+                // Audio service doesn't need video surface
+                mSurfaceWidth = 640;
+                mSurfaceHeight = 480;
+                break;
+                
+            default:
+                // Default HD resolution
+                mSurfaceWidth = 1280;
+                mSurfaceHeight = 720;
+                break;
+        }
+        
+        Log.d("BaseBackgroundService", "Calculated optimal surface dimensions for " + 
+              serviceType + ": " + mSurfaceWidth + "x" + mSurfaceHeight);
+    }
+
+    /**
+     * Initialize surface with optimal settings
+     */
+    protected void initializeOptimalSurface() {
+        calculateOptimalSurfaceDimensions();
+        prepareSurfaceForOptimalPerformance();
+        
+        // Ensure SharedEglManager has streamers ready
+        if (mEglManager != null) {
+            mEglManager.ensureStreamersCreated();
+        }
+    }
+
+    /**
+     * Clean up surface resources properly
+     */
+    protected void cleanupSurfaceResources() {
+        try {
+            if (mPreviewTexture != null) {
+                mPreviewTexture.setOnFrameAvailableListener(null);
+                mPreviewTexture.release();
+                mPreviewTexture = null;
+            }
+            
+            if (mPreviewSurface != null) {
+                mPreviewSurface.release();
+                mPreviewSurface = null;
+            }
+            
+            mFrameAvailableListener = null;
+            
+            Log.d("BaseBackgroundService", "Surface resources cleaned up for service: " + getServiceType());
+            
+        } catch (Exception e) {
+            Log.e("BaseBackgroundService", "Error cleaning up surface resources", e);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        cleanupSurfaceResources();
+        super.onDestroy();
+    }
 }

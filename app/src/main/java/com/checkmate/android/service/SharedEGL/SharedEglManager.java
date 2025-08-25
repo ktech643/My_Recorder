@@ -345,7 +345,13 @@ public class SharedEglManager {
         void onEglReady();
     }
 
+    public interface EglReadyCallback {
+        void onEglReady();
+        void onEglError(String error);
+    }
+
     private Listener listener;
+    private EglReadyCallback eglReadyCallback;
 
     public void setListener(Listener listener) {
         this.listener = listener;
@@ -626,6 +632,135 @@ public class SharedEglManager {
         }
 
         mCameraHandler.postDelayed(this::internalInit, 500);
+    }
+
+    /**
+     * Initialize EGL early without a specific service for optimal performance
+     * This should be called from MainActivity.onCreate() for seamless transitions
+     */
+    public void initializeEarlyEGL(Context ctx) {
+        synchronized (SharedEglManager.class) {
+            if (mIsInitialized && !mIsShuttingDown) {
+                Log.d(TAG, "SharedEglManager already initialized for early EGL");
+                if (eglReadyCallback != null) {
+                    eglReadyCallback.onEglReady();
+                }
+                return;
+            }
+            
+            if (mIsShuttingDown) {
+                Log.w(TAG, "SharedEglManager is shutting down, cannot initialize early EGL");
+                if (eglReadyCallback != null) {
+                    eglReadyCallback.onEglError("Manager is shutting down");
+                }
+                return;
+            }
+            
+            context = ctx;
+            mIsShuttingDown = false;
+        }
+
+        Log.d(TAG, "Starting early EGL initialization for seamless service transitions");
+        
+        // Initialize basic components needed for EGL
+        mCameraHandler.post(() -> {
+            try {
+                initRequiredValues();
+                // Initialize EGL without streamer/recorder for early setup
+                initializeEarlyEGLCore();
+                
+                synchronized (SharedEglManager.class) {
+                    mIsInitialized = true;
+                    mInitLatch.countDown();
+                }
+                
+                Log.d(TAG, "Early EGL initialization completed successfully");
+                
+                if (eglReadyCallback != null) {
+                    eglReadyCallback.onEglReady();
+                }
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Early EGL initialization failed", e);
+                
+                synchronized (SharedEglManager.class) {
+                    mIsInitialized = false;
+                    mInitLatch.countDown();
+                }
+                
+                if (eglReadyCallback != null) {
+                    eglReadyCallback.onEglError(e.getMessage());
+                }
+            }
+        });
+    }
+
+    /**
+     * Initialize EGL core components for early setup
+     */
+    private void initializeEarlyEGLCore() {
+        try {
+            Log.d(TAG, "Initializing early EGL core components");
+            
+            // Set default video size for early initialization
+            videoSize = new Streamer.Size(1280, 720);
+            recordSize = new Streamer.Size(1280, 720);
+            mScreenWidth = videoSize.width;
+            mScreenHeight = videoSize.height;
+            
+            // Initialize EGL with shared context
+            sharedContext = EGL14.eglGetCurrentContext();
+            
+            float scaleFactor = Math.max(1.0f, mScreenHeight / BASE_HEIGHT);
+            textSize = TEXT_SIZE_DP * scaleFactor;
+            overlayPadding = (int) (PADDING_DP * scaleFactor);
+
+            try {
+                Log.d(TAG, "Creating early EGL core with FLAG_RECORDABLE...");
+                eglCore = new EglCoreNew(sharedContext, EglCoreNew.FLAG_RECORDABLE);
+                Log.d(TAG, "Early EGL core created successfully with FLAG_RECORDABLE");
+            } catch (RuntimeException e) {
+                Log.w(TAG, "FLAG_RECORDABLE not supported — retrying without it", e);
+                eglCore = new EglCoreNew(sharedContext, 0);
+                Log.d(TAG, "Early EGL core created successfully without FLAG_RECORDABLE");
+            }
+
+            try {
+                Log.d(TAG, "Creating temporary surface for texture program setup...");
+                WindowSurfaceNew tempSurface = new WindowSurfaceNew(eglCore, new SurfaceTexture(0));
+                tempSurface.makeCurrent();
+
+                fullFrameBlit = new FullFrameRectLetterboxNew(
+                        new Texture2dProgramNew(Texture2dProgramNew.ProgramType.TEXTURE_EXT));
+                Log.d(TAG, "TEXTURE_EXT program created successfully");
+
+                tempSurface.release();
+            } catch (RuntimeException e) {
+                Log.e(TAG, "TEXTURE_EXT failed, trying TEXTURE_2D", e);
+                fullFrameBlit = new FullFrameRectLetterboxNew(
+                        new Texture2dProgramNew(Texture2dProgramNew.ProgramType.TEXTURE_2D));
+                Log.d(TAG, "TEXTURE_2D program created successfully");
+            }
+            
+            textureId = fullFrameBlit.createTextureObject();
+            cameraTexture = new SurfaceTexture(textureId);
+            cameraTexture.setDefaultBufferSize(mScreenWidth, mScreenHeight);
+            Log.d(TAG, "Camera texture created with ID: " + textureId);
+            
+            eglIsReady = true;
+            Log.d(TAG, "Early EGL core is now ready");
+            
+            initializeOverlay();
+            updateDisplayOrientation();
+            precalculateTransforms();
+            oesTextureId = initOESTexture();
+            
+            Log.d(TAG, "Early EGL initialization completed successfully");
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize early EGL core", e);
+            throw e;
+        }
     }
 
     private void internalInit() {
@@ -3226,6 +3361,270 @@ public class SharedEglManager {
             cleanupDeadReferences();
             return mRegisteredServices.keySet().toArray(new ServiceType[0]);
         }
+    }
+
+    /**
+     * Set callback for early EGL initialization status
+     * @param callback The callback to receive initialization events
+     */
+    public void setEglReadyCallback(EglReadyCallback callback) {
+        this.eglReadyCallback = callback;
+        
+        // If already initialized, notify immediately
+        if (mIsInitialized && eglIsReady && callback != null) {
+            callback.onEglReady();
+        }
+    }
+
+    /**
+     * Update configuration dynamically without stopping streams/recordings
+     * @param configKey The configuration key to update
+     * @param configValue The new configuration value
+     */
+    public void updateDynamicConfiguration(String configKey, Object configValue) {
+        if (!mIsInitialized) {
+            Log.w(TAG, "Cannot update configuration - EGL not initialized");
+            return;
+        }
+
+        Log.d(TAG, "Updating dynamic configuration: " + configKey + " = " + configValue);
+        
+        mCameraHandler.post(() -> {
+            try {
+                switch (configKey) {
+                    case "resolution":
+                        updateResolution((String) configValue);
+                        break;
+                        
+                    case "bitrate":
+                        updateBitrate((Integer) configValue);
+                        break;
+                        
+                    case "fps":
+                        updateFrameRate((Integer) configValue);
+                        break;
+                        
+                    case "orientation":
+                        updateOrientation((Integer) configValue);
+                        break;
+                        
+                    case "mirror":
+                        updateMirrorState((Boolean) configValue);
+                        break;
+                        
+                    case "flip":
+                        updateFlipState((Boolean) configValue);
+                        break;
+                        
+                    case "quality":
+                        updateQuality((String) configValue);
+                        break;
+                        
+                    default:
+                        Log.w(TAG, "Unknown configuration key: " + configKey);
+                        break;
+                }
+                
+                Log.d(TAG, "Configuration updated successfully: " + configKey);
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to update configuration: " + configKey, e);
+            }
+        });
+    }
+
+    /**
+     * Update resolution dynamically
+     */
+    private void updateResolution(String resolution) {
+        try {
+            String[] parts = resolution.split("x");
+            if (parts.length == 2) {
+                int width = Integer.parseInt(parts[0]);
+                int height = Integer.parseInt(parts[1]);
+                
+                // Update video size
+                if (videoSize != null) {
+                    videoSize = new Streamer.Size(width, height);
+                }
+                if (recordSize != null) {
+                    recordSize = new Streamer.Size(width, height);
+                }
+                
+                mScreenWidth = width;
+                mScreenHeight = height;
+                
+                // Update camera texture size
+                if (cameraTexture != null) {
+                    cameraTexture.setDefaultBufferSize(width, height);
+                }
+                
+                Log.d(TAG, "Resolution updated to: " + resolution);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to update resolution: " + resolution, e);
+        }
+    }
+
+    /**
+     * Update bitrate dynamically
+     */
+    private void updateBitrate(int bitrate) {
+        try {
+            // Update streamer bitrate if streaming
+            if (mStreamer != null && mStreaming) {
+                mStreamer.setBitrate(bitrate);
+                Log.d(TAG, "Streaming bitrate updated to: " + bitrate);
+            }
+            
+            // Update recorder bitrate if recording
+            if (mRecorder != null && mRecording) {
+                mRecorder.setBitrate(bitrate);
+                Log.d(TAG, "Recording bitrate updated to: " + bitrate);
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to update bitrate: " + bitrate, e);
+        }
+    }
+
+    /**
+     * Update frame rate dynamically
+     */
+    private void updateFrameRate(int fps) {
+        try {
+            // Update streamer frame rate if streaming
+            if (mStreamer != null && mStreaming) {
+                mStreamer.setFramerate(fps);
+                Log.d(TAG, "Streaming frame rate updated to: " + fps);
+            }
+            
+            // Update recorder frame rate if recording
+            if (mRecorder != null && mRecording) {
+                mRecorder.setFramerate(fps);
+                Log.d(TAG, "Recording frame rate updated to: " + fps);
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to update frame rate: " + fps, e);
+        }
+    }
+
+    /**
+     * Update orientation dynamically
+     */
+    private void updateOrientation(int orientation) {
+        try {
+            setRotation(orientation);
+            updateDisplayOrientation();
+            precalculateTransforms();
+            
+            Log.d(TAG, "Orientation updated to: " + orientation);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to update orientation: " + orientation, e);
+        }
+    }
+
+    /**
+     * Update mirror state dynamically
+     */
+    private void updateMirrorState(boolean mirror) {
+        try {
+            setMirror(mirror);
+            precalculateTransforms();
+            
+            Log.d(TAG, "Mirror state updated to: " + mirror);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to update mirror state: " + mirror, e);
+        }
+    }
+
+    /**
+     * Update flip state dynamically
+     */
+    private void updateFlipState(boolean flip) {
+        try {
+            setFlip(flip);
+            precalculateTransforms();
+            
+            Log.d(TAG, "Flip state updated to: " + flip);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to update flip state: " + flip, e);
+        }
+    }
+
+    /**
+     * Update quality dynamically
+     */
+    private void updateQuality(String quality) {
+        try {
+            // Update quality settings based on preset
+            switch (quality.toLowerCase()) {
+                case "low":
+                    updateBitrate(1000000); // 1 Mbps
+                    updateFrameRate(15);
+                    break;
+                    
+                case "medium":
+                    updateBitrate(2500000); // 2.5 Mbps
+                    updateFrameRate(24);
+                    break;
+                    
+                case "high":
+                    updateBitrate(5000000); // 5 Mbps
+                    updateFrameRate(30);
+                    break;
+                    
+                case "ultra":
+                    updateBitrate(8000000); // 8 Mbps
+                    updateFrameRate(60);
+                    break;
+                    
+                default:
+                    Log.w(TAG, "Unknown quality preset: " + quality);
+                    break;
+            }
+            
+            Log.d(TAG, "Quality updated to: " + quality);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to update quality: " + quality, e);
+        }
+    }
+
+    /**
+     * Create streamers and recorders with optimal settings if not already created
+     */
+    public void ensureStreamersCreated() {
+        mCameraHandler.post(() -> {
+            try {
+                if (mStreamer == null) {
+                    createStreamer();
+                }
+                if (mRecorder == null) {
+                    createRecorder();
+                }
+                
+                // Update encoder surfaces if EGL is ready
+                if (eglIsReady && eglCore != null) {
+                    if (mStreamer != null && mStreamer.getEncoderSurface() != null && encoderSurface == null) {
+                        encoderSurface = new WindowSurfaceNew(eglCore, mStreamer.getEncoderSurface(), false);
+                        Log.d(TAG, "Encoder surface created for existing streamer");
+                    }
+                    
+                    if (mRecorder != null && mRecorder.getEncoderSurface() != null && recorderSurface == null) {
+                        recorderSurface = new WindowSurfaceNew(eglCore, mRecorder.getEncoderSurface(), false);
+                        Log.d(TAG, "Recorder surface created for existing recorder");
+                    }
+                }
+                
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to ensure streamers created", e);
+            }
+        });
     }
 }
 
