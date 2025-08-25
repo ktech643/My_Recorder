@@ -252,9 +252,50 @@ public class StreamingFragment extends BaseFragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        try {
+            InternalLogger.d(TAG, "StreamingFragment onAttach starting");
+            CriticalComponentsMonitor.executeComponentSafely("StreamingFragment", () -> {
+                super.onAttach(context);
+                if (context instanceof ActivityFragmentCallbacks) {
+                    mListener = (ActivityFragmentCallbacks) context;
+                } else {
+                    InternalLogger.e(TAG, "Context does not implement ActivityFragmentCallbacks");
+                }
+                InternalLogger.d(TAG, "StreamingFragment onAttach completed successfully");
+            });
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in StreamingFragment onAttach", e);
+            CriticalComponentsMonitor.recordComponentError("StreamingFragment", "onAttach failed", e);
+        }
+    }
+
+    @Override
     public void onDestroyView() {
-        super.onDestroyView();
-        rootView = null; // Avoid memory leaks
+        try {
+            InternalLogger.d(TAG, "StreamingFragment onDestroyView starting");
+            super.onDestroyView();
+            rootView = null; // Avoid memory leaks
+            InternalLogger.d(TAG, "StreamingFragment onDestroyView completed successfully");
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in StreamingFragment onDestroyView", e);
+        }
+    }
+    
+    @Override
+    public void onDestroy() {
+        try {
+            InternalLogger.d(TAG, "StreamingFragment onDestroy starting");
+            CriticalComponentsMonitor.executeComponentSafely("StreamingFragment", () -> {
+                super.onDestroy();
+                // Clean up resources
+                mActivity = null;
+                mListener = null;
+                InternalLogger.d(TAG, "StreamingFragment onDestroy completed successfully");
+            });
+        } catch (Exception e) {
+            InternalLogger.e(TAG, "Error in StreamingFragment onDestroy", e);
+        }
     }
 
     @Override
@@ -378,9 +419,10 @@ public class StreamingFragment extends BaseFragment {
             rootView = mView;
         }
         
-        // Call the rest of initialization
-        initializeRestOfUIComponents();
-        showInitialLogin();
+        // Complete the onCreateView method by calling the rest of initialization
+        try {
+            initializeRestOfUIComponents();
+            showInitialLogin();
         String login_email = AppPreference.getStr(AppPreference.KEY.LOGIN_EMAIL, "");
         String login_password = AppPreference.getStr(AppPreference.KEY.LOGIN_PASSWORD, "");
         if (!TextUtils.isEmpty(login_email) && !TextUtils.isEmpty(login_password)) {
